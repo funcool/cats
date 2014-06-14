@@ -135,7 +135,7 @@
             b (mg a)]
     (return b)))
 
-
+#+clj
 (defn sequence-m
   [mvs]
   {:pre [(not-empty mvs)]}
@@ -144,6 +144,18 @@
                     vs mvs]
                (return (conj vs v))))
           (with-context (first mvs)
+            (return []))
+          mvs))
+
+#+cljs
+(defn sequence-m
+  [mvs]
+  {:pre [(not-empty mvs)]}
+  (reduce (fn [mvs mv]
+             (cm/mlet [v mv
+                       vs mvs]
+               (return (conj vs v))))
+          (cm/with-context (first mvs)
             (return []))
           mvs))
 
