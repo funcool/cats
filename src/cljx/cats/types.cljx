@@ -32,6 +32,7 @@
   proto/Applicative
   (pure [_ v]
     (Either. v type))
+
   (fapply [s av]
     (case type
       :right (proto/fmap av v)
