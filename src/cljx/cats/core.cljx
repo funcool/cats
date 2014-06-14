@@ -5,7 +5,7 @@
   (:require-macros [cats.core :as cm]))
 
 
-(def ^{:dynamic true :private true} *m-context*)
+(def ^{:dynamic true} *m-context*)
 
 #+clj
 (defmacro with-context
