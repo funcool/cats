@@ -14,7 +14,7 @@
          :dependencies [[org.clojure/clojurescript "0.0-2227"]
                         [org.clojure/tools.namespace "0.2.4"]
                         [com.cemerick/clojurescript.test "0.3.1"]]
-         :prep-tasks ["cljx" "javac" "compile"]
+         ;; :prep-tasks ["cljx" "javac" "compile"]
          :plugins [[com.keminglabs/cljx "0.4.0"]
                    [com.cemerick/clojurescript.test "0.3.1"]
                    [lein-cljsbuild "1.0.3"]]
