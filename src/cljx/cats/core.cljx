@@ -80,9 +80,11 @@
   (when-not (and (vector? bindings) (even? (count bindings)))
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
   (if (seq bindings)
-    (let [sym (get bindings 0)
-          monad (get bindings 1)]
-      `(bind ~monad
-             (fn [~sym]
-               (mlet ~(subvec bindings 2) ~body))))
+    (let [l (get bindings 0)
+          r (get bindings 1)]
+      (if (= :let l)
+        `(let ~r (mlet ~(subvec bindings 2) ~body))
+        `(bind ~r
+               (fn [~l]
+                 (mlet ~(subvec bindings 2) ~body)))))
     body))
