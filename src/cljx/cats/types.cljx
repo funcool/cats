@@ -159,3 +159,80 @@
     (vec (for [f self
                v av]
            (f v)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Pair (State monad related)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(deftype Pair [fst snd]
+  clojure.lang.Seqable
+  (seq [_] (list fst snd))
+
+  clojure.lang.Indexed
+  (nth [_ i]
+    (case i
+      0 fst
+      1 snd
+      (throw (IndexOutOfBoundsException.))))
+
+  (nth [_ i notfound]
+    (case i
+      0 fst
+      1 snd
+      notfound))
+
+  clojure.lang.Counted
+  (count [_] 2)
+
+  Object
+  (equals [this other]
+    (if (instance? Pair other)
+      (and (= (.fst this) (.fst other))
+           (= (.snd this) (.snd other)))
+      false))
+
+  (toString [this]
+    (with-out-str (print [fst snd]))))
+
+(defn pair
+  [fst snd]
+  (Pair. fst snd))
+
+(defn pair?
+  [v]
+  (instance? Pair v))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; State Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(declare state-t)
+
+(deftype State [mfn]
+  proto/Monad
+  (bind [self f]
+    (-> (fn [s]
+          (let [p        (mfn s)
+                value    (.fst p)
+                newstate (.snd p)]
+            ((f value) newstate)))
+        (state-t)))
+
+  clojure.lang.IFn
+  (invoke [self seed]
+    (mfn seed))
+
+  proto/Applicative
+  (pure [_ v]
+    (State. (fn [s] (pair v s))))
+  (fapply [_ av]
+    (throw (RuntimeException. "Not implemented"))))
+
+(defn state-t
+  "Transform a simple state-monad function
+  to State class instance.
+  State class instance work as simple wrapper
+  for standard clojure function, just for avoid
+  extend plain function type of clojure."
+  [f]
+  (State. f))

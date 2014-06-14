@@ -187,3 +187,67 @@
 (defn for-m
   [vs mf]
   (map-m mf vs))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; State monad functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn get-state
+  "Return State instance with computation that returns
+  the current state."
+  []
+  (-> (fn [s] (types/pair s s))
+      (types/state-t)))
+
+(defn put-state
+  "Return State instance with computation that replaces
+  the current state with specified new state."
+  [newstate]
+  (-> (fn [s] (types/pair s newstate))
+      (types/state-t)))
+
+(defn swap-state
+  [f]
+  "Return State instance with computation that applies
+  specified function to state and return the old state."
+  (-> (fn [s] (types/pair s (f s)))
+      (types/state-t)))
+
+(defn run-state
+  "Given a State instance, execute the
+  wrapped computation and return Pair
+  instance with result and new state.
+
+  (def computation (mlet [x (get-state)
+                          y (put-state (inc x))]
+                     (return y)))
+
+  (def initial-state 1)
+  (run-state computation initial-state)
+
+  This should be return something to: #<Pair [1 2]>"
+  [state seed]
+  #+clj
+  (with-context state
+    (state seed))
+  #+cljs
+  (cm/with-context state
+    (state seed)))
+
+(defn eval-state
+  "Given a State instance, execute the
+  wrapped computation and return the resultant
+  value, ignoring the state.
+  Shortly, return the first value of pair instance
+  returned by `run-state` function."
+  [state seed]
+  (first (run-state state seed)))
+
+(defn exec-state
+  "Given a State instance, execute the
+  wrapped computation and return the resultant
+  state.
+  Shortly, return the second value of pair instance
+  returned by `run-state` function."
+  [state seed]
+  (second (run-state state seed)))
