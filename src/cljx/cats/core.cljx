@@ -78,8 +78,11 @@
 
 (defn <$>
   "Alias of fmap."
-  [f fv]
-  (p/fmap fv f))
+  ([f]
+     (fn [fv]
+       (p/fmap fv f)))
+  ([f fv]
+     (p/fmap fv f)))
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
