@@ -62,16 +62,16 @@
 
 (defn left?
   [mv]
-  (= (.type mv) :left))
+  (= (.-type mv) :left))
 
 (defn right?
   [mv]
-  (= (.type mv) :right))
+  (= (.-type mv) :right))
 
 (defn from-either
   "Return inner value of either monad."
   [mv]
-  (.v mv))
+  (.-v mv))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Maybe
@@ -219,8 +219,8 @@
   Object
   (equals [this other]
     (if (instance? Pair other)
-      (and (= (.fst this) (.fst other))
-           (= (.snd this) (.snd other)))
+      (and (= (.-fst this) (.-fst other))
+           (= (.-snd this) (.-snd other)))
       false))
 
   (toString [this]
@@ -249,8 +249,8 @@
   (bind [self f]
     (-> (fn [s]
           (let [p        (mfn s)
-                value    (.fst p)
-                newstate (.snd p)]
+                value    (.-fst p)
+                newstate (.-snd p)]
             ((f value) newstate)))
         (state-t)))
 
