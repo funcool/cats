@@ -140,7 +140,6 @@
 ;; Clojure types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 #+clj
 (extend-type clojure.lang.PersistentVector
   proto/Monad
@@ -149,7 +148,7 @@
 
   proto/MonadPlus
   (mzero [_] [])
-  (mplus [mv mv'] (vec (concat mv mv')))
+  (mplus [mv mv'] (into mv mv'))
 
   proto/Functor
   (fmap [self f] (vec (map f self)))
