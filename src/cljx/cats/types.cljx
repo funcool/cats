@@ -113,3 +113,16 @@
 (defn nothing
   []
   (Nothing.))
+
+(defn maybe?
+  [v]
+  (or (instance? Just v)
+      (instance? Nothing v)))
+
+(defn just?
+  [v]
+  (instance? Just v))
+
+(defn nothing?
+  [v]
+  (instance? Nothing v))
