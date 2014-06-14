@@ -88,3 +88,18 @@
                (fn [~l]
                  (mlet ~(subvec bindings 2) ~body)))))
     body))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monadic helpers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn sequence-m
+  [mvs]
+  {:pre [(not-empty mvs)]}
+  (reduce (fn [mvs mv]
+             (mlet [v mv
+                    vs mvs]
+               (return (conj vs v))))
+          (with-context (first mvs)
+            (return []))
+          mvs))
