@@ -135,3 +135,28 @@
 (defn nothing?
   [v]
   (instance? Nothing v))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clojure types
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+#+clj
+(extend-type clojure.lang.PersistentVector
+  proto/Monad
+  (bind [self f]
+    (vec (flatten (map f self))))
+
+  proto/MonadPlus
+  (mzero [_] [])
+  (mplus [mv mv'] (vec (concat mv mv')))
+
+  proto/Functor
+  (fmap [self f] (vec (map f self)))
+
+  proto/Applicative
+  (pure [_ v] [v])
+  (fapply [self av]
+    (vec (for [f self
+               v av]
+           (f v)))))

@@ -1,7 +1,6 @@
 (ns cats.core
   "Category Theory abstractions for Clojure"
-  (:require [cats.protocols :as p]
-            [cats.types :as types])
+  (:require [cats.protocols :as p])
   #+cljs
   (:require-macros [cats.core :as cm]))
 
