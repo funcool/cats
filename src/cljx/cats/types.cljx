@@ -1,17 +1,29 @@
 (ns cats.types
   "Monadic types definition."
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            #+cljs [cljs.core]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Either
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Either [v type]
+  #+clj
   Object
+  #+clj
   (equals [self other]
     (if (instance? Either other)
-      (and (= v (.v other))
-           (= type (.type other)))
+      (and (= v (.-v other))
+           (= type (.-type other)))
+      false))
+
+  #+cljs
+  cljs.core/IEquiv
+  #+cljs
+  (-equiv [self other]
+    (if (instance? Either other)
+      (and (= v (.-v other))
+           (= type (.-type other)))
       false))
 
   (toString [self]
@@ -66,8 +78,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Nothing []
+  #+clj
   Object
+  #+clj
   (equals [_ other]
+    (instance? Nothing other))
+
+  #+cljs
+  cljs.core/IEquiv
+  #+cljs
+  (-equiv [_ other]
     (instance? Nothing other))
 
   (toString [_]
@@ -88,10 +108,20 @@
   (fapply [s av] s))
 
 (deftype Just [v]
+  #+clj
   Object
+  #+clj
   (equals [self other]
     (if (instance? Just other)
-      (= v (.v other))
+      (= v (.-v other))
+      false))
+
+  #+cljs
+  cljs.core/IEquiv
+  #+cljs
+  (-equiv [_ other]
+    (if (instance? Just other)
+      (= v (.-v other))
       false))
 
   (toString [self]
@@ -127,7 +157,7 @@
 (defn maybe?
   [v]
   (or (instance? Just v)
-     (instance? Nothing v)))
+      (instance? Nothing v)))
 
 (defn just?
   [v]
@@ -165,6 +195,7 @@
 ;; Pair (State monad related)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+clj
 (deftype Pair [fst snd]
   clojure.lang.Seqable
   (seq [_] (list fst snd))
@@ -195,10 +226,12 @@
   (toString [this]
     (with-out-str (print [fst snd]))))
 
+#+clj
 (defn pair
   [fst snd]
   (Pair. fst snd))
 
+#+clj
 (defn pair?
   [v]
   (instance? Pair v))
@@ -207,8 +240,10 @@
 ;; State Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+clj
 (declare state-t)
 
+#+clj
 (deftype State [mfn]
   proto/Monad
   (bind [self f]
@@ -229,6 +264,7 @@
   (fapply [_ av]
     (throw (RuntimeException. "Not implemented"))))
 
+#+clj
 (defn state-t
   "Transform a simple state-monad function
   to State class instance.

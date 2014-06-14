@@ -17,7 +17,6 @@
       (is (t/maybe? m1))
       (is (t/just? m1))))
 
-  #+clj
   (testing "Test fmap"
     (let [m1 (t/just 1)
           m2 (t/nothing)]
