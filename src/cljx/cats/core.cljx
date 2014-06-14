@@ -89,13 +89,13 @@
 
 #+clj
 (defmacro mlet
-  [bindings body]
+  [bindings & body]
   (when-not (and (vector? bindings) (even? (count bindings)))
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
   (if (seq bindings)
     (let [l (get bindings 0)
           r (get bindings 1)
-          next-mlet `(mlet ~(subvec bindings 2) ~body)]
+          next-mlet `(mlet ~(subvec bindings 2) ~@body)]
       (condp = l
         :let `(let ~r ~next-mlet)
         :when `(bind (guard ~r)
@@ -104,7 +104,7 @@
         `(bind ~r
                (fn [~l]
                  ~next-mlet))))
-    body))
+    `(do ~@body)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic functions
