@@ -1,6 +1,7 @@
 (ns cats.core
   "Category Theory abstractions for Clojure"
-  (:require [cats.protocols :as p])
+  (:require [cats.protocols :as p]
+            [cats.types :as t])
   #+cljs
   (:require-macros [cats.core :as cm]))
 
@@ -196,22 +197,22 @@
   "Return State instance with computation that returns
   the current state."
   []
-  (-> (fn [s] (types/pair s s))
-      (types/state-t)))
+  (-> (fn [s] (t/pair s s))
+      (t/state-t)))
 
 (defn put-state
   "Return State instance with computation that replaces
   the current state with specified new state."
   [newstate]
-  (-> (fn [s] (types/pair s newstate))
-      (types/state-t)))
+  (-> (fn [s] (t/pair s newstate))
+      (t/state-t)))
 
 (defn swap-state
   [f]
   "Return State instance with computation that applies
   specified function to state and return the old state."
-  (-> (fn [s] (types/pair s (f s)))
-      (types/state-t)))
+  (-> (fn [s] (t/pair s (f s)))
+      (t/state-t)))
 
 (defn run-state
   "Given a State instance, execute the
