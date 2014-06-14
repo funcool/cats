@@ -34,7 +34,7 @@
                           :output-path "target/testclasses"
                           :rules :cljs}]}}
 
-   :test [:dev {:hooks [leiningen.cljsbuild]
+   :test [:dev {:hooks [cljx.hooks leiningen.cljsbuild]
                 :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
                                                           "target/tests.js"]}
                             :builds {:test {:source-paths ["target/testclasses"
