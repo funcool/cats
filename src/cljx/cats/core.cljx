@@ -50,6 +50,12 @@
   [mv mv']
   (p/mplus mv mv'))
 
+(defn guard
+  [b]
+  (if b
+    (return nil)
+    (mzero)))
+
 (defn fmap
   "Apply a function f to the value inside functor's fv
   preserving the context type."
@@ -89,12 +95,16 @@
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
   (if (seq bindings)
     (let [l (get bindings 0)
-          r (get bindings 1)]
-      (if (= :let l)
-        `(let ~r (mlet ~(subvec bindings 2) ~body))
+          r (get bindings 1)
+          next-mlet `(mlet ~(subvec bindings 2) ~body)]
+      (condp = l
+        :let `(let ~r ~next-mlet)
+        :when `(bind (guard ~r)
+                     (fn [~(gensym)]
+                       ~next-mlet))
         `(bind ~r
                (fn [~l]
-                 (mlet ~(subvec bindings 2) ~body)))))
+                 ~next-mlet))))
     body))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
