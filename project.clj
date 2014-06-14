@@ -1,7 +1,7 @@
 (defproject cats "0.1.0-SNAPSHOT"
   :description "Category Theory abstractions for Clojure"
   :url "https://github.com/niwibe/cats"
-  :license {:name "BSD (2 Caluse)"
+  :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
   :dependencies [[org.clojure/clojure "1.6.0"]]
   :source-paths ["target/classes"]
