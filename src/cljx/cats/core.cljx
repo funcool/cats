@@ -42,6 +42,14 @@
   (cm/with-context mv
     (p/bind mv f)))
 
+(defn mzero
+  []
+  (p/mzero *m-context*))
+
+(defn mplus
+  [mv mv']
+  (p/mplus mv mv'))
+
 (defn fmap
   "Apply a function f to the value inside functor's fv
   preserving the context type."

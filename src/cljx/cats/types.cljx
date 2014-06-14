@@ -64,6 +64,28 @@
 ;; Maybe
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(deftype Nothing []
+  Object
+  (equals [_ other]
+    (instance? Nothing other))
+
+  (toString [_]
+    (with-out-str (print "")))
+
+  proto/Monad
+  (bind [s f] s)
+
+  proto/MonadPlus
+  (mzero [_] (Nothing.))
+  (mplus [_ mv] mv)
+
+  proto/Functor
+  (fmap [s f] s)
+
+  proto/Applicative
+  (pure [s v] s)
+  (fapply [s av] s))
+
 (deftype Just [v]
   Object
   (equals [self other]
@@ -78,6 +100,11 @@
   (bind [self f]
     (f v))
 
+  proto/MonadPlus
+  (mzero [_]
+    (Nothing.))
+  (mplus [mv _] mv)
+
   proto/Functor
   (fmap [s f]
     (Just. (f v)))
@@ -87,24 +114,6 @@
     (Just. v))
   (fapply [_ av]
     (proto/fmap av v)))
-
-(deftype Nothing []
-  Object
-  (equals [_ other]
-    (instance? Nothing other))
-
-  (toString [_]
-    (with-out-str (print "")))
-
-  proto/Monad
-  (bind [s f] s)
-
-  proto/Functor
-  (fmap [s f] s)
-
-  proto/Applicative
-  (pure [s v] s)
-  (fapply [s av] s))
 
 (defn just
   [v]
@@ -117,7 +126,7 @@
 (defn maybe?
   [v]
   (or (instance? Just v)
-      (instance? Nothing v)))
+     (instance? Nothing v)))
 
 (defn just?
   [v]
