@@ -9,15 +9,18 @@
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :profiles
-  {:dev {:hooks [cljx.hooks
-                 leiningen.cljsbuild]
+  {:dev {:hooks [cljx.hooks]
          :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
          :dependencies [[org.clojure/clojurescript "0.0-2227"]
+                        [org.clojure/tools.namespace "0.2.4"]
                         [com.cemerick/clojurescript.test "0.3.1"]]
+         :prep-tasks ["cljx" "javac" "compile"]
          :plugins [[com.keminglabs/cljx "0.4.0"]
                    [com.cemerick/clojurescript.test "0.3.1"]
                    [lein-cljsbuild "1.0.3"]]
-         :prep-tasks ["cljx" "javac" "compile"]
+         :injections [(use '[clojure.tools.namespace.repl :only (refresh)])
+                      (require '[cats.types :as t])
+                      (require '[cats.core :as m])]
          :cljx {:builds [{:source-paths ["src/cljx"]
                           :output-path "target/classes"
                           :rules :clj}
@@ -29,13 +32,15 @@
                           :rules :clj}
                          {:source-paths ["tests"]
                           :output-path "target/testclasses"
-                          :rules :cljs}]}
-         :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
-                                                   "target/tests.js"]}
-                     :builds {:test {:source-paths ["target/testclasses"
-                                                    "target/classes"]
-                                     :compiler {:output-to "target/tests.js"
-                                                :optimizations :simple
-                                                :pretty-print true}}}}}})
+                          :rules :cljs}]}}
+
+   :test [:dev {:hooks [leiningen.cljsbuild]
+                :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
+                                                          "target/tests.js"]}
+                            :builds {:test {:source-paths ["target/testclasses"
+                                                           "target/classes"]
+                                            :compiler {:output-to "target/tests.js"
+                                                       :optimizations :simple
+                                                       :pretty-print true}}}}}]})
 
 
