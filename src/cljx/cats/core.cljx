@@ -62,12 +62,6 @@
   ([mv f & fs]
      (reduce bind mv (cons f fs))))
 
-(defn =<<
-  "Same as the two argument version of `>>=` but with the
-  arguments interchanged."
-  [f mv]
-  (>>= mv f))
-
 (defn <$>
   "Alias of fmap."
   [f fv]
@@ -96,8 +90,51 @@
     body))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monadic helpers
+;; Monadic functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn =<<
+  "Same as the two argument version of `>>=` but with the
+  arguments interchanged."
+  [f mv]
+  (>>= mv f))
+
+#+clj
+(defn >=>
+  [mf mg x]
+  "Left-to-right composition of monads."
+  (mlet [a (mf x)
+         b (mg a)]
+    (return b)))
+
+#+cljs
+(defn >=>
+  [mf mg x]
+  "Left-to-right composition of monads."
+  (cm/mlet [a (mf x)
+            b (mg a)]
+    (return b)))
+
+#+clj
+(defn <=<
+  [mg mf x]
+  "Right-to-left composition of monads.
+
+  Same as `>=>` with its first two arguments flipped."
+  (mlet [a (mf x)
+         b (mg a)]
+    (return b)))
+
+#+cljs
+(defn <=<
+  [mg mf x]
+  "Right-to-left composition of monads.
+
+  Same as `>=>` with its first two arguments flipped."
+  (cm/mlet [a (mf x)
+            b (mg a)]
+    (return b)))
+
 
 (defn sequence-m
   [mvs]
