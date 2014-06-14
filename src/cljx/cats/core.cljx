@@ -93,6 +93,11 @@
 ;; Monadic functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn join
+  "Remove one level of monadic structure."
+  [mv]
+  (bind mv identity))
+
 (defn =<<
   "Same as the two argument version of `>>=` but with the
   arguments interchanged."
