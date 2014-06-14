@@ -103,3 +103,10 @@
           (with-context (first mvs)
             (return []))
           mvs))
+
+(def ^{:arglist '([mf vs])}
+     map-m (comp sequence-m map))
+
+(defn for-m
+  [vs mf]
+  (map-m mf vs))
