@@ -62,6 +62,12 @@
   ([mv f & fs]
      (reduce bind mv (cons f fs))))
 
+(defn =<<
+  "Same as the two argument version of `>>=` but with the
+  arguments interchanged."
+  [f mv]
+  (>>= mv f))
+
 (defn <$>
   "Alias of fmap."
   [f fv]
