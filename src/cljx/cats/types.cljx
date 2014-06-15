@@ -96,8 +96,10 @@
   proto/Monad
   (bind [s f] s)
 
-  proto/MonadPlus
+  proto/MonadZero
   (mzero [_] (Nothing.))
+
+  proto/MonadPlus
   (mplus [_ mv] mv)
 
   proto/Functor
@@ -131,9 +133,10 @@
   (bind [self f]
     (f v))
 
+  proto/MonadZero
+  (mzero [_] (Nothing.))
+
   proto/MonadPlus
-  (mzero [_]
-    (Nothing.))
   (mplus [mv _] mv)
 
   proto/Functor
@@ -177,8 +180,10 @@
   (bind [self f]
     (vec (flatten (map f self))))
 
-  proto/MonadPlus
+  proto/MonadZero
   (mzero [_] [])
+
+  proto/MonadPlus
   (mplus [mv mv'] (into mv mv'))
 
   proto/Functor

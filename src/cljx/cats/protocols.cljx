@@ -5,10 +5,13 @@
   "Incomplete monad type definition."
   (bind [mv f] "Applies the function f to the value(s) inside mv's context."))
 
+(defprotocol MonadZero
+  "A `Monad` that supports the notion of an identity element."
+  (mzero [ctx] "The identity element for `ctx`."))
+
 (defprotocol MonadPlus
-  "A monad that also supports failure."
-  (mzero [ctx] "The identity of `mplus`.")
-  (mplus [mv mv'] "An associative operation."))
+  "A `MonadZero` that supports the notion of addition."
+  (mplus [mv mv'] "An associative addition operation."))
 
 (defprotocol Functor
   (fmap [fv f] "Applies function f to the value(s) inside the context of the functor fv."))
