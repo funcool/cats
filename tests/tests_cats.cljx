@@ -11,6 +11,23 @@
             [cats.core :as m]
             [cats.types :as t]))
 
+
+(deftest test-mlet
+  (testing "It supports regular let inside its bindings")
+    (is (= (t/just 2)
+           (m/mlet [i (t/just 1)
+                    :let [i (inc i)]]
+                   (m/return i))))
+  (testing "It supports :when guards inside its bindings")
+    (is (= (t/nothing)
+           (m/mlet [i (t/just 2)
+                    :when (> i 2)]
+                   (m/return i))))
+    (is (= [3 4 5]
+           (m/mlet [i [1 2 3 4 5]
+                    :when (> i 2)]
+                   (m/return i)))))
+
 (deftest test-maybe
   (testing "Test predicates"
     (let [m1 (t/just 1)]
