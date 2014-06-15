@@ -258,3 +258,13 @@
   returned by `run-state` function."
   [state seed]
   (second (run-state state seed)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Continuation monad functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn run-cont
+  [cont]
+  "Given a Continuation instance, execute the
+  wrapped computation and return its value."
+  (cont identity))

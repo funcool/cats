@@ -278,3 +278,34 @@
   extend plain function type of clojure."
   [f]
   (State. f))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Continuation Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#+clj
+(deftype Continuation [mfn]
+  proto/Monad
+  (bind [self mf]
+    (Continuation. (fn [c]
+                     (self (fn [v]
+                             ((mf v) c))))))
+
+  clojure.lang.IFn
+  (invoke [self f]
+    (mfn f))
+
+  proto/Applicative
+  (pure [_ v]
+    (Continuation. (fn [c] (c v))))
+  (fapply [_ av]
+    (throw (RuntimeException. "Not implemented"))))
+
+#+clj
+(defn call-cc
+  [f]
+  (Continuation.
+    (fn [c]
+      (let [cc (Continuation. (fn [a]
+                                (fn [_] (c a))))]
+        ((f cc) c)))))
