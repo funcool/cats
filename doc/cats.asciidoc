@@ -1,7 +1,7 @@
 Category Theory abstractions for Clojure
 ========================================
 Andrey Antukh & Alejandro Gómez
-0.2.0b1, 2014-06-06
+0.1.0, 2014-06-06
 
 :toc:
 
@@ -101,7 +101,7 @@ Functor
 
 The Functor class is the most basic and ubiquitous type class in the _cats_ libraries. A simple intuition is that
 a Functor represents a "container" of some sort, along with the ability to apply a function uniformly to every
-xelement in the container. For example, a list is a container of elements, and we can apply a function to every
+element in the container. For example, a list is a container of elements, and we can apply a function to every
 element of a list, using map. As another example, a binary tree is also a container of elements, and it’s not
 hard to come up with a way to recursively apply a function to every element in a tree.
 
@@ -123,7 +123,7 @@ Definition
 [NOTE]
 ====
 The real fmap signature is `(a -> b) -> f a -> f b` that can be traslated to clojure `[f fv]`. The changed
-order on protocol definition is required because of clojure's protocols limitation on dispatch on first 
+order on protocol definition is required because of clojure's protocols limitation on dispatch on first
 argument. You should not use protocol function directly, for it, `cats.core/fmap` exists and has the correct
 signature.
 ====
