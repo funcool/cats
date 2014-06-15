@@ -306,6 +306,10 @@
   [f]
   (Continuation.
     (fn [c]
-      (let [cc (Continuation. (fn [a]
-                                (fn [_] (c a))))]
+      (let [cc (fn [a] (Continuation. (fn [_] (c a))))]
         ((f cc) c)))))
+
+#+clj
+(defn halt
+  [x]
+  (Continuation. (fn [c] x)))

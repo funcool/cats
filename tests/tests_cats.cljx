@@ -66,3 +66,19 @@
           m2 (t/nothing)]
       (is (= (m/fmap inc m1) (t/just 2)))
       (is (= (m/fmap inc m2) (t/nothing))))))
+
+#+clj
+(deftest test-continuation-monad
+  (testing "Allows the creation of resumable computations."
+    (let [cc (atom nil)]
+      (is (= 44
+             (m/run-cont (mlet [x (t/->Continuation (fn [c] (c 42)))
+                                y (t/call-cc (fn [k]
+                                             (reset! cc k)
+                                             (k 2)))]
+                               (m/return (+ x y))))))
+      (is (= 45
+             (m/run-cont (@cc 3))))
+      (is (= 46
+             (m/run-cont (@cc 4)))))))
+
