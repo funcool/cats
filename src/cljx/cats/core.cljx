@@ -208,8 +208,9 @@
   "
   [f]
   (fn [& args]
-    (#+clj mlet #+cljs cm/mlet [vs (sequence-m args)]
-      (return (apply f vs)))))
+    (#+clj  mlet
+     #+cljs cm/mlet [vs (sequence-m args)]
+                    (return (apply f vs)))))
 
 (defn filter-m
   "Applies a predicate to a value in a `MonadZero` instance,
@@ -226,7 +227,7 @@
       ;=> <Nothing>
   "
   [p mv]
-  (#+clj mlet
+  (#+clj  mlet
    #+cljs cm/mlet [v mv
                   :when (p v)]
                   (return v)))
