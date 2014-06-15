@@ -8,12 +8,20 @@
   :test-paths ["target/testclasses"]
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
+  :release-tasks [["cljx" "once"]
+                  ["deploy" "clojars"]]
+  :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
+                                            "target/tests.js"]}
+              :builds {:test {:source-paths ["target/testclasses"
+                                             "target/classes"]
+                              :compiler {:output-to "target/tests.js"
+                                         :optimizations :simple
+                                         :pretty-print true}}}}
   :profiles
   {:common {:hooks [cljx.hooks]
             :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
             :dependencies [[org.clojure/clojurescript "0.0-2227"]
                            [org.clojure/tools.namespace "0.2.4"]]
-            ;; :prep-tasks ["cljx" "javac" "compile"]
             :plugins [[com.cemerick/clojurescript.test "0.3.1"]
                       [com.keminglabs/cljx "0.4.0" :exclusions [org.clojure/clojure]]
                       [lein-cljsbuild "1.0.3"]]
@@ -29,16 +37,7 @@
                             {:source-paths ["tests"]
                              :output-path "target/testclasses"
                              :rules :cljs}]}}
-   :dev [:common {:injections [(use '[clojure.tools.namespace.repl :only (refresh)])
-                               (require '[cats.types :as t])
-                               (require '[cats.core :as m])]}]
-   :test [:common {:hooks [cljx.hooks leiningen.cljsbuild]
-                :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
-                                                          "target/tests.js"]}
-                            :builds {:test {:source-paths ["target/testclasses"
-                                                           "target/classes"]
-                                            :compiler {:output-to "target/tests.js"
-                                                       :optimizations :simple
-                                                       :pretty-print true}}}}}]})
+   :dev [:common {:injections [(use '[clojure.tools.namespace.repl :only (refresh)])]}]
+   :test [:common {:hooks [cljx.hooks leiningen.cljsbuild]}]})
 
 
