@@ -267,4 +267,6 @@
   [cont]
   "Given a Continuation instance, execute the
   wrapped computation and return its value."
-  (cont identity))
+  (#+clj  with-context
+   #+cljs cm/with-context cont
+    (cont identity)))
