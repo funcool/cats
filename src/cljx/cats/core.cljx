@@ -188,9 +188,28 @@
 (def ^{:arglist '([mf vs])}
      map-m (comp sequence-m map))
 
+; TODO: docstring
 (defn for-m
   [vs mf]
   (map-m mf vs))
+
+(defn lift-m
+  "Lifts a function to a monadic context.
+
+      (require '[cats.types :as t])
+
+      (def monad+ (lift-m +))
+
+      (monad+ (t/just 1) (t/just 2))
+      ;=> <Just [3]>
+
+      (monad+ (t/just 1) (t/nothing))
+      ;=> <Nothing>
+  "
+  [f]
+  (fn [& args]
+    (#+clj mlet #+cljs cm/mlet [vs (sequence-m args)]
+      (return (apply f vs)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions

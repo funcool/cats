@@ -29,6 +29,14 @@
                     :when (> i 2)]
                    (m/return i)))))
 
+(deftest test-lift-m
+  (testing "It can lift a function to the Maybe monad"
+    (let [monad+ (m/lift-m +)]
+      (is (= (t/just 6)
+             (monad+ (t/just 1) (t/just 2) (t/just 3))))
+      (is (= (t/nothing)
+             (monad+ (t/just 1) (t/nothing)))))))
+
 (deftest test-maybe
   (testing "Test predicates"
     (let [m1 (t/just 1)]
