@@ -11,7 +11,8 @@
             [cats.core :as m]
             [cats.types :as t]))
 
-
+; FIXME: cljs
+#+clj
 (deftest test-mlet
   (testing "It supports regular let inside its bindings")
     (is (= (t/just 2)
@@ -40,7 +41,6 @@
       (is (= (m/fmap inc m1) (t/just 2)))
       (is (= (m/fmap inc m2) (t/nothing)))))
 
-  #+clj
   (testing "sequence-m"
     (is (= (m/sequence-m [(t/just 2) (t/just 3)])
            (t/just [2 3])))

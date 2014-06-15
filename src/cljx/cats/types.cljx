@@ -171,8 +171,8 @@
 ;; Clojure types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
-(extend-type clojure.lang.PersistentVector
+(extend-type #+clj clojure.lang.PersistentVector
+             #+cljs cljs.core.PersistentVector
   proto/Monad
   (bind [self f]
     (vec (flatten (map f self))))
