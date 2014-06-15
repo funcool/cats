@@ -37,6 +37,17 @@
       (is (= (t/nothing)
              (monad+ (t/just 1) (t/nothing)))))))
 
+(deftest test-filter-m
+  (testing "It can filter Maybe monadic values"
+    (let [bigger-than-4 (partial < 4)]
+      (is (= (t/just 6)
+             (m/filter-m bigger-than-4 (t/just 6))))
+      (is (= (t/nothing)
+             (m/filter-m bigger-than-4 (t/just 3))))))
+  (testing "It can filter vectors"
+    (is (= [1 3 5]
+           (m/filter-m odd? [1 2 3 4 5 6])))))
+
 (deftest test-maybe
   (testing "Test predicates"
     (let [m1 (t/just 1)]

@@ -211,6 +211,26 @@
     (#+clj mlet #+cljs cm/mlet [vs (sequence-m args)]
       (return (apply f vs)))))
 
+(defn filter-m
+  "Applies a predicate to a value in a `MonadZero` instance,
+  returning the identity element when the predicate yields false.
+
+  Otherwise, returns the instance unchanged.
+
+      (require '[cats.types :as t])
+
+      (filter-m (partial < 2) (t/just 3))
+      ;=> <Just [3]>
+
+      (filter-m (partial < 4) (t/just 3))
+      ;=> <Nothing>
+  "
+  [p mv]
+  (#+clj mlet
+   #+cljs cm/mlet [v mv
+                  :when (p v)]
+                  (return v)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
