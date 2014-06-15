@@ -29,6 +29,13 @@
                  :when (> i 2)]
                  (m/return i)))))
 
+(deftest test-sequence-m
+  (testing "It works with Maybe values"
+    (is (= (m/sequence-m [(t/just 2) (t/just 3)])
+           (t/just [2 3])))
+    (is (= (m/sequence-m [(t/just 2) (t/nothing)])
+           (t/nothing)))))
+
 (deftest test-lift-m
   (testing "It can lift a function to the Maybe monad"
     (let [monad+ (m/lift-m +)]
@@ -58,10 +65,4 @@
     (let [m1 (t/just 1)
           m2 (t/nothing)]
       (is (= (m/fmap inc m1) (t/just 2)))
-      (is (= (m/fmap inc m2) (t/nothing)))))
-
-  (testing "sequence-m"
-    (is (= (m/sequence-m [(t/just 2) (t/just 3)])
-           (t/just [2 3])))
-    (is (= (m/sequence-m [(t/just 2) (t/nothing)])
-           (t/nothing)))))
+      (is (= (m/fmap inc m2) (t/nothing))))))
