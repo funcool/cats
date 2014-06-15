@@ -55,6 +55,14 @@
     (is (= [1 3 5]
            (m/filter-m odd? [1 2 3 4 5 6])))))
 
+(deftest test-when-m
+  (testing "It returns the monadic value unchanged when the condition is true"
+    (is (= (t/just 3)
+           (m/when-m true (t/just 3)))))
+  (testing "It returns nil in the monadic context when the condition is false"
+    (is (= [nil]
+           (m/when-m false [])))))
+
 (deftest test-maybe
   (testing "Test predicates"
     (let [m1 (t/just 1)]

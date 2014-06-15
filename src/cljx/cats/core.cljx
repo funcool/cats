@@ -195,6 +195,15 @@
                   :when (p v)]
                   (return v)))
 
+(defn when-m
+  "If the expression is true, returns the monadic value.
+
+  Otherwise, yields nil in a monadic context."
+  [b mv]
+  (if b
+    mv
+    (pure mv nil)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
