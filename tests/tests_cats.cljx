@@ -1,33 +1,33 @@
 (ns tests-cats
   #+cljs
   (:require-macros [cemerick.cljs.test
-                    :refer (is deftest with-test run-tests testing test-var)])
+                    :refer (is deftest with-test run-tests testing test-var)]
+                   [cats.core :refer (mlet)])
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
             [cats.types :as t])
   #+clj
   (:require [clojure.test :refer :all]
-            [cats.core :as m]
+            [cats.core :as m :refer [mlet]]
             [cats.types :as t]))
 
-; FIXME: cljs
-#+clj
+
 (deftest test-mlet
   (testing "It supports regular let inside its bindings")
     (is (= (t/just 2)
-           (m/mlet [i (t/just 1)
-                    :let [i (inc i)]]
-                   (m/return i))))
+           (mlet [i (t/just 1)
+                  :let [i (inc i)]]
+                 (m/return i))))
   (testing "It supports :when guards inside its bindings")
     (is (= (t/nothing)
-           (m/mlet [i (t/just 2)
-                    :when (> i 2)]
-                   (m/return i))))
+           (mlet [i (t/just 2)
+                  :when (> i 2)]
+                 (m/return i))))
     (is (= [3 4 5]
-           (m/mlet [i [1 2 3 4 5]
-                    :when (> i 2)]
-                   (m/return i)))))
+           (mlet [i [1 2 3 4 5]
+                 :when (> i 2)]
+                 (m/return i)))))
 
 (deftest test-lift-m
   (testing "It can lift a function to the Maybe monad"

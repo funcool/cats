@@ -26,20 +26,12 @@
   [av v]
   (p/pure av v))
 
-#+clj
 (defn bind
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (with-context mv
-    (p/bind mv f)))
-
-#+cljs
-(defn bind
-  "Given a value inside monadic context mv and any function,
-  applies a function to value of mv."
-  [mv f]
-  (cm/with-context mv
+  (#+clj  with-context
+   #+cljs cm/with-context mv
     (p/bind mv f)))
 
 (defn mzero
@@ -125,63 +117,34 @@
   [f mv]
   (>>= mv f))
 
-#+clj
 (defn >=>
   [mf mg x]
   "Left-to-right composition of monads."
-  (mlet [a (mf x)
-         b (mg a)]
-    (return b)))
+  (#+clj  mlet
+   #+cljs cm/mlet [a (mf x)
+                   b (mg a)]
+                  (return b)))
 
-#+cljs
-(defn >=>
-  [mf mg x]
-  "Left-to-right composition of monads."
-  (cm/mlet [a (mf x)
-            b (mg a)]
-    (return b)))
-
-#+clj
 (defn <=<
   [mg mf x]
   "Right-to-left composition of monads.
 
   Same as `>=>` with its first two arguments flipped."
-  (mlet [a (mf x)
-         b (mg a)]
-    (return b)))
+  (#+clj  mlet
+   #+cljs cm/mlet [a (mf x)
+                   b (mg a)]
+                  (return b)))
 
-#+cljs
-(defn <=<
-  [mg mf x]
-  "Right-to-left composition of monads.
-
-  Same as `>=>` with its first two arguments flipped."
-  (cm/mlet [a (mf x)
-            b (mg a)]
-    (return b)))
-
-#+clj
 (defn sequence-m
   [mvs]
   {:pre [(not-empty mvs)]}
   (reduce (fn [mvs mv]
-             (mlet [v mv
-                    vs mvs]
-               (return (conj vs v))))
-          (with-context (first mvs)
-            (return []))
-          mvs))
-
-#+cljs
-(defn sequence-m
-  [mvs]
-  {:pre [(not-empty mvs)]}
-  (reduce (fn [mvs mv]
-             (cm/mlet [v mv
-                       vs mvs]
-               (return (conj vs v))))
-          (cm/with-context (first mvs)
+             (#+clj  mlet
+              #+cljs cm/mlet [v mv
+                              vs mvs]
+                             (return (conj vs v))))
+          (#+clj  with-context
+           #+cljs cm/with-context (first mvs)
             (return []))
           mvs))
 
