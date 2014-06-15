@@ -313,3 +313,10 @@
 (defn halt
   [x]
   (Continuation. (fn [c] x)))
+
+#+clj
+(defn cont-t
+  "Takes a function written in a continuation-passing-style and
+  creates a Continuation out of it."
+  [f]
+  (Continuation. f))
