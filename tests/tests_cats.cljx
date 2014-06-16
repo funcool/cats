@@ -2,14 +2,14 @@
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet)])
+                   [cats.core :refer (mlet with-context)])
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
             [cats.types :as t])
   #+clj
   (:require [clojure.test :refer :all]
-            [cats.core :as m :refer [mlet]]
+            [cats.core :as m :refer [mlet with-context]]
             [cats.types :as t]))
 
 
@@ -73,7 +73,24 @@
     (let [m1 (t/just 1)
           m2 (t/nothing)]
       (is (= (m/fmap inc m1) (t/just 2)))
-      (is (= (m/fmap inc m2) (t/nothing))))))
+      (is (= (m/fmap inc m2) (t/nothing)))))
+
+  (testing "The first monad law : left identity"
+    (is (= (t/just 2)
+           (with-context (t/just 0) (m/>>= (m/return 2) t/just)))))
+
+  (testing "The second monad law: right identity"
+    (is (= (t/just 2)
+           (m/>>= (t/just 2) m/return))))
+
+  (testing "The third monad law: associativity"
+    (is (= (m/>>= (mlet [x  (t/just 2)
+                         y  (t/just (inc x))]
+                        (m/return y))
+                  (fn [y] (t/just (inc y))))
+           (m/>>= (t/just 2)
+                  (fn [x] (m/>>= (t/just (inc x))
+                                (fn [y] (t/just (inc y))))))))))
 
 #+clj
 (deftest test-continuation-monad
