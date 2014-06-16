@@ -92,13 +92,12 @@
                   (fn [x] (m/>>= (t/just (inc x))
                                 (fn [y] (t/just (inc y))))))))))
 
-#+clj
 (deftest test-continuation-monad
   (testing "call-cc allows the creation of resumable computations."
     (let [cc (atom nil)]
       (is (= 44
              (m/run-cont (mlet [x (t/->Continuation (fn [c] (c 42)))
-                                y (t/call-cc (fn [k]
+                                y (m/call-cc (fn [k]
                                              (reset! cc k)
                                              (k 2)))]
                                (m/return (+ x y))))))
@@ -106,13 +105,14 @@
              (m/run-cont (@cc 3))))
       (is (= 46
              (m/run-cont (@cc 4))))))
+
   (testing "it can represent computations that halt"
-    (let [cont-42 (t/cont-t (fn [c] (c 42)))
+    (let [cont-42 (m/cont-t (fn [c] (c 42)))
           inc-cont (fn [x]
-                     (t/cont-t (fn [c] (c (inc x)))))]
+                     (m/cont-t (fn [c] (c (inc x)))))]
       (is (= 43
              (m/run-cont (m/>>= cont-42 inc-cont))))
       (is (= 42
              (m/run-cont (m/>>= cont-42
-                                t/halt
+                                m/halt-cont
                                 inc-cont)))))))

@@ -1,7 +1,6 @@
 (ns cats.types
   "Monadic types definition."
-  (:require [cats.protocols :as proto]
-            #+cljs [cljs.core]))
+  (:require [cats.protocols :as proto]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Either
@@ -283,7 +282,6 @@
 ;; Continuation Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
 (deftype Continuation [mfn]
   proto/Monad
   (bind [self mf]
@@ -291,7 +289,8 @@
                      (self (fn [v]
                              ((mf v) c))))))
 
-  clojure.lang.IFn
+  #+clj   clojure.lang.IFn
+  #+cljs  IFn
   (invoke [self f]
     (mfn f))
 
@@ -300,23 +299,3 @@
     (Continuation. (fn [c] (c v))))
   (fapply [_ av]
     (throw (RuntimeException. "Not implemented"))))
-
-#+clj
-(defn call-cc
-  [f]
-  (Continuation.
-    (fn [c]
-      (let [cc (fn [a] (Continuation. (fn [_] (c a))))]
-        ((f cc) c)))))
-
-#+clj
-(defn halt
-  [x]
-  (Continuation. (fn [c] x)))
-
-#+clj
-(defn cont-t
-  "Takes a function written in a continuation-passing-style and
-  creates a Continuation out of it."
-  [f]
-  (Continuation. f))

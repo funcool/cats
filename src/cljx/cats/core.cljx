@@ -279,3 +279,20 @@
   (#+clj  with-context
    #+cljs cm/with-context cont
     (cont identity)))
+
+(defn call-cc
+  [f]
+  (t/->Continuation
+    (fn [c]
+      (let [cc (fn [a] (t/->Continuation (fn [_] (c a))))]
+        ((f cc) c)))))
+
+(defn halt-cont
+  [x]
+  (t/->Continuation (fn [c] x)))
+
+(defn cont-t
+  "Takes a function written in a continuation-passing-style and
+  creates a Continuation out of it."
+  [f]
+  (t/->Continuation f))
