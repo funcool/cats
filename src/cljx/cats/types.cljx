@@ -290,7 +290,7 @@
                              ((mf v) c))))))
 
   #+clj   clojure.lang.IFn
-  #+cljs  IFn
+  #+cljs  cljs.core/IFn
   (invoke [self f]
     (mfn f))
 
