@@ -14,17 +14,21 @@
   `(binding [*m-context* ~ctx]
      ~@body))
 
-(defn return
-  "Context dependent version of pure."
-  [v]
-  (p/pure *m-context* v))
-
 (defn pure
-  "Takes a context type av value and any arbitrary
-  value v, and return v value wrapped in a minimal
-  contex of same type of av."
-  [av v]
-  (p/pure av v))
+  "Given any value v, return it wrapped in
+  default/effect free context.
+
+  This is multiarity function that with arity pure/1
+  it uses the dynamic scope for resolve the current
+  context. With pure/2, you can force specific context
+  value."
+  ([v]
+     (p/pure *m-context* v))
+  ([av v]
+     (p/pure av v)))
+
+(def ^{:doc "This is a monad version of pure."}
+  return pure)
 
 (defn bind
   "Given a value inside monadic context mv and any function,
