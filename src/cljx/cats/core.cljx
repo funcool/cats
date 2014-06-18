@@ -287,9 +287,10 @@
 (defn call-cc
   [f]
   (t/->Continuation
-    (fn [c]
-      (let [cc (fn [a] (t/->Continuation (fn [_] (c a))))]
-        ((f cc) c)))))
+    (fn [cc]
+      (let [k (fn [a]
+                (t/->Continuation (fn [_] (cc a))))]
+        ((f k) cc)))))
 
 (defn halt-cont
   [x]

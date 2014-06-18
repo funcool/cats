@@ -94,29 +94,53 @@
                                 (fn [y] (t/just (inc y))))))))))
 
 (deftest test-continuation-monad
-  (testing "call-cc allows the creation of resumable computations."
-    (let [cc (atom nil)]
-      (is (= 44
-             (m/run-cont (mlet [x (t/->Continuation (fn [c] (c 42)))
-                                y (m/call-cc (fn [k]
-                                             (reset! cc k)
-                                             (k 2)))]
-                               (m/return (+ x y))))))
-      (is (= 45
-             (m/run-cont (@cc 3))))
-      (is (= 46
-             (m/run-cont (@cc 4))))))
+  (let [cont-42 (m/cont-t (fn [c] (c 42)))
+        inc-cont-fn (fn [x]
+                      (m/cont-t (fn [c] (c (inc x)))))]
 
-  (testing "it can represent computations that halt"
-    (let [cont-42 (m/cont-t (fn [c] (c 42)))
-          inc-cont (fn [x]
-                     (m/cont-t (fn [c] (c (inc x)))))]
-      (is (= 43
-             (m/run-cont (m/>>= cont-42 inc-cont))))
-      (is (= 42
-             (m/run-cont (m/>>= cont-42
-                                m/halt-cont
-                                inc-cont)))))))
+    (testing "The first monad law : left identity"
+      (is (= (m/run-cont cont-42)
+             (m/run-cont
+               (with-context (m/cont-t #())
+                 (m/>>= (m/return 42)
+                        (fn [v] (m/cont-t (fn [c] c v)))))))))
+
+    (testing "The second monad law: right identity"
+      (is (= (m/run-cont cont-42)
+             (m/run-cont
+               (m/>>= cont-42 m/return)))))
+
+    (testing "The third monad law: associativity"
+      (is (= (m/>>= (mlet [x  cont-42
+                           y  inc-cont-fn]
+                         (m/return y))
+                         inc-cont-fn))
+             (m/>>= cont-42
+                    (fn [x] (m/>>= (m/cont-t (fn [c] (c (inc x))))
+                                   inc-cont-fn)))))
+
+    (testing "call-cc allows the creation of resumable computations."
+      (let [cc (atom nil)]
+        (is (= 44
+               (m/run-cont (mlet [x cont-42
+                                  y (m/call-cc (fn [k]
+                                                 (reset! cc k)
+                                                 (k 2)))]
+                                 (m/return (+ x y))))))
+        (is (= 45
+               (m/run-cont (@cc 3))))
+        (is (= 46
+               (m/run-cont (@cc 4))))))
+
+    (testing "it can represent computations that halt"
+      (let [inc-cont-fn (fn [x]
+                       (m/cont-t (fn [c] (c (inc x)))))]
+        (is (= 43
+               (m/run-cont (m/>>= cont-42 inc-cont-fn))))
+        (is (= 42
+               (m/run-cont (m/>>= cont-42
+                                  m/halt-cont
+                                  inc-cont-fn))))))))
 
 (deftest test-lazy-seq
   (let [s (lazy-seq [2])
