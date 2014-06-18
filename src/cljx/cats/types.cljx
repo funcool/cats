@@ -315,3 +315,8 @@
     (Continuation. (fn [c]
                      (self (fn [v]
                              ((mf v) c)))))))
+
+(defn continuation
+  "Default constructor for continuation."
+  [mfn]
+  (Continuation. mfn))
