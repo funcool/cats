@@ -129,6 +129,39 @@ on dispatch on first argument. You should not use protocol function directly. Fo
 function exists and has the correct signature.
 ====
 
+Use case
+^^^^^^^^
+
+Let see an example of using fmap over some type that implements the `Functor` protocol: `Just`
+and `Nothing:
+
+.Apply function `inc` to value `1` wrapped in a `Just`
+
+[source, clojure]
+----
+(require '[cats.core :refer :all])
+(require '[cats.types :refer :all])
+
+(fmap inc (just 1))
+;; => #<Just [2]>
+----
+
+`fmap` unwrapps the context, apply the function to inner value, and wrap it in a new context. If you
+repeat the same operation over `Nothing`, instead of raising some strange exception, it again return
+`Nothing` instance:
+
+[source, clojure]
+----
+(fmap inc (nothing))
+;; => #<Nothing >
+----
+
+One of the most popular use case for it, is just it, safe operations over possible failure results,
+forward error handling to the end of pipeline.
+
+
+*TODO*: examples using clojure vectors as functor context.
+
 
 Applicative Functors
 ~~~~~~~~~~~~~~~~~~~~
@@ -140,6 +173,7 @@ It encapsulates certain sorts of "effectful" computations in a functionally pure
 Recall that Functor allows us to lift a "normal" function to a function on computational contexts.
 But `fmap` doesn't allow us to apply a function which is itself in a context to a value in a context.
 Applicative gives us just such a tool.
+
 
 Definition
 ^^^^^^^^^^
@@ -154,6 +188,50 @@ Definition
     "Takes any context monadic value ctx and any value v, and puts
      the value v in the most minimal context of same type of ctx"))
 ----
+
+Use case
+^^^^^^^^
+
+That is hapens if context value is also an computation and you want safety execute it? Applicative
+functors is the solution for it.
+
+Let see this code:
+
+[source, clojure]
+----
+(defn get-greeter
+  []
+  (let [v (rand-int 2)]
+    (case v
+      0 (fn [x] (println "hello" x))
+      1 nil)))
+
+((get-greeter) "Alex")
+----
+
+This code in some situations can raise some exception because `get-greeter` in some circumstances
+can return nil (failed result) and for capture it you should constantly check if returned value
+from `get-greeter` function is a valid function.
+
+Using applicative functors, you can avoid that:
+
+[source, clojure]
+----
+(defn get-greeter
+  []
+  (let [v (rand-int 2)]
+    (case v
+      0 (just (fn [x] (println "hello" x)))
+      1 (nothing))))
+
+(<*> (get-greeter) (just "hello World"))
+----
+
+With this code, if `get-greeter` returns nothing, the operation simply return nothing, without
+any need catching exceptions or put additional conditionals for check the returned value.
+
+*TODO:* examples using clojure keywords as applicative context.
+
 
 Data Types Reference
 --------------------
@@ -186,24 +264,6 @@ _cats_, implements two constructors:
 (nothing)
 ;; => #<Nothing >
 ----
-
-
-The two instance, implements the almost all category abstractions protocols and works very well
-with them:
-
-.Functor
-[source, clojure]
-----
-(require '[cats.core :refer :all])
-(require '[cats.types :refer :all])
-
-(fmap inc (just 1))
-;; => #<Just [2]>
-
-(fmap inc (nothing))
-;; => #<Nothing >
-----
-
 
 License
 -------
