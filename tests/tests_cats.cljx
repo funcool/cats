@@ -130,17 +130,7 @@
         (is (= 45
                (m/run-cont (@cc 3))))
         (is (= 46
-               (m/run-cont (@cc 4))))))
-
-    (testing "it can represent computations that halt"
-      (let [inc-cont-fn (fn [x]
-                       (m/cont-t (fn [c] (c (inc x)))))]
-        (is (= 43
-               (m/run-cont (m/>>= cont-42 inc-cont-fn))))
-        (is (= 42
-               (m/run-cont (m/>>= cont-42
-                                  m/halt-cont
-                                  inc-cont-fn))))))))
+               (m/run-cont (@cc 4))))))))
 
 (deftest test-lazy-seq
   (let [s (lazy-seq [2])

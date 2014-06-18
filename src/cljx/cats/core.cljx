@@ -292,10 +292,6 @@
                 (t/->Continuation (fn [_] (cc a))))]
         ((f k) cc)))))
 
-(defn halt-cont
-  [x]
-  (t/->Continuation (fn [c] x)))
-
 (defn cont-t
   "Takes a function written in a continuation-passing-style and
   creates a Continuation out of it."
