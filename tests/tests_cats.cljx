@@ -100,16 +100,16 @@
                                 (fn [y] (t/just (inc y))))))))))
 
 (deftest test-continuation-monad
-  (let [cont-42 (m/cont-t (fn [c] (c 42)))
+  (let [cont-42 (t/continuation (fn [c] (c 42)))
         inc-cont-fn (fn [x]
-                      (m/cont-t (fn [c] (c (inc x)))))]
+                      (t/continuation (fn [c] (c (inc x)))))]
 
     (testing "The first monad law : left identity"
       (is (= (m/run-cont cont-42)
              (m/run-cont
-               (with-context (m/cont-t #())
+               (with-context (t/continuation #())
                  (m/>>= (m/return 42)
-                        (fn [v] (m/cont-t (fn [c] c v)))))))))
+                        (fn [v] (t/continuation (fn [c] c v)))))))))
 
     (testing "The second monad law: right identity"
       (is (= (m/run-cont cont-42)
@@ -122,7 +122,7 @@
                          (m/return y))
                          inc-cont-fn))
              (m/>>= cont-42
-                    (fn [x] (m/>>= (m/cont-t (fn [c] (c (inc x))))
+                    (fn [x] (m/>>= (t/continuation (fn [c] (c (inc x))))
                                    inc-cont-fn)))))
 
     (testing "call-cc allows the creation of resumable computations."
