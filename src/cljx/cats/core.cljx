@@ -122,24 +122,36 @@
   (>>= mv f))
 
 (defn >=>
-  [mf mg x]
   "Left-to-right composition of monads."
+  [mf mg x]
   (#+clj  mlet
    #+cljs cm/mlet [a (mf x)
                    b (mg a)]
                   (return b)))
 
 (defn <=<
-  [mg mf x]
   "Right-to-left composition of monads.
 
   Same as `>=>` with its first two arguments flipped."
+  [mg mf x]
   (#+clj  mlet
    #+cljs cm/mlet [a (mf x)
                    b (mg a)]
                   (return b)))
 
 (defn sequence-m
+  "Given a non-empty collection of monadic values, collect
+  their values in a vector returned in the monadic context.
+
+      (require '[cats.types :as t])
+      (require '[cats.core :as m])
+
+      (m/sequence-m [(t/just 2) (t/just 3)])
+      ;=> <Just [[2, 3]]>
+
+      (m/sequence-m [(t/nothing) (t/just 3)])
+      ;=> <Nothing>
+  "
   [mvs]
   {:pre [(not-empty mvs)]}
   (reduce (fn [mvs mv]
@@ -152,11 +164,43 @@
             (return []))
           mvs))
 
-(def ^{:arglist '([mf vs])}
-     map-m (comp sequence-m map))
+(defn map-m
+   "Given a function that takes a value and puts it into a
+   monadic context, map it into the given collection
+   calling sequence-m on the results.
 
-; TODO: docstring
+       (require '[cats.types :as t])
+       (require '[cats.core :as m])
+
+       (m/map-m t/just [2 3])
+       ;=> <Just [[2 3]]>
+
+       (m/for-m (fn [v]
+                   (if (odd? v)
+                     (t/just v)
+                     (t/nothing)))
+                [1 2])
+       ;=> <Nothing>
+     "
+  [mf coll]
+  (sequence-m (map mf coll)))
+
 (defn for-m
+  "Same as map-m but with the arguments in reverse order.
+
+      (require '[cats.types :as t])
+      (require '[cats.core :as m])
+
+      (m/for-m [2 3] t/just)
+      ;=> <Just [[2 3]]>
+
+      (m/for-m [1 2]
+               (fn [v]
+                  (if (odd? v)
+                    (t/just v)
+                    (t/nothing))))
+      ;=> <Nothing>
+   "
   [vs mf]
   (map-m mf vs))
 
@@ -164,8 +208,9 @@
   "Lifts a function to a monadic context.
 
       (require '[cats.types :as t])
+      (require '[cats.core :as m])
 
-      (def monad+ (lift-m +))
+      (def monad+ (m/lift-m +))
 
       (monad+ (t/just 1) (t/just 2))
       ;=> <Just [3]>
@@ -186,11 +231,12 @@
   Otherwise, returns the instance unchanged.
 
       (require '[cats.types :as t])
+      (require '[cats.core :as m])
 
-      (filter-m (partial < 2) (t/just 3))
+      (m/filter-m (partial < 2) (t/just 3))
       ;=> <Just [3]>
 
-      (filter-m (partial < 4) (t/just 3))
+      (m/filter-m (partial < 4) (t/just 3))
       ;=> <Nothing>
   "
   [p mv]
@@ -277,9 +323,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn run-cont
-  [cont]
   "Given a Continuation instance, execute the
   wrapped computation and return its value."
+  [cont]
   (#+clj  with-context
    #+cljs cm/with-context cont
     (cont identity)))
