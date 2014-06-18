@@ -77,7 +77,8 @@
 
   (testing "The first monad law : left identity"
     (is (= (t/just 2)
-           (with-context (t/just 0) (m/>>= (m/return 2) t/just)))))
+           (with-context (t/just 0)
+             (m/>>= (m/return 2) t/just)))))
 
   (testing "The second monad law: right identity"
     (is (= (t/just 2)
@@ -116,3 +117,26 @@
              (m/run-cont (m/>>= cont-42
                                 m/halt-cont
                                 inc-cont)))))))
+
+(deftest test-lazy-seq
+  (let [s (lazy-seq [2])
+        val->lazyseq (fn [x] (lazy-seq [x]))]
+    (testing "The first monad law : left identity"
+      (is (= s
+             (with-context s
+               (m/>>= (m/return 2)
+                      val->lazyseq)))))
+
+    (testing "The second monad law: right identity"
+      (is (= s
+             (m/>>= s
+                    m/return))))
+
+    (testing "The third monad law: associativity"
+      (is (= (m/>>= (mlet [x  s
+                           y  (val->lazyseq (inc x))]
+                          (m/return y))
+                    (fn [y] (val->lazyseq (inc y))))
+             (m/>>= s
+                    (fn [x] (m/>>= (val->lazyseq (inc x))
+                                  (fn [y] (val->lazyseq (inc y)))))))))))

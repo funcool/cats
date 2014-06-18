@@ -173,6 +173,22 @@
 ;; Clojure(Script) types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(extend-type #+clj  clojure.lang.LazySeq
+             #+cljs cljs.core.LazySeq
+  proto/Functor
+  (fmap [self f] (map f self))
+
+  proto/Applicative
+  (pure [_ v] (lazy-seq [v]))
+  (fapply [self av]
+    (for [f self
+          v av]
+         (f v)))
+
+  proto/Monad
+  (bind [self f]
+    (flatten (map f self))))
+
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
   proto/Functor
