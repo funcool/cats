@@ -28,12 +28,6 @@
   (toString [self]
     (with-out-str (print [v type])))
 
-  proto/Monad
-  (bind [s f]
-    (case type
-      :right (f v)
-      s))
-
   proto/Functor
   (fmap [s f]
     (case type
@@ -47,6 +41,12 @@
   (fapply [s av]
     (case type
       :right (proto/fmap av v)
+      s))
+
+  proto/Monad
+  (bind [s f]
+    (case type
+      :right (f v)
       s)))
 
 (defn left
@@ -92,6 +92,13 @@
   (toString [_]
     (with-out-str (print "")))
 
+  proto/Functor
+  (fmap [s f] s)
+
+  proto/Applicative
+  (pure [s v] s)
+  (fapply [s av] s)
+
   proto/Monad
   (bind [s f] s)
 
@@ -99,14 +106,7 @@
   (mzero [_] (Nothing.))
 
   proto/MonadPlus
-  (mplus [_ mv] mv)
-
-  proto/Functor
-  (fmap [s f] s)
-
-  proto/Applicative
-  (pure [s v] s)
-  (fapply [s av] s))
+  (mplus [_ mv] mv))
 
 (deftype Just [v]
   #+clj
@@ -128,16 +128,6 @@
   (toString [self]
     (with-out-str (print [v])))
 
-  proto/Monad
-  (bind [self f]
-    (f v))
-
-  proto/MonadZero
-  (mzero [_] (Nothing.))
-
-  proto/MonadPlus
-  (mplus [mv _] mv)
-
   proto/Functor
   (fmap [s f]
     (Just. (f v)))
@@ -146,7 +136,17 @@
   (pure [_ v]
     (Just. v))
   (fapply [_ av]
-    (proto/fmap av v)))
+    (proto/fmap av v))
+
+  proto/Monad
+  (bind [self f]
+    (f v))
+
+  proto/MonadZero
+  (mzero [_] (Nothing.))
+
+  proto/MonadPlus
+  (mplus [mv _] mv))
 
 (defn just
   [v]
@@ -175,16 +175,6 @@
 
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
-  proto/Monad
-  (bind [self f]
-    (vec (flatten (map f self))))
-
-  proto/MonadZero
-  (mzero [_] [])
-
-  proto/MonadPlus
-  (mplus [mv mv'] (into mv mv'))
-
   proto/Functor
   (fmap [self f] (vec (map f self)))
 
@@ -193,7 +183,17 @@
   (fapply [self av]
     (vec (for [f self
                v av]
-           (f v)))))
+           (f v))))
+
+  proto/Monad
+  (bind [self f]
+    (vec (flatten (map f self))))
+
+  proto/MonadZero
+  (mzero [_] [])
+
+  proto/MonadPlus
+  (mplus [mv mv'] (into mv mv')))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pair (State monad related)
@@ -249,15 +249,6 @@
 
 #+clj
 (deftype State [mfn]
-  proto/Monad
-  (bind [self f]
-    (-> (fn [s]
-          (let [p        (mfn s)
-                value    (.-fst p)
-                newstate (.-snd p)]
-            ((f value) newstate)))
-        (state-t)))
-
   clojure.lang.IFn
   (invoke [self seed]
     (mfn seed))
@@ -266,7 +257,16 @@
   (pure [_ v]
     (State. (fn [s] (pair v s))))
   (fapply [_ av]
-    (throw (RuntimeException. "Not implemented"))))
+    (throw (RuntimeException. "Not implemented")))
+
+  proto/Monad
+  (bind [self f]
+    (-> (fn [s]
+          (let [p        (mfn s)
+                value    (.-fst p)
+                newstate (.-snd p)]
+            ((f value) newstate)))
+        (state-t))))
 
 #+clj
 (defn state-t
@@ -283,12 +283,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Continuation [mfn]
-  proto/Monad
-  (bind [self mf]
-    (Continuation. (fn [c]
-                     (self (fn [v]
-                             ((mf v) c))))))
-
   #+clj   clojure.lang.IFn
   #+cljs  cljs.core/IFn
   (invoke [self f]
@@ -298,4 +292,10 @@
   (pure [_ v]
     (Continuation. (fn [c] (c v))))
   (fapply [_ av]
-    (throw (RuntimeException. "Not implemented"))))
+    (throw (RuntimeException. "Not implemented")))
+
+  proto/Monad
+  (bind [self mf]
+    (Continuation. (fn [c]
+                     (self (fn [v]
+                             ((mf v) c)))))))
