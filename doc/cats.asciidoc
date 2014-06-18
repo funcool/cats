@@ -93,21 +93,22 @@ git clone https://github.com/niwibe/cats
 ----
 
 
-User Guide
-----------
+Abstractions Reference
+----------------------
 
 Functor
 ~~~~~~~
 
-The Functor class is the most basic and ubiquitous type class in the _cats_ libraries. A simple intuition is that
-a Functor represents a "container" of some sort, along with the ability to apply a function uniformly to every
-element in the container. For example, a list is a container of elements, and we can apply a function to every
-element of a list, using map. As another example, a binary tree is also a container of elements, and it’s not
-hard to come up with a way to recursively apply a function to every element in a tree.
+The Functor class is the most basic and ubiquitous type class in the _cats_ libraries. A simple
+intuition is that a Functor represents a "container" of some sort, along with the ability to apply a
+function uniformly to every element in the container. For example, a list is a container of elements,
+and we can apply a function to every element of a list, using map. As another example, a binary tree
+is also a container of elements, and it’s not hard to come up with a way to recursively apply a
+function to every element in a tree.
 
-Another intuition is that a Functor represents some sort of "computational context". This intuition is generally more
-useful, but is more difficult to explain, precisely because it is so general. Some examples later should help to
-clarify the Functor-as-context point of view.
+Another intuition is that a Functor represents some sort of "computational context". This intuition is
+generally more useful, but is more difficult to explain, precisely because it is so general. Some
+examples later should help to clarify the Functor-as-context point of view.
 
 Definition
 ^^^^^^^^^^
@@ -122,12 +123,86 @@ Definition
 
 [NOTE]
 ====
-The real fmap signature is `(a -> b) -> f a -> f b` that can be traslated to clojure `[f fv]`. The changed
-order on protocol definition is required because of clojure's protocols limitation on dispatch on first
-argument. You should not use protocol function directly, for it, `cats.core/fmap` exists and has the correct
-signature.
+The real fmap signature is `(a -> b) -> f a -> f b` that can be traslated to clojure `[f fv]`. The
+changed order on protocol parameters definition is required because of clojure's protocols limitation
+on dispatch on first argument. You should not use protocol function directly. For it, `cats.core/fmap`
+function exists and has the correct signature.
 ====
 
+
+Applicative Functors
+~~~~~~~~~~~~~~~~~~~~
+
+Represents an abstraction lying in between Functor and Monad in expressivity.
+
+It encapsulates certain sorts of "effectful" computations in a functionally pure way.
+
+Recall that Functor allows us to lift a "normal" function to a function on computational contexts.
+But `fmap` doesn't allow us to apply a function which is itself in a context to a value in a context.
+Applicative gives us just such a tool.
+
+Definition
+^^^^^^^^^^
+
+[source, clojure]
+----
+(defprotocol Applicative
+  (fapply [af av]
+    "Applies the function(s) inside ag's context to the value(s)
+     inside av's context while preserving the context.")
+  (pure [ctx v]
+    "Takes any context monadic value ctx and any value v, and puts
+     the value v in the most minimal context of same type of ctx"))
+----
+
+Data Types Reference
+--------------------
+
+We talked about values in a context, but that is a context? Context per se is any value that
+wraps an other value inside.
+
+Maybe
+~~~~~
+
+Two most common wrapper is "Maybe" (commonly named Optional on not functional programming
+languages).
+
+Maybe/Optional is a polymorphic type that represents encapsulation of an optional value; e.g. it is
+used as the return type of functions which may or may not return a meaningful value when they
+are applied. It consists of either an empty constructor (called None or Nothing), or a constructor
+encapsulating the original data type A (written Just A or Some A).
+
+_cats_, implements two constructors:
+
+- `(just v)`: represents just a value in a context.
+- `(nothing)`: represents a failure or null.
+
+
+[source, clojure]
+----
+(require '[cats.types :refer :all])
+(just 1)
+;; => #<Just [1]>
+(nothing)
+;; => #<Nothing >
+----
+
+
+The two instance, implements the almost all category abstractions protocols and works very well
+with them:
+
+.Functor
+[source, clojure]
+----
+(require '[cats.core :refer :all])
+(require '[cats.types :refer :all])
+
+(fmap inc (just 1))
+;; => #<Just [2]>
+
+(fmap inc (nothing))
+;; => #<Nothing >
+----
 
 
 License
