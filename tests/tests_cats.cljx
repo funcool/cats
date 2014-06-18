@@ -27,7 +27,13 @@
     (is (= [3 4 5]
            (mlet [i [1 2 3 4 5]
                  :when (> i 2)]
-                 (m/return i)))))
+                 (m/return i))))
+  (testing "The body runs in an implicit do"
+    (is (= (t/just 3)
+           (mlet [i (t/just 2)
+                  :let [x (inc i)]]
+                 (assert (= x 3))
+                 (m/return x))))))
 
 (deftest test-sequence-m
   (testing "It works with Maybe values"
