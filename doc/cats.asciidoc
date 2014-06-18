@@ -156,11 +156,28 @@ repeat the same operation over `Nothing`, instead of raising some strange except
 ;; => #<Nothing >
 ----
 
-One of the most popular use case for it, is just it, safe operations over possible failure results,
-forward error handling to the end of pipeline.
+That allows forward error handlig to the end of the computation pipeline.
 
+One of the main property of *Functors* is that fmap always returns a result wrapped in the same
+context that input value:
 
-*TODO*: examples using clojure vectors as functor context.
+.Clojure vectors are also functors and works as container.
+[source, clojure]
+----
+(fmap inc [1 2 3])
+;; => [2 3 4]
+----
+
+If you compare this result with standard clojure `map` function:
+
+[source, clojure]
+----
+(map inc [1 2 3])
+;; => (2 3 4)
+----
+
+This happens because clojure's map works over seq abstraction and always return seqs, independently
+of input value.
 
 
 Applicative Functors
