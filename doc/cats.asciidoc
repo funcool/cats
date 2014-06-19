@@ -99,20 +99,9 @@ Abstractions Reference
 Functor
 ~~~~~~~
 
-The Functor class is the most basic and ubiquitous type class in the _cats_ libraries. A simple
-intuition is that a Functor represents a "container" of some sort, along with the ability to apply a
-function uniformly to every element in the container. For example, a list is a container of elements,
-and we can apply a function to every element of a list, using map. As another example, a binary tree
-is also a container of elements, and it’s not hard to come up with a way to recursively apply a
-function to every element in a tree.
+The Functor represents some sort of "computational context".
 
-Another intuition is that a Functor represents some sort of "computational context". This intuition is
-generally more useful, but is more difficult to explain, precisely because it is so general. Some
-examples later should help to clarify the Functor-as-context point of view.
-
-Definition
-^^^^^^^^^^
-
+.This is aspect of Functor protocol
 [source, clojure]
 ----
 (defprotocol Functor
@@ -121,21 +110,11 @@ Definition
     the context of the functor fv."))
 ----
 
-[NOTE]
-====
-The real fmap signature is `(a -> b) -> f a -> f b` that can be traslated to clojure `[f fv]`. The
-changed order on protocol parameters definition is required because of clojure's protocols limitation
-on dispatch on first argument. You should not use protocol function directly. For it, `cats.core/fmap`
-function exists and has the correct signature.
-====
+`fmap` takes one wrapped value in functor context fv (ex: `Just 2`) and plain function,
+unwraps the value and apply a function to plain value returning it wrapped in a new context
+of *the same type* of the first argument.
 
-Use case
-^^^^^^^^
-
-Let see an example of using fmap over some type that implements the `Functor` protocol: `Just`
-and `Nothing:
-
-.Apply function `inc` to value `1` wrapped in a `Just`
+Some examples can explain it better:
 
 [source, clojure]
 ----
@@ -146,9 +125,7 @@ and `Nothing:
 ;; => #<Just [2]>
 ----
 
-`fmap` unwrapps the context, apply the function to inner value, and wrap it in a new context. If you
-repeat the same operation over `Nothing`, instead of raising some strange exception, it again return
-`Nothing` instance:
+Same example but applying function over Nothing:
 
 [source, clojure]
 ----
@@ -156,19 +133,32 @@ repeat the same operation over `Nothing`, instead of raising some strange except
 ;; => #<Nothing >
 ----
 
-That allows forward error handlig to the end of the computation pipeline.
+[NOTE]
+====
+The real fmap signature is `(a -> b) -> f a -> f b` that can be traslated to clojure `[f fv]`.
 
-One of the main property of *Functors* is that fmap always returns a result wrapped in the same
-context that input value:
+The changed order on protocol parameters definition is required because of clojure's protocols
+limitation that only allow dispatching on first argument.
 
-.Clojure vectors are also functors and works as container.
+You should never use protocol function directly. For it, `cats.core/fmap` exists, and it has
+the correct signature.
+
+All examples of this documentation uses `cats.core/fmap` instead of function defined in the
+protocol.
+====
+
+
+Some of native clojure types, like Vector, also implements the Functor protocol and can
+work like functor context/container:
+
 [source, clojure]
 ----
 (fmap inc [1 2 3])
 ;; => [2 3 4]
 ----
 
-If you compare this result with standard clojure `map` function:
+The main difference of previous example with default clojure map, is that the clojure
+map works with seqs and it not respects the input container:
 
 [source, clojure]
 ----
@@ -176,25 +166,16 @@ If you compare this result with standard clojure `map` function:
 ;; => (2 3 4)
 ----
 
-This happens because clojure's map works over seq abstraction and always return seqs, independently
-of input value.
+You can see more information and examples of clojure types that implements this protocol
+on the last section of this documentation.
 
 
-Applicative Functors
-~~~~~~~~~~~~~~~~~~~~
+Applicative Functor
+~~~~~~~~~~~~~~~~~~~
 
 Represents an abstraction lying in between Functor and Monad in expressivity.
 
-It encapsulates certain sorts of "effectful" computations in a functionally pure way.
-
-Recall that Functor allows us to lift a "normal" function to a function on computational contexts.
-But `fmap` doesn't allow us to apply a function which is itself in a context to a value in a context.
-Applicative gives us just such a tool.
-
-
-Definition
-^^^^^^^^^^
-
+.Applicative protocol definition
 [source, clojure]
 ----
 (defprotocol Applicative
@@ -206,48 +187,100 @@ Definition
      the value v in the most minimal context of same type of ctx"))
 ----
 
-Use case
-^^^^^^^^
+With the same idea of data inside a context (like `Functor`), what is happens if a wrapped value is
+one function/computation? Applicative functors works like plain functors but additionally
+can apply function wrapped in some context similar to input value.
 
-That is hapens if context value is also an computation and you want safety execute it? Applicative
-functors is the solution for it.
-
-Let see this code:
+Let see one example:
 
 [source, clojure]
 ----
-(defn get-greeter
-  []
-  (let [v (rand-int 2)]
-    (case v
-      0 (fn [x] (println "hello" x))
-      1 nil)))
+(defn make-greeter
+  [^String lang]
+  (condp = lang
+    "es" (just (fn [name] (str "Hola " name)))
+    "en" (just (fn [name] (str "Hello " name)))
+    (nothing)))
 
-((get-greeter) "Alex")
+(fapply (make-greeter "es") (just "Alex"))
+;; => #<Just [Hola Alex]>
+
+(fapply (make-greeter "en") (just "Alex"))
+;; => #<Just [Hello Alex]>
+
+(fapply (make-greeter "it") (just "Alex"))
+;; => #<Nothing >
 ----
 
-This code in some situations can raise some exception because `get-greeter` in some circumstances
-can return nil (failed result) and for capture it you should constantly check if returned value
-from `get-greeter` function is a valid function.
+Moreover, applicative functor protocol comes with an other function: `pure`. The main purpose of
+it, is given any value in a context and new value, wraps the new value in a minimal context of same
+type as first argument.
 
-Using applicative functors, you can avoid that:
+To understand it better, see some examples:
 
 [source, clojure]
 ----
-(defn get-greeter
-  []
-  (let [v (rand-int 2)]
-    (case v
-      0 (just (fn [x] (println "hello" x)))
-      1 (nothing))))
+(pure (just 1) 5)
+;; => #<Just [5]>
 
-(<*> (get-greeter) (just "hello World"))
+(pure (right :foo) :bar)
+;; => #<Either [:bar :right]>
 ----
 
-With this code, if `get-greeter` returns nothing, the operation simply return nothing, without
-any need catching exceptions or put additional conditionals for check the returned value.
+The real purpose of this function you will see in a following `Monad` section.
 
-*TODO:* examples using clojure keywords as applicative context.
+
+Monad
+~~~~~
+
+Monads are the most discussed programming concept to come from category theory. Like functors and
+applicatives, monads deal with data in contexts.
+
+Additionaly, monads can also transform context by unwrapping data, applying functions to it and
+put new value in a completely different context.
+
+.This is aspect of Monad protocol
+[source, clojure]
+----
+(defprotocol Monad
+  "Incomplete monad type definition."
+  (bind [mv f] "Applies the function f to the value(s) inside mv's context."))
+----
+
+NOTE: In diference with haskel type class, _cats_ protocol only defines one method: `bind`. Other
+related methods like `return` are defined as auxiliar functions in `cats.core` namespace.
+
+`bind` function, takes a monadic value (any container that implements a `Monad` protocol) and one
+function, applies the function with unwrapped value as first parameter and return a result. In this
+case, is a function respoisability of function wrap the result in a corresponding context.
+
+One of the key features of bind function, that everythig insined a monad context known the context
+type. Having this, if you apply some computation over a monad and you want return the result
+in the same container context but you don't know that contaier is it, you can use `return` or `pure`
+function for it.
+
+[source, clojure]
+----
+(bind (just 1) (fn [v] (return (inc v))))
+;; => #<Just [2]>
+----
+
+`return` or `pure` function with one argument, try takes a context value from dynamic scope collected
+internaly by `bind` function, so that, you can not use them with one argument out of `bind` context.
+
+And finally, for make more powerful monadic compositions, _cats_ comes with `mlet` macro that
+if you coming from haskell, represents a `do-syntax`:
+
+[source, clojure]
+----
+(mlet [x (just 1)
+       y (just 2)
+       z (just (+ x y))]
+  (return z))
+;; => #<Just [3]>
+----
+
+TODO: document other more advanced options like `:let` and `:when` in a `mlet` context.
 
 
 Data Types Reference
@@ -281,6 +314,59 @@ _cats_, implements two constructors:
 (nothing)
 ;; => #<Nothing >
 ----
+
+NOTE: Maybe types are: Functors, Applicative Functors and Monads
+
+
+Either
+~~~~~~
+
+Either is an other type that represents a result of computation, but in contrast with maybe
+it can return something with failed computation result.
+
+In _cats_ library it has two constructors:
+
+- `(left v)`: represents a failure.
+- `(right v)`: represents a successful result.
+
+[source, clojure]
+----
+(require '[cats.types :refer :all])
+
+(right :valid-value)
+;; => #<Right [:valid-value :right]>
+
+(left "Error message")
+;; => #<Either [Error message :left]>
+----
+
+NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
+
+Clojure Types
+-------------
+
+Besides the own types, some colojure types has implementations for previously explained
+category theory abstractions.
+
+NOTE: With contrast with other similar libraries in clojure, _cats_ not intends extend clojure types
+that not acts like containers. As example, clojure keywords are values but can not be containers, so
+that, their should not extend previously explained protocols.
+
+Vector
+~~~~~~
+
+TODO
+
+List
+~~~~
+
+TODO
+
+Set
+~~~
+
+TODO
+
 
 License
 -------
