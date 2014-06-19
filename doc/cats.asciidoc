@@ -93,6 +93,30 @@ git clone https://github.com/niwibe/cats
 ----
 
 
+Why another library?
+--------------------
+
+Because cats library:
+
+- targets both most used clojure implementations:  *Clojure (jvm)* and *ClojureScript(js)*
+- targets to have the most simple implementation for supported abstractions.
+- targets to have more abstractions that simple monad.
+- has documentation as first class citizen.
+- licensed under permisive license (in comparison with other libraries): BSD (2-Clause)
+
+With differences with other existing libraries:
+
+- The official monads library `algo.monads` is very good, but its approach for modeling 
+  is slighty limited (as example, you always should specify that monad you want use instead
+  relying on the type). And obviously because it only has monads.
+- Fluokitten is the best library that we found, but the future of it is uncertain. One big
+  difference with fluokitten library is that `cats` not intends extend every clojure type
+  with monadic protocols, for obvious reason of monad, functor and applicative represents
+  context/wrapper type and it not make sense implement Functor protocol for `java.lang.String`.
+- `bwo/monads` is the last monads library. It is completely undocumented and its implementation
+  has much innecesary complexity.
+
+
 Abstractions Reference
 ----------------------
 
