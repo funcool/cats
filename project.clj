@@ -24,7 +24,10 @@
                            [org.clojure/tools.namespace "0.2.4"]]
             :plugins [[com.cemerick/clojurescript.test "0.3.1"]
                       [com.keminglabs/cljx "0.4.0" :exclusions [org.clojure/clojure]]
-                      [lein-cljsbuild "1.0.3"]]
+                      [lein-cljsbuild "1.0.3"]
+                      [codox "0.8.0"]]
+            :codox {:sources ["target/classes"]
+                    :output-dir "doc/codox"}
             :cljx {:builds [{:source-paths ["src/cljx"]
                              :output-path "target/classes"
                              :rules :clj}

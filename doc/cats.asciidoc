@@ -25,7 +25,8 @@ Four most important rules:
 Project Maturity
 ----------------
 
-Since _cats_ is a young project there can be some API breakage.
+Since _cats_ is a young project there can be some link:codox/index.html#id[API]
+breakage.
 
 
 Install
