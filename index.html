@@ -63,7 +63,8 @@ Readability counts
 <div class="sect1">
 <h2 id="_project_maturity">Project Maturity</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Since <em>cats</em> is a young project there can be some API breakage.</p></div>
+<div class="paragraph"><p>Since <em>cats</em> is a young project there can be some <a href="codox/index.html#id">API</a>
+breakage.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -121,6 +122,63 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p></div>
 <div class="content"><div class="highlight"><pre>git clone https://github.com/niwibe/cats
 </pre></div></div></div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_why_another_library">Why another library?</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Because cats library:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+targets both most used clojure implementations:  <strong>Clojure (jvm)</strong> and <strong>ClojureScript(js)</strong>
+</p>
+</li>
+<li>
+<p>
+targets to have the most simple implementation for supported abstractions.
+</p>
+</li>
+<li>
+<p>
+targets to have more abstractions that simple monad.
+</p>
+</li>
+<li>
+<p>
+has documentation as first class citizen.
+</p>
+</li>
+<li>
+<p>
+licensed under permisive license (in comparison with other libraries): BSD (2-Clause)
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>With differences with other existing libraries:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The official monads library <span class="monospaced">algo.monads</span> is very good, but its approach for modeling
+  is slighty limited (as example, you always should specify that monad you want use instead
+  relying on the type). And obviously because it only has monads.
+</p>
+</li>
+<li>
+<p>
+Fluokitten is the best library that we found, but the future of it is uncertain. One big
+  difference with fluokitten library is that <span class="monospaced">cats</span> not intends extend every clojure type
+  with monadic protocols, for obvious reason of monad, functor and applicative represents
+  context/wrapper type and it not make sense implement Functor protocol for <span class="monospaced">java.lang.String</span>.
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">bwo/monads</span> is the last monads library. It is completely undocumented and its implementation
+  has much innecesary complexity.
+</p>
+</li>
+</ul></div>
 </div>
 </div>
 <div class="sect1">
@@ -422,7 +480,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div id="footer">
 <div id="footer-text">
 Version 0.1.0<br>
-Last updated 2014-06-19 02:15:27 CEST
+Last updated 2014-06-24 08:47:33 UTC
 </div>
 </div>
 </body>

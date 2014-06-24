@@ -1,0 +1,333 @@
+body {
+   font-family: Helvetica, Arial, sans-serif;
+   font-size: 15px;
+}
+
+pre, code {
+   font-family: Monaco, DejaVu Sans Mono, Consolas, monospace;
+   font-size: 9pt;
+}
+
+h2 {
+   font-weight: normal;
+   font-size: 18pt;
+   padding: 7px 0 0 0;
+   margin: 0;
+}
+
+#header, #content, .sidebar {
+   position: fixed;
+}
+
+#header {
+   top: 0;
+   left: 0;
+   right: 0;
+   height: 20px;
+   background: #444;
+   color: #fff;
+   padding: 5px;
+}
+
+#content {
+   top: 30px;
+   right: 0;
+   bottom: 0;
+   overflow: auto;
+   background: #fff;
+   color: #333;
+   padding: 0 1em;
+}
+
+.sidebar {
+   position: fixed;
+   top: 30px;
+   bottom: 0;
+   overflow: auto;
+}
+
+#namespaces {
+   background: #e6e6e6;
+   border-right: solid 1px #bbb;
+   left: 0;
+   width: 250px;
+}
+
+#vars {
+   background: #eeeeee;
+   border-right: solid 1px #ccc;
+   left: 251px;
+   width: 200px;
+}
+
+.namespace-index {
+   left: 251px;
+}
+
+.namespace-docs {
+   left: 452px;
+}
+
+#header {
+   background: -moz-linear-gradient(top, #555 0%, #222 100%);
+   background: -webkit-linear-gradient(top, #555 0%, #333 100%);
+   background: -o-linear-gradient(top, #555 0%, #222 100%);
+   background: -ms-linear-gradient(top, #555 0%, #222 100%);
+   background: linear-gradient(top, #555 0%, #222 100%);
+   box-shadow: 0 0 10px #555;
+   z-index: 100;
+}
+
+#header h1 {
+   margin: 0;
+   padding: 0;
+   font-size: 12pt;
+   font-weight: lighter;
+   text-shadow: -1px -1px 0px #333;
+}
+
+#header a, .sidebar a {
+   display: block;
+   text-decoration: none;
+}
+
+#header a {
+   color: #fff;
+}
+
+.sidebar a {
+   color: #333;
+}
+
+#header h2 {
+    float: right;
+    font-size: 9pt;
+    font-weight: normal;
+    margin: 3px 3px;
+    padding: 0;
+    color: #bbb;
+}
+
+#header h2 a {
+    display: inline;
+}
+
+.sidebar h3 {
+   margin: 0;
+   padding: 10px 0.5em 0 0.5em;
+   font-size: 14pt;
+   font-weight: normal
+}
+
+.sidebar ul {
+   padding: 0.5em 0em;
+   margin: 0;
+}
+
+.sidebar li {
+   display: block;
+   vertical-align: middle;
+}
+
+.sidebar li a, .sidebar li .no-link {
+    border-left: 3px solid transparent;
+    padding: 0 7px;
+}
+
+.sidebar li .no-link {
+    display: block;
+    color: #777;
+    font-style: italic;
+}
+
+.sidebar li .inner {
+    display: inline-block;
+    padding-top: 7px;
+    height: 24px;
+}
+
+.sidebar li a, .sidebar li .tree {
+    height: 31px;
+}
+
+.depth-1 .inner { padding-left: 2px; }
+.depth-2 .inner { padding-left: 6px; }
+.depth-3 .inner { padding-left: 20px; }
+.depth-4 .inner { padding-left: 34px; }
+.depth-5 .inner { padding-left: 48px; }
+.depth-6 .inner { padding-left: 62px; }
+
+.sidebar li .tree {
+    display: block;
+    float: left;
+    position: relative;
+    top: -10px;
+    margin: 0 4px 0 0;
+    padding: 0;
+}
+
+.sidebar li.depth-1 .tree {
+    display: none;
+}
+
+.sidebar li .tree .top, .sidebar li .tree .bottom {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: 7px;
+}
+
+.sidebar li .tree .top {
+    border-left: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+    height: 19px;
+}
+
+.sidebar li .tree .bottom {
+    height: 22px;
+}
+
+.sidebar li.branch .tree .bottom {
+    border-left: 1px solid #aaa;
+}
+
+#namespaces li.current a {
+   border-left: 3px solid #a33;
+   color: #a33;
+}
+
+#vars li.current a {
+   border-left: 3px solid #33a;
+   color: #33a;
+}
+
+#content h3 {
+   font-size: 13pt;
+   font-weight: bold;
+}
+
+.public h3 {
+    margin: 0;
+    float: left;
+}
+
+.usage {
+    clear: both;
+}
+
+h4.type, h4.added, h4.deprecated {
+    margin: 0;
+    float: left;
+    font-variant: small-caps;
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 3px;
+    margin-left: 10px;
+}
+
+h4.type {
+    color: #717171;
+}
+
+h4.added {
+    color: #508820;
+}
+
+h4.deprecated {
+    color: #880000;
+}
+
+.public {
+   margin-top: 1.8em;
+   margin-bottom: 2.4em;
+}
+
+.public:last-child {
+   margin-bottom: 20%;
+}
+
+.members .public:last-child {
+    margin-bottom: 0;
+}
+
+.members {
+    margin: 15px 0;
+}
+
+.members h4 {
+    color: #555;
+    font-weight: normal;
+    font-variant: small-caps;
+    margin: 0 0 5px 0;
+}
+
+.members .inner {
+    padding-top: 5px;
+    padding-left: 15px;
+    margin-top: 2px;
+    margin-left: 4px;
+    border-left: 1px solid #bbb;
+}
+
+#content .members .inner h3 {
+    font-size: 12pt;
+}
+
+.members .public {
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.namespace {
+    margin-bottom: 30px;
+}
+
+.namespace:last-child {
+    margin-bottom: 10%;
+}
+
+.index {
+   padding: 0;
+   font-size: 80%;
+   margin: 15px 0;
+}
+
+.index * {
+   display: inline;
+}
+
+.index li {
+   padding: 0 .5em;
+}
+
+.index ul {
+   padding-left: 0;
+}
+
+.usage code {
+    display: block;
+    color: #008;
+}
+
+.usage code:first-child {
+    padding-top: 0.5em;
+}
+
+div.doc {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+pre.doc {
+    margin: 10px 0;
+}
+
+.src-link a {
+    background: #f6f6f6;
+    border: 1px solid #e4e4e4;
+    border-radius: 2px;
+    font-size: 70%;
+    padding: 1px 4px;
+    text-decoration: none;
+    color: #5555bb;
+}
