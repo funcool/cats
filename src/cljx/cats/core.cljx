@@ -139,17 +139,17 @@
                    b (mg a)]
                   (return b)))
 
-(defn sequence-m
+(defn m-sequence
   "Given a non-empty collection of monadic values, collect
   their values in a vector returned in the monadic context.
 
       (require '[cats.types :as t])
       (require '[cats.core :as m])
 
-      (m/sequence-m [(t/just 2) (t/just 3)])
+      (m/m-sequence [(t/just 2) (t/just 3)])
       ;=> <Just [[2, 3]]>
 
-      (m/sequence-m [(t/nothing) (t/just 3)])
+      (m/m-sequence [(t/nothing) (t/just 3)])
       ;=> <Nothing>
   "
   [mvs]
@@ -164,18 +164,18 @@
             (return []))
           mvs))
 
-(defn map-m
+(defn m-map
    "Given a function that takes a value and puts it into a
    monadic context, map it into the given collection
-   calling sequence-m on the results.
+   calling m-sequence on the results.
 
        (require '[cats.types :as t])
        (require '[cats.core :as m])
 
-       (m/map-m t/just [2 3])
+       (m/m-map t/just [2 3])
        ;=> <Just [[2 3]]>
 
-       (m/for-m (fn [v]
+       (m/m-for (fn [v]
                    (if (odd? v)
                      (t/just v)
                      (t/nothing)))
@@ -183,18 +183,18 @@
        ;=> <Nothing>
      "
   [mf coll]
-  (sequence-m (map mf coll)))
+  (m-sequence (map mf coll)))
 
-(defn for-m
-  "Same as map-m but with the arguments in reverse order.
+(defn m-for
+  "Same as m-map but with the arguments in reverse order.
 
       (require '[cats.types :as t])
       (require '[cats.core :as m])
 
-      (m/for-m [2 3] t/just)
+      (m/m-for [2 3] t/just)
       ;=> <Just [[2 3]]>
 
-      (m/for-m [1 2]
+      (m/m-for [1 2]
                (fn [v]
                   (if (odd? v)
                     (t/just v)
@@ -202,15 +202,15 @@
       ;=> <Nothing>
    "
   [vs mf]
-  (map-m mf vs))
+  (m-map mf vs))
 
-(defn lift-m
+(defn m-lift
   "Lifts a function to a monadic context.
 
       (require '[cats.types :as t])
       (require '[cats.core :as m])
 
-      (def monad+ (m/lift-m +))
+      (def monad+ (m/m-lift +))
 
       (monad+ (t/just 1) (t/just 2))
       ;=> <Just [3]>
@@ -221,10 +221,10 @@
   [f]
   (fn [& args]
     (#+clj  mlet
-     #+cljs cm/mlet [vs (sequence-m args)]
+     #+cljs cm/mlet [vs (m-sequence args)]
                     (return (apply f vs)))))
 
-(defn filter-m
+(defn m-filter
   "Applies a predicate to a value in a `MonadZero` instance,
   returning the identity element when the predicate yields false.
 
@@ -233,10 +233,10 @@
       (require '[cats.types :as t])
       (require '[cats.core :as m])
 
-      (m/filter-m (partial < 2) (t/just 3))
+      (m/m-filter (partial < 2) (t/just 3))
       ;=> <Just [3]>
 
-      (m/filter-m (partial < 4) (t/just 3))
+      (m/m-filter (partial < 4) (t/just 3))
       ;=> <Nothing>
   "
   [p mv]
@@ -245,7 +245,7 @@
                   :when (p v)]
                   (return v)))
 
-(defn when-m
+(defn m-when
   "If the expression is true, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."

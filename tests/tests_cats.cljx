@@ -35,39 +35,39 @@
                  (assert (= x 3))
                  (m/return x))))))
 
-(deftest test-sequence-m
+(deftest test-m-sequence
   (testing "It works with Maybe values"
-    (is (= (m/sequence-m [(t/just 2) (t/just 3)])
+    (is (= (m/m-sequence [(t/just 2) (t/just 3)])
            (t/just [2 3])))
-    (is (= (m/sequence-m [(t/just 2) (t/nothing)])
+    (is (= (m/m-sequence [(t/just 2) (t/nothing)])
            (t/nothing)))))
 
-(deftest test-lift-m
+(deftest test-m-lift
   (testing "It can lift a function to the Maybe monad"
-    (let [monad+ (m/lift-m +)]
+    (let [monad+ (m/m-lift +)]
       (is (= (t/just 6)
              (monad+ (t/just 1) (t/just 2) (t/just 3))))
       (is (= (t/nothing)
              (monad+ (t/just 1) (t/nothing)))))))
 
-(deftest test-filter-m
+(deftest test-m-filter
   (testing "It can filter Maybe monadic values"
     (let [bigger-than-4 (partial < 4)]
       (is (= (t/just 6)
-             (m/filter-m bigger-than-4 (t/just 6))))
+             (m/m-filter bigger-than-4 (t/just 6))))
       (is (= (t/nothing)
-             (m/filter-m bigger-than-4 (t/just 3))))))
+             (m/m-filter bigger-than-4 (t/just 3))))))
   (testing "It can filter vectors"
     (is (= [1 3 5]
-           (m/filter-m odd? [1 2 3 4 5 6])))))
+           (m/m-filter odd? [1 2 3 4 5 6])))))
 
-(deftest test-when-m
+(deftest test-m-when
   (testing "It returns the monadic value unchanged when the condition is true"
     (is (= (t/just 3)
-           (m/when-m true (t/just 3)))))
+           (m/m-when true (t/just 3)))))
   (testing "It returns nil in the monadic context when the condition is false"
     (is (= [nil]
-           (m/when-m false [])))))
+           (m/m-when false [])))))
 
 (deftest test-maybe
   (testing "Test predicates"
