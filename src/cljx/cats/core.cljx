@@ -205,7 +205,7 @@
   (m-map mf vs))
 
 (defmacro m-lift
-  "Lifts a function with a fixed number of arguments to a
+  "Lifts a function with the given fixed number of arguments to a
   monadic context.
 
       (require '[cats.types :as t])
@@ -279,9 +279,9 @@
       (t/state-t)))
 
 (defn swap-state
-  [f]
   "Return State instance with computation that applies
   specified function to state and return the old state."
+  [f]
   (-> (fn [s] (t/pair s (f s)))
       (t/state-t)))
 
