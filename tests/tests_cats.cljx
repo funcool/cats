@@ -2,14 +2,14 @@
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet with-context)])
+                   [cats.core :refer (mlet with-context m-lift)])
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
             [cats.types :as t])
   #+clj
   (:require [clojure.test :refer :all]
-            [cats.core :as m :refer [mlet with-context]]
+            [cats.core :as m :refer [mlet with-context m-lift]]
             [cats.types :as t]))
 
 
@@ -43,10 +43,13 @@
            (t/nothing)))))
 
 (deftest test-m-lift
-  (testing "It can lift a function to the Maybe monad"
-    (let [monad+ (m/m-lift +)]
+  (let [monad+ (m-lift 2 +)]
+    (testing "It can lift a function to the vector monad"
+      (is (= [1 2 3 4 5 6]
+             (monad+ [0 2 4] [1 2]))))
+    (testing "It can lift a function to the Maybe monad"
       (is (= (t/just 6)
-             (monad+ (t/just 1) (t/just 2) (t/just 3))))
+             (monad+ (t/just 2) (t/just 4))))
       (is (= (t/nothing)
              (monad+ (t/just 1) (t/nothing)))))))
 

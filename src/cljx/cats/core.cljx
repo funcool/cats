@@ -204,25 +204,31 @@
   [vs mf]
   (m-map mf vs))
 
-(defn m-lift
-  "Lifts a function to a monadic context.
+(defmacro m-lift
+  "Lifts a function with a fixed number of arguments to a
+  monadic context.
 
       (require '[cats.types :as t])
       (require '[cats.core :as m])
 
-      (def monad+ (m/m-lift +))
+      (def monad+ (m/m-lift 2 +))
 
       (monad+ (t/just 1) (t/just 2))
       ;=> <Just [3]>
 
       (monad+ (t/just 1) (t/nothing))
       ;=> <Nothing>
+
+      (monad+ [0 2 4] [1 2])
+      ;=> [1 2 3 4 5 6]
   "
-  [f]
-  (fn [& args]
-    (#+clj  mlet
-     #+cljs cm/mlet [vs (m-sequence args)]
-                    (return (apply f vs)))))
+  [n f]
+  (let [val-syms (repeatedly n gensym)
+        mval-syms (repeatedly n gensym)
+        mlet-bindings (vec (interleave val-syms mval-syms))]
+    `(fn [~@mval-syms]
+       (mlet ~mlet-bindings
+         (return (~f ~@val-syms))))))
 
 (defn m-filter
   "Applies a predicate to a value in a `MonadZero` instance,
