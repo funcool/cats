@@ -308,7 +308,9 @@
   (pure [_ v]
     (Continuation. (fn [c] (c v))))
   (fapply [_ av]
-    (throw (RuntimeException. "Not implemented")))
+    (throw (#+clj  RuntimeException.
+            #+cljs Error.
+              "Not implemented")))
 
   proto/Monad
   (bind [self mf]
