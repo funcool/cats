@@ -175,11 +175,11 @@
        (m/m-map t/just [2 3])
        ;=> <Just [[2 3]]>
 
-       (m/m-for (fn [v]
-                   (if (odd? v)
-                     (t/just v)
-                     (t/nothing)))
-                [1 2])
+       (m/m-map (fn [v]
+                  (if (odd? v)
+                    (t/just v)
+                    (t/nothing)))
+                 [1 2])
        ;=> <Nothing>
      "
   [mf coll]

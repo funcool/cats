@@ -42,6 +42,17 @@
     (is (= (m/m-sequence [(t/just 2) (t/nothing)])
            (t/nothing)))))
 
+(deftest test-m-map
+  (testing "It works with maybe values"
+    (is (= (m/m-map t/just [1 2 3 4 5])
+           (t/just [1 2 3 4 5])))
+    (is (= (t/nothing)
+           (m/m-map (fn [v]
+                      (if (odd? v)
+                        (t/just v)
+                        (t/nothing)))
+                    [1 2 3 4 5])))))
+
 (deftest test-m-lift
   (let [monad+ (m-lift 2 +)]
     (testing "It can lift a function to the vector monad"
