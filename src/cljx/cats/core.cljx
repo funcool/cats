@@ -225,9 +225,9 @@
   [n f]
   (let [val-syms (repeatedly n gensym)
         mval-syms (repeatedly n gensym)
-        mlet-bindings (vec (interleave val-syms mval-syms))]
+        mlet-bindings (interleave val-syms mval-syms)]
     `(fn [~@mval-syms]
-       (mlet ~mlet-bindings
+       (mlet [~@mlet-bindings]
          (return (~f ~@val-syms))))))
 
 (defn m-filter
