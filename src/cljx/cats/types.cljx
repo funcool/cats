@@ -169,6 +169,21 @@
   [v]
   (instance? Nothing v))
 
+(defn from-maybe
+  "Return inner value from maybe monad.
+
+  Examples:
+    (from-maybe (just 1))
+    ;=> 1
+    (from-maybe (nothing))
+    ;=> nil
+  "
+  [mv]
+  {:pre [(maybe? mv)]}
+  (cond
+   (just? mv) (.v mv)
+   (nothing? mv) nil))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure(Script) types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

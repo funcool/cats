@@ -13,6 +13,11 @@
             [cats.types :as t]))
 
 
+(deftest common
+  (testing "Basic maybe operations."
+    (is (= 1 (t/from-maybe (t/just 1))))
+    (is (= nil (t/from-maybe (t/nothing))))))
+
 (deftest test-mlet
   (testing "It supports regular let inside its bindings")
     (is (= (t/just 2)
