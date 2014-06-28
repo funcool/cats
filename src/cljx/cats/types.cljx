@@ -324,7 +324,7 @@
     (Continuation. (fn [c] (c v))))
   (fapply [_ av]
     (throw (#+clj  RuntimeException.
-            #+cljs Error.
+            #+cljs js/Error.
               "Not implemented")))
 
   proto/Monad
