@@ -51,13 +51,17 @@
 
 (defn left
   "Left constructor for Either type."
-  [^Object v]
-  (Either. v :left))
+  ([v]
+     (Either. v :left))
+  ([]
+     (Either. nil :left)))
 
 (defn right
   "Right constructor for Either type."
-  [^Object v]
-  (Either. v :right))
+  ([v]
+     (Either. v :right))
+  ([]
+     (Either. nil :right)))
 
 (defn left?
   [mv]
@@ -149,8 +153,10 @@
   (mplus [mv _] mv))
 
 (defn just
-  [v]
-  (Just. v))
+  ([v]
+     (Just. v))
+  ([]
+     (Just. nil)))
 
 (defn nothing
   []
