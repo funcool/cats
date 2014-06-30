@@ -107,7 +107,7 @@ Because cats library:
 
 With differences with other existing libraries:
 
-- The official monads library `algo.monads` is very good, but its approach for modeling 
+- The official monads library `algo.monads` is very good, but its approach for modeling
   is slighty limited (as example, you always should specify that monad you want use instead
   relying on the type). And obviously because it only has monads.
 - Fluokitten is the best library that we found, but the future of it is uncertain. One big
@@ -264,7 +264,7 @@ applicatives, monads deal with data in contexts.
 Additionaly, monads can also transform context by unwrapping data, applying functions to it and
 put new value in a completely different context.
 
-.This is aspect of Monad protocol
+.This is the aspect of the Monad protocol
 [source, clojure]
 ----
 (defprotocol Monad
@@ -307,6 +307,45 @@ if you coming from haskell, represents a `do-syntax`:
 
 TODO: document other more advanced options like `:let` and `:when` in a `mlet` context.
 
+MonadZero
+~~~~~~~~~
+
+The MonadZero (http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero) protocol represents a monad that has a notion of an identity element.
+
+.This is the aspect of the MonadZero protocol
+[source, clojure]
+----
+(defprotocol MonadZero
+  "A `Monad` that supports the notion of an identity element."
+  (mzero [ctx] "The identity element for `ctx`."))
+----
+
+The `bind` operation on the identity element satisfies Left Zero:
+
+[source, clojure]
+----
+(mzero (just 1))
+;; => #<Nothing >
+
+(= (mzero (just 1))
+   (>>= (mzero (just 1)) just))
+;; => true
+----
+
+When a monad instance implements the MonadZero protocol, `:where` clauses can be used in `mlet` bindings:
+
+[source, clojure]
+----
+(mlet [i [1 2 3 4 5]
+       :when (> i 2)]
+      (return i))
+;; => [3 4 5]
+
+(mlet [i (t/just 2)
+       :when (> i 2)]
+      (m/return i))
+;; => #<Nothing >
+----
 
 Data Types Reference
 --------------------

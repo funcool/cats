@@ -31,7 +31,7 @@
                  (m/return i))))
     (is (= [3 4 5]
            (mlet [i [1 2 3 4 5]
-                 :when (> i 2)]
+                  :when (> i 2)]
                  (m/return i))))
   (testing "The body runs in an implicit do"
     (is (= (t/just 3)
