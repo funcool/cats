@@ -295,7 +295,7 @@ applicatives, monads deal with data in contexts.</p></div>
 <div class="paragraph"><p>Additionaly, monads can also transform context by unwrapping data, applying functions to it and
 put new value in a completely different context.</p></div>
 <div class="listingblock">
-<div class="title">This is aspect of Monad protocol</div>
+<div class="title">This is the aspect of the Monad protocol</div>
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="kd">defprotocol </span><span class="nv">Monad</span>
   <span class="s">&quot;Incomplete monad type definition.&quot;</span>
   <span class="p">(</span><span class="nf">bind</span> <span class="p">[</span><span class="nv">mv</span> <span class="nv">f</span><span class="p">]</span> <span class="s">&quot;Applies the function f to the value(s) inside mv&#39;s context.&quot;</span><span class="p">))</span>
@@ -332,6 +332,37 @@ if you coming from haskell, represents a <span class="monospaced">do-syntax</spa
 <span class="c1">;; =&gt; #&lt;Just [3]&gt;</span>
 </pre></div></div></div>
 <div class="paragraph"><p>TODO: document other more advanced options like <span class="monospaced">:let</span> and <span class="monospaced">:when</span> in a <span class="monospaced">mlet</span> context.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_monadzero">MonadZero</h3>
+<div class="paragraph"><p>The MonadZero (<a href="http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero">http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero</a>) protocol represents a monad that has a notion of an identity element.</p></div>
+<div class="listingblock">
+<div class="title">This is the aspect of the MonadZero protocol</div>
+<div class="content"><div class="highlight"><pre><span class="p">(</span><span class="kd">defprotocol </span><span class="nv">MonadZero</span>
+  <span class="s">&quot;A `Monad` that supports the notion of an identity element.&quot;</span>
+  <span class="p">(</span><span class="nf">mzero</span> <span class="p">[</span><span class="nv">ctx</span><span class="p">]</span> <span class="s">&quot;The identity element for `ctx`.&quot;</span><span class="p">))</span>
+</pre></div></div></div>
+<div class="paragraph"><p>The <span class="monospaced">bind</span> operation on the identity element satisfies Left Zero:</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">mzero</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1">;; =&gt; #&lt;Nothing &gt;</span>
+
+<span class="p">(</span><span class="nb">= </span><span class="p">(</span><span class="nf">mzero</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">))</span>
+   <span class="p">(</span><span class="nf">&gt;&gt;=</span> <span class="p">(</span><span class="nf">mzero</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">))</span> <span class="nv">just</span><span class="p">))</span>
+<span class="c1">;; =&gt; true</span>
+</pre></div></div></div>
+<div class="paragraph"><p>When a monad instance implements the MonadZero protocol, <span class="monospaced">:where</span> clauses can be used in <span class="monospaced">mlet</span> bindings:</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">mlet</span> <span class="p">[</span><span class="nv">i</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span><span class="p">]</span>
+       <span class="ss">:when</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">i</span> <span class="mi">2</span><span class="p">)]</span>
+      <span class="p">(</span><span class="nf">return</span> <span class="nv">i</span><span class="p">))</span>
+<span class="c1">;; =&gt; [3 4 5]</span>
+
+<span class="p">(</span><span class="nf">mlet</span> <span class="p">[</span><span class="nv">i</span> <span class="p">(</span><span class="nf">t/just</span> <span class="mi">2</span><span class="p">)</span>
+       <span class="ss">:when</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">i</span> <span class="mi">2</span><span class="p">)]</span>
+      <span class="p">(</span><span class="nf">m/return</span> <span class="nv">i</span><span class="p">))</span>
+<span class="c1">;; =&gt; #&lt;Nothing &gt;</span>
+</pre></div></div></div>
 </div>
 </div>
 </div>
@@ -480,7 +511,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div id="footer">
 <div id="footer-text">
 Version 0.1.0<br>
-Last updated 2014-06-29 01:08:27 CEST
+Last updated 2014-06-30 21:25:57 CEST
 </div>
 </div>
 </body>
