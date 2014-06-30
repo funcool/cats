@@ -310,7 +310,7 @@ TODO: document other more advanced options like `:let` and `:when` in a `mlet` c
 MonadZero
 ~~~~~~~~~
 
-The MonadZero (http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero) protocol represents a monad that has a notion of an identity element.
+The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero[MonadZero] protocol represents a monad that has a notion of an identity element.
 
 .This is the aspect of the MonadZero protocol
 [source, clojure]
