@@ -224,7 +224,8 @@
 
   proto/Monad
   (bind [self f]
-    (vec (flatten (map f self))))
+    (into []
+          (apply concat (map f self))))
 
   proto/MonadZero
   (mzero [_] [])

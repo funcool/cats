@@ -41,6 +41,9 @@
                  (m/return x))))))
 
 (deftest test-m-sequence
+  (testing "It works with vectors"
+    (is (= (m/m-sequence [[1 2] [3 4]])
+           [[1 3] [1 4] [2 3] [2 4]])))
   (testing "It works with Maybe values"
     (is (= (m/m-sequence [(t/just 2) (t/just 3)])
            (t/just [2 3])))

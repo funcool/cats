@@ -158,11 +158,11 @@
              (#+clj  mlet
               #+cljs cm/mlet [v mv
                               vs mvs]
-                             (return (conj vs v))))
+                             (return (cons v vs))))
           (#+clj  with-context
            #+cljs cm/with-context (first mvs)
-            (return []))
-          mvs))
+            (return '()))
+          (reverse mvs)))
 
 (defn m-map
    "Given a function that takes a value and puts it into a
