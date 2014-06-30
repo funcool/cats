@@ -50,8 +50,8 @@
   (p/mzero *m-context*))
 
 (defn mplus
-  [mv mv']
-  (p/mplus mv mv'))
+  [& mvs]
+  (reduce p/mplus mvs))
 
 (defn guard
   [b]

@@ -126,7 +126,7 @@ Functor
 
 The Functor represents some sort of "computational context".
 
-.This is aspect of Functor protocol
+.Functor protocol
 [source, clojure]
 ----
 (defprotocol Functor
@@ -200,7 +200,7 @@ Applicative Functor
 
 Represents an abstraction lying in between Functor and Monad in expressivity.
 
-.Applicative protocol definition
+.Applicative protocol
 [source, clojure]
 ----
 (defprotocol Applicative
@@ -264,7 +264,7 @@ applicatives, monads deal with data in contexts.
 Additionaly, monads can also transform context by unwrapping data, applying functions to it and
 put new value in a completely different context.
 
-.This is the aspect of the Monad protocol
+.Monad protocol
 [source, clojure]
 ----
 (defprotocol Monad
@@ -312,7 +312,7 @@ MonadZero
 
 The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero[MonadZero] protocol represents a monad that has a notion of an identity element.
 
-.This is the aspect of the MonadZero protocol
+.MonadZero protocol
 [source, clojure]
 ----
 (defprotocol MonadZero
@@ -346,6 +346,40 @@ When a monad instance implements the MonadZero protocol, `:where` clauses can be
       (m/return i))
 ;; => #<Nothing >
 ----
+
+MonadPlus
+~~~~~~~~~
+
+The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[MonadPlus] protocol represents a MonadZero wich has a plus operation.
+
+.MonadPlus protocol
+[source, clojure]
+----
+(defprotocol MonadPlus
+  "A `MonadZero` that supports the notion of addition."
+  (mplus [mv mv'] "An associative addition operation."))
+----
+
+`mplus` is an associative binary operation for which the value that `mzero` gives is the identity element. The `mplus` version contained in the core namespace is variadic.
+
+[source, clojure]
+----
+(require '[cats.types :refer [just nothing]])
+(require '[cats.core :refer [mplus]])
+
+(mplus [1 2 3] [4 5 6] [7 8])
+;; => [1 2 3 4 5 6 7 8]
+
+(mplus (nothing))
+;; => #<Nothing >
+
+(mplus (nothing) (just 42))
+;; => #<Just [42]>
+
+(mplus (nothing) (just 42) (just 3))
+;; => #<Just [42]>
+----
+
 
 Data Types Reference
 --------------------
