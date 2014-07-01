@@ -3,10 +3,13 @@
 </pre></div><div class="public anchor" id="var-*m-context*"><h3>*m-context*</h3><h4 class="dynamic">dynamic</h4><div class="usage"></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-.3C.24.3E"><h3>&lt;$&gt;</h3><div class="usage"><code>(&lt;$&gt; f)</code><code>(&lt;$&gt; f fv)</code></div><div class="doc"><pre class="plaintext">Alias of fmap.
 </pre></div></div><div class="public anchor" id="var-.3C*.3E"><h3>&lt;*&gt;</h3><div class="usage"><code>(&lt;*&gt; af av)</code><code>(&lt;*&gt; af av &amp; avs)</code></div><div class="doc"><pre class="plaintext">Performs a Haskell-style left-associative fapply.
 </pre></div></div><div class="public anchor" id="var-.3C.3D.3C"><h3>&lt;=&lt;</h3><div class="usage"><code>(&lt;=&lt; mg mf x)</code></div><div class="doc"><pre class="plaintext">Right-to-left composition of monads.
-
 Same as `&gt;=&gt;` with its first two arguments flipped.</pre></div></div><div class="public anchor" id="var-.3D.3C.3C"><h3>=&lt;&lt;</h3><div class="usage"><code>(=&lt;&lt; f mv)</code></div><div class="doc"><pre class="plaintext">Same as the two argument version of `&gt;&gt;=` but with the
 arguments interchanged.</pre></div></div><div class="public anchor" id="var-.3E.3D.3E"><h3>&gt;=&gt;</h3><div class="usage"><code>(&gt;=&gt; mf mg x)</code></div><div class="doc"><pre class="plaintext">Left-to-right composition of monads.
 </pre></div></div><div class="public anchor" id="var-.3E.3E.3D"><h3>&gt;&gt;=</h3><div class="usage"><code>(&gt;&gt;= mv f)</code><code>(&gt;&gt;= mv f &amp; fs)</code></div><div class="doc"><pre class="plaintext">Performs a Haskell-style left-associative bind.
+
+Example:
+  (&gt;&gt;= (just 1) (comp just inc) (comp just inc))
+  ;=&gt; #&lt;Just [3]&gt;
 </pre></div></div><div class="public anchor" id="var-bind"><h3>bind</h3><div class="usage"><code>(bind mv f)</code></div><div class="doc"><pre class="plaintext">Given a value inside monadic context mv and any function,
 applies a function to value of mv.</pre></div></div><div class="public anchor" id="var-call-cc"><h3>call-cc</h3><div class="usage"><code>(call-cc f)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-eval-state"><h3>eval-state</h3><div class="usage"><code>(eval-state state seed)</code></div><div class="doc"><pre class="plaintext">Given a State instance, execute the
 wrapped computation and return the resultant
@@ -26,14 +29,14 @@ returning the identity element when the predicate yields false.
 
 Otherwise, returns the instance unchanged.
 
-    (require &apos;[cats.types :as t])
-    (require &apos;[cats.core :as m])
+  (require &apos;[cats.types :as t])
+  (require &apos;[cats.core :as m])
 
-    (m/m-filter (partial &lt; 2) (t/just 3))
-    ;=&gt; &lt;Just [3]&gt;
+  (m/m-filter (partial &lt; 2) (t/just 3))
+  ;=&gt; &lt;Just [3]&gt;
 
-    (m/m-filter (partial &lt; 4) (t/just 3))
-    ;=&gt; &lt;Nothing&gt;
+  (m/m-filter (partial &lt; 4) (t/just 3))
+  ;=&gt; &lt;Nothing&gt;
 </pre></div></div><div class="public anchor" id="var-m-for"><h3>m-for</h3><div class="usage"><code>(m-for vs mf)</code></div><div class="doc"><pre class="plaintext">Same as m-map but with the arguments in reverse order.
 
 (require &apos;[cats.types :as t])
@@ -51,49 +54,49 @@ Otherwise, returns the instance unchanged.
 </pre></div></div><div class="public anchor" id="var-m-lift"><h3>m-lift</h3><h4 class="type">macro</h4><div class="usage"><code>(m-lift n f)</code></div><div class="doc"><pre class="plaintext">Lifts a function with the given fixed number of arguments to a
 monadic context.
 
-    (require &apos;[cats.types :as t])
-    (require &apos;[cats.core :as m])
+  (require &apos;[cats.types :as t])
+  (require &apos;[cats.core :as m])
 
-    (def monad+ (m/m-lift 2 +))
+  (def monad+ (m/m-lift 2 +))
 
-    (monad+ (t/just 1) (t/just 2))
-    ;=&gt; &lt;Just [3]&gt;
+  (monad+ (t/just 1) (t/just 2))
+  ;=&gt; &lt;Just [3]&gt;
 
-    (monad+ (t/just 1) (t/nothing))
-    ;=&gt; &lt;Nothing&gt;
+  (monad+ (t/just 1) (t/nothing))
+  ;=&gt; &lt;Nothing&gt;
 
-    (monad+ [0 2 4] [1 2])
-    ;=&gt; [1 2 3 4 5 6]
+  (monad+ [0 2 4] [1 2])
+  ;=&gt; [1 2 3 4 5 6]
 </pre></div></div><div class="public anchor" id="var-m-map"><h3>m-map</h3><div class="usage"><code>(m-map mf coll)</code></div><div class="doc"><pre class="plaintext">Given a function that takes a value and puts it into a
 monadic context, map it into the given collection
 calling m-sequence on the results.
 
-    (require &apos;[cats.types :as t])
-    (require &apos;[cats.core :as m])
+  (require &apos;[cats.types :as t])
+  (require &apos;[cats.core :as m])
 
-    (m/m-map t/just [2 3])
-    ;=&gt; &lt;Just [[2 3]]&gt;
+  (m/m-map t/just [2 3])
+  ;=&gt; &lt;Just [[2 3]]&gt;
 
-    (m/m-map (fn [v]
-               (if (odd? v)
-                 (t/just v)
-                 (t/nothing)))
-              [1 2])
-    ;=&gt; &lt;Nothing&gt;
-  </pre></div></div><div class="public anchor" id="var-m-sequence"><h3>m-sequence</h3><div class="usage"><code>(m-sequence mvs)</code></div><div class="doc"><pre class="plaintext">Given a non-empty collection of monadic values, collect
+  (m/m-map (fn [v]
+             (if (odd? v)
+               (t/just v)
+               (t/nothing)))
+            [1 2])
+  ;=&gt; &lt;Nothing&gt;
+</pre></div></div><div class="public anchor" id="var-m-sequence"><h3>m-sequence</h3><div class="usage"><code>(m-sequence mvs)</code></div><div class="doc"><pre class="plaintext">Given a non-empty collection of monadic values, collect
 their values in a vector returned in the monadic context.
 
-    (require &apos;[cats.types :as t])
-    (require &apos;[cats.core :as m])
+  (require &apos;[cats.types :as t])
+  (require &apos;[cats.core :as m])
 
-    (m/m-sequence [(t/just 2) (t/just 3)])
-    ;=&gt; &lt;Just [[2, 3]]&gt;
+  (m/m-sequence [(t/just 2) (t/just 3)])
+  ;=&gt; &lt;Just [[2, 3]]&gt;
 
-    (m/m-sequence [(t/nothing) (t/just 3)])
-    ;=&gt; &lt;Nothing&gt;
+  (m/m-sequence [(t/nothing) (t/just 3)])
+  ;=&gt; &lt;Nothing&gt;
 </pre></div></div><div class="public anchor" id="var-m-when"><h3>m-when</h3><div class="usage"><code>(m-when b mv)</code></div><div class="doc"><pre class="plaintext">If the expression is true, returns the monadic value.
 
-Otherwise, yields nil in a monadic context.</pre></div></div><div class="public anchor" id="var-mlet"><h3>mlet</h3><h4 class="type">macro</h4><div class="usage"><code>(mlet bindings &amp; body)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-mplus"><h3>mplus</h3><div class="usage"><code>(mplus mv mv&apos;)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-mzero"><h3>mzero</h3><div class="usage"><code>(mzero)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-pure"><h3>pure</h3><div class="usage"><code>(pure v)</code><code>(pure av v)</code></div><div class="doc"><pre class="plaintext">Given any value v, return it wrapped in
+Otherwise, yields nil in a monadic context.</pre></div></div><div class="public anchor" id="var-mlet"><h3>mlet</h3><h4 class="type">macro</h4><div class="usage"><code>(mlet bindings &amp; body)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-mplus"><h3>mplus</h3><div class="usage"><code>(mplus &amp; mvs)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-mzero"><h3>mzero</h3><div class="usage"><code>(mzero)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-pure"><h3>pure</h3><div class="usage"><code>(pure v)</code><code>(pure av v)</code></div><div class="doc"><pre class="plaintext">Given any value v, return it wrapped in
 default/effect free context.
 
 This is multiarity function that with arity pure/1
@@ -106,12 +109,12 @@ wrapped computation and return its value.</pre></div></div><div class="public an
 wrapped computation and return Pair
 instance with result and new state.
 
-(def computation (mlet [x (get-state)
-                        y (put-state (inc x))]
-                   (return y)))
+  (def computation (mlet [x (get-state)
+                          y (put-state (inc x))]
+                     (return y)))
 
-(def initial-state 1)
-(run-state computation initial-state)
+  (def initial-state 1)
+  (run-state computation initial-state)
 
 This should be return something to: #&lt;Pair [1 2]&gt;</pre></div></div><div class="public anchor" id="var-swap-state"><h3>swap-state</h3><div class="usage"><code>(swap-state f)</code></div><div class="doc"><pre class="plaintext">Return State instance with computation that applies
 specified function to state and return the old state.</pre></div></div><div class="public anchor" id="var-with-context"><h3>with-context</h3><h4 class="type">macro</h4><div class="usage"><code>(with-context ctx &amp; body)</code></div><div class="doc"><pre class="plaintext"></pre></div></div></div></body></html>
