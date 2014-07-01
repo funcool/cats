@@ -208,7 +208,7 @@
 
   proto/Monad
   (bind [self f]
-    (flatten (map f self))))
+    (apply concat (map f self))))
 
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
