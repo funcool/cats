@@ -331,7 +331,14 @@ if you coming from haskell, represents a <span class="monospaced">do-syntax</spa
   <span class="p">(</span><span class="nf">return</span> <span class="nv">z</span><span class="p">))</span>
 <span class="c1">;; =&gt; #&lt;Just [3]&gt;</span>
 </pre></div></div></div>
-<div class="paragraph"><p>TODO: document other more advanced options like <span class="monospaced">:let</span> and <span class="monospaced">:when</span> in a <span class="monospaced">mlet</span> context.</p></div>
+<div class="paragraph"><p>If you want to use regular (non-monadic) let bindings inside a <span class="monospaced">mlet</span> block, you can do so using <span class="monospaced">:let</span> and a bindings vector as a pair inside the mlet bindings:</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">mlet</span> <span class="p">[</span><span class="nv">x</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">)</span>
+       <span class="nv">y</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">2</span><span class="p">)</span>
+       <span class="ss">:let</span> <span class="p">[</span><span class="nv">z</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="nv">y</span><span class="p">)]]</span>
+  <span class="p">(</span><span class="nf">return</span> <span class="nv">z</span><span class="p">))</span>
+<span class="c1">;; =&gt; #&lt;Just [3]&gt;</span>
+</pre></div></div></div>
 </div>
 <div class="sect2">
 <h3 id="_monadzero">MonadZero</h3>
@@ -538,7 +545,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div id="footer">
 <div id="footer-text">
 Version 0.1.0<br>
-Last updated 2014-07-01 22:38:59 CEST
+Last updated 2014-07-01 22:49:09 CEST
 </div>
 </div>
 </body>
