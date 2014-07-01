@@ -5,6 +5,9 @@
   #+cljs
   (:require-macros [cats.core :as cm]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Context Management
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^:dynamic *m-context*)
 
@@ -13,6 +16,10 @@
   [ctx & body]
   `(binding [*m-context* ~ctx]
      ~@body))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Context-aware funcionts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn pure
   "Given any value v, return it wrapped in
@@ -52,6 +59,11 @@
     (return nil)
     (mzero)))
 
+(defn join
+  "Remove one level of monadic structure."
+  [mv]
+  (bind mv identity))
+
 (defn fmap
   "Apply a function f to the value inside functor's fv
   preserving the context type."
@@ -65,27 +77,18 @@
   [af av]
   (p/fapply af av))
 
-(defn >>=
-  "Performs a Haskell-style left-associative bind."
-  ([mv f]
-     (bind mv f))
-  ([mv f & fs]
-     (reduce bind mv (cons f fs))))
+(defn m-when
+  "If the expression is true, returns the monadic value.
 
-(defn <$>
-  "Alias of fmap."
-  ([f]
-     (fn [fv]
-       (p/fmap fv f)))
-  ([f fv]
-     (p/fmap fv f)))
+  Otherwise, yields nil in a monadic context."
+  [b mv]
+  (if b
+    mv
+    (pure mv nil)))
 
-(defn <*>
-  "Performs a Haskell-style left-associative fapply."
-  ([af av]
-     (p/fapply af av))
-  ([af av & avs]
-     (reduce p/fapply af (cons av avs))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monadic Let Macro
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #+clj
 (defmacro mlet
@@ -106,51 +109,49 @@
                  ~next-mlet))))
     `(do ~@body)))
 
+#+clj
+(defmacro m-lift
+  "Lifts a function with the given fixed number of arguments to a
+  monadic context.
+
+    (require '[cats.types :as t])
+    (require '[cats.core :as m])
+
+    (def monad+ (m/m-lift 2 +))
+
+    (monad+ (t/just 1) (t/just 2))
+    ;=> <Just [3]>
+
+    (monad+ (t/just 1) (t/nothing))
+    ;=> <Nothing>
+
+    (monad+ [0 2 4] [1 2])
+    ;=> [1 2 3 4 5 6]
+  "
+  [n f]
+  (let [val-syms (repeatedly n gensym)
+        mval-syms (repeatedly n gensym)
+        mlet-bindings (interleave val-syms mval-syms)]
+    `(fn [~@mval-syms]
+       (mlet [~@mlet-bindings]
+         (return (~f ~@val-syms))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monadic functions
+;; Sequences.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn join
-  "Remove one level of monadic structure."
-  [mv]
-  (bind mv identity))
-
-(defn =<<
-  "Same as the two argument version of `>>=` but with the
-  arguments interchanged."
-  [f mv]
-  (>>= mv f))
-
-(defn >=>
-  "Left-to-right composition of monads."
-  [mf mg x]
-  (#+clj  mlet
-   #+cljs cm/mlet [a (mf x)
-                   b (mg a)]
-                  (return b)))
-
-(defn <=<
-  "Right-to-left composition of monads.
-
-  Same as `>=>` with its first two arguments flipped."
-  [mg mf x]
-  (#+clj  mlet
-   #+cljs cm/mlet [a (mf x)
-                   b (mg a)]
-                  (return b)))
 
 (defn m-sequence
   "Given a non-empty collection of monadic values, collect
   their values in a vector returned in the monadic context.
 
-      (require '[cats.types :as t])
-      (require '[cats.core :as m])
+    (require '[cats.types :as t])
+    (require '[cats.core :as m])
 
-      (m/m-sequence [(t/just 2) (t/just 3)])
-      ;=> <Just [[2, 3]]>
+    (m/m-sequence [(t/just 2) (t/just 3)])
+    ;=> <Just [[2, 3]]>
 
-      (m/m-sequence [(t/nothing) (t/just 3)])
-      ;=> <Nothing>
+    (m/m-sequence [(t/nothing) (t/just 3)])
+    ;=> <Nothing>
   "
   [mvs]
   {:pre [(not-empty mvs)]}
@@ -169,66 +170,40 @@
    monadic context, map it into the given collection
    calling m-sequence on the results.
 
-       (require '[cats.types :as t])
-       (require '[cats.core :as m])
+     (require '[cats.types :as t])
+     (require '[cats.core :as m])
 
-       (m/m-map t/just [2 3])
-       ;=> <Just [[2 3]]>
+     (m/m-map t/just [2 3])
+     ;=> <Just [[2 3]]>
 
-       (m/m-map (fn [v]
-                  (if (odd? v)
-                    (t/just v)
-                    (t/nothing)))
-                 [1 2])
-       ;=> <Nothing>
-     "
+     (m/m-map (fn [v]
+                (if (odd? v)
+                  (t/just v)
+                  (t/nothing)))
+               [1 2])
+     ;=> <Nothing>
+  "
   [mf coll]
   (m-sequence (map mf coll)))
 
 (defn m-for
   "Same as m-map but with the arguments in reverse order.
 
-      (require '[cats.types :as t])
-      (require '[cats.core :as m])
+    (require '[cats.types :as t])
+    (require '[cats.core :as m])
 
-      (m/m-for [2 3] t/just)
-      ;=> <Just [[2 3]]>
+    (m/m-for [2 3] t/just)
+    ;=> <Just [[2 3]]>
 
-      (m/m-for [1 2]
-               (fn [v]
-                  (if (odd? v)
-                    (t/just v)
-                    (t/nothing))))
-      ;=> <Nothing>
-   "
+    (m/m-for [1 2]
+             (fn [v]
+                (if (odd? v)
+                  (t/just v)
+                  (t/nothing))))
+    ;=> <Nothing>
+  "
   [vs mf]
   (m-map mf vs))
-
-(defmacro m-lift
-  "Lifts a function with the given fixed number of arguments to a
-  monadic context.
-
-      (require '[cats.types :as t])
-      (require '[cats.core :as m])
-
-      (def monad+ (m/m-lift 2 +))
-
-      (monad+ (t/just 1) (t/just 2))
-      ;=> <Just [3]>
-
-      (monad+ (t/just 1) (t/nothing))
-      ;=> <Nothing>
-
-      (monad+ [0 2 4] [1 2])
-      ;=> [1 2 3 4 5 6]
-  "
-  [n f]
-  (let [val-syms (repeatedly n gensym)
-        mval-syms (repeatedly n gensym)
-        mlet-bindings (interleave val-syms mval-syms)]
-    `(fn [~@mval-syms]
-       (mlet [~@mlet-bindings]
-         (return (~f ~@val-syms))))))
 
 (defn m-filter
   "Applies a predicate to a value in a `MonadZero` instance,
@@ -236,14 +211,14 @@
 
   Otherwise, returns the instance unchanged.
 
-      (require '[cats.types :as t])
-      (require '[cats.core :as m])
+    (require '[cats.types :as t])
+    (require '[cats.core :as m])
 
-      (m/m-filter (partial < 2) (t/just 3))
-      ;=> <Just [3]>
+    (m/m-filter (partial < 2) (t/just 3))
+    ;=> <Just [3]>
 
-      (m/m-filter (partial < 4) (t/just 3))
-      ;=> <Nothing>
+    (m/m-filter (partial < 4) (t/just 3))
+    ;=> <Nothing>
   "
   [p mv]
   (#+clj  mlet
@@ -251,14 +226,59 @@
                   :when (p v)]
                   (return v)))
 
-(defn m-when
-  "If the expression is true, returns the monadic value.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Haskell-style aliases and util functions.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  Otherwise, yields nil in a monadic context."
-  [b mv]
-  (if b
-    mv
-    (pure mv nil)))
+(defn <$>
+  "Alias of fmap."
+  ([f]
+     (fn [fv]
+       (p/fmap fv f)))
+  ([f fv]
+     (p/fmap fv f)))
+
+(defn <*>
+  "Performs a Haskell-style left-associative fapply."
+  ([af av]
+     (p/fapply af av))
+  ([af av & avs]
+     (reduce p/fapply af (cons av avs))))
+
+(defn >>=
+  "Performs a Haskell-style left-associative bind.
+
+  Example:
+    (>>= (just 1) (comp just inc) (comp just inc))
+    ;=> #<Just [3]>
+  "
+  ([mv f]
+     (bind mv f))
+  ([mv f & fs]
+     (reduce bind mv (cons f fs))))
+
+(defn =<<
+  "Same as the two argument version of `>>=` but with the
+  arguments interchanged."
+  [f mv]
+  (>>= mv f))
+
+(defn >=>
+  "Left-to-right composition of monads."
+  [mf mg x]
+  (#+clj  mlet
+   #+cljs cm/mlet [a (mf x)
+                   b (mg a)]
+                  (return b)))
+
+(defn <=<
+  "Right-to-left composition of monads.
+  Same as `>=>` with its first two arguments flipped."
+  [mg mf x]
+  (#+clj  mlet
+   #+cljs cm/mlet [a (mf x)
+                   b (mg a)]
+                  (return b)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
@@ -290,12 +310,12 @@
   wrapped computation and return Pair
   instance with result and new state.
 
-  (def computation (mlet [x (get-state)
-                          y (put-state (inc x))]
-                     (return y)))
+    (def computation (mlet [x (get-state)
+                            y (put-state (inc x))]
+                       (return y)))
 
-  (def initial-state 1)
-  (run-state computation initial-state)
+    (def initial-state 1)
+    (run-state computation initial-state)
 
   This should be return something to: #<Pair [1 2]>"
   [state seed]
