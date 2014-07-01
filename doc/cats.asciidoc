@@ -305,7 +305,16 @@ if you coming from haskell, represents a `do-syntax`:
 ;; => #<Just [3]>
 ----
 
-TODO: document other more advanced options like `:let` and `:when` in a `mlet` context.
+If you want to use regular (non-monadic) let bindings inside a `mlet` block, you can do so using `:let` and a bindings vector as a pair inside the mlet bindings:
+
+[source, clojure]
+----
+(mlet [x (just 1)
+       y (just 2)
+       :let [z (+ x y)]]
+  (return z))
+;; => #<Just [3]>
+----
 
 MonadZero
 ~~~~~~~~~
