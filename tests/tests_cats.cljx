@@ -46,7 +46,10 @@
            [[1 3] [1 4] [2 3] [2 4]])))
   (testing "It works with lazy seqs"
     (is (= (m/m-sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
-           [[1 3] [1 4] [2 3] [2 4]])))
+           '([1 3] [1 4] [2 3] [2 4]))))
+  (testing "It works with sets"
+    (is (= (m/m-sequence [#{1 2} #{3 4}])
+           #{[1 3] [1 4] [2 3] [2 4]})))
   (testing "It works with Maybe values"
     (is (= (m/m-sequence [(t/just 2) (t/just 3)])
            (t/just [2 3])))

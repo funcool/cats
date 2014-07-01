@@ -1,6 +1,7 @@
 (ns cats.types
   "Monadic types definition."
-  (:require [cats.protocols :as proto]))
+  (:require [clojure.set :as s]
+            [cats.protocols :as proto]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Either
@@ -194,6 +195,8 @@
 ;; Clojure(Script) types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; TODO: PersistenList
+; TODO: document
 (extend-type #+clj  clojure.lang.LazySeq
              #+cljs cljs.core.LazySeq
   proto/Functor
@@ -210,6 +213,7 @@
   (bind [self f]
     (apply concat (map f self))))
 
+; TODO: test & document
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
   proto/Functor
@@ -232,6 +236,32 @@
 
   proto/MonadPlus
   (mplus [mv mv'] (into mv mv')))
+
+; TODO: test & document
+(extend-type #+clj clojure.lang.PersistentHashSet
+             #+cljs cljs.core.PersistentHashSet
+  proto/Functor
+  (fmap [self f]
+    (set (map f self)))
+
+  proto/Applicative
+  (pure [_ v] #{v})
+
+  (fapply [self av]
+    (set (for [f self
+               v av]
+           (f v))))
+
+  proto/Monad
+  (bind [self f]
+    (apply s/union (map f self)))
+
+  proto/MonadZero
+  (mzero [_] #{})
+
+  proto/MonadPlus
+  (mplus [mv mv']
+    (s/union mv mv')))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pair (State monad related)
