@@ -348,12 +348,12 @@ When a monad instance implements the MonadZero protocol, `:where` clauses can be
 [source, clojure]
 ----
 (mlet [i [1 2 3 4 5]
-       :when (> i 2)]
+       :where (> i 2)]
       (return i))
 ;; => [3 4 5]
 
 (mlet [i (t/just 2)
-       :when (> i 2)]
+       :where (> i 2)]
       (m/return i))
 ;; => #<Nothing >
 ----
