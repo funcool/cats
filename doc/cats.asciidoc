@@ -5,6 +5,8 @@ Andrey Antukh & Alejandro Gómez
 
 :toc:
 
+image:static/logo/logo.png[cats logo]
+
 Introduction
 ------------
 

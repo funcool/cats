@@ -4,6 +4,7 @@ lein doc
 cp -vr doc/index.html /tmp/index.html;
 cp -vr doc/static /tmp/static
 cp -vr doc/codox /tmp/codox
+cp -vr logo /tmp/static
 git checkout gh-pages;
 
 rm -rf static index.html codox
