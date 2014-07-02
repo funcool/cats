@@ -368,12 +368,12 @@ if you coming from haskell, represents a <span class="monospaced">do-syntax</spa
 <div class="paragraph"><p>When a monad instance implements the MonadZero protocol, <span class="monospaced">:where</span> clauses can be used in <span class="monospaced">mlet</span> bindings:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">mlet</span> <span class="p">[</span><span class="nv">i</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span><span class="p">]</span>
-       <span class="ss">:when</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">i</span> <span class="mi">2</span><span class="p">)]</span>
+       <span class="ss">:where</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">i</span> <span class="mi">2</span><span class="p">)]</span>
       <span class="p">(</span><span class="nf">return</span> <span class="nv">i</span><span class="p">))</span>
 <span class="c1">;; =&gt; [3 4 5]</span>
 
 <span class="p">(</span><span class="nf">mlet</span> <span class="p">[</span><span class="nv">i</span> <span class="p">(</span><span class="nf">t/just</span> <span class="mi">2</span><span class="p">)</span>
-       <span class="ss">:when</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">i</span> <span class="mi">2</span><span class="p">)]</span>
+       <span class="ss">:where</span> <span class="p">(</span><span class="nb">&gt; </span><span class="nv">i</span> <span class="mi">2</span><span class="p">)]</span>
       <span class="p">(</span><span class="nf">m/return</span> <span class="nv">i</span><span class="p">))</span>
 <span class="c1">;; =&gt; #&lt;Nothing &gt;</span>
 </pre></div></div></div>
@@ -552,7 +552,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div id="footer">
 <div id="footer-text">
 Version 0.1.0<br>
-Last updated 2014-07-02 18:14:21 UTC
+Last updated 2014-07-02 23:15:25 CEST
 </div>
 </div>
 </body>
