@@ -200,8 +200,7 @@
 (extend-type #+clj  clojure.lang.LazySeq
              #+cljs cljs.core.LazySeq
   proto/Functor
-  (fmap [self f]
-    (map f self))
+  (fmap [self f] (map f self))
 
   proto/Applicative
   (pure [_ v] (lazy-seq [v]))
@@ -212,7 +211,7 @@
 
   proto/Monad
   (bind [self f]
-    (mapcat f self)))
+    (apply concat (map f self))))
 
 ; TODO: test & document
 (extend-type #+clj clojure.lang.PersistentVector
@@ -230,7 +229,7 @@
   proto/Monad
   (bind [self f]
     (into []
-          (mapcat f self)))
+          (apply concat (map f self))))
 
   proto/MonadZero
   (mzero [_] [])
