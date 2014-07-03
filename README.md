@@ -6,3 +6,5 @@ cats
 ![](./logo/logo.png "cats logo")
 
 Category Theory abstractions for Clojure.
+
+[![Clojars Project](http://clojars.org/cats/latest-version.svg)](http://clojars.org/cats)
