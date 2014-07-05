@@ -2,14 +2,14 @@
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet with-context m-lift)])
+                   [cats.core :refer (mlet with-context lift)])
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
             [cats.types :as t])
   #+clj
   (:require [clojure.test :refer :all]
-            [cats.core :as m :refer [mlet with-context m-lift]]
+            [cats.core :as m :refer [mlet with-context lift]]
             [cats.types :as t]))
 
 
@@ -40,35 +40,35 @@
                  (assert (= x 3))
                  (m/return x))))))
 
-(deftest test-m-sequence
+(deftest test-sequence
   (testing "It works with vectors"
-    (is (= (m/m-sequence [[1 2] [3 4]])
+    (is (= (m/sequence [[1 2] [3 4]])
            [[1 3] [1 4] [2 3] [2 4]])))
   (testing "It works with lazy seqs"
-    (is (= (m/m-sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
+    (is (= (m/sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
            '([1 3] [1 4] [2 3] [2 4]))))
   (testing "It works with sets"
-    (is (= (m/m-sequence [#{1 2} #{3 4}])
+    (is (= (m/sequence [#{1 2} #{3 4}])
            #{[1 3] [1 4] [2 3] [2 4]})))
   (testing "It works with Maybe values"
-    (is (= (m/m-sequence [(t/just 2) (t/just 3)])
+    (is (= (m/sequence [(t/just 2) (t/just 3)])
            (t/just [2 3])))
-    (is (= (m/m-sequence [(t/just 2) (t/nothing)])
+    (is (= (m/sequence [(t/just 2) (t/nothing)])
            (t/nothing)))))
 
-(deftest test-m-map
+(deftest test-mapseq
   (testing "It works with maybe values"
-    (is (= (m/m-map t/just [1 2 3 4 5])
+    (is (= (m/mapseq t/just [1 2 3 4 5])
            (t/just [1 2 3 4 5])))
     (is (= (t/nothing)
-           (m/m-map (fn [v]
-                      (if (odd? v)
-                        (t/just v)
-                        (t/nothing)))
-                    [1 2 3 4 5])))))
+           (m/mapseq (fn [v]
+                        (if (odd? v)
+                          (t/just v)
+                          (t/nothing)))
+                      [1 2 3 4 5])))))
 
-(deftest test-m-lift
-  (let [monad+ (m-lift 2 +)]
+(deftest test-lift
+  (let [monad+ (lift 2 +)]
     (testing "It can lift a function to the vector monad"
       (is (= [1 2 3 4 5 6]
              (monad+ [0 2 4] [1 2]))))
@@ -78,24 +78,24 @@
       (is (= (t/nothing)
              (monad+ (t/just 1) (t/nothing)))))))
 
-(deftest test-m-filter
+(deftest test-filter
   (testing "It can filter Maybe monadic values"
     (let [bigger-than-4 (partial < 4)]
       (is (= (t/just 6)
-             (m/m-filter bigger-than-4 (t/just 6))))
+             (m/filter bigger-than-4 (t/just 6))))
       (is (= (t/nothing)
-             (m/m-filter bigger-than-4 (t/just 3))))))
+             (m/filter bigger-than-4 (t/just 3))))))
   (testing "It can filter vectors"
     (is (= [1 3 5]
-           (m/m-filter odd? [1 2 3 4 5 6])))))
+           (m/filter odd? [1 2 3 4 5 6])))))
 
-(deftest test-m-when
+(deftest test-when
   (testing "It returns the monadic value unchanged when the condition is true"
     (is (= (t/just 3)
-           (m/m-when true (t/just 3)))))
+           (m/when true (t/just 3)))))
   (testing "It returns nil in the monadic context when the condition is false"
     (is (= [nil]
-           (m/m-when false [])))))
+           (m/when false [])))))
 
 (deftest test-maybe
   (testing "Test predicates"
