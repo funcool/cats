@@ -343,17 +343,17 @@ The `bind` operation on the identity element satisfies Left Zero:
 ;; => true
 ----
 
-When a monad instance implements the MonadZero protocol, `:where` clauses can be used in `mlet` bindings:
+When a monad instance implements the MonadZero protocol, `:when` clauses can be used in `mlet` bindings:
 
 [source, clojure]
 ----
 (mlet [i [1 2 3 4 5]
-       :where (> i 2)]
+       :when (> i 2)]
       (return i))
 ;; => [3 4 5]
 
 (mlet [i (t/just 2)
-       :where (> i 2)]
+       :when (> i 2)]
       (m/return i))
 ;; => #<Nothing >
 ----
