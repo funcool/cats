@@ -13,4 +13,4 @@ And there are my cats, engaged in a ritual that goes back thousands of years, tr
 -- <cite>William S. Burroughs, The Cat Inside</cite>
 </blockquote>
 
-[![Clojars Project](http://clojars.org/cats/latest-version.svg)](http://clojars.org/cat)
+[![Clojars Project](http://clojars.org/cats/latest-version.svg)](http://clojars.org/cats)
