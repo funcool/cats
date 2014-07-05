@@ -202,11 +202,11 @@
     (require '[cats.types :as t])
     (require '[cats.core :as m])
 
-    (m/for [2 3] t/just)
+    (m/forseq [2 3] t/just)
     ;=> <Just [[2 3]]>
 
-    (m/for [1 2]
-             (fn [v]
+    (m/forseq [1 2]
+              (fn [v]
                 (if (odd? v)
                   (t/just v)
                   (t/nothing))))
