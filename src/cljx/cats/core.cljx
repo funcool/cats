@@ -86,6 +86,15 @@
     mv
     (pure mv nil)))
 
+(defn m-unless
+  "If the expression is false, returns the monadic value.
+
+  Otherwise, yields nil in a monadic context."
+  [b mv]
+  (if (not b)
+    mv
+    (pure mv nil)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
