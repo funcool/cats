@@ -29,6 +29,42 @@
             [cats.protocols :as proto]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Identity
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(deftype Identity [v]
+  #+clj
+  Object
+  #+clj
+  (equals [_ other]
+    (= v (.-v other)))
+
+  #+cljs
+  cljs.core/IEquiv
+  #+cljs
+  (-equiv [_ other]
+    (= v (.-v other)))
+
+  #+clj
+  (toString [_]
+    (str v))
+
+  proto/Functor
+  (fmap [_ f]
+    (Identity. (f v)))
+
+  proto/Applicative
+  (pure [_ v']
+    (Identity. v'))
+
+  (fapply [_ av]
+    (Identity. (v (.-v av))))
+
+  proto/Monad
+  (bind [_ f]
+    (f v)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Either
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -218,6 +254,79 @@
    (nothing? mv) nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clojure(Script) types
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; TODO: PersistenList
+; TODO: document
+(extend-type #+clj  clojure.lang.LazySeq
+             #+cljs cljs.core.LazySeq
+  proto/Functor
+  (fmap [self f] (map f self))
+
+  proto/Applicative
+  (pure [_ v] (lazy-seq [v]))
+  (fapply [self av]
+    (for [f self
+          v av]
+         (f v)))
+
+  proto/Monad
+  (bind [self f]
+    (apply concat (map f self))))
+
+; TODO: document
+(extend-type #+clj clojure.lang.PersistentVector
+             #+cljs cljs.core.PersistentVector
+  proto/Functor
+  (fmap [self f] (vec (map f self)))
+
+  proto/Applicative
+  (pure [_ v] [v])
+  (fapply [self av]
+    (vec (for [f self
+               v av]
+           (f v))))
+
+  proto/Monad
+  (bind [self f]
+    (into []
+          (apply concat (map f self))))
+
+  proto/MonadZero
+  (mzero [_] [])
+
+  proto/MonadPlus
+  (mplus [mv mv'] (into mv mv')))
+
+; TODO: test & document
+(extend-type #+clj clojure.lang.PersistentHashSet
+             #+cljs cljs.core.PersistentHashSet
+  proto/Functor
+  (fmap [self f]
+    (set (map f self)))
+
+  proto/Applicative
+  (pure [_ v] #{v})
+
+  (fapply [self av]
+    (set (for [f self
+               v av]
+           (f v))))
+
+  proto/Monad
+  (bind [self f]
+    (apply s/union (map f self)))
+
+  proto/MonadZero
+  (mzero [_] #{})
+
+  proto/MonadPlus
+  (mplus [mv mv']
+    (s/union mv mv')))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+>>>>>>> Identity monad
 ;; Pair (State monad related)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
