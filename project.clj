@@ -40,7 +40,5 @@
                             {:source-paths ["tests"]
                              :output-path "target/testclasses"
                              :rules :cljs}]}}
-   :dev [:common {:injections [(use '[clojure.tools.namespace.repl :only (refresh)])]}]
+   :dev [:common {:source-paths ["dev"]}]
    :test [:common {:hooks [cljx.hooks leiningen.cljsbuild]}]})
-
-
