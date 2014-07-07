@@ -109,7 +109,7 @@
       (is (= (m/fmap inc m1) (t/just 2)))
       (is (= (m/fmap inc m2) (t/nothing)))))
 
-  (testing "The first monad law : left identity"
+  (testing "The first monad law: left identity"
     (is (= (t/just 2)
            (with-context (t/just 0)
              (m/>>= (m/return 2) t/just)))))
@@ -132,7 +132,7 @@
         inc-cont-fn (fn [x]
                       (t/continuation (fn [c] (c (inc x)))))]
 
-    (testing "The first monad law : left identity"
+    (testing "The first monad law: left identity"
       (is (= (m/run-cont cont-42)
              (m/run-cont
                (with-context (t/continuation #())
@@ -169,7 +169,7 @@
 (deftest test-lazy-seq
   (let [s (lazy-seq [2])
         val->lazyseq (fn [x] (lazy-seq [x]))]
-    (testing "The first monad law : left identity"
+    (testing "The first monad law: left identity"
       (is (= s
              (with-context s
                (m/>>= (m/return 2)
@@ -188,3 +188,22 @@
              (m/>>= s
                     (fn [x] (m/>>= (val->lazyseq (inc x))
                                   (fn [y] (val->lazyseq (inc y)))))))))))
+
+(deftest test-vector
+  (testing "The first monad law: left identity"
+    (is (= [1 2 3 4 5]
+           (m/>>= [0 1 2 3 4]
+                  (fn [x] [(inc x)])))))
+  (testing "The second law: right identity"
+    (is (= [1 2 3]
+           (m/>>= [1 2 3]
+                  m/return))))
+  (testing "The third law: associativity"
+    (is (= (m/>>= (mlet [x [1 2 3 4 5]
+                         y [(inc x)]]
+                        (m/return y))
+                  (fn [z] [(inc z)]))
+
+           (m/>>= [1 2 3 4 5]
+                  (fn [x] (m/>>= [(inc x)]
+                                (fn [y] [(inc y)]))))))))
