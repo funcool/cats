@@ -207,3 +207,25 @@
            (m/>>= [1 2 3 4 5]
                   (fn [x] (m/>>= [(inc x)]
                                 (fn [y] [(inc y)]))))))))
+
+
+(deftest state-monad
+  (testing "get-state should return the identity."
+    (let [computation (m/get-state)]
+      (is (= :foo (m/exec-state computation :foo)))))
+
+  (testing "swap-state should should apply function to state and return it."
+    (let [computation (m/swap-state inc)]
+      (is (= 2 (m/exec-state computation 1)))))
+
+  (testing "State monad compositio with mlet should return state"
+    (let [res (mlet [s (m/get-state)]
+                (m/return (inc s)))]
+      (is (t/state? res))
+      (let [res (m/run-state res 1)]
+        (is (t/pair? res))
+        (is (= 2 (first res)))
+        (is (= 1 (second res)))))))
+
+
+

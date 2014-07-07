@@ -17,6 +17,10 @@
            (= type (.-type other)))
       false))
 
+  #+clj
+  (toString [self]
+    (with-out-str (print [v type])))
+
   #+cljs
   cljs.core/IEquiv
   #+cljs
@@ -25,9 +29,6 @@
       (and (= v (.-v other))
            (= type (.-type other)))
       false))
-
-  (toString [self]
-    (with-out-str (print [v type])))
 
   proto/Functor
   (fmap [s f]
@@ -267,43 +268,47 @@
 ;; Pair (State monad related)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
 (deftype Pair [fst snd]
-  clojure.lang.Seqable
-  (seq [_] (list fst snd))
+  #+clj  clojure.lang.Seqable
+  #+cljs cljs.core/ISeqable
+  (#+cljs -seq #+clj seq [_]
+    (list fst snd))
 
-  clojure.lang.Indexed
-  (nth [_ i]
+  #+clj  clojure.lang.Indexed
+  #+cljs cljs.core/IIndexed
+  (#+clj nth #+cljs -nth [_ i]
     (case i
       0 fst
       1 snd
-      (throw (IndexOutOfBoundsException.))))
+      (throw #+clj (IndexOutOfBoundsException.)
+             #+cljs (js/Error. "Out of index"))))
 
-  (nth [_ i notfound]
+  (#+clj nth #+cljs -nth [_ i notfound]
     (case i
       0 fst
       1 snd
       notfound))
 
-  clojure.lang.Counted
-  (count [_] 2)
+  #+clj  clojure.lang.Counted
+  #+cljs cljs.core/ICounted
+  (#+clj count #+cljs -count [_] 2)
 
-  Object
-  (equals [this other]
+  #+clj  java.lang.Object
+  #+cljs cljs.core/IEquiv
+  (#+clj equals #+cljs -equiv [this other]
     (if (instance? Pair other)
       (and (= (.-fst this) (.-fst other))
            (= (.-snd this) (.-snd other)))
       false))
 
+  #+clj
   (toString [this]
     (with-out-str (print [fst snd]))))
 
-#+clj
 (defn pair
   [fst snd]
   (Pair. fst snd))
 
-#+clj
 (defn pair?
   [v]
   (instance? Pair v))
@@ -312,20 +317,20 @@
 ;; State Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
 (declare state-t)
 
-#+clj
 (deftype State [mfn]
-  clojure.lang.IFn
-  (invoke [self seed]
+  #+clj  clojure.lang.IFn
+  #+cljs cljs.core/IFn
+  (#+clj invoke #+cljs -invoke [self seed]
     (mfn seed))
 
   proto/Applicative
   (pure [_ v]
     (State. (fn [s] (pair v s))))
   (fapply [_ av]
-    (throw (RuntimeException. "Not implemented")))
+    (throw #+clj (RuntimeException. "Not implemented")
+           #+cljs (js/Error. "Not implemented")))
 
   proto/Monad
   (bind [self f]
@@ -336,7 +341,6 @@
             ((f value) newstate)))
         (state-t))))
 
-#+clj
 (defn state-t
   "Transform a simple state-monad function
   to State class instance.
@@ -346,6 +350,12 @@
   [f]
   (State. f))
 
+(defn state?
+  "Check if value s is instance of
+  State type."
+  [s]
+  (instance? State s))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Continuation Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -353,7 +363,7 @@
 (deftype Continuation [mfn]
   #+clj   clojure.lang.IFn
   #+cljs  cljs.core/IFn
-  (invoke [self f]
+  (#+clj invoke #+cljs -invoke [self f]
     (mfn f))
 
   proto/Applicative
