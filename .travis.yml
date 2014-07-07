@@ -2,8 +2,9 @@ language: clojure
 lein: lein2
 
 script:
-  - lein2 with-profile test cljx once
-  - lein2 with-profile test test
+  - lein2 cljx once
+  - lein2 cljsbuild test
+  - lein2 test
 
 jdk:
   - openjdk7
