@@ -1,7 +1,7 @@
 Category Theory abstractions for Clojure
 ========================================
 Andrey Antukh & Alejandro Gómez
-0.1.0, 2014-06-06
+0.1.0, 2014-07-08
 
 :toc:
 
@@ -23,9 +23,32 @@ Four most important rules:
 - Simple is better than complex
 - Readability counts
 
+Why another library?
+~~~~~~~~~~~~~~~~~~~~
+
+Because cats library:
+
+- targets both most used clojure implementations:  *Clojure (jvm)* and *ClojureScript(js)*
+- targets to have the most simple implementation for supported abstractions.
+- targets to have more abstractions that simple monad.
+- has documentation as first class citizen.
+- licensed under permisive license (in comparison with other libraries): BSD (2-Clause)
+
+This is a incomplete list of differences with other existing libraries:
+
+- The official monads library `algo.monads` is very good, but its approach for modeling
+  is slighty limited (as example, you always should specify that monad you want use instead
+  relying on the type). And obviously because it only has monads.
+- Fluokitten is the best library that we found, but the future of it is uncertain. One big
+  difference with fluokitten library is that `cats` not intends extend every clojure type
+  with monadic protocols, for obvious reason of monad, functor and applicative represents
+  context/wrapper type and it not make sense implement Functor protocol for `java.lang.String`.
+- `bwo/monads` is the last monads library. It is completely undocumented and its implementation
+  has much innecesary complexity.
+
 
 Project Maturity
-----------------
+~~~~~~~~~~~~~~~~
 
 Since _cats_ is a young project there can be some link:codox/index.html#id[API]
 breakage.
@@ -95,33 +118,11 @@ You can clone the public repository with this command:
 git clone https://github.com/niwibe/cats
 ----
 
+Protocols reference
+-------------------
 
-Why another library?
---------------------
-
-Because cats library:
-
-- targets both most used clojure implementations:  *Clojure (jvm)* and *ClojureScript(js)*
-- targets to have the most simple implementation for supported abstractions.
-- targets to have more abstractions that simple monad.
-- has documentation as first class citizen.
-- licensed under permisive license (in comparison with other libraries): BSD (2-Clause)
-
-With differences with other existing libraries:
-
-- The official monads library `algo.monads` is very good, but its approach for modeling
-  is slighty limited (as example, you always should specify that monad you want use instead
-  relying on the type). And obviously because it only has monads.
-- Fluokitten is the best library that we found, but the future of it is uncertain. One big
-  difference with fluokitten library is that `cats` not intends extend every clojure type
-  with monadic protocols, for obvious reason of monad, functor and applicative represents
-  context/wrapper type and it not make sense implement Functor protocol for `java.lang.String`.
-- `bwo/monads` is the last monads library. It is completely undocumented and its implementation
-  has much innecesary complexity.
-
-
-Abstractions Reference
-----------------------
+**In this section, we are using _Maybe_ type for all examples. You can see more about
+it in the next section.**
 
 Functor
 ~~~~~~~
@@ -152,7 +153,7 @@ Some examples can explain it better:
 ;; => #<Just [2]>
 ----
 
-Same example but applying function over Nothing:
+Same example but applying function over **Nothing**:
 
 [source, clojure]
 ----
@@ -174,7 +175,6 @@ All examples of this documentation uses `cats.core/fmap` instead of function def
 protocol.
 ====
 
-
 Some of native clojure types, like Vector, also implements the Functor protocol and can
 work like functor context/container:
 
@@ -192,9 +192,6 @@ map works with seqs and it not respects the input container:
 (map inc [1 2 3])
 ;; => (2 3 4)
 ----
-
-You can see more information and examples of clojure types that implements this protocol
-on the last section of this documentation.
 
 
 Applicative Functor
@@ -254,7 +251,7 @@ To understand it better, see some examples:
 ;; => #<Either [:bar :right]>
 ----
 
-The real purpose of this function you will see in a following `Monad` section.
+The real purpose of this function you will see when using a **Monad** abstraction.
 
 
 Monad
@@ -307,7 +304,8 @@ if you coming from haskell, represents a `do-syntax`:
 ;; => #<Just [3]>
 ----
 
-If you want to use regular (non-monadic) let bindings inside a `mlet` block, you can do so using `:let` and a bindings vector as a pair inside the mlet bindings:
+If you want to use regular (non-monadic) let bindings inside a `mlet` block, you can do so using
+`:let` and a bindings vector as a pair inside the mlet bindings:
 
 [source, clojure]
 ----
@@ -321,7 +319,8 @@ If you want to use regular (non-monadic) let bindings inside a `mlet` block, you
 MonadZero
 ~~~~~~~~~
 
-The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero[MonadZero] protocol represents a monad that has a notion of an identity element.
+The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero[MonadZero] protocol
+represents a monad that has a notion of an identity element.
 
 .MonadZero protocol
 [source, clojure]
@@ -343,7 +342,8 @@ The `bind` operation on the identity element satisfies Left Zero:
 ;; => true
 ----
 
-When a monad instance implements the MonadZero protocol, `:when` clauses can be used in `mlet` bindings:
+When a monad instance implements the MonadZero protocol, `:when` clauses can be used in `mlet`
+bindings:
 
 [source, clojure]
 ----
@@ -361,7 +361,8 @@ When a monad instance implements the MonadZero protocol, `:when` clauses can be 
 MonadPlus
 ~~~~~~~~~
 
-The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[MonadPlus] protocol represents a MonadZero wich has a plus operation.
+The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[MonadPlus] protocol
+represents a MonadZero wich has a plus operation.
 
 .MonadPlus protocol
 [source, clojure]
@@ -371,7 +372,8 @@ The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[
   (mplus [mv mv'] "An associative addition operation."))
 ----
 
-`mplus` is an associative binary operation for which the value that `mzero` gives is the identity element. The `mplus` version contained in the core namespace is variadic.
+`mplus` is an associative binary operation for which the value that `mzero` gives is the identity
+element. The `mplus` version contained in the core namespace is variadic.
 
 [source, clojure]
 ----
@@ -392,7 +394,7 @@ The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[
 ----
 
 
-Data Types Reference
+Data Types reference
 --------------------
 
 We talked about values in a context, but that is a context? Context per se is any value that
@@ -401,7 +403,8 @@ wraps an other value inside.
 Maybe
 ~~~~~
 
-Two most common wrapper is "Maybe" (commonly named Optional on not functional programming
+
+This is one of the two most used monad types (commonly named Optional on not functional programming
 languages).
 
 Maybe/Optional is a polymorphic type that represents encapsulation of an optional value; e.g. it is
@@ -461,21 +464,91 @@ NOTE: With contrast with other similar libraries in clojure, _cats_ not intends 
 that not acts like containers. As example, clojure keywords are values but can not be containers, so
 that, their should not extend previously explained protocols.
 
-Vector
-~~~~~~
 
-TODO
+.Summary of clojure types and implemented protocols
+[options="header"]
+|=============================================================
+| Name    | Implemented protocols
+| vector  | Functor, Applicative, Monad, MonadZero, MonadPlus
+| has-set | Functor, Applicative, Monad, MonadZero, MonadPlus
+| list    | Functor, Applicative, Monad, MonadZero, MonadPlus
+| atom    | No one (in future)
+|=============================================================
 
-List
-~~~~
 
-TODO
+Special use case of monads
+--------------------------
 
-Set
-~~~
+State monad
+~~~~~~~~~~~
 
-TODO
+State monad in one of the special use case of mode most used in haskell. It has different
+purposes including: lazy computation composition, mantain state without state.
 
+The de facto monadic type of state monad is a plain function. Function represents a computation
+as is (without executig it). Obviously, a function should have some special characteristics for work
+in monad state composition.
+
+.Valid function for valid state monad
+[source, clojure]
+----
+(fn [state]
+  "Takes state as argument and return a vector
+  with first argument with procesed value and
+  second argument the transformed new state."
+  (let [newvalue (first state)
+        newstate (next state)]
+    [newvalue newstate]))
+----
+
+Right, you just see an example of the low level primitive of state monad but for basic usage
+you do not need build your own functions, just use some helpers that _cats_ library gives you.
+
+Let see one example before explaining anything:
+
+.Lazy composition of computations
+[source, clojure]
+----
+(m/mlet [state (m/get-state)
+         _     (m/put-state (next state))]
+  (return (first state)))
+;;=> #<State cats.types.State@2eebabb6>
+----
+
+At the momment of evaluating the previous expression, anything that we have defined
+is executed. Instead of it, a strange/unknown object is returned of type *State*.
+
+State is a simple wrapper for clojure function, nothing more.
+
+Now, it time to execute the composed computation, for this we can use one of the following
+functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
+
+- `run-state` function executes the composed computation and return both, the value and the
+  result state.
+- `eval-state` function executes the composed computation and returns the resulting value
+  discarding the state.
+- `exec-state` function executes the composed computation and return only the resulting
+  state, ignoring the resulting value.
+
+.This is happens when we execute these three functions over previously generated `State` instance
+[source, clojure]
+----
+(m/run-state s [1 2 3])
+;;=> #<Pair [1 (2 3)]>
+(m/eval-state s [1 2 3])
+;;=> 1
+(m/exec-state s [1 2 3])
+;;=> (2 3)
+----
+
+NOTE: the pair instance returned by `run-state` functions works like any other seq of clojure, with
+difference that pair only can have two slots.
+
+This is a very basic example of state monad, it has a lot of use cases and explaining all them
+seems out of the scope of this document.
+
+However, if you have better example for explain state monad, documentation for an other monad or 
+any other contribution is always welcome.
 
 License
 -------
