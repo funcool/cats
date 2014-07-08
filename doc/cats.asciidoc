@@ -78,7 +78,7 @@ it as a dependency in your *_project.clj_*:
 ._in project.clj_
 [source,clojure]
 ----
-[cats "0.1.0-SNAPSHOT"]
+[cats "0.1.0"]
 ----
 
 Maven
@@ -101,7 +101,7 @@ Then for cats:
 <dependency>
     <groupId>cats</groupId>
     <artifactId>cats</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 </dependency>
 ----
 
