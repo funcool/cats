@@ -75,7 +75,6 @@ Leiningen
 The simplest way to use _cats_ in a Clojure project is by including
 it as a dependency in your *_project.clj_*:
 
-._in project.clj_
 [source,clojure]
 ----
 [cats "0.1.0"]
