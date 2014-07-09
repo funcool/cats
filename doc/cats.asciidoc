@@ -468,11 +468,11 @@ that, their should not extend previously explained protocols.
 .Summary of clojure types and implemented protocols
 [options="header"]
 |=============================================================
-| Name    | Implemented protocols
-| vector  | Functor, Applicative, Monad, MonadZero, MonadPlus
-| has-set | Functor, Applicative, Monad, MonadZero, MonadPlus
-| list    | Functor, Applicative, Monad, MonadZero, MonadPlus
-| atom    | No one (in future)
+| Name     | Implemented protocols
+| vector   | Functor, Applicative, Monad, MonadZero, MonadPlus
+| hash-set | Functor, Applicative, Monad, MonadZero, MonadPlus
+| list     | Functor, Applicative, Monad, MonadZero, MonadPlus
+| atom     | No one (in future)
 |=============================================================
 
 
