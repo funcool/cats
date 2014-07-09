@@ -14,11 +14,11 @@ Example:
 applies a function to value of mv.</pre></div></div><div class="public anchor" id="var-call-cc"><h3>call-cc</h3><div class="usage"><code>(call-cc f)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-eval-state"><h3>eval-state</h3><div class="usage"><code>(eval-state state seed)</code></div><div class="doc"><pre class="plaintext">Given a State instance, execute the
 wrapped computation and return the resultant
 value, ignoring the state.
-Shortly, return the first value of pair instance
+Equivalent to taking the first value of the pair instance
 returned by `run-state` function.</pre></div></div><div class="public anchor" id="var-exec-state"><h3>exec-state</h3><div class="usage"><code>(exec-state state seed)</code></div><div class="doc"><pre class="plaintext">Given a State instance, execute the
 wrapped computation and return the resultant
 state.
-Shortly, return the second value of pair instance
+Equivalent to taking the second value of the pair instance
 returned by `run-state` function.</pre></div></div><div class="public anchor" id="var-fapply"><h3>fapply</h3><div class="usage"><code>(fapply af av)</code></div><div class="doc"><pre class="plaintext">Given function inside af&apos;s conext and value inside
 av&apos;s context, applies the function to value and return
 a result wrapped in context of same type of av context.</pre></div></div><div class="public anchor" id="var-filter"><h3>filter</h3><div class="usage"><code>(filter p mv)</code></div><div class="doc"><pre class="plaintext">Applies a predicate to a value in a `MonadZero` instance,
@@ -49,7 +49,7 @@ preserving the context type.</pre></div></div><div class="public anchor" id="var
               (t/just v)
               (t/nothing))))
 ;=&gt; &lt;Nothing&gt;
-</pre></div></div><div class="public anchor" id="var-get-state"><h3>get-state</h3><div class="usage"><code>(get-state)</code></div><div class="doc"><pre class="plaintext">Return State instance with computation that returns
+</pre></div></div><div class="public anchor" id="var-get-state"><h3>get-state</h3><div class="usage"><code>(get-state)</code></div><div class="doc"><pre class="plaintext">Return a State instance with computation that returns
 the current state.</pre></div></div><div class="public anchor" id="var-guard"><h3>guard</h3><div class="usage"><code>(guard b)</code></div><div class="doc"><pre class="plaintext"></pre></div></div><div class="public anchor" id="var-join"><h3>join</h3><div class="usage"><code>(join mv)</code></div><div class="doc"><pre class="plaintext">Remove one level of monadic structure.
 </pre></div></div><div class="public anchor" id="var-lift"><h3>lift</h3><h4 class="type">macro</h4><div class="usage"><code>(lift n f)</code></div><div class="doc"><pre class="plaintext">Lifts a function with the given fixed number of arguments to a
 monadic context.
@@ -87,13 +87,13 @@ calling sequence on the results.
 default/effect free context.
 
 This is multiarity function that with arity pure/1
-it uses the dynamic scope for resolve the current
-context. With pure/2, you can force specific context
-value.</pre></div></div><div class="public anchor" id="var-put-state"><h3>put-state</h3><div class="usage"><code>(put-state newstate)</code></div><div class="doc"><pre class="plaintext">Return State instance with computation that replaces
+it uses the dynamic scope to resolve the current
+context. With pure/2, you can force a specific context
+value.</pre></div></div><div class="public anchor" id="var-put-state"><h3>put-state</h3><div class="usage"><code>(put-state newstate)</code></div><div class="doc"><pre class="plaintext">Return a State instance with computation that replaces
 the current state with specified new state.</pre></div></div><div class="public anchor" id="var-return"><h3>return</h3><div class="usage"></div><div class="doc"><pre class="plaintext">This is a monad version of pure.
 </pre></div></div><div class="public anchor" id="var-run-cont"><h3>run-cont</h3><div class="usage"><code>(run-cont cont)</code></div><div class="doc"><pre class="plaintext">Given a Continuation instance, execute the
 wrapped computation and return its value.</pre></div></div><div class="public anchor" id="var-run-state"><h3>run-state</h3><div class="usage"><code>(run-state state seed)</code></div><div class="doc"><pre class="plaintext">Given a State instance, execute the
-wrapped computation and return Pair
+wrapped computation and returns a Pair
 instance with result and new state.
 
   (def computation (mlet [x (get-state)
@@ -114,8 +114,8 @@ their values in a vector returned in the monadic context.
 
   (m/sequence [(t/nothing) (t/just 3)])
   ;=&gt; &lt;Nothing&gt;
-</pre></div></div><div class="public anchor" id="var-swap-state"><h3>swap-state</h3><div class="usage"><code>(swap-state f)</code></div><div class="doc"><pre class="plaintext">Return State instance with computation that applies
-specified function to state and return the old state.</pre></div></div><div class="public anchor" id="var-unless"><h3>unless</h3><div class="usage"><code>(unless b mv)</code></div><div class="doc"><pre class="plaintext">If the expression is false, returns the monadic value.
+</pre></div></div><div class="public anchor" id="var-swap-state"><h3>swap-state</h3><div class="usage"><code>(swap-state f)</code></div><div class="doc"><pre class="plaintext">Return a State instance with computation that applies the
+specified function to state and returns the old state.</pre></div></div><div class="public anchor" id="var-unless"><h3>unless</h3><div class="usage"><code>(unless b mv)</code></div><div class="doc"><pre class="plaintext">If the expression is false, returns the monadic value.
 
 Otherwise, yields nil in a monadic context.</pre></div></div><div class="public anchor" id="var-when"><h3>when</h3><div class="usage"><code>(when b mv)</code></div><div class="doc"><pre class="plaintext">If the expression is true, returns the monadic value.
 

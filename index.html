@@ -76,12 +76,12 @@ targets both most used clojure implementations:  <strong>Clojure (jvm)</strong> 
 </li>
 <li>
 <p>
-targets to have the most simple implementation for supported abstractions.
+aims to have the most simple implementation for supported abstractions.
 </p>
 </li>
 <li>
 <p>
-targets to have more abstractions that simple monad.
+aims to have more abstractions that are simple monads.
 </p>
 </li>
 <li>
@@ -91,31 +91,31 @@ has documentation as first class citizen.
 </li>
 <li>
 <p>
-licensed under permisive license (in comparison with other libraries): BSD (2-Clause)
+licensed under a permissive license (compared to other libraries): BSD (2-Clause)
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>This is a incomplete list of differences with other existing libraries:</p></div>
+<div class="paragraph"><p>This is an incomplete list of differences with other existing libraries:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 The official monads library <span class="monospaced">algo.monads</span> is very good, but its approach for modeling
-  is slighty limited (as example, you always should specify that monad you want use instead
+  is slighty limited (e.g. you always need to specify what monad you want use instead of
   relying on the type). And obviously because it only has monads.
 </p>
 </li>
 <li>
 <p>
 Fluokitten is the best library that we found, but the future of it is uncertain. One big
-  difference with fluokitten library is that <span class="monospaced">cats</span> not intends extend every clojure type
-  with monadic protocols, for obvious reason of monad, functor and applicative represents
-  context/wrapper type and it not make sense implement Functor protocol for <span class="monospaced">java.lang.String</span>.
+  difference with fluokitten is that <span class="monospaced">cats</span> doesn&#8217;t aim to extend every clojure type
+  with monadic protocols, for the obvious reason that monad; functor and applicative represents
+  context/wrapper types and it doesn&#8217;t make sense to implement Functor protocol for <span class="monospaced">java.lang.String</span>.
 </p>
 </li>
 <li>
 <p>
 <span class="monospaced">bwo/monads</span> is the last monads library. It is completely undocumented and its implementation
-  has much innecesary complexity.
+  has much unnecesary complexity.
 </p>
 </li>
 </ul></div>
@@ -133,7 +133,7 @@ breakage.</p></div>
 <div class="paragraph"><p>This section covers installing <em>cats</em>.</p></div>
 <div class="sect2">
 <h3 id="_requirements">Requirements</h3>
-<div class="paragraph"><p><em>cats</em> has support for these jvm versions:</p></div>
+<div class="paragraph"><p><em>cats</em> supports:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -152,7 +152,6 @@ JDK8
 <div class="paragraph"><p>The simplest way to use <em>cats</em> in a Clojure project is by including
 it as a dependency in your <strong><em>project.clj</em></strong>:</p></div>
 <div class="listingblock">
-<div class="title"><em>in project.clj</em></div>
 <div class="content"><div class="highlight"><pre><span class="p">[</span><span class="nv">cats</span> <span class="s">&quot;0.1.0&quot;</span><span class="p">]</span>
 </pre></div></div></div>
 </div>
@@ -187,7 +186,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p></div>
 <div class="sect1">
 <h2 id="_protocols_reference">Protocols reference</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><strong>In this section, we are using <em>Maybe</em> type for all examples. You can see more about
+<div class="paragraph"><p><strong>In this section, we are using <em>Maybe</em> type for all examples. You can read more about
 it in the next section.</strong></p></div>
 <div class="sect2">
 <h3 id="_functor">Functor</h3>
@@ -199,9 +198,9 @@ it in the next section.</strong></p></div>
     <span class="s">&quot;Applies function f to the value(s) inside</span>
 <span class="s">    the context of the functor fv.&quot;</span><span class="p">))</span>
 </pre></div></div></div>
-<div class="paragraph"><p><span class="monospaced">fmap</span> takes one wrapped value in functor context fv (ex: <span class="monospaced">Just 2</span>) and plain function,
-unwraps the value and apply a function to plain value returning it wrapped in a new context
-of <strong>the same type</strong> of the first argument.</p></div>
+<div class="paragraph"><p><span class="monospaced">fmap</span> takes one wrapped value in functor context fv (ex: <span class="monospaced">Just 2</span>) and a plain function,
+unwraps the value and applies a function to the plain value returning it wrapped in a new context
+of <strong>the same type</strong> as the first argument.</p></div>
 <div class="paragraph"><p>Some examples can explain it better:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">require</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">cats.core</span> <span class="ss">:refer</span> <span class="ss">:all</span><span class="p">])</span>
@@ -221,24 +220,24 @@ of <strong>the same type</strong> of the first argument.</p></div>
 <div class="title">Note</div>
 </td>
 <td class="content">
-<div class="paragraph"><p>The real fmap signature is <span class="monospaced">(a -&gt; b) -&gt; f a -&gt; f b</span> that can be traslated to clojure <span class="monospaced">[f fv]</span>.</p></div>
-<div class="paragraph"><p>The changed order on protocol parameters definition is required because of clojure&#8217;s protocols
-limitation that only allow dispatching on first argument.</p></div>
-<div class="paragraph"><p>You should never use protocol function directly. For it, <span class="monospaced">cats.core/fmap</span> exists, and it has
+<div class="paragraph"><p>The real fmap signature is <span class="monospaced">(a -&gt; b) -&gt; f a -&gt; f b</span> that can be translated to clojure <span class="monospaced">[f fv]</span>.</p></div>
+<div class="paragraph"><p>The changed order of the protocol parameters definition is required because of clojure&#8217;s protocols
+limitation that only allow dispatching on the first argument.</p></div>
+<div class="paragraph"><p>You should never use a protocol function directly. Instead use <span class="monospaced">cats.core/fmap</span>. It has
 the correct signature.</p></div>
-<div class="paragraph"><p>All examples of this documentation uses <span class="monospaced">cats.core/fmap</span> instead of function defined in the
+<div class="paragraph"><p>All examples in this documentation uses <span class="monospaced">cats.core/fmap</span> instead of a function defined in the
 protocol.</p></div>
 </td>
 </tr></table>
 </div>
-<div class="paragraph"><p>Some of native clojure types, like Vector, also implements the Functor protocol and can
-work like functor context/container:</p></div>
+<div class="paragraph"><p>Some of the native clojure types, like Vector, also implements the Functor protocol and can
+work like a functor context/container:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">fmap</span> <span class="nb">inc </span><span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">])</span>
 <span class="c1">;; =&gt; [2 3 4]</span>
 </pre></div></div></div>
-<div class="paragraph"><p>The main difference of previous example with default clojure map, is that the clojure
-map works with seqs and it not respects the input container:</p></div>
+<div class="paragraph"><p>The main difference compared to the previous example with default clojure map, is that the clojure
+map works with seqs and doesn&#8217;t respect the input container:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nb">map inc </span><span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">])</span>
 <span class="c1">;; =&gt; (2 3 4)</span>
@@ -255,11 +254,11 @@ map works with seqs and it not respects the input container:</p></div>
 <span class="s">     inside av&#39;s context while preserving the context.&quot;</span><span class="p">)</span>
   <span class="p">(</span><span class="nf">pure</span> <span class="p">[</span><span class="nv">ctx</span> <span class="nv">v</span><span class="p">]</span>
     <span class="s">&quot;Takes any context monadic value ctx and any value v, and puts</span>
-<span class="s">     the value v in the most minimal context of same type of ctx&quot;</span><span class="p">))</span>
+<span class="s">     the value v in the most minimal context of the same type of ctx&quot;</span><span class="p">))</span>
 </pre></div></div></div>
-<div class="paragraph"><p>With the same idea of data inside a context (like <span class="monospaced">Functor</span>), what is happens if a wrapped value is
+<div class="paragraph"><p>With the same idea of data inside a context (like <span class="monospaced">Functor</span>), what happens if a wrapped value is
 one function/computation? Applicative functors works like plain functors but additionally
-can apply function wrapped in some context similar to input value.</p></div>
+can apply a function wrapped in some context similar to input value.</p></div>
 <div class="paragraph"><p>Let see one example:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="kd">defn </span><span class="nv">make-greeter</span>
@@ -278,10 +277,10 @@ can apply function wrapped in some context similar to input value.</p></div>
 <span class="p">(</span><span class="nf">fapply</span> <span class="p">(</span><span class="nf">make-greeter</span> <span class="s">&quot;it&quot;</span><span class="p">)</span> <span class="p">(</span><span class="nf">just</span> <span class="s">&quot;Alex&quot;</span><span class="p">))</span>
 <span class="c1">;; =&gt; #&lt;Nothing &gt;</span>
 </pre></div></div></div>
-<div class="paragraph"><p>Moreover, applicative functor protocol comes with an other function: <span class="monospaced">pure</span>. The main purpose of
-it, is given any value in a context and new value, wraps the new value in a minimal context of same
-type as first argument.</p></div>
-<div class="paragraph"><p>To understand it better, see some examples:</p></div>
+<div class="paragraph"><p>Moreover, the applicative functor protocol comes with another function: <span class="monospaced">pure</span>. The main purpose of
+this function is, given any value in a context and new value, wrap the new value in a minimal context of the same
+type as the first argument.</p></div>
+<div class="paragraph"><p>Examples:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">pure</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">)</span> <span class="mi">5</span><span class="p">)</span>
 <span class="c1">;; =&gt; #&lt;Just [5]&gt;</span>
@@ -289,14 +288,14 @@ type as first argument.</p></div>
 <span class="p">(</span><span class="nf">pure</span> <span class="p">(</span><span class="nb">right </span><span class="ss">:foo</span><span class="p">)</span> <span class="ss">:bar</span><span class="p">)</span>
 <span class="c1">;; =&gt; #&lt;Either [:bar :right]&gt;</span>
 </pre></div></div></div>
-<div class="paragraph"><p>The real purpose of this function you will see when using a <strong>Monad</strong> abstraction.</p></div>
+<div class="paragraph"><p>You will understand the real purpose of this function when using a <strong>Monad</strong> abstraction.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_monad">Monad</h3>
 <div class="paragraph"><p>Monads are the most discussed programming concept to come from category theory. Like functors and
 applicatives, monads deal with data in contexts.</p></div>
 <div class="paragraph"><p>Additionaly, monads can also transform context by unwrapping data, applying functions to it and
-put new value in a completely different context.</p></div>
+put new values in a completely different context.</p></div>
 <div class="listingblock">
 <div class="title">Monad protocol</div>
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="kd">defprotocol </span><span class="nv">Monad</span>
@@ -308,25 +307,24 @@ put new value in a completely different context.</p></div>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">In diference with haskel type class, <em>cats</em> protocol only defines one method: <span class="monospaced">bind</span>. Other
-related methods like <span class="monospaced">return</span> are defined as auxiliar functions in <span class="monospaced">cats.core</span> namespace.</td>
+<td class="content">As opposed to haskell type classes, <em>cats</em> protocols only define one method: <span class="monospaced">bind</span>. Other
+related methods like <span class="monospaced">return</span> are defined as auxiliar functions in <span class="monospaced">cats.core</span>.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p><span class="monospaced">bind</span> function, takes a monadic value (any container that implements a <span class="monospaced">Monad</span> protocol) and one
-function, applies the function with unwrapped value as first parameter and return a result. In this
-case, is a function respoisability of function wrap the result in a corresponding context.</p></div>
-<div class="paragraph"><p>One of the key features of bind function, that everythig insined a monad context known the context
-type. Having this, if you apply some computation over a monad and you want return the result
-in the same container context but you don&#8217;t know that contaier is it, you can use <span class="monospaced">return</span> or <span class="monospaced">pure</span>
-function for it.</p></div>
+function, applies the function with unwrapped value as first parameter and returns a result. In this
+case, the function is responsible for wrapping the result in a corresponding context.</p></div>
+<div class="paragraph"><p>One of the key features of the bind function is that everything inside a monad context knows the context
+type. Having this, if you apply some computation over a monad and you want to return the result
+in the same container context but you don&#8217;t know that container is it, you can use <span class="monospaced">return</span> or <span class="monospaced">pure</span>.</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">bind</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">)</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">v</span><span class="p">]</span> <span class="p">(</span><span class="nf">return</span> <span class="p">(</span><span class="nb">inc </span><span class="nv">v</span><span class="p">))))</span>
 <span class="c1">;; =&gt; #&lt;Just [2]&gt;</span>
 </pre></div></div></div>
-<div class="paragraph"><p><span class="monospaced">return</span> or <span class="monospaced">pure</span> function with one argument, try takes a context value from dynamic scope collected
-internaly by <span class="monospaced">bind</span> function, so that, you can not use them with one argument out of <span class="monospaced">bind</span> context.</p></div>
-<div class="paragraph"><p>And finally, for make more powerful monadic compositions, <em>cats</em> comes with <span class="monospaced">mlet</span> macro that
-if you coming from haskell, represents a <span class="monospaced">do-syntax</span>:</p></div>
+<div class="paragraph"><p>The <span class="monospaced">return</span> or <span class="monospaced">pure</span> functions, when called with one argument, try to use the dynamic scope context value
+that&#8217;s set internaly by the <span class="monospaced">bind</span> function. Therefore you can&#8217;t use them with one argument out of a <span class="monospaced">bind</span> context.</p></div>
+<div class="paragraph"><p>And finally, to make more powerful monadic compositions, <em>cats</em> comes with the <span class="monospaced">mlet</span> macro that
+if you are coming from haskell, represents a <span class="monospaced">do-syntax</span>:</p></div>
 <div class="listingblock">
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">mlet</span> <span class="p">[</span><span class="nv">x</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">1</span><span class="p">)</span>
        <span class="nv">y</span> <span class="p">(</span><span class="nf">just</span> <span class="mi">2</span><span class="p">)</span>
@@ -415,7 +413,7 @@ element. The <span class="monospaced">mplus</span> version contained in the core
 wraps an other value inside.</p></div>
 <div class="sect2">
 <h3 id="_maybe">Maybe</h3>
-<div class="paragraph"><p>This is one of the two most used monad types (commonly named Optional on not functional programming
+<div class="paragraph"><p>This is one of the two most used monad types (commonly named Optional in non-functional programming
 languages).</p></div>
 <div class="paragraph"><p>Maybe/Optional is a polymorphic type that represents encapsulation of an optional value; e.g. it is
 used as the return type of functions which may or may not return a meaningful value when they
@@ -452,9 +450,9 @@ encapsulating the original data type A (written Just A or Some A).</p></div>
 </div>
 <div class="sect2">
 <h3 id="_either">Either</h3>
-<div class="paragraph"><p>Either is an other type that represents a result of computation, but in contrast with maybe
-it can return something with failed computation result.</p></div>
-<div class="paragraph"><p>In <em>cats</em> library it has two constructors:</p></div>
+<div class="paragraph"><p>Either is another type that represents a result of computation, but in contrast with maybe
+it can return some data with a failed computation result.</p></div>
+<div class="paragraph"><p>In <em>cats</em> it has two constructors:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -490,16 +488,16 @@ it can return something with failed computation result.</p></div>
 <div class="sect1">
 <h2 id="_clojure_types">Clojure Types</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Besides the own types, some colojure types has implementations for previously explained
+<div class="paragraph"><p>Besides the own types, some clojure types has implementations for previously explained
 category theory abstractions.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">With contrast with other similar libraries in clojure, <em>cats</em> not intends extend clojure types
-that not acts like containers. As example, clojure keywords are values but can not be containers, so
-that, their should not extend previously explained protocols.</td>
+<td class="content">In contrast to other similar libraries in clojure, <em>cats</em> doesn&#8217;t intend to extend clojure types
+that don&#8217;t act like containers. For example, clojure keywords are values but can not be containers so
+they should not extend any of the previously explained protocols.</td>
 </tr></table>
 </div>
 <table class="tableblock frame-all grid-all"
@@ -537,14 +535,14 @@ width:100%;
 </div>
 </div>
 <div class="sect1">
-<h2 id="_special_use_case_of_monads">Special use case of monads</h2>
+<h2 id="_special_use_cases_of_monads">Special use cases of monads</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_state_monad">State monad</h3>
-<div class="paragraph"><p>State monad in one of the special use case of mode most used in haskell. It has different
-purposes including: lazy computation composition, mantain state without state.</p></div>
-<div class="paragraph"><p>The de facto monadic type of state monad is a plain function. Function represents a computation
-as is (without executig it). Obviously, a function should have some special characteristics for work
+<div class="paragraph"><p>State monad in one of the special use cases of monads most used in haskell. It has different
+purposes including: lazy computation composition and maintaining state without explicit state.</p></div>
+<div class="paragraph"><p>The de facto monadic type of the state monad is a plain function. Function represents a computation
+as is (without executing it). Obviously, a function should have some special characteristics to work
 in monad state composition.</p></div>
 <div class="listingblock">
 <div class="title">Valid function for valid state monad</div>
@@ -556,9 +554,9 @@ in monad state composition.</p></div>
         <span class="nv">newstate</span> <span class="p">(</span><span class="nb">next </span><span class="nv">state</span><span class="p">)]</span>
     <span class="p">[</span><span class="nv">newvalue</span> <span class="nv">newstate</span><span class="p">]))</span>
 </pre></div></div></div>
-<div class="paragraph"><p>Right, you just see an example of the low level primitive of state monad but for basic usage
-you do not need build your own functions, just use some helpers that <em>cats</em> library gives you.</p></div>
-<div class="paragraph"><p>Let see one example before explaining anything:</p></div>
+<div class="paragraph"><p>Right, you just saw an example of the low level primitive of state monad but for basic usage
+you do not need to build your own functions, just use some helpers that <em>cats</em> gives you.</p></div>
+<div class="paragraph"><p>Let&#8217;s look at one example before explaining the details:</p></div>
 <div class="listingblock">
 <div class="title">Lazy composition of computations</div>
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">m/mlet</span> <span class="p">[</span><span class="nv">state</span> <span class="p">(</span><span class="nf">m/get-state</span><span class="p">)</span>
@@ -566,15 +564,15 @@ you do not need build your own functions, just use some helpers that <em>cats</e
   <span class="p">(</span><span class="nf">return</span> <span class="p">(</span><span class="nb">first </span><span class="nv">state</span><span class="p">)))</span>
 <span class="c1">;;=&gt; #&lt;State cats.types.State@2eebabb6&gt;</span>
 </pre></div></div></div>
-<div class="paragraph"><p>At the momment of evaluating the previous expression, anything that we have defined
-is executed. Instead of it, a strange/unknown object is returned of type <strong>State</strong>.</p></div>
-<div class="paragraph"><p>State is a simple wrapper for clojure function, nothing more.</p></div>
+<div class="paragraph"><p>At the moment of evaluating the previous expression, anything that we have defined
+is executed. Instead of the finished value of the computation, a strange/unknown object is returned of type <strong>State</strong>.</p></div>
+<div class="paragraph"><p>State is a simple wrapper for clojure functions, nothing more.</p></div>
 <div class="paragraph"><p>Now, it time to execute the composed computation, for this we can use one of the following
 functions exposed by <em>cats</em>: <span class="monospaced">run-state</span>, <span class="monospaced">eval-state</span> and <span class="monospaced">exec-state</span>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<span class="monospaced">run-state</span> function executes the composed computation and return both, the value and the
+<span class="monospaced">run-state</span> function executes the composed computation and returns both the value and the
   result state.
 </p>
 </li>
@@ -592,7 +590,7 @@ functions exposed by <em>cats</em>: <span class="monospaced">run-state</span>, <
 </li>
 </ul></div>
 <div class="listingblock">
-<div class="title">This is happens when we execute these three functions over previously generated <span class="monospaced">State</span> instance</div>
+<div class="title">This is what happens when we execute these three functions over previously generated <span class="monospaced">State</span> instance</div>
 <div class="content"><div class="highlight"><pre><span class="p">(</span><span class="nf">m/run-state</span> <span class="nv">s</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">])</span>
 <span class="c1">;;=&gt; #&lt;Pair [1 (2 3)]&gt;</span>
 <span class="p">(</span><span class="nf">m/eval-state</span> <span class="nv">s</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">])</span>
@@ -606,12 +604,12 @@ functions exposed by <em>cats</em>: <span class="monospaced">run-state</span>, <
 <div class="title">Note</div>
 </td>
 <td class="content">the pair instance returned by <span class="monospaced">run-state</span> functions works like any other seq of clojure, with
-difference that pair only can have two slots.</td>
+the difference that pairs can only have two slots.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>This is a very basic example of state monad, it has a lot of use cases and explaining all them
+<div class="paragraph"><p>This is a very basic example of the state monad, it has a lot of use cases and explaining all them
 seems out of the scope of this document.</p></div>
-<div class="paragraph"><p>However, if you have better example for explain state monad, documentation for an other monad or
+<div class="paragraph"><p>However, if you have better examples to explain the state monad, documentation for another monad or
 any other contribution is always welcome.</p></div>
 </div>
 </div>
@@ -653,7 +651,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div id="footer">
 <div id="footer-text">
 Version 0.1.0<br>
-Last updated 2014-07-09 20:11:55 CEST
+Last updated 2014-07-09 23:26:33 CEST
 </div>
 </div>
 </body>
