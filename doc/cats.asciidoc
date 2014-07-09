@@ -235,7 +235,7 @@ Let see one example:
 ;; => #<Nothing >
 ----
 
-Moreover, the applicative functor protocol comes with another function: `pure`. The main purpose of 
+Moreover, the applicative functor protocol comes with another function: `pure`. The main purpose of
 this function is, given any value in a context and new value, wrap the new value in a minimal context of the same
 type as the first argument.
 
@@ -287,8 +287,8 @@ in the same container context but you don't know that container is it, you can u
 ;; => #<Just [2]>
 ----
 
-`return` or `pure` function with one argument, try takes a context value from dynamic scope collected
-internaly by `bind` function, so that, you can not use them with one argument out of `bind` context.
+The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context value
+that's set internaly by the `bind` function. Therefore you can't use them with one argument out of a `bind` context.
 
 And finally, to make more powerful monadic compositions, _cats_ comes with the `mlet` macro that
 if you are coming from haskell, represents a `do-syntax`:
@@ -545,7 +545,7 @@ the difference that pairs can only have two slots.
 This is a very basic example of the state monad, it has a lot of use cases and explaining all them
 seems out of the scope of this document.
 
-However, if you have better examples to explain the state monad, documentation for another monad or 
+However, if you have better examples to explain the state monad, documentation for another monad or
 any other contribution is always welcome.
 
 License
