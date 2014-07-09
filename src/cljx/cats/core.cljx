@@ -27,8 +27,8 @@
   default/effect free context.
 
   This is multiarity function that with arity pure/1
-  it uses the dynamic scope for resolve the current
-  context. With pure/2, you can force specific context
+  it uses the dynamic scope to resolve the current
+  context. With pure/2, you can force a specific context
   value."
   ([v]
      (p/pure *m-context* v))
@@ -295,29 +295,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn get-state
-  "Return State instance with computation that returns
+  "Return a State instance with computation that returns
   the current state."
   []
   (-> (fn [s] (t/pair s s))
       (t/state-t)))
 
 (defn put-state
-  "Return State instance with computation that replaces
+  "Return a State instance with computation that replaces
   the current state with specified new state."
   [newstate]
   (-> (fn [s] (t/pair s newstate))
       (t/state-t)))
 
 (defn swap-state
-  "Return State instance with computation that applies
-  specified function to state and return the old state."
+  "Return a State instance with computation that applies the
+  specified function to state and returns the old state."
   [f]
   (-> (fn [s] (t/pair s (f s)))
       (t/state-t)))
 
 (defn run-state
   "Given a State instance, execute the
-  wrapped computation and return Pair
+  wrapped computation and returns a Pair
   instance with result and new state.
 
     (def computation (mlet [x (get-state)
@@ -340,7 +340,7 @@
   "Given a State instance, execute the
   wrapped computation and return the resultant
   value, ignoring the state.
-  Shortly, return the first value of pair instance
+  Equivalent to taking the first value of the pair instance
   returned by `run-state` function."
   [state seed]
   (first (run-state state seed)))
@@ -349,7 +349,7 @@
   "Given a State instance, execute the
   wrapped computation and return the resultant
   state.
-  Shortly, return the second value of pair instance
+  Equivalent to taking the second value of the pair instance
   returned by `run-state` function."
   [state seed]
   (second (run-state state seed)))
