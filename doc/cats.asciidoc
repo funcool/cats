@@ -63,7 +63,7 @@ This section covers installing _cats_.
 Requirements
 ~~~~~~~~~~~~
 
-_cats_ has support for these jvm versions:
+_cats_ supports:
 
 - JDK7
 - JDK8
@@ -121,7 +121,7 @@ git clone https://github.com/niwibe/cats
 Protocols reference
 -------------------
 
-**In this section, we are using _Maybe_ type for all examples. You can see more about
+**In this section, we are using _Maybe_ type for all examples. You can read more about
 it in the next section.**
 
 Functor
@@ -138,9 +138,9 @@ The Functor represents some sort of "computational context".
     the context of the functor fv."))
 ----
 
-`fmap` takes one wrapped value in functor context fv (ex: `Just 2`) and plain function,
-unwraps the value and apply a function to plain value returning it wrapped in a new context
-of *the same type* of the first argument.
+`fmap` takes one wrapped value in functor context fv (ex: `Just 2`) and a plain function,
+unwraps the value and applies a function to the plain value returning it wrapped in a new context
+of *the same type* as the first argument.
 
 Some examples can explain it better:
 
@@ -163,20 +163,20 @@ Same example but applying function over **Nothing**:
 
 [NOTE]
 ====
-The real fmap signature is `(a -> b) -> f a -> f b` that can be traslated to clojure `[f fv]`.
+The real fmap signature is `(a -> b) -> f a -> f b` that can be translated to clojure `[f fv]`.
 
-The changed order on protocol parameters definition is required because of clojure's protocols
-limitation that only allow dispatching on first argument.
+The changed order of the protocol parameters definition is required because of clojure's protocols
+limitation that only allow dispatching on the first argument.
 
-You should never use protocol function directly. For it, `cats.core/fmap` exists, and it has
+You should never use a protocol function directly. Instead use `cats.core/fmap`. It has
 the correct signature.
 
-All examples of this documentation uses `cats.core/fmap` instead of function defined in the
+All examples in this documentation uses `cats.core/fmap` instead of a function defined in the
 protocol.
 ====
 
-Some of native clojure types, like Vector, also implements the Functor protocol and can
-work like functor context/container:
+Some of the native clojure types, like Vector, also implements the Functor protocol and can
+work like a functor context/container:
 
 [source, clojure]
 ----
@@ -184,8 +184,8 @@ work like functor context/container:
 ;; => [2 3 4]
 ----
 
-The main difference of previous example with default clojure map, is that the clojure
-map works with seqs and it not respects the input container:
+The main difference compared to the previous example with default clojure map, is that the clojure
+map works with seqs and doesn't respect the input container:
 
 [source, clojure]
 ----
@@ -208,12 +208,12 @@ Represents an abstraction lying in between Functor and Monad in expressivity.
      inside av's context while preserving the context.")
   (pure [ctx v]
     "Takes any context monadic value ctx and any value v, and puts
-     the value v in the most minimal context of same type of ctx"))
+     the value v in the most minimal context of the same type of ctx"))
 ----
 
-With the same idea of data inside a context (like `Functor`), what is happens if a wrapped value is
+With the same idea of data inside a context (like `Functor`), what happens if a wrapped value is
 one function/computation? Applicative functors works like plain functors but additionally
-can apply function wrapped in some context similar to input value.
+can apply a function wrapped in some context similar to input value.
 
 Let see one example:
 
@@ -236,11 +236,11 @@ Let see one example:
 ;; => #<Nothing >
 ----
 
-Moreover, applicative functor protocol comes with an other function: `pure`. The main purpose of
-it, is given any value in a context and new value, wraps the new value in a minimal context of same
-type as first argument.
+Moreover, the applicative functor protocol comes with another function: `pure`. The main purpose of 
+this function is, given any value in a context and new value, wrap the new value in a minimal context of the same
+type as the first argument.
 
-To understand it better, see some examples:
+Examples:
 
 [source, clojure]
 ----
@@ -251,7 +251,7 @@ To understand it better, see some examples:
 ;; => #<Either [:bar :right]>
 ----
 
-The real purpose of this function you will see when using a **Monad** abstraction.
+You will understand the real purpose of this function when using a **Monad** abstraction.
 
 
 Monad
@@ -261,7 +261,7 @@ Monads are the most discussed programming concept to come from category theory. 
 applicatives, monads deal with data in contexts.
 
 Additionaly, monads can also transform context by unwrapping data, applying functions to it and
-put new value in a completely different context.
+put new values in a completely different context.
 
 .Monad protocol
 [source, clojure]
@@ -271,17 +271,16 @@ put new value in a completely different context.
   (bind [mv f] "Applies the function f to the value(s) inside mv's context."))
 ----
 
-NOTE: In diference with haskel type class, _cats_ protocol only defines one method: `bind`. Other
-related methods like `return` are defined as auxiliar functions in `cats.core` namespace.
+NOTE: As opposed to haskell type classes, _cats_ protocols only define one method: `bind`. Other
+related methods like `return` are defined as auxiliar functions in `cats.core`.
 
 `bind` function, takes a monadic value (any container that implements a `Monad` protocol) and one
-function, applies the function with unwrapped value as first parameter and return a result. In this
-case, is a function respoisability of function wrap the result in a corresponding context.
+function, applies the function with unwrapped value as first parameter and returns a result. In this
+case, the function is responsible for wrapping the result in a corresponding context.
 
-One of the key features of bind function, that everythig insined a monad context known the context
-type. Having this, if you apply some computation over a monad and you want return the result
-in the same container context but you don't know that contaier is it, you can use `return` or `pure`
-function for it.
+One of the key features of the bind function is that everything inside a monad context knows the context
+type. Having this, if you apply some computation over a monad and you want to return the result
+in the same container context but you don't know that container is it, you can use `return` or `pure`.
 
 [source, clojure]
 ----
@@ -292,8 +291,8 @@ function for it.
 `return` or `pure` function with one argument, try takes a context value from dynamic scope collected
 internaly by `bind` function, so that, you can not use them with one argument out of `bind` context.
 
-And finally, for make more powerful monadic compositions, _cats_ comes with `mlet` macro that
-if you coming from haskell, represents a `do-syntax`:
+And finally, to make more powerful monadic compositions, _cats_ comes with the `mlet` macro that
+if you are coming from haskell, represents a `do-syntax`:
 
 [source, clojure]
 ----
@@ -404,7 +403,7 @@ Maybe
 ~~~~~
 
 
-This is one of the two most used monad types (commonly named Optional on not functional programming
+This is one of the two most used monad types (commonly named Optional in non-functional programming
 languages).
 
 Maybe/Optional is a polymorphic type that represents encapsulation of an optional value; e.g. it is
@@ -433,10 +432,10 @@ NOTE: Maybe types are: Functors, Applicative Functors and Monads
 Either
 ~~~~~~
 
-Either is an other type that represents a result of computation, but in contrast with maybe
-it can return something with failed computation result.
+Either is another type that represents a result of computation, but in contrast with maybe
+it can return some data with a failed computation result.
 
-In _cats_ library it has two constructors:
+In _cats_ it has two constructors:
 
 - `(left v)`: represents a failure.
 - `(right v)`: represents a successful result.
@@ -457,12 +456,12 @@ NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 Clojure Types
 -------------
 
-Besides the own types, some colojure types has implementations for previously explained
+Besides the own types, some clojure types has implementations for previously explained
 category theory abstractions.
 
-NOTE: With contrast with other similar libraries in clojure, _cats_ not intends extend clojure types
-that not acts like containers. As example, clojure keywords are values but can not be containers, so
-that, their should not extend previously explained protocols.
+NOTE: In contrast to other similar libraries in clojure, _cats_ doesn't intend to extend clojure types
+that don't act like containers. For example, clojure keywords are values but can not be containers so
+they should not extend any of the previously explained protocols.
 
 
 .Summary of clojure types and implemented protocols
@@ -476,17 +475,17 @@ that, their should not extend previously explained protocols.
 |=============================================================
 
 
-Special use case of monads
+Special use cases of monads
 --------------------------
 
 State monad
 ~~~~~~~~~~~
 
-State monad in one of the special use case of mode most used in haskell. It has different
-purposes including: lazy computation composition, mantain state without state.
+State monad in one of the special use cases of monads most used in haskell. It has different
+purposes including: lazy computation composition and maintaining state without explicit state.
 
-The de facto monadic type of state monad is a plain function. Function represents a computation
-as is (without executig it). Obviously, a function should have some special characteristics for work
+The de facto monadic type of the state monad is a plain function. Function represents a computation
+as is (without executing it). Obviously, a function should have some special characteristics to work
 in monad state composition.
 
 .Valid function for valid state monad
@@ -501,10 +500,10 @@ in monad state composition.
     [newvalue newstate]))
 ----
 
-Right, you just see an example of the low level primitive of state monad but for basic usage
-you do not need build your own functions, just use some helpers that _cats_ library gives you.
+Right, you just saw an example of the low level primitive of state monad but for basic usage
+you do not need to build your own functions, just use some helpers that _cats_ gives you.
 
-Let see one example before explaining anything:
+Let's look at one example before explaining the details:
 
 .Lazy composition of computations
 [source, clojure]
@@ -515,22 +514,22 @@ Let see one example before explaining anything:
 ;;=> #<State cats.types.State@2eebabb6>
 ----
 
-At the momment of evaluating the previous expression, anything that we have defined
-is executed. Instead of it, a strange/unknown object is returned of type *State*.
+At the moment of evaluating the previous expression, anything that we have defined
+is executed. Instead of the finished value of the computation, a strange/unknown object is returned of type *State*.
 
-State is a simple wrapper for clojure function, nothing more.
+State is a simple wrapper for clojure functions, nothing more.
 
 Now, it time to execute the composed computation, for this we can use one of the following
 functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
 
-- `run-state` function executes the composed computation and return both, the value and the
+- `run-state` function executes the composed computation and returns both the value and the
   result state.
 - `eval-state` function executes the composed computation and returns the resulting value
   discarding the state.
 - `exec-state` function executes the composed computation and return only the resulting
   state, ignoring the resulting value.
 
-.This is happens when we execute these three functions over previously generated `State` instance
+.This is what happens when we execute these three functions over previously generated `State` instance
 [source, clojure]
 ----
 (m/run-state s [1 2 3])
@@ -542,12 +541,12 @@ functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
 ----
 
 NOTE: the pair instance returned by `run-state` functions works like any other seq of clojure, with
-difference that pair only can have two slots.
+the difference that pairs can only have two slots.
 
-This is a very basic example of state monad, it has a lot of use cases and explaining all them
+This is a very basic example of the state monad, it has a lot of use cases and explaining all them
 seems out of the scope of this document.
 
-However, if you have better example for explain state monad, documentation for an other monad or 
+However, if you have better examples to explain the state monad, documentation for another monad or 
 any other contribution is always welcome.
 
 License
