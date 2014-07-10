@@ -288,7 +288,7 @@ in the same container context but you don't know that container is it, you can u
 ----
 
 The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context value
-that's set internaly by the `bind` function. Therefore you can't use them with one argument out of a `bind` context.
+that's set internally by the `bind` function. Therefore you can't use them with one argument out of a `bind` context.
 
 And finally, to make more powerful monadic compositions, _cats_ comes with the `mlet` macro that
 if you are coming from haskell, represents a `do-syntax`:
