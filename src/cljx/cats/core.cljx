@@ -26,7 +26,8 @@
 (ns cats.core
   "Category Theory abstractions for Clojure"
   (:require [cats.protocols :as p]
-            [cats.types :as t])
+            [cats.types :as t]
+            [cats.builtin :as builtin])
   #+cljs
   (:require-macros [cats.core :as cm])
   (:refer-clojure :exclude [when unless filter sequence]))
