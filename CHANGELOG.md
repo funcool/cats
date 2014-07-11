@@ -5,6 +5,7 @@
 Date: unreleased
 
 - Non recursive mlet macro.
+- Breaking change: split core.types ns into core.monad.*
 
 
 ## Version 0.1.0 ##
