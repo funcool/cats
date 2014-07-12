@@ -131,6 +131,13 @@
     mv
     (pure mv nil)))
 
+(defn lift
+  ; TODO: docstring
+  ([mv]
+     (lift *m-context* mv))
+  ([m mv]
+     (p/lift m mv)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -146,6 +153,7 @@
           next-mlet `(mlet ~(subvec bindings 2) ~@body)]
       (condp = l
         :let `(let ~r ~next-mlet)
+
         :when `(bind (guard ~r)
                      (fn [~(gensym)]
                        ~next-mlet))
@@ -155,14 +163,14 @@
     `(do ~@body)))
 
 #+clj
-(defmacro lift
+(defmacro lift-m
   "Lifts a function with the given fixed number of arguments to a
   monadic context.
 
     (require '[cats.types :as t])
     (require '[cats.core :as m])
 
-    (def monad+ (m/lift 2 +))
+    (def monad+ (m/lift-m 2 +))
 
     (monad+ (t/just 1) (t/just 2))
     ;=> <Just [3]>
