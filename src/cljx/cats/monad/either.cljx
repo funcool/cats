@@ -1,6 +1,6 @@
 (ns cats.monad.either
   "The Either (Error) Monad."
-  (:require [cats.protocols :as p]))
+  (:require [cats.protocols :as proto]))
 
 (declare either-monad)
 
@@ -92,4 +92,30 @@
        (f (.-v s))
        s))))
 
-; TODO Either transformer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad transformer definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn either-trans [inner-m]
+  (reify
+    proto/Monad
+    (mreturn [_ v]
+      (proto/mreturn inner-m (right v)))
+
+    (mbind [_ mv f]
+      (proto/mbind inner-m
+                   mv
+                   (fn [either-v]
+                     (if (left? either-v)
+                       (proto/mreturn inner-m either-v)
+                       (f (from-either either-v))))))
+
+    proto/MonadTrans
+    (inner [_]
+      inner-m)
+
+    (lift [m mv]
+      (proto/mbind inner-m
+                   mv
+                   (fn [v]
+                     (proto/mreturn inner-m (right v)))))))
