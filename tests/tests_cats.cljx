@@ -6,27 +6,34 @@
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
-            [cats.types :as t])
+            [cats.protocols :as p]
+            [cats.monad.maybe :as t]
+            [cats.monad.continuation :as cont]
+            [cats.monad.state :as state])
   #+clj
   (:require [clojure.test :refer :all]
             [cats.core :as m :refer [mlet with-context lift]]
-            [cats.types :as t]))
+            [cats.types :as t]
+            [cats.protocols :as p]
+            [cats.monad.maybe :as maybe]
+            [cats.monad.continuation :as cont]
+            [cats.monad.state :as state]))
 
 
 (deftest common
   (testing "Basic maybe operations."
-    (is (= 1 (t/from-maybe (t/just 1))))
-    (is (= nil (t/from-maybe (t/nothing))))))
+    (is (= 1 (maybe/from-maybe (maybe/just 1))))
+    (is (= nil (maybe/from-maybe (maybe/nothing))))))
 
 (deftest test-mlet
   (testing "It supports regular let inside its bindings")
-    (is (= (t/just 2)
-           (mlet [i (t/just 1)
+    (is (= (maybe/just 2)
+           (mlet [i (maybe/just 1)
                   :let [i (inc i)]]
                  (m/return i))))
   (testing "It supports :when guards inside its bindings")
-    (is (= (t/nothing)
-           (mlet [i (t/just 2)
+    (is (= (maybe/nothing)
+           (mlet [i (maybe/just 2)
                   :when (> i 2)]
                  (m/return i))))
     (is (= [3 4 5]
@@ -34,8 +41,8 @@
                   :when (> i 2)]
                  (m/return i))))
   (testing "The body runs in an implicit do"
-    (is (= (t/just 3)
-           (mlet [i (t/just 2)
+    (is (= (maybe/just 3)
+           (mlet [i (maybe/just 2)
                   :let [x (inc i)]]
                  (assert (= x 3))
                  (m/return x))))))
@@ -44,27 +51,27 @@
   (testing "It works with vectors"
     (is (= (m/sequence [[1 2] [3 4]])
            [[1 3] [1 4] [2 3] [2 4]])))
-  (testing "It works with lazy seqs"
-    (is (= (m/sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
-           '([1 3] [1 4] [2 3] [2 4]))))
-  (testing "It works with sets"
-    (is (= (m/sequence [#{1 2} #{3 4}])
-           #{[1 3] [1 4] [2 3] [2 4]})))
+;  (testing "It works with lazy seqs"
+;    (is (= (m/sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
+;           '([1 3] [1 4] [2 3] [2 4]))))
+;  (testing "It works with sets"
+;    (is (= (m/sequence [#{1 2} #{3 4}])
+;           #{[1 3] [1 4] [2 3] [2 4]})))
   (testing "It works with Maybe values"
-    (is (= (m/sequence [(t/just 2) (t/just 3)])
-           (t/just [2 3])))
-    (is (= (m/sequence [(t/just 2) (t/nothing)])
-           (t/nothing)))))
-
+    (is (= (m/sequence [(maybe/just 2) (maybe/just 3)])
+           (maybe/just [2 3])))
+    (is (= (m/sequence [(maybe/just 2) (maybe/nothing)])
+           (maybe/nothing)))))
+;
 (deftest test-mapseq
   (testing "It works with maybe values"
-    (is (= (m/mapseq t/just [1 2 3 4 5])
-           (t/just [1 2 3 4 5])))
-    (is (= (t/nothing)
+    (is (= (m/mapseq maybe/just [1 2 3 4 5])
+           (maybe/just [1 2 3 4 5])))
+    (is (= (maybe/nothing)
            (m/mapseq (fn [v]
                         (if (odd? v)
-                          (t/just v)
-                          (t/nothing)))
+                          (maybe/just v)
+                          (maybe/nothing)))
                       [1 2 3 4 5])))))
 
 (deftest test-lift
@@ -73,75 +80,76 @@
       (is (= [1 2 3 4 5 6]
              (monad+ [0 2 4] [1 2]))))
     (testing "It can lift a function to the Maybe monad"
-      (is (= (t/just 6)
-             (monad+ (t/just 2) (t/just 4))))
-      (is (= (t/nothing)
-             (monad+ (t/just 1) (t/nothing)))))))
+      (is (= (maybe/just 6)
+             (monad+ (maybe/just 2) (maybe/just 4))))
+      (is (= (maybe/nothing)
+             (monad+ (maybe/just 1) (maybe/nothing)))))))
 
 (deftest test-filter
   (testing "It can filter Maybe monadic values"
     (let [bigger-than-4 (partial < 4)]
-      (is (= (t/just 6)
-             (m/filter bigger-than-4 (t/just 6))))
-      (is (= (t/nothing)
-             (m/filter bigger-than-4 (t/just 3))))))
+      (is (= (maybe/just 6)
+             (m/filter bigger-than-4 (maybe/just 6))))
+      (is (= (maybe/nothing)
+             (m/filter bigger-than-4 (maybe/just 3))))))
   (testing "It can filter vectors"
     (is (= [1 3 5]
            (m/filter odd? [1 2 3 4 5 6])))))
 
 (deftest test-when
   (testing "It returns the monadic value unchanged when the condition is true"
-    (is (= (t/just 3)
-           (m/when true (t/just 3)))))
+    (is (= (maybe/just 3)
+           (m/when true (maybe/just 3)))))
   (testing "It returns nil in the monadic context when the condition is false"
     (is (= [nil]
            (m/when false [])))))
 
 (deftest test-maybe
   (testing "Test predicates"
-    (let [m1 (t/just 1)]
-      (is (t/maybe? m1))
-      (is (t/just? m1))))
+    (let [m1 (maybe/just 1)]
+      (is (maybe/maybe? m1))
+      (is (maybe/just? m1))))
 
   (testing "Test fmap"
-    (let [m1 (t/just 1)
-          m2 (t/nothing)]
-      (is (= (m/fmap inc m1) (t/just 2)))
-      (is (= (m/fmap inc m2) (t/nothing)))))
+    (let [m1 (maybe/just 1)
+          m2 (maybe/nothing)]
+      (is (= (m/fmap inc m1) (maybe/just 2)))
+      (is (= (m/fmap inc m2) (maybe/nothing)))))
 
   (testing "The first monad law: left identity"
-    (is (= (t/just 2)
-           (with-context (t/just 0)
-             (m/>>= (m/return 2) t/just)))))
+    (is (= (maybe/just 2)
+           (m/>>= (p/mreturn maybe/maybe-monad 2) maybe/just))))
 
   (testing "The second monad law: right identity"
-    (is (= (t/just 2)
-           (m/>>= (t/just 2) m/return))))
+    (is (= (maybe/just 2)
+           (m/>>= (maybe/just 2) m/return))))
 
   (testing "The third monad law: associativity"
-    (is (= (m/>>= (mlet [x  (t/just 2)
-                         y  (t/just (inc x))]
+    (is (= (m/>>= (mlet [x  (maybe/just 2)
+                         y  (maybe/just (inc x))]
                         (m/return y))
-                  (fn [y] (t/just (inc y))))
-           (m/>>= (t/just 2)
-                  (fn [x] (m/>>= (t/just (inc x))
-                                (fn [y] (t/just (inc y))))))))))
+                  (fn [y] (maybe/just (inc y))))
+           (m/>>= (maybe/just 2)
+                  (fn [x] (m/>>= (maybe/just (inc x))
+                                (fn [y] (maybe/just (inc y))))))))))
+
+; TODO: test maybe transformer
 
 (deftest test-continuation-monad
-  (let [cont-42 (t/continuation (fn [c] (c 42)))
+  (let [cont-42 (cont/continuation (fn [c] (c 42)))
         inc-cont-fn (fn [x]
-                      (t/continuation (fn [c] (c (inc x)))))]
+                      (cont/continuation (fn [c] (c (inc x)))))]
 
     (testing "The first monad law: left identity"
-      (is (= (m/run-cont cont-42)
-             (m/run-cont
-               (with-context (t/continuation #())
+      (is (= (cont/run-cont cont-42)
+             (cont/run-cont
+               (with-context cont/continuation-monad
                  (m/>>= (m/return 42)
-                        (fn [v] (t/continuation (fn [c] c v)))))))))
+                        (fn [v] (cont/continuation (fn [c] c v)))))))))
 
     (testing "The second monad law: right identity"
-      (is (= (m/run-cont cont-42)
-             (m/run-cont
+      (is (= (cont/run-cont cont-42)
+             (cont/run-cont
                (m/>>= cont-42 m/return)))))
 
     (testing "The third monad law: associativity"
@@ -150,44 +158,44 @@
                          (m/return y))
                          inc-cont-fn))
              (m/>>= cont-42
-                    (fn [x] (m/>>= (t/continuation (fn [c] (c (inc x))))
+                    (fn [x] (m/>>= (cont/continuation (fn [c] (c (inc x))))
                                    inc-cont-fn)))))
 
     (testing "call-cc allows the creation of resumable computations."
       (let [cc (atom nil)]
         (is (= 44
-               (m/run-cont (mlet [x cont-42
-                                  y (m/call-cc (fn [k]
-                                                 (reset! cc k)
-                                                 (k 2)))]
+               (cont/run-cont (mlet [x cont-42
+                                  y (cont/call-cc (fn [k]
+                                                    (reset! cc k)
+                                                    (k 2)))]
                                  (m/return (+ x y))))))
         (is (= 45
-               (m/run-cont (@cc 3))))
+               (cont/run-cont (@cc 3))))
         (is (= 46
-               (m/run-cont (@cc 4))))))))
+               (cont/run-cont (@cc 4))))))))
 
-(deftest test-lazy-seq
-  (let [s (lazy-seq [2])
-        val->lazyseq (fn [x] (lazy-seq [x]))]
-    (testing "The first monad law: left identity"
-      (is (= s
-             (with-context s
-               (m/>>= (m/return 2)
-                      val->lazyseq)))))
-
-    (testing "The second monad law: right identity"
-      (is (= s
-             (m/>>= s
-                    m/return))))
-
-    (testing "The third monad law: associativity"
-      (is (= (m/>>= (mlet [x  s
-                           y  (val->lazyseq (inc x))]
-                          (m/return y))
-                    (fn [y] (val->lazyseq (inc y))))
-             (m/>>= s
-                    (fn [x] (m/>>= (val->lazyseq (inc x))
-                                  (fn [y] (val->lazyseq (inc y)))))))))))
+;(deftest test-lazy-seq
+;  (let [s (lazy-seq [2])
+;        val->lazyseq (fn [x] (lazy-seq [x]))]
+;    (testing "The first monad law: left identity"
+;      (is (= s
+;             (with-context s
+;               (m/>>= (m/return 2)
+;                      val->lazyseq)))))
+;
+;    (testing "The second monad law: right identity"
+;      (is (= s
+;             (m/>>= s
+;                    m/return))))
+;
+;    (testing "The third monad law: associativity"
+;      (is (= (m/>>= (mlet [x  s
+;                           y  (val->lazyseq (inc x))]
+;                          (m/return y))
+;                    (fn [y] (val->lazyseq (inc y))))
+;             (m/>>= s
+;                    (fn [x] (m/>>= (val->lazyseq (inc x))
+;                                  (fn [y] (val->lazyseq (inc y)))))))))))
 
 (deftest test-vector
   (testing "The first monad law: left identity"
@@ -208,24 +216,20 @@
                   (fn [x] (m/>>= [(inc x)]
                                 (fn [y] [(inc y)]))))))))
 
-
 (deftest state-monad
   (testing "get-state should return the identity."
-    (let [computation (m/get-state)]
-      (is (= :foo (m/exec-state computation :foo)))))
+    (let [computation (state/get-state)]
+      (is (= :foo (state/exec-state computation :foo)))))
 
   (testing "swap-state should should apply function to state and return it."
-    (let [computation (m/swap-state inc)]
-      (is (= 2 (m/exec-state computation 1)))))
+    (let [computation (state/swap-state inc)]
+      (is (= 2 (state/exec-state computation 1)))))
 
   (testing "State monad compositio with mlet should return state"
-    (let [res (mlet [s (m/get-state)]
+    (let [res (mlet [s (state/get-state)]
                 (m/return (inc s)))]
-      (is (t/state? res))
-      (let [res (m/run-state res 1)]
-        (is (t/pair? res))
+      (is (state/state? res))
+      (let [res (state/run-state res 1)]
+        (is (state/pair? res))
         (is (= 2 (first res)))
         (is (= 1 (second res)))))))
-
-
-
