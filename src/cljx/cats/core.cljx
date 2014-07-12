@@ -31,6 +31,10 @@
   context. With pure/2, you can force a specific context
   value."
   ([v]
+     #+clj
+     (when-not (bound? #'*m-context*)
+       (throw (IllegalArgumentException.
+               "You are using return/pure function without context.")))
      (p/pure *m-context* v))
   ([av v]
      (p/pure av v)))
