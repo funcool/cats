@@ -26,6 +26,10 @@
 (ns cats.protocols
   "Cathegory theory types definition.")
 
+(defprotocol Context
+  "A type that is part of a computational context."
+  (get-context [_]))
+
 (defprotocol Functor
   (fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
 
@@ -40,10 +44,6 @@
 (defprotocol Monad
   (mreturn [m v])
   (mbind [m mv f]))
-
-(defprotocol Monadic
-  "A type that is part of a monad."
-  (monad [_] ))
 
 (defprotocol MonadZero
   "A `Monad` that supports the notion of an identity element."

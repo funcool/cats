@@ -64,8 +64,8 @@
 
 (extend-type #+clj clojure.lang.LazySeq
              #+cljs cljs.core.LazySeq
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     sequence-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -105,8 +105,8 @@
 
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     vector-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -145,6 +145,6 @@
 
 (extend-type #+clj clojure.lang.PersistentHashSet
              #+cljs cljs.core.PersistentHashSet
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     set-monad))

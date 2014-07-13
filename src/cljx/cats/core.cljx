@@ -76,7 +76,7 @@
   [mv f]
   (if (not (nil? *m-context*))
     (p/mbind *m-context* mv f)
-    (with-context (p/monad mv)
+    (with-context (p/get-context mv)
       (bind mv f))))
 
 (defn mzero
@@ -87,7 +87,7 @@
   [& mvs]
   {:pre [(not (empty? mvs))]}
   (let [ctx (if (nil? *m-context*)
-              (p/monad (first mvs))
+              (p/get-context (first mvs))
               *m-context*)]
     (reduce (partial p/mplus ctx)
             mvs)))
@@ -108,7 +108,7 @@
   preserving the context type."
   [f fv]
   (let [ctx (if (nil? *m-context*)
-              (p/monad fv) ; FIXME: functors that may not be monads
+              (p/get-context fv)
               *m-context*)]
     (p/fmap ctx f fv)))
 
@@ -118,7 +118,7 @@
   a result wrapped in context of same type of av context."
   [af av]
   (let [ctx (if (nil? *m-context*)
-              (p/monad av) ; FIXME: applicatives that may not be monads
+              (p/get-context av)
               *m-context*)]
     (p/fapply ctx af av)))
 
@@ -128,7 +128,7 @@
   Otherwise, yields nil in a monadic context."
   [b mv]
   (let [ctx (if (nil? *m-context*)
-              (p/monad mv)
+              (p/get-context mv)
               *m-context*)]
     (if b
       mv
@@ -140,7 +140,7 @@
   Otherwise, yields nil in a monadic context."
   [b mv]
   (let [ctx (if (nil? *m-context*)
-              (p/monad mv)
+              (p/get-context mv)
               *m-context*)]
     (if (not b)
       mv
@@ -224,7 +224,7 @@
   [mvs]
   {:pre [(not-empty mvs)]}
   (let [ctx (if (nil? *m-context*)
-              (p/monad (first mvs))
+              (p/get-context (first mvs))
               *m-context*)]
   (with-context ctx
     (reduce (fn [mvs mv]

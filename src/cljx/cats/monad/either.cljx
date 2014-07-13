@@ -34,8 +34,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Either [v type]
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     either-monad)
 
   #+clj

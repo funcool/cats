@@ -34,8 +34,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Just [v]
-  proto/Monadic
-  (monad [_] maybe-monad)
+  proto/Context
+  (get-context [_]
+    maybe-monad)
 
   #+clj
   Object
@@ -57,8 +58,9 @@
     (with-out-str (print [v]))))
 
 (deftype Nothing []
-  proto/Monadic
-  (monad [_] maybe-monad)
+  proto/Context
+  (get-context [_]
+    maybe-monad)
 
   #+clj
   Object

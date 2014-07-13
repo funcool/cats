@@ -34,8 +34,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Identity [v]
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     identity-monad)
 
   #+clj

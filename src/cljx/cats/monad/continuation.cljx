@@ -38,8 +38,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Continuation [mfn]
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     continuation-monad)
 
   #+clj   clojure.lang.IFn

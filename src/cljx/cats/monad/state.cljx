@@ -83,8 +83,8 @@
   (instance? Pair v))
 
 (deftype State [mfn]
-  proto/Monadic
-  (monad [_]
+  proto/Context
+  (get-context [_]
     state-monad)
 
   #+clj  clojure.lang.IFn

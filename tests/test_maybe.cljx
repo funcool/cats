@@ -53,7 +53,6 @@
 
 (deftest test-maybe-trans
   (let [maybe-vector-trans (maybe/maybe-trans b/vector-monad)]
-
     (testing "It can be combined with the effects of other monads"
       (is (= [(maybe/just 2)]
              (with-context maybe-vector-trans
