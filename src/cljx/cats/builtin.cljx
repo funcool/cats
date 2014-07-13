@@ -27,9 +27,51 @@
   (:require [clojure.set :as s]
             [cats.protocols :as proto]))
 
-; TODO: set, lazy seq and list
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (Lazy) Sequence Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def vector-m
+(def sequence-monad
+  (reify
+    proto/Functor
+    (fmap [_ f v]
+      (map f v))
+
+    proto/Applicative
+    (pure [_ v]
+      (lazy-seq [v]))
+
+    (fapply [_ self av]
+      (for [f self
+            v av]
+           (f v)))
+
+    proto/Monad
+    (mreturn [_ v]
+      (lazy-seq [v]))
+
+    (mbind [_ self f]
+      (apply concat (map f self)))
+
+    proto/MonadZero
+    (mzero [_]
+      (lazy-seq []))
+
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (concat mv mv'))))
+
+(extend-type #+clj clojure.lang.LazySeq
+             #+cljs cljs.core.LazySeq
+  proto/Monadic
+  (monad [_]
+    sequence-monad))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Vector Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def vector-monad
   (reify
     proto/Functor
     (fmap [_ f v]
@@ -64,4 +106,8 @@
              #+cljs cljs.core.PersistentVector
   proto/Monadic
   (monad [_]
-    vector-m))
+    vector-monad))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Set Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
