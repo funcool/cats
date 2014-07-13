@@ -147,7 +147,8 @@
       (return ctx nil))))
 
 (defn lift
-  ; TODO: docstring
+  "Lift a value from the inner monad of a monad transformer into a value
+  of the monad transformer."
   ([mv]
      (p/lift *m-context* mv))
   ([m mv]
