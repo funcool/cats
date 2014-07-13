@@ -14,6 +14,7 @@
   (:require [clojure.test :refer :all]
             [cats.core :as m :refer [mlet with-context lift-m]]
             [cats.protocols :as p]
+            [cats.builtins :refer :all]
             [cats.monad.maybe :as maybe]
             [cats.monad.continuation :as cont]
             [cats.monad.state :as state]))

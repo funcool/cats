@@ -182,15 +182,15 @@
   "Lifts a function with the given fixed number of arguments to a
   monadic context.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.maybe :as maybe])
     (require '[cats.core :as m])
 
     (def monad+ (m/lift-m 2 +))
 
-    (monad+ (t/just 1) (t/just 2))
+    (monad+ (maybe/just 1) (maybe/just 2))
     ;=> <Just [3]>
 
-    (monad+ (t/just 1) (t/nothing))
+    (monad+ (maybe/just 1) (maybe/nothing))
     ;=> <Nothing>
 
     (monad+ [0 2 4] [1 2])
@@ -212,13 +212,13 @@
   "Given a non-empty collection of monadic values, collect
   their values in a vector returned in the monadic context.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.maybe :as maybe])
     (require '[cats.core :as m])
 
-    (m/sequence [(t/just 2) (t/just 3)])
+    (m/sequence [(maybe/just 2) (maybe/just 3)])
     ;=> <Just [[2, 3]]>
 
-    (m/sequence [(t/nothing) (t/just 3)])
+    (m/sequence [(maybe/nothing) (maybe/just 3)])
     ;=> <Nothing>
   "
   [mvs]
@@ -239,16 +239,16 @@
    monadic context, map it into the given collection
    calling sequence on the results.
 
-     (require '[cats.types :as t])
+     (require '[cats.monad.maybe :as maybe])
      (require '[cats.core :as m])
 
-     (m/mapseq t/just [2 3])
+     (m/mapseq maybe/just [2 3])
      ;=> <Just [[2 3]]>
 
      (m/mapseq (fn [v]
                   (if (odd? v)
-                    (t/just v)
-                    (t/nothing)))
+                    (maybe/just v)
+                    (maybe/nothing)))
                  [1 2])
      ;=> <Nothing>
   "
@@ -258,17 +258,17 @@
 (defn forseq
   "Same as mapseq but with the arguments in reverse order.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.maybe :as maybe])
     (require '[cats.core :as m])
 
-    (m/forseq [2 3] t/just)
+    (m/forseq [2 3] maybe/just)
     ;=> <Just [[2 3]]>
 
     (m/forseq [1 2]
               (fn [v]
                 (if (odd? v)
-                  (t/just v)
-                  (t/nothing))))
+                  (maybe/just v)
+                  (maybe/nothing))))
     ;=> <Nothing>
   "
   [vs mf]
@@ -280,13 +280,13 @@
 
   Otherwise, returns the instance unchanged.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.moaybe :as maybe])
     (require '[cats.core :as m])
 
-    (m/filter (partial < 2) (t/just 3))
+    (m/filter (partial < 2) (maybe/just 3))
     ;=> <Just [3]>
 
-    (m/filter (partial < 4) (t/just 3))
+    (m/filter (partial < 4) (maybe/just 3))
     ;=> <Nothing>
   "
   [p mv]
