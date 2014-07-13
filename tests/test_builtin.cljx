@@ -52,5 +52,29 @@
                           (m/return y))
                     (fn [y] (val->lazyseq (inc y))))
              (m/>>= s
-                    (fn [x] (m/>>= (val->lazyseq (inc x))
-                                  (fn [y] (val->lazyseq (inc y)))))))))))
+                    (fn [x]
+                      (m/>>= (val->lazyseq (inc x))
+                             (fn [y] (val->lazyseq (inc y)))))))))))
+
+
+(deftest test-set-monad
+  (testing "The first monad law: left identity"
+    (is (= #{2}
+           (with-context b/set-monad
+             (m/>>= (m/return 2)
+                    (fn [x] #{x}))))))
+
+  (testing "The second monad law: right identity"
+      (is (= #{2}
+             (m/>>= #{2}
+                    m/return))))
+
+  (testing "The third monad law: associativity"
+    (is (= (m/>>= (mlet [x #{2}
+                         y #{(inc x)}]
+                        (m/return y))
+                  (fn [y] #{(inc y)}))
+           (m/>>= #{2}
+                  (fn [x]
+                    (m/>>= #{(inc x)}
+                           (fn [y] #{(inc y)}))))))))

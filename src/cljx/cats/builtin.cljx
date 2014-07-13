@@ -111,3 +111,39 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def set-monad
+  (reify
+    proto/Functor
+    (fmap [_ self f]
+      (set (map f self)))
+
+    proto/Applicative
+    (pure [_ v]
+      #{v})
+
+    (fapply [_ self av]
+      (set (for [f self
+                 v av]
+             (f v))))
+
+    proto/Monad
+    (mreturn [_ v]
+      #{v})
+
+    (mbind [_ self f]
+      (apply s/union (map f self)))
+
+    proto/MonadZero
+    (mzero [_]
+      #{})
+
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (s/union mv mv'))))
+
+(extend-type #+clj clojure.lang.PersistentHashSet
+             #+cljs cljs.core.PersistentHashSet
+  proto/Monadic
+  (monad [_]
+    set-monad))
