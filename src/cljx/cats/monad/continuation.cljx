@@ -1,10 +1,10 @@
 (ns cats.monad.continuation
   "The Continuation Monad."
+  (:require [cats.protocols :as proto])
   #+clj
   (:require [cats.core :refer [with-context]])
   #+cljs
-  (:require-macros [cats.core :refer (with-context)])
-  (:require [cats.protocols :as proto]))
+  (:require-macros [cats.core :refer (with-context)]))
 
 (declare continuation-monad)
 
