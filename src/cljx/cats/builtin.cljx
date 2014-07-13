@@ -22,84 +22,46 @@
 ;; THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 (ns cats.builtin
-  "Clojure(Script) builtin types extensions."
+  "Monadic built-in types definition."
   (:require [clojure.set :as s]
             [cats.protocols :as proto]))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LazySeq
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; TODO: set, lazy seq and list
 
-(extend-type #+clj  clojure.lang.LazySeq
-             #+cljs cljs.core.LazySeq
-  proto/Functor
-  (fmap [self f] (map f self))
+(def vector-m
+  (reify
+    proto/Functor
+    (fmap [_ f v]
+      (vec (map f v)))
 
-  proto/Applicative
-  (pure [_ v] (lazy-seq [v]))
-  (fapply [self av]
-    (for [f self
-          v av]
-         (f v)))
+    proto/Applicative
+    (pure [_ v]
+      [v])
 
-  proto/Monad
-  (bind [self f]
-    (apply concat (map f self))))
+    (fapply [_ self av]
+      (vec (for [f self
+                 v av]
+             (f v))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Vector
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    proto/Monad
+    (mreturn [_ v]
+      [v])
+
+    (mbind [_ self f]
+      (into []
+            (apply concat (map f self))))
+
+    proto/MonadZero
+    (mzero [_]
+      [])
+
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (into mv mv'))))
 
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
-  proto/Functor
-  (fmap [self f] (vec (map f self)))
-
-  proto/Applicative
-  (pure [_ v] [v])
-  (fapply [self av]
-    (vec (for [f self
-               v av]
-           (f v))))
-
-  proto/Monad
-  (bind [self f]
-    (into []
-          (apply concat (map f self))))
-
-  proto/MonadZero
-  (mzero [_] [])
-
-  proto/MonadPlus
-  (mplus [mv mv'] (into mv mv')))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Set
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(extend-type #+clj clojure.lang.PersistentHashSet
-             #+cljs cljs.core.PersistentHashSet
-  proto/Functor
-  (fmap [self f]
-    (set (map f self)))
-
-  proto/Applicative
-  (pure [_ v] #{v})
-
-  (fapply [self av]
-    (set (for [f self
-               v av]
-           (f v))))
-
-  proto/Monad
-  (bind [self f]
-    (apply s/union (map f self)))
-
-  proto/MonadZero
-  (mzero [_] #{})
-
-  proto/MonadPlus
-  (mplus [mv mv']
-    (s/union mv mv')))
+  proto/Monadic
+  (monad [_]
+    vector-m))
