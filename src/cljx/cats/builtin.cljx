@@ -23,7 +23,7 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 (ns cats.builtin
-  "Monadic built-in types definition."
+  "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.protocols :as proto]))
 
