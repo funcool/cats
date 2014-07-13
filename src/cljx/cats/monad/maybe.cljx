@@ -77,6 +77,11 @@
   (toString [_]
     (with-out-str (print ""))))
 
+(defn maybe?
+  [v]
+  (or (instance? Just v)
+     (instance? Nothing v)))
+
 (defn just
   ([v]
      (Just. v))
@@ -86,11 +91,6 @@
 (defn nothing
   []
   (Nothing.))
-
-(defn maybe?
-  [v]
-  (or (instance? Just v)
-      (instance? Nothing v)))
 
 (defn just?
   [v]

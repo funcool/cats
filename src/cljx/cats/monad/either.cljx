@@ -60,6 +60,10 @@
            (= type (.-type other)))
       false)))
 
+(defn either?
+  [v]
+  (instance? Either v))
+
 (defn left
   "Left constructor for Either type."
   ([v]

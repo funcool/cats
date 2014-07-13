@@ -135,21 +135,21 @@
   the current state."
   []
   (-> (fn [s] (pair s s))
-      (state-t)))
+     (state-t)))
 
 (defn put-state
   "Return a State instance with computation that replaces
   the current state with specified new state."
   [newstate]
   (-> (fn [s] (pair s newstate))
-      (state-t)))
+     (state-t)))
 
 (defn swap-state
   "Return a State instance with computation that applies the
   specified function to state and returns the old state."
   [f]
   (-> (fn [s] (pair s (f s)))
-      (state-t)))
+     (state-t)))
 
 (defn run-state
   "Given a State instance, execute the
