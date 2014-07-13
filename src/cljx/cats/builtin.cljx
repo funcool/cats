@@ -24,82 +24,127 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.builtin
-  "Clojure(Script) builtin types extensions."
+  "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.protocols :as proto]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; LazySeq
+;; (Lazy) Sequence Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(extend-type #+clj  clojure.lang.LazySeq
+(def sequence-monad
+  (reify
+    proto/Functor
+    (fmap [_ f v]
+      (map f v))
+
+    proto/Applicative
+    (pure [_ v]
+      (lazy-seq [v]))
+
+    (fapply [_ self av]
+      (for [f self
+            v av]
+           (f v)))
+
+    proto/Monad
+    (mreturn [_ v]
+      (lazy-seq [v]))
+
+    (mbind [_ self f]
+      (apply concat (map f self)))
+
+    proto/MonadZero
+    (mzero [_]
+      (lazy-seq []))
+
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (concat mv mv'))))
+
+(extend-type #+clj clojure.lang.LazySeq
              #+cljs cljs.core.LazySeq
-  proto/Functor
-  (fmap [self f] (map f self))
-
-  proto/Applicative
-  (pure [_ v] (lazy-seq [v]))
-  (fapply [self av]
-    (for [f self
-          v av]
-         (f v)))
-
-  proto/Monad
-  (bind [self f]
-    (apply concat (map f self))))
+  proto/Context
+  (get-context [_]
+    sequence-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Vector
+;; Vector Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def vector-monad
+  (reify
+    proto/Functor
+    (fmap [_ f v]
+      (vec (map f v)))
+
+    proto/Applicative
+    (pure [_ v]
+      [v])
+
+    (fapply [_ self av]
+      (vec (for [f self
+                 v av]
+             (f v))))
+
+    proto/Monad
+    (mreturn [_ v]
+      [v])
+
+    (mbind [_ self f]
+      (into []
+            (apply concat (map f self))))
+
+    proto/MonadZero
+    (mzero [_]
+      [])
+
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (into mv mv'))))
 
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
-  proto/Functor
-  (fmap [self f] (vec (map f self)))
-
-  proto/Applicative
-  (pure [_ v] [v])
-  (fapply [self av]
-    (vec (for [f self
-               v av]
-           (f v))))
-
-  proto/Monad
-  (bind [self f]
-    (into []
-          (apply concat (map f self))))
-
-  proto/MonadZero
-  (mzero [_] [])
-
-  proto/MonadPlus
-  (mplus [mv mv'] (into mv mv')))
+  proto/Context
+  (get-context [_]
+    vector-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Set
+;; Set Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def set-monad
+  (reify
+    proto/Functor
+    (fmap [_ self f]
+      (set (map f self)))
+
+    proto/Applicative
+    (pure [_ v]
+      #{v})
+
+    (fapply [_ self av]
+      (set (for [f self
+                 v av]
+             (f v))))
+
+    proto/Monad
+    (mreturn [_ v]
+      #{v})
+
+    (mbind [_ self f]
+      (apply s/union (map f self)))
+
+    proto/MonadZero
+    (mzero [_]
+      #{})
+
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (s/union mv mv'))))
 
 (extend-type #+clj clojure.lang.PersistentHashSet
              #+cljs cljs.core.PersistentHashSet
-  proto/Functor
-  (fmap [self f]
-    (set (map f self)))
-
-  proto/Applicative
-  (pure [_ v] #{v})
-
-  (fapply [self av]
-    (set (for [f self
-               v av]
-           (f v))))
-
-  proto/Monad
-  (bind [self f]
-    (apply s/union (map f self)))
-
-  proto/MonadZero
-  (mzero [_] #{})
-
-  proto/MonadPlus
-  (mplus [mv mv']
-    (s/union mv mv')))
+  proto/Context
+  (get-context [_]
+    set-monad))

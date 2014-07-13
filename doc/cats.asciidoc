@@ -146,7 +146,7 @@ Some examples can explain it better:
 [source, clojure]
 ----
 (require '[cats.core :refer :all])
-(require '[cats.types :refer :all])
+(require '[cats.monad.maybe :refer :all])
 
 (fmap inc (just 1))
 ;; => #<Just [2]>
@@ -375,7 +375,7 @@ element. The `mplus` version contained in the core namespace is variadic.
 
 [source, clojure]
 ----
-(require '[cats.types :refer [just nothing]])
+(require '[cats.monad.maybe :refer [just nothing]])
 (require '[cats.core :refer [mplus]])
 
 (mplus [1 2 3] [4 5 6] [7 8])
@@ -418,7 +418,7 @@ _cats_, implements two constructors:
 
 [source, clojure]
 ----
-(require '[cats.types :refer :all])
+(require '[cats.monad.maybe :refer :all])
 (just 1)
 ;; => #<Just [1]>
 (nothing)
@@ -441,7 +441,7 @@ In _cats_ it has two constructors:
 
 [source, clojure]
 ----
-(require '[cats.types :refer :all])
+(require '[cats.monad.either :refer :all])
 
 (right :valid-value)
 ;; => #<Right [:valid-value :right]>
@@ -510,7 +510,7 @@ Let's look at one example before explaining the details:
 (m/mlet [state (m/get-state)
          _     (m/put-state (next state))]
   (return (first state)))
-;;=> #<State cats.types.State@2eebabb6>
+;;=> #<State cats.monad.state.State@2eebabb6>
 ----
 
 At the moment of evaluating the previous expression, anything that we have defined

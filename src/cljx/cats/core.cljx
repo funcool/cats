@@ -25,18 +25,16 @@
 
 (ns cats.core
   "Category Theory abstractions for Clojure"
-  (:require [cats.protocols :as p]
-            [cats.types :as t]
-            [cats.builtin :as builtin])
+  (:require [cats.protocols :as p])
   #+cljs
-  (:require-macros [cats.core :as cm])
+  (:require-macros [cats.core :refer (with-context mlet)])
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^:dynamic *m-context*)
+(def ^:dynamic *m-context* nil)
 
 #+clj
 (defmacro with-context
@@ -62,19 +60,24 @@
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
      (p/pure *m-context* v))
-  ([av v]
-     (p/pure av v)))
+  ([app v]
+     (p/pure app v)))
 
-(def ^{:doc "This is a monad version of pure."}
-  return pure)
+(defn return
+  "This is a monad version of pure."
+  ([v]
+     (p/mreturn *m-context* v))
+  ([m v]
+     (p/mreturn m v)))
 
 (defn bind
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (#+clj  with-context
-   #+cljs cm/with-context mv
-    (p/bind mv f)))
+  (if (not (nil? *m-context*))
+    (p/mbind *m-context* mv f)
+    (with-context (p/get-context mv)
+      (bind mv f))))
 
 (defn mzero
   []
@@ -82,7 +85,12 @@
 
 (defn mplus
   [& mvs]
-  (reduce p/mplus mvs))
+  {:pre [(not (empty? mvs))]}
+  (let [ctx (if (nil? *m-context*)
+              (p/get-context (first mvs))
+              *m-context*)]
+    (reduce (partial p/mplus ctx)
+            mvs)))
 
 (defn guard
   [b]
@@ -99,32 +107,52 @@
   "Apply a function f to the value inside functor's fv
   preserving the context type."
   [f fv]
-  (p/fmap fv f))
+  (let [ctx (if (nil? *m-context*)
+              (p/get-context fv)
+              *m-context*)]
+    (p/fmap ctx f fv)))
 
 (defn fapply
   "Given function inside af's conext and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
-  (p/fapply af av))
+  (let [ctx (if (nil? *m-context*)
+              (p/get-context av)
+              *m-context*)]
+    (p/fapply ctx af av)))
 
 (defn when
   "If the expression is true, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   [b mv]
-  (if b
-    mv
-    (pure mv nil)))
+  (let [ctx (if (nil? *m-context*)
+              (p/get-context mv)
+              *m-context*)]
+    (if b
+      mv
+      (return ctx nil))))
 
 (defn unless
   "If the expression is false, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   [b mv]
-  (if (not b)
-    mv
-    (pure mv nil)))
+  (let [ctx (if (nil? *m-context*)
+              (p/get-context mv)
+              *m-context*)]
+    (if (not b)
+      mv
+      (return ctx nil))))
+
+(defn lift
+  "Lift a value from the inner monad of a monad transformer into a value
+  of the monad transformer."
+  ([mv]
+     (p/lift *m-context* mv))
+  ([m mv]
+     (p/lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -141,6 +169,7 @@
           next-mlet `(mlet ~(subvec bindings 2) ~@body)]
       (condp = l
         :let `(let ~r ~next-mlet)
+
         :when `(bind (guard ~r)
                      (fn [~(gensym)]
                        ~next-mlet))
@@ -150,19 +179,19 @@
     `(do ~@body)))
 
 #+clj
-(defmacro lift
+(defmacro lift-m
   "Lifts a function with the given fixed number of arguments to a
   monadic context.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.maybe :as maybe])
     (require '[cats.core :as m])
 
-    (def monad+ (m/lift 2 +))
+    (def monad+ (m/lift-m 2 +))
 
-    (monad+ (t/just 1) (t/just 2))
+    (monad+ (maybe/just 1) (maybe/just 2))
     ;=> <Just [3]>
 
-    (monad+ (t/just 1) (t/nothing))
+    (monad+ (maybe/just 1) (maybe/nothing))
     ;=> <Nothing>
 
     (monad+ [0 2 4] [1 2])
@@ -184,42 +213,43 @@
   "Given a non-empty collection of monadic values, collect
   their values in a vector returned in the monadic context.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.maybe :as maybe])
     (require '[cats.core :as m])
 
-    (m/sequence [(t/just 2) (t/just 3)])
+    (m/sequence [(maybe/just 2) (maybe/just 3)])
     ;=> <Just [[2, 3]]>
 
-    (m/sequence [(t/nothing) (t/just 3)])
+    (m/sequence [(maybe/nothing) (maybe/just 3)])
     ;=> <Nothing>
   "
   [mvs]
   {:pre [(not-empty mvs)]}
-  (reduce (fn [mvs mv]
-             (#+clj  mlet
-              #+cljs cm/mlet [v mv
-                              vs mvs]
-                             (return (cons v vs))))
-          (#+clj  with-context
-           #+cljs cm/with-context (first mvs)
-            (return '()))
-          (reverse mvs)))
+  (let [ctx (if (nil? *m-context*)
+              (p/get-context (first mvs))
+              *m-context*)]
+  (with-context ctx
+    (reduce (fn [mvs mv]
+               (mlet [v mv
+                      vs mvs]
+                     (return (cons v vs))))
+            (return '())
+            (reverse mvs)))))
 
 (defn mapseq
    "Given a function that takes a value and puts it into a
    monadic context, map it into the given collection
    calling sequence on the results.
 
-     (require '[cats.types :as t])
+     (require '[cats.monad.maybe :as maybe])
      (require '[cats.core :as m])
 
-     (m/mapseq t/just [2 3])
+     (m/mapseq maybe/just [2 3])
      ;=> <Just [[2 3]]>
 
      (m/mapseq (fn [v]
                   (if (odd? v)
-                    (t/just v)
-                    (t/nothing)))
+                    (maybe/just v)
+                    (maybe/nothing)))
                  [1 2])
      ;=> <Nothing>
   "
@@ -229,17 +259,17 @@
 (defn forseq
   "Same as mapseq but with the arguments in reverse order.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.maybe :as maybe])
     (require '[cats.core :as m])
 
-    (m/forseq [2 3] t/just)
+    (m/forseq [2 3] maybe/just)
     ;=> <Just [[2 3]]>
 
     (m/forseq [1 2]
               (fn [v]
                 (if (odd? v)
-                  (t/just v)
-                  (t/nothing))))
+                  (maybe/just v)
+                  (maybe/nothing))))
     ;=> <Nothing>
   "
   [vs mf]
@@ -251,20 +281,19 @@
 
   Otherwise, returns the instance unchanged.
 
-    (require '[cats.types :as t])
+    (require '[cats.monad.moaybe :as maybe])
     (require '[cats.core :as m])
 
-    (m/filter (partial < 2) (t/just 3))
+    (m/filter (partial < 2) (maybe/just 3))
     ;=> <Just [3]>
 
-    (m/filter (partial < 4) (t/just 3))
+    (m/filter (partial < 4) (maybe/just 3))
     ;=> <Nothing>
   "
   [p mv]
-  (#+clj  mlet
-   #+cljs cm/mlet [v mv
-                  :when (p v)]
-                  (return v)))
+  (mlet [v mv
+         :when (p v)]
+        (return v)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
@@ -274,16 +303,16 @@
   "Alias of fmap."
   ([f]
      (fn [fv]
-       (p/fmap fv f)))
+       (fmap f fv)))
   ([f fv]
-     (p/fmap fv f)))
+     (fmap f fv)))
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
   ([af av]
-     (p/fapply af av))
+     (fapply af av))
   ([af av & avs]
-     (reduce p/fapply af (cons av avs))))
+     (reduce fapply af (cons av avs))))
 
 (defn >>=
   "Performs a Haskell-style left-associative bind.
@@ -306,100 +335,14 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (#+clj  mlet
-   #+cljs cm/mlet [a (mf x)
-                   b (mg a)]
-                  (return b)))
+  (mlet [a (mf x)
+         b (mg a)]
+       (return b)))
 
 (defn <=<
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (#+clj  mlet
-   #+cljs cm/mlet [a (mf x)
-                   b (mg a)]
-                  (return b)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; State monad functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn get-state
-  "Return a State instance with computation that returns
-  the current state."
-  []
-  (-> (fn [s] (t/pair s s))
-      (t/state-t)))
-
-(defn put-state
-  "Return a State instance with computation that replaces
-  the current state with specified new state."
-  [newstate]
-  (-> (fn [s] (t/pair s newstate))
-      (t/state-t)))
-
-(defn swap-state
-  "Return a State instance with computation that applies the
-  specified function to state and returns the old state."
-  [f]
-  (-> (fn [s] (t/pair s (f s)))
-      (t/state-t)))
-
-(defn run-state
-  "Given a State instance, execute the
-  wrapped computation and returns a Pair
-  instance with result and new state.
-
-    (def computation (mlet [x (get-state)
-                            y (put-state (inc x))]
-                       (return y)))
-
-    (def initial-state 1)
-    (run-state computation initial-state)
-
-  This should be return something to: #<Pair [1 2]>"
-  [state seed]
-  #+clj
-  (with-context state
-    (state seed))
-  #+cljs
-  (cm/with-context state
-    (state seed)))
-
-(defn eval-state
-  "Given a State instance, execute the
-  wrapped computation and return the resultant
-  value, ignoring the state.
-  Equivalent to taking the first value of the pair instance
-  returned by `run-state` function."
-  [state seed]
-  (first (run-state state seed)))
-
-(defn exec-state
-  "Given a State instance, execute the
-  wrapped computation and return the resultant
-  state.
-  Equivalent to taking the second value of the pair instance
-  returned by `run-state` function."
-  [state seed]
-  (second (run-state state seed)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Continuation monad functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn run-cont
-  "Given a Continuation instance, execute the
-  wrapped computation and return its value."
-  [cont]
-  (#+clj  with-context
-   #+cljs cm/with-context cont
-    (cont identity)))
-
-(defn call-cc
-  [f]
-  (t/continuation
-    (fn [cc]
-      (let [k (fn [a]
-                (t/continuation (fn [_] (cc a))))]
-        ((f k) cc)))))
+  (mlet [a (mf x)
+         b (mg a)]
+        (return b)))
