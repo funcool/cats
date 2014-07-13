@@ -1,15 +1,15 @@
 (ns tests-cats
   #+cljs
-  (:require-macros [cemerick.cljs.test
-                    :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet with-context lift-m)])
-  #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
             [cats.protocols :as p]
-            [cats.monad.maybe :as t]
+            [cats.monad.maybe :as maybe]
             [cats.monad.continuation :as cont]
             [cats.monad.state :as state])
+  #+cljs
+  (:require-macros [cemerick.cljs.test
+                    :refer (is deftest with-test run-tests testing test-var)]
+                   [cats.core :refer (mlet with-context lift-m)])
   #+clj
   (:require [clojure.test :refer :all]
             [cats.core :as m :refer [mlet with-context lift-m]]

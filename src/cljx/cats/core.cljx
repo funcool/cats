@@ -27,14 +27,14 @@
   "Category Theory abstractions for Clojure"
   (:require [cats.protocols :as p])
   #+cljs
-  (:require-macros [cats.core :as cm])
+  (:require-macros [cats.core :refer (with-context mlet)])
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^:dynamic *m-context*)
+(def ^:dynamic *m-context* nil)
 
 #+clj
 (defmacro with-context
@@ -60,23 +60,24 @@
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
      (p/pure *m-context* v))
-  ([av v]
-     (p/pure av v)))
+  ([app v]
+     (p/pure app v)))
 
 (defn return
   "This is a monad version of pure."
   ([v]
      (p/mreturn *m-context* v))
-  ([av v]
-     (p/mreturn av v)))
+  ([m v]
+     (p/mreturn m v)))
 
 (defn bind
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (#+clj  with-context
-   #+cljs cm/with-context (p/monad mv)
-    (p/mbind (p/monad mv) mv f)))
+  (if (not (nil? *m-context*))
+    (p/mbind *m-context* mv f)
+    (with-context (p/monad mv)
+      (bind mv f))))
 
 (defn mzero
   []
@@ -85,8 +86,11 @@
 (defn mplus
   [& mvs]
   {:pre [(not (empty? mvs))]}
-  (reduce (partial p/mplus (p/monad (first mvs)))
-          mvs))
+  (let [ctx (if (nil? *m-context*)
+              (p/monad (first mvs))
+              *m-context*)]
+    (reduce (partial p/mplus ctx)
+            mvs)))
 
 (defn guard
   [b]
@@ -103,33 +107,44 @@
   "Apply a function f to the value inside functor's fv
   preserving the context type."
   [f fv]
-  {:pre [(satisfies? p/Monadic fv)]}
-  (p/fmap (p/monad fv) f fv))
+  (let [ctx (if (nil? *m-context*)
+              (p/monad fv) ; FIXME: functors that may not be monads
+              *m-context*)]
+    (p/fmap ctx f fv)))
 
 (defn fapply
   "Given function inside af's conext and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
-  (p/fapply (p/monad af) af av))
+  (let [ctx (if (nil? *m-context*)
+              (p/monad av) ; FIXME: applicatives that may not be monads
+              *m-context*)]
+    (p/fapply ctx af av)))
 
 (defn when
   "If the expression is true, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   [b mv]
-  (if b
-    mv
-    (pure (p/monad mv) nil)))
+  (let [ctx (if (nil? *m-context*)
+              (p/monad mv)
+              *m-context*)]
+    (if b
+      mv
+      (return ctx nil))))
 
 (defn unless
   "If the expression is false, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   [b mv]
-  (if (not b)
-    mv
-    (pure mv nil)))
+  (let [ctx (if (nil? *m-context*)
+              (p/monad mv)
+              *m-context*)]
+    (if (not b)
+      mv
+      (return ctx nil))))
 
 (defn lift
   ; TODO: docstring
@@ -208,15 +223,16 @@
   "
   [mvs]
   {:pre [(not-empty mvs)]}
-  (reduce (fn [mvs mv]
-             (#+clj  mlet
-              #+cljs cm/mlet [v mv
-                              vs mvs]
-                             (return (cons v vs))))
-          (#+clj  with-context
-           #+cljs cm/with-context (p/monad (first mvs))
-            (return '()))
-          (reverse mvs)))
+  (let [ctx (if (nil? *m-context*)
+              (p/monad (first mvs))
+              *m-context*)]
+  (with-context ctx
+    (reduce (fn [mvs mv]
+               (mlet [v mv
+                      vs mvs]
+                     (return (cons v vs))))
+            (return '())
+            (reverse mvs)))))
 
 (defn mapseq
    "Given a function that takes a value and puts it into a
@@ -274,10 +290,9 @@
     ;=> <Nothing>
   "
   [p mv]
-  (#+clj  mlet
-   #+cljs cm/mlet [v mv
-                  :when (p v)]
-                  (return v)))
+  (mlet [v mv
+         :when (p v)]
+        (return v)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
@@ -287,9 +302,9 @@
   "Alias of fmap."
   ([f]
      (fn [fv]
-       (fmap fv f)))
+       (fmap f fv)))
   ([f fv]
-     (fmap fv f)))
+     (fmap f fv)))
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
@@ -319,16 +334,14 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (#+clj  mlet
-   #+cljs cm/mlet [a (mf x)
-                   b (mg a)]
-                  (return b)))
+  (mlet [a (mf x)
+         b (mg a)]
+       (return b)))
 
 (defn <=<
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (#+clj  mlet
-   #+cljs cm/mlet [a (mf x)
-                   b (mg a)]
-                  (return b)))
+  (mlet [a (mf x)
+         b (mg a)]
+        (return b)))
