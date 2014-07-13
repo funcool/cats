@@ -64,6 +64,12 @@
                       y [(maybe/just 1) (maybe/just 2)]]
                      (m/return (+ x y))))))
 
+      (is (= [(maybe/just 1) (maybe/just 2) (maybe/just 2) (maybe/just 3)]
+             (with-context maybe-vector-trans
+               (mlet [x (m/lift [0 1])
+                      y (m/lift [1 2])]
+                     (m/return (+ x y))))))
+
       (is (= [(maybe/just 1) (maybe/nothing) (maybe/just 2) (maybe/nothing)]
              (with-context maybe-vector-trans
                (mlet [x [(maybe/just 0) (maybe/just 1)]

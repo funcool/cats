@@ -149,7 +149,7 @@
 (defn lift
   ; TODO: docstring
   ([mv]
-     (lift *m-context* mv))
+     (p/lift *m-context* mv))
   ([m mv]
      (p/lift m mv)))
 
