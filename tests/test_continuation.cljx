@@ -6,10 +6,10 @@
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet with-context)])
+                   [cats.core :refer (mlet with-monad)])
   #+clj
   (:require [clojure.test :refer :all]
-            [cats.core :as m :refer [mlet with-context]]
+            [cats.core :as m :refer [mlet with-monad]]
             [cats.monad.continuation :as cont]))
 
 
@@ -21,7 +21,7 @@
     (testing "The first monad law: left identity"
       (is (= (cont/run-cont cont-42)
              (cont/run-cont
-               (with-context cont/continuation-monad
+               (with-monad cont/continuation-monad
                  (m/>>= (m/return 42)
                         (fn [v] (cont/continuation (fn [c] c v)))))))))
 

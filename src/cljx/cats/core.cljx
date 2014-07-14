@@ -34,13 +34,28 @@
 ;; Context Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^:dynamic *m-context* nil)
+(def ^:dynamic *context* nil)
+(def ^:dynamic *forced-context* nil)
 
 #+clj
 (defmacro with-context
   [ctx & body]
-  `(binding [*m-context* ~ctx]
+  `(binding [*context* ~ctx]
      ~@body))
+
+#+clj
+(defmacro with-monad
+  [ctx & body]
+  `(binding [*forced-context* ~ctx]
+     ~@body))
+
+(defn get-current-context-or
+  [default]
+  (cond
+    (not (nil? *forced-context*)) *forced-context*
+    (not (nil? *context*))        *context*
+    :else                         (p/get-context default)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
@@ -56,17 +71,27 @@
   value."
   ([v]
      #+clj
-     (when-not (bound? #'*m-context*)
+     (when-not (or (bound? #'*context*)
+                  (bound? #'*forced-context*))
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
-     (p/pure *m-context* v))
+     (if (not (nil? *forced-context*))
+       (p/pure *forced-context* v)
+       (p/pure *context* v)))
   ([app v]
      (p/pure app v)))
 
 (defn return
   "This is a monad version of pure."
   ([v]
-     (p/mreturn *m-context* v))
+     #+clj
+     (when-not (or (bound? #'*context*)
+                  (bound? #'*forced-context*))
+       (throw (IllegalArgumentException.
+               "You are using return/pure function without context.")))
+     (if (not (nil? *forced-context*))
+       (p/mreturn *forced-context* v)
+       (p/mreturn *context* v)))
   ([m v]
      (p/mreturn m v)))
 
@@ -74,23 +99,22 @@
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (if (not (nil? *m-context*))
-    (p/mbind *m-context* mv f)
+  (if (not (nil? *forced-context*))
+    (p/mbind *forced-context* mv f)
     (with-context (p/get-context mv)
-      (bind mv f))))
+      (p/mbind *context* mv f))))
 
 (defn mzero
   []
-  (p/mzero *m-context*))
+  (if (not (nil? *forced-context*))
+    (p/mzero *forced-context*)
+    (p/mzero *context*)))
 
 (defn mplus
   [& mvs]
   {:pre [(not (empty? mvs))]}
-  (let [ctx (if (nil? *m-context*)
-              (p/get-context (first mvs))
-              *m-context*)]
-    (reduce (partial p/mplus ctx)
-            mvs)))
+  (let [ctx (get-current-context-or (first mvs))]
+    (reduce (partial p/mplus ctx) mvs)))
 
 (defn guard
   [b]
@@ -107,50 +131,40 @@
   "Apply a function f to the value inside functor's fv
   preserving the context type."
   [f fv]
-  (let [ctx (if (nil? *m-context*)
-              (p/get-context fv)
-              *m-context*)]
-    (p/fmap ctx f fv)))
+  (p/fmap (get-current-context-or fv) f fv))
 
 (defn fapply
   "Given function inside af's conext and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
-  (let [ctx (if (nil? *m-context*)
-              (p/get-context av)
-              *m-context*)]
-    (p/fapply ctx af av)))
+  (p/fapply (get-current-context-or af) af av))
 
 (defn when
   "If the expression is true, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
-  [b mv]
-  (let [ctx (if (nil? *m-context*)
-              (p/get-context mv)
-              *m-context*)]
-    (if b
-      mv
-      (return ctx nil))))
+  ([b mv]
+     (when (get-current-context-or mv) b mv))
+  ([ctx b mv]
+     (if b
+       mv
+       (return ctx nil))))
 
 (defn unless
   "If the expression is false, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   [b mv]
-  (let [ctx (if (nil? *m-context*)
-              (p/get-context mv)
-              *m-context*)]
-    (if (not b)
-      mv
-      (return ctx nil))))
+  (when (not b) mv))
 
 (defn lift
   "Lift a value from the inner monad of a monad transformer into a value
   of the monad transformer."
   ([mv]
-     (p/lift *m-context* mv))
+     (if (not (nil? *forced-context*))
+       (p/lift *forced-context* mv)
+       (p/lift *context* mv)))
   ([m mv]
      (p/lift m mv)))
 
@@ -224,16 +238,14 @@
   "
   [mvs]
   {:pre [(not-empty mvs)]}
-  (let [ctx (if (nil? *m-context*)
-              (p/get-context (first mvs))
-              *m-context*)]
-  (with-context ctx
-    (reduce (fn [mvs mv]
-               (mlet [v mv
-                      vs mvs]
-                     (return (cons v vs))))
-            (return '())
-            (reverse mvs)))))
+  (let [ctx (get-current-context-or (first mvs))]
+    (with-context ctx
+      (reduce (fn [mvs mv]
+                 (mlet [v mv
+                        vs mvs]
+                       (return (cons v vs))))
+              (return '())
+              (reverse mvs)))))
 
 (defn mapseq
    "Given a function that takes a value and puts it into a
@@ -291,9 +303,10 @@
     ;=> <Nothing>
   "
   [p mv]
-  (mlet [v mv
-         :when (p v)]
-        (return v)))
+  (with-context (get-current-context-or mv)
+    (mlet [v mv
+           :when (p v)]
+          (return v))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.

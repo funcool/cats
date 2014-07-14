@@ -8,10 +8,10 @@
    #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet with-context)])
+                   [cats.core :refer (mlet with-monad)])
   #+clj
   (:require [clojure.test :refer :all]
-            [cats.core :as m :refer [mlet with-context]]
+            [cats.core :as m :refer [mlet with-monad]]
             [cats.protocols :as p]
             [cats.builtin :as b]
             [cats.monad.maybe :as maybe]))
@@ -55,23 +55,23 @@
   (let [maybe-vector-trans (maybe/maybe-trans b/vector-monad)]
     (testing "It can be combined with the effects of other monads"
       (is (= [(maybe/just 2)]
-             (with-context maybe-vector-trans
+             (with-monad maybe-vector-trans
                (m/return 2))))
 
       (is (= [(maybe/just 1) (maybe/just 2) (maybe/just 2) (maybe/just 3)]
-             (with-context maybe-vector-trans
+             (with-monad maybe-vector-trans
                (mlet [x [(maybe/just 0) (maybe/just 1)]
                       y [(maybe/just 1) (maybe/just 2)]]
                      (m/return (+ x y))))))
 
       (is (= [(maybe/just 1) (maybe/just 2) (maybe/just 2) (maybe/just 3)]
-             (with-context maybe-vector-trans
+             (with-monad maybe-vector-trans
                (mlet [x (m/lift [0 1])
                       y (m/lift [1 2])]
                      (m/return (+ x y))))))
 
       (is (= [(maybe/just 1) (maybe/nothing) (maybe/just 2) (maybe/nothing)]
-             (with-context maybe-vector-trans
+             (with-monad maybe-vector-trans
                (mlet [x [(maybe/just 0) (maybe/just 1)]
                       y [(maybe/just 1) (maybe/nothing)]]
                      (m/return (+ x y)))))))))
