@@ -373,14 +373,16 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (mlet [a (mf x)
-         b (mg a)]
-       (return b)))
+  (with-context (get-current-context-or mf)
+    (mlet [a (mf x)
+           b (mg a)]
+          (return b))))
 
 (defn <=<
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (mlet [a (mf x)
-         b (mg a)]
-        (return b)))
+  (with-context (get-current-context-or mf)
+    (mlet [a (mf x)
+           b (mg a)]
+          (return b))))
