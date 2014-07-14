@@ -129,7 +129,21 @@
                   value    (.-fst p)
                   newstate (.-snd p)]
               ((f value) newstate)))
-          (state-t)))))
+         (state-t)))
+
+    proto/MonadState
+    (get-state [_]
+      (state-t (fn [s]
+                 (pair s s))))
+
+    (put-state [_ newstate]
+      (state-t (fn [s]
+                 (pair s newstate))))
+
+    (swap-state [_ f]
+      (-> (fn [s]
+           (pair s (f s)))
+         (state-t)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
@@ -139,22 +153,19 @@
   "Return a State instance with computation that returns
   the current state."
   []
-  (-> (fn [s] (pair s s))
-     (state-t)))
+  (proto/get-state state-monad))
 
 (defn put-state
   "Return a State instance with computation that replaces
   the current state with specified new state."
   [newstate]
-  (-> (fn [s] (pair s newstate))
-     (state-t)))
+  (proto/put-state state-monad newstate))
 
 (defn swap-state
   "Return a State instance with computation that applies the
   specified function to state and returns the old state."
   [f]
-  (-> (fn [s] (pair s (f s)))
-     (state-t)))
+  (proto/swap-state state-monad f))
 
 (defn run-state
   "Given a State instance, execute the
