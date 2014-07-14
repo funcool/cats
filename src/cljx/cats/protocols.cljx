@@ -54,6 +54,13 @@
   "A `MonadZero` that supports the notion of addition."
   (mplus [m mv mv'] "An associative addition operation."))
 
+(defprotocol MonadState
+  "A `Monad` formed by functions from states to a new state
+  and a (poosibly monadic) value."
+  (get-state [m] "Return the current state.")
+  (put-state [m newstate] "Update the state.")
+  (swap-state [m f] "Apply a function to the current state and update it."))
+
 (defprotocol MonadTrans
   (inner [mt] "Return the inner monad of this transformer.")
   (outer [mt] "Return the outer monad of this transformer.")
