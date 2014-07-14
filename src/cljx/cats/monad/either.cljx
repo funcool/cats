@@ -143,6 +143,9 @@
     (inner [_]
       inner-m)
 
+    (outer [_]
+      either-monad)
+
     (lift [m mv]
       (proto/mbind inner-m
                    mv

@@ -197,6 +197,9 @@
     (inner [_]
       inner-m)
 
+    (outer [_]
+      maybe-monad)
+
     (lift [_ mv]
       (proto/mbind inner-m
                    mv

@@ -56,4 +56,5 @@
 
 (defprotocol MonadTrans
   (inner [mt] "Return the inner monad of this transformer.")
+  (outer [mt] "Return the outer monad of this transformer.")
   (lift [m mv] "Lift a value from the inner monad to the outher monad."))
