@@ -23,4 +23,70 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(ns cats.monad.reader)
+(ns cats.monad.reader
+  "The Reader Monad."
+  #+clj
+  (:require [cats.core :refer [with-context]])
+  #+cljs
+  (:require-macros [cats.core :refer (with-context)])
+  (:require [cats.protocols :as proto]))
+
+(declare reader-monad)
+
+(deftype Reader [mfn]
+  proto/Context
+  (get-context [_]
+    reader-monad)
+
+  #+clj  clojure.lang.IFn
+  #+cljs cljs.core/IFn
+  (#+clj invoke #+cljs -invoke [self seed]
+    (mfn seed)))
+
+(defn reader
+  "Transform a simple reader-monad function
+  to Reader class instance.
+  Reader class instance work as simple wrapper
+  for standard clojure function, just for avoid
+  extend plain function type of clojure."
+  [f]
+  (Reader. f))
+
+(defn reader?
+  "Check if value s is instance of
+  Reader type."
+  [s]
+  (instance? Reader s))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def reader-monad
+  (reify
+    proto/Functor
+    (fmap [_ f fv]
+      (reader (fn [env]
+                (f (fv env)))))
+
+    proto/Monad
+    (mreturn [_ v]
+      (reader (fn [env]
+                v)))
+
+    (mbind [_ mv f]
+      (reader (fn [env]
+                ((f (mv env)) env))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Reader monad functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn run-reader
+  "Given a Reader instance, execute the
+  wrapped computation and returns a value."
+  [reader seed]
+  (with-context reader-monad
+    (reader seed)))
+
+; TODO: Reader transformer

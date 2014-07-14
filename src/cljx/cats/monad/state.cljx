@@ -113,6 +113,11 @@
 
 (def state-monad
   (reify
+    proto/Functor ; TODO: test functor laws
+    (fmap [_ f fv]
+      (state-t (fn [s]
+                 (f (fv s)))))
+
     proto/Monad
     (mreturn [_ v]
       (state-t (fn [s]
