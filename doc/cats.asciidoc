@@ -60,15 +60,6 @@ Install
 This section covers installing _cats_.
 
 
-Requirements
-~~~~~~~~~~~~
-
-_cats_ supports:
-
-- JDK7
-- JDK8
-
-
 Leiningen
 ~~~~~~~~~
 
