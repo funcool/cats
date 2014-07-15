@@ -75,7 +75,7 @@
                   (bound? #'*forced-context*))
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
-     (if (not (nil? *forced-context*))
+     (if-not (nil? *forced-context*)
        (p/pure *forced-context* v)
        (p/pure *context* v)))
   ([app v]
@@ -89,7 +89,7 @@
                   (bound? #'*forced-context*))
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
-     (if (not (nil? *forced-context*))
+     (if-not (nil? *forced-context*)
        (p/mreturn *forced-context* v)
        (p/mreturn *context* v)))
   ([m v]
@@ -99,14 +99,14 @@
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (if (not (nil? *forced-context*))
+  (if-not (nil? *forced-context*)
     (p/mbind *forced-context* mv f)
     (with-context (p/get-context mv)
       (p/mbind *context* mv f))))
 
 (defn mzero
   []
-  (if (not (nil? *forced-context*))
+  (if-not (nil? *forced-context*)
     (p/mzero *forced-context*)
     (p/mzero *context*)))
 
@@ -162,7 +162,7 @@
   "Lift a value from the inner monad of a monad transformer into a value
   of the monad transformer."
   ([mv]
-     (if (not (nil? *forced-context*))
+     (if-not (nil? *forced-context*)
        (p/lift *forced-context* mv)
        (p/lift *context* mv)))
   ([m mv]
