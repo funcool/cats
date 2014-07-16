@@ -117,8 +117,8 @@ You can clone the public repository with this command:
 git clone https://github.com/niwibe/cats
 ----
 
-Abstractions
-------------
+User Guide
+----------
 
 This section introduces almost all category theory abstractios that cats library
 supports.
@@ -129,33 +129,49 @@ all protocols. You can read more about it in the next section.
 Functor
 ~~~~~~~
 
-The Functor represents some sort of "computational context".
+Let start with functor. The Functor represents some sort of "computational context", and the
+abstraction consists in one unique function: **fmap**.
 
-.Functor protocol
+.Signature of **fmap** function
 [source, clojure]
 ----
-(defprotocol Functor
-  (fmap [fv f]
-    "Applies function f to the value(s) inside
-    the context of the functor fv."))
+(fmap [f fv])
 ----
 
-`fmap` takes one wrapped value in functor context fv (ex: `Just 2`) and a plain function,
-unwraps the value and applies a function to the plain value returning it wrapped in a new context
-of *the same type* as the first argument.
+**fmap** takes a plain function as first parameter and and value wrapped in functor
+context/wrapper. It, extracts the inner value apply the function to it, and return
+the result wrapped in same type as the second parameter.
 
-Some examples can explain it better:
+But, what is the **functor context wrapper*? It sonds more complex that it is. Functor
+wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocol.
+
+One good example of functor wrapper is the **Maybe** type:
 
 [source, clojure]
 ----
-(require '[cats.core :refer :all])
-(require '[cats.monad.maybe :refer :all])
+(require '[cats.monad.maybe :as maybe])
 
-(fmap inc (just 1))
+(maybe/just 2)
 ;; => #<Just [2]>
 ----
 
-Same example but applying function over **Nothing**:
+**just** is one of two constructors of **Maybe** type and it's only wraps the real 
+value. Now, let see one example using **fmap** over **just** instance:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+
+(m/fmap inc (just 1))
+;; => #<Just [2]>
+----
+
+But **Maybe** has another constructor: `maybe/nothing`. This constructor makes 
+empty object that not wraps anything. It represents the failure. Is the safe
+substitute of `nil` and represents the failure.
+
+Let see that is happens if we make same operation of previous example over
+*nothing* instance:
 
 [source, clojure]
 ----
@@ -163,22 +179,13 @@ Same example but applying function over **Nothing**:
 ;; => #<Nothing >
 ----
 
-[NOTE]
-====
-The real fmap signature is `(a -> b) -> f a -> f b` that can be translated to clojure `[f fv]`.
+Oh, awesome, instead of raising null pointer exception, it just return *nothing*.
 
-The changed order of the protocol parameters definition is required because of clojure's protocols
-limitation that only allow dispatching on the first argument.
 
-You should never use a protocol function directly. Instead use `cats.core/fmap`. It has
-the correct signature.
+An other good advantage of use functor abstraction, is that it always return result
+in the same type of second argument
 
-All examples in this documentation uses `cats.core/fmap` instead of a function defined in the
-protocol.
-====
-
-Some of the native clojure types, like Vector, also implements the Functor protocol and can
-work like a functor context/container:
+Let see one example of apply fmap over clojure vector:
 
 [source, clojure]
 ----
@@ -194,6 +201,9 @@ map works with seqs and doesn't respect the input container:
 (map inc [1 2 3])
 ;; => (2 3 4)
 ----
+
+But why fmap works with vectors? Some "container" types of clojure like vectors, lists or sets 
+also implements the functor abstraction.
 
 
 Applicative Functor
