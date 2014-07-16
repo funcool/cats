@@ -177,20 +177,14 @@
   [bindings & body]
   (when-not (and (vector? bindings) (even? (count bindings)))
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-  (if (seq bindings)
-    (let [l (get bindings 0)
-          r (get bindings 1)
-          next-mlet `(mlet ~(subvec bindings 2) ~@body)]
-      (condp = l
-        :let `(let ~r ~next-mlet)
-
-        :when `(bind (guard ~r)
-                     (fn [~(gensym)]
-                       ~next-mlet))
-        `(bind ~r
-               (fn [~l]
-                 ~next-mlet))))
-    `(do ~@body)))
+  (->> (reverse (partition 2 bindings))
+       (reduce (fn [acc [l r]]
+                 (condp = l
+                   :let  `(let ~r ~acc)
+                   :when `(bind (guard ~r)
+                                (fn [~(gensym)] ~acc))
+                   `(bind ~r (fn [~l] ~acc))))
+               `(do ~@body))))
 
 #+clj
 (defmacro lift-m
