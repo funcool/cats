@@ -328,7 +328,7 @@ If you want to use regular (non-monadic) let bindings inside a `mlet` block, you
 ----
 
 MonadZero
-~~~~~~~~~
+^^^^^^^^^
 
 The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero[MonadZero] protocol
 represents a monad that has a notion of an identity element.
@@ -370,7 +370,7 @@ bindings:
 ----
 
 MonadPlus
-~~~~~~~~~
+^^^^^^^^^
 
 The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[MonadPlus] protocol
 represents a MonadZero wich has a plus operation.
@@ -403,6 +403,21 @@ element. The `mplus` version contained in the core namespace is variadic.
 (mplus (nothing) (just 42) (just 3))
 ;; => #<Just [42]>
 ----
+
+Monad Transformers
+~~~~~~~~~~~~~~~~~~
+
+
+What is Monad transformer?
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
+
+How I can use them?
+^^^^^^^^^^^^^^^^^^^
+
+TODO
 
 
 Data Types reference
