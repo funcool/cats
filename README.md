@@ -15,7 +15,12 @@ And there are my cats, engaged in a ritual that goes back thousands of years, tr
 
 Category Theory abstractions for Clojure.
 
-**Documentation:** http://niwibe.github.io/cats/
+Stable:
 
-**API reference:** http://niwibe.github.io/cats/codox/index.html
+- **Documentation:** http://niwibe.github.io/cats/
+- **API reference:** http://niwibe.github.io/cats/codox/index.html
 
+Development:
+
+- **Documentation:** http://niwibe.github.io/cats/index-dev.html
+- **API reference:** http://niwibe.github.io/cats/codox-dev/index.html
