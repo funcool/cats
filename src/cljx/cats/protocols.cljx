@@ -61,6 +61,10 @@
   (put-state [m newstate] "Update the state.")
   (swap-state [m f] "Apply a function to the current state and update it."))
 
+(defprotocol MonadReader
+  "A `Monad` with a read-only access to an environment value."
+  (ask [m] "Return the current environment."))
+
 (defprotocol MonadTrans
   (inner [mt] "Return the inner monad of this transformer.")
   (outer [mt] "Return the outer monad of this transformer.")

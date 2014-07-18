@@ -76,7 +76,14 @@
 
     (mbind [_ mv f]
       (reader (fn [env]
-                ((f (mv env)) env))))))
+                ((f (mv env)) env))))
+
+    proto/MonadReader
+    (ask [_]
+      (reader (fn [env]
+                env)))
+
+  ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions
@@ -88,5 +95,7 @@
   [reader seed]
   (with-context reader-monad
     (reader seed)))
+
+(def ask (proto/ask reader-monad))
 
 ; TODO: Reader transformer
