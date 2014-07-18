@@ -18,7 +18,5 @@
 
 (deftest test-reader-monad
   (testing "The `ask` reader gives you access to the environment"
-    (let [env {:x 42 :y nil}]
-      (m/mlet [renv reader/ask]
-        (is (= renv env))
-        (m/return nil)))))
+    (is (= (reader/run-reader reader/ask {:foo "bar"})
+           {:foo "bar"}))))

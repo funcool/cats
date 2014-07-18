@@ -96,6 +96,6 @@
   (with-context reader-monad
     (reader seed)))
 
-(def ask (proto/ask reader-monad))
+(def ask (reader (proto/ask reader-monad)))
 
 ; TODO: Reader transformer
