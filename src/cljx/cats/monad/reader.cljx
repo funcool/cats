@@ -83,6 +83,10 @@
       (reader (fn [env]
                 env)))
 
+    (local [_ f mr]
+      (reader (fn [env]
+                (mr (f env)))))
+
   ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -96,6 +100,7 @@
   (with-context reader-monad
     (reader seed)))
 
-(def ask (reader (proto/ask reader-monad)))
+(def ask (proto/ask reader-monad))
 
+(def local (partial proto/local reader-monad))
 ; TODO: Reader transformer

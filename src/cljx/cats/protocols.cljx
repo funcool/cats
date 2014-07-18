@@ -63,7 +63,8 @@
 
 (defprotocol MonadReader
   "A `Monad` with a read-only access to an environment value."
-  (ask [m] "Return the current environment."))
+  (ask [m] "Return the current environment.")
+  (local [m f reader] "Create a reader in a modified version of the environment."))
 
 (defprotocol MonadTrans
   (inner [mt] "Return the inner monad of this transformer.")
