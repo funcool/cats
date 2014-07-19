@@ -80,7 +80,8 @@
 (defn maybe?
   [v]
   (or (instance? Just v)
-      (instance? Nothing v)))
+      (instance? Nothing v)
+      (nil? v)))
 
 (defn just
   ([v]
