@@ -2,6 +2,7 @@
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.builtin :as b]
+            [cats.monad.maybe :as maybe]
             [cats.core :as m])
   #+cljs
   (:require-macros [cemerick.cljs.test
@@ -10,8 +11,16 @@
   #+clj
   (:require [clojure.test :refer :all]
             [cats.builtin :as b]
+            [cats.monad.maybe :as maybe]
             [cats.core :as m :refer [mlet with-context]]))
 
+
+(deftest test-nil-as-nothing
+  (testing "Nil works like nothing (for avoid unnecesary null pointers)."
+    (is (= (m/>>= nil (fn [_] (m/return 1))) nil))
+    (is (= (m/fmap inc nil) nil))
+    (is (maybe/nothing? nil))
+    (is (maybe/maybe? nil))))
 
 (deftest test-vector-monad
   (testing "The first monad law: left identity"

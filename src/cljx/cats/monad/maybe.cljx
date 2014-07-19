@@ -80,7 +80,8 @@
 (defn maybe?
   [v]
   (or (instance? Just v)
-     (instance? Nothing v)))
+      (instance? Nothing v)
+      (nil? v)))
 
 (defn just
   ([v]
@@ -98,7 +99,9 @@
 
 (defn nothing?
   [v]
-  (instance? Nothing v))
+  (or
+   (nil? v)
+   (instance? Nothing v)))
 
 (defn from-maybe
   "Return inner value from maybe monad.
