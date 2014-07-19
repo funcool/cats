@@ -25,7 +25,8 @@
 
 (ns cats.monad.identity
   "The Identity Monad."
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto])
+  (:refer-clojure :exclude [identity]))
 
 (declare identity-monad)
 
@@ -53,6 +54,11 @@
   #+clj
   (toString [_]
     (str v)))
+
+(defn identity
+  "Default constructor for identity type."
+  [v]
+  (Identity. v))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
