@@ -13,6 +13,11 @@
             [cats.core :as m :refer [mlet with-context]]))
 
 
+(deftest test-nil-as-nothing
+  (testing "Nil works like nothing (for avoid unnecesary null pointers)."
+    (is (= (m/>>= nil (fn [_] (m/return 1))) nil))
+    (is (= (m/fmap inc nil) nil))))
+
 (deftest test-vector-monad
   (testing "The first monad law: left identity"
     (is (= [1 2 3 4 5]

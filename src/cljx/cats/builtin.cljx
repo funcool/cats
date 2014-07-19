@@ -26,7 +26,17 @@
 (ns cats.builtin
   "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
+            [cats.monad.maybe :as maybe]
             [cats.protocols :as proto]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Nil as Nothing of Maybe monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(extend-type nil
+  proto/Context
+  (get-context [_]
+    maybe/maybe-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (Lazy) Sequence Monad
