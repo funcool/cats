@@ -67,6 +67,11 @@
   (local [m f reader] "Create a reader in a modified version of the environment."))
 
 (defprotocol MonadTrans
-  (inner [mt] "Return the inner monad of this transformer.")
-  (outer [mt] "Return the outer monad of this transformer.")
-  (lift [m mv] "Lift a value from the inner monad to the outher monad."))
+  (outer [mt]
+    "Return the outer monad of this transformer. The values of the transformer
+     are values whose context is this monad.")
+  (inner [mt]
+    "Return the inner monad of this transformer. The values of the transformer
+     contain a value whose context is this monad.")
+  (lift [m mv]
+    "Lift a value from the parameterized monad to the transformer."))
