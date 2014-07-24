@@ -160,48 +160,48 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn maybe-trans [outer-monad]
+(defn maybe-trans [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]
-      (proto/fmap outer-monad
+      (proto/fmap inner-monad
                   #(proto/fmap maybe-monad f %)
                   fv))
 
     proto/Monad
     (mreturn [m v]
-      (proto/mreturn outer-monad (just v)))
+      (proto/mreturn inner-monad (just v)))
 
     (mbind [_ mv f]
-      (proto/mbind outer-monad
+      (proto/mbind inner-monad
                    mv
                    (fn [maybe-v]
                      (if (just? maybe-v)
                        (f (from-maybe maybe-v))
-                       (proto/mreturn outer-monad (nothing))))))
+                       (proto/mreturn inner-monad (nothing))))))
 
     proto/MonadZero
     (mzero [_]
-      (proto/mreturn outer-monad (nothing)))
+      (proto/mreturn inner-monad (nothing)))
 
     proto/MonadPlus
     (mplus [_ mv mv']
-      (proto/mbind outer-monad
+      (proto/mbind inner-monad
                    mv
                    (fn [maybe-v]
                      (if (just? maybe-v)
-                       (proto/mreturn outer-monad maybe-v)
+                       (proto/mreturn inner-monad maybe-v)
                        mv'))))
 
     proto/MonadTrans
-    (inner [_]
+    (base [_]
       maybe-monad)
 
-    (outer [_]
-      outer-monad)
+    (inner [_]
+      inner-monad)
 
     (lift [_ mv]
-      (proto/mbind outer-monad
+      (proto/mbind inner-monad
                    mv
                    (fn [v]
-                     (proto/mreturn outer-monad (just v)))))))
+                     (proto/mreturn inner-monad (just v)))))))

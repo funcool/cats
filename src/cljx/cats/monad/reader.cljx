@@ -113,11 +113,11 @@
                        ((f a) env)))))
 
     proto/MonadTrans
+    (base [_]
+      reader-monad)
+
     (inner [_]
       inner-monad)
-
-    (outer [_]
-      reader-monad)
 
     (lift [m mv]
       (fn [_]
