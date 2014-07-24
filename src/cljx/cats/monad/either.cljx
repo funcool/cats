@@ -125,29 +125,29 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn either-trans [inner-m]
+(defn either-trans [outer-monad]
   (reify
     proto/Monad
     (mreturn [_ v]
-      (proto/mreturn inner-m (right v)))
+      (proto/mreturn outer-monad (right v)))
 
     (mbind [_ mv f]
-      (proto/mbind inner-m
+      (proto/mbind outer-monad
                    mv
                    (fn [either-v]
                      (if (left? either-v)
-                       (proto/mreturn inner-m either-v)
+                       (proto/mreturn outer-monad either-v)
                        (f (from-either either-v))))))
 
     proto/MonadTrans
     (inner [_]
-      inner-m)
-
-    (outer [_]
       either-monad)
 
+    (outer [_]
+      outer-monad)
+
     (lift [m mv]
-      (proto/mbind inner-m
+      (proto/mbind outer-monad
                    mv
                    (fn [v]
-                     (proto/mreturn inner-m (right v)))))))
+                     (proto/mreturn outer-monad (right v)))))))
