@@ -26,10 +26,11 @@
 (ns cats.monad.reader
   "The Reader Monad."
   #+clj
-  (:require [cats.core :refer [with-context]])
+  (:require [cats.core :refer [with-context with-monad]])
   #+cljs
-  (:require-macros [cats.core :refer (with-context)])
-  (:require [cats.protocols :as proto]))
+  (:require-macros [cats.core :refer (with-context with-monad)])
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]))
 
 (declare reader-monad)
 
@@ -90,6 +91,49 @@
   ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad transformer definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn reader-trans [inner-monad]
+  (reify
+    proto/Functor
+    (fmap [_ f fv]
+      (reader (fn [env]
+                (proto/fmap inner-monad f (fv env)))))
+
+    proto/Monad
+    (mreturn [_ v]
+      (proto/mreturn reader-monad (proto/mreturn inner-monad v)))
+
+    (mbind [_ mr f]
+      (fn [env]
+        (proto/mbind inner-monad
+                     (mr env)
+                     (fn [a]
+                       ((f a) env)))))
+
+    proto/MonadTrans
+    (inner [_]
+      inner-monad)
+
+    (outer [_]
+      reader-monad)
+
+    (lift [m mv]
+      (fn [_]
+        mv))
+
+    proto/MonadReader
+    (ask [_]
+      (fn [env]
+        (proto/mreturn inner-monad env)))
+
+    (local [_ f mr]
+      (fn [env]
+        (mr (f env))))
+))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -97,10 +141,18 @@
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
   [reader seed]
-  (with-context reader-monad
+  (with-context (m/get-current-context-or reader-monad)
     (reader seed)))
 
-(def ask (proto/ask reader-monad))
+(def ask
+  (reader
+   (fn [env]
+     (let [ctx (m/get-current-context-or reader-monad)]
+       ((proto/ask  ctx) env)))))
 
-(def local (partial proto/local reader-monad))
-; TODO: Reader transformer
+(def local
+  (fn [f mr]
+    (reader
+     (fn [env]
+       (let [ctx (m/get-current-context-or reader-monad)]
+         ((proto/local ctx f mr) env))))))

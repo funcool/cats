@@ -54,7 +54,9 @@
   (cond
     (not (nil? *forced-context*)) *forced-context*
     (not (nil? *context*))        *context*
-    :else                         (p/get-context default)))
+    :else                         (if (satisfies? p/Context default)
+                                    (p/get-context default)
+                                    default)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
