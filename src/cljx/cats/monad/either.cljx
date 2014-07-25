@@ -35,8 +35,8 @@
 
 (deftype Either [v type]
   proto/Context
-  (get-context [_]
-    either-monad)
+  (get-context [_] either-monad)
+  (get-value [_] v)
 
   #+clj
   Object
