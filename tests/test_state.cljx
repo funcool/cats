@@ -2,6 +2,7 @@
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
+            [cats.data :as data]
             [cats.monad.state :as state])
   #+cljs
   (:require-macros [cemerick.cljs.test
@@ -10,6 +11,7 @@
   #+clj
   (:require [clojure.test :refer :all]
             [cats.core :as m :refer [mlet]]
+            [cats.data :as d]
             [cats.monad.state :as state]))
 
 
@@ -27,6 +29,6 @@
                 (m/return (inc s)))]
       (is (state/state? res))
       (let [res (state/run-state res 1)]
-        (is (state/pair? res))
+        (is (d/pair? res))
         (is (= 2 (first res)))
         (is (= 1 (second res)))))))

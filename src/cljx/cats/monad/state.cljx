@@ -29,58 +29,14 @@
   (:require [cats.core :refer [with-context]])
   #+cljs
   (:require-macros [cats.core :refer (with-context)])
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            [cats.data :as d]))
 
 (declare state-monad)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructors and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(deftype Pair [fst snd]
-  #+clj  clojure.lang.Seqable
-  #+cljs cljs.core/ISeqable
-  (#+cljs -seq #+clj seq [_]
-    (list fst snd))
-
-  #+clj  clojure.lang.Indexed
-  #+cljs cljs.core/IIndexed
-  (#+clj nth #+cljs -nth [_ i]
-    (case i
-      0 fst
-      1 snd
-      (throw #+clj (IndexOutOfBoundsException.)
-             #+cljs (js/Error. "Out of index"))))
-
-  (#+clj nth #+cljs -nth [_ i notfound]
-    (case i
-      0 fst
-      1 snd
-      notfound))
-
-  #+clj  clojure.lang.Counted
-  #+cljs cljs.core/ICounted
-  (#+clj count #+cljs -count [_] 2)
-
-  #+clj  java.lang.Object
-  #+cljs cljs.core/IEquiv
-  (#+clj equals #+cljs -equiv [this other]
-    (if (instance? Pair other)
-      (and (= (.-fst this) (.-fst other))
-           (= (.-snd this) (.-snd other)))
-      false))
-
-  #+clj
-  (toString [this]
-    (with-out-str (print [fst snd]))))
-
-(defn pair
-  [fst snd]
-  (Pair. fst snd))
-
-(defn pair?
-  [v]
-  (instance? Pair v))
 
 (deftype State [mfn]
   proto/Context
@@ -121,7 +77,7 @@
     proto/Monad
     (mreturn [_ v]
       (state-t (fn [s]
-                 (pair v s))))
+                 (d/pair v s))))
 
     (mbind [_ self f]
       (-> (fn [s]
@@ -134,15 +90,15 @@
     proto/MonadState
     (get-state [_]
       (state-t (fn [s]
-                 (pair s s))))
+                 (d/pair s s))))
 
     (put-state [_ newstate]
       (state-t (fn [s]
-                 (pair s newstate))))
+                 (d/pair s newstate))))
 
     (swap-state [_ f]
       (-> (fn [s]
-           (pair s (f s)))
+           (d/pair s (f s)))
          (state-t)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -169,7 +125,7 @@
 
 (defn run-state
   "Given a State instance, execute the
-  wrapped computation and returns a Pair
+  wrapped computation and returns a cats.data.Pair
   instance with result and new state.
 
     (def computation (mlet [x (get-state)
