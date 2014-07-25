@@ -33,6 +33,9 @@
             [cats.core :as m]
             [cats.data :as d]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def writer-monad
   (reify
@@ -57,13 +60,66 @@
         (d/pair v (f (second mv)))))
 ))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad transformer definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def log second)
+(defn writer-trans [inner-monad]
+  (reify
+    proto/Monad
+    (mreturn [_ v]
+      (proto/mreturn inner-monad
+                     (d/pair v [])))
+
+    (mbind [_ mv f]
+      (proto/mbind inner-monad
+                   mv
+                   (fn [[v log]]
+                    (proto/mbind inner-monad
+                                 (f v)
+                                 (fn [[v' log']]
+                                   (proto/mreturn inner-monad
+                                                  (d/pair v' (into log log'))))))))
+
+    proto/MonadWriter
+    (tell [_ v]
+      (proto/mreturn inner-monad (d/pair nil [v])))
+
+    (listen [_ mv]
+      (proto/mbind inner-monad
+                   mv
+                   (fn [mv]
+                     (proto/mreturn inner-monad
+                                    (d/pair mv (second mv))))))
+
+    (pass [_ mv]
+      (proto/mbind inner-monad
+                   mv
+                   (fn [w]
+                     (let [[v f] (first w)
+                           log   (second w)]
+                       (proto/mreturn inner-monad
+                                      (d/pair v (f log)))))))
+
+    )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Writer monad functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn tell
+  [v]
+  (proto/tell (m/get-current-context-or writer-monad) v))
+
+(defn listen
+  [mv]
+  (proto/listen (m/get-current-context-or writer-monad) mv))
+
+(defn pass
+  [mv]
+  (proto/pass (m/get-current-context-or writer-monad) mv))
 
 (def value first)
 
-(def listen (partial proto/listen writer-monad))
-
-(def tell (partial proto/tell writer-monad))
-
-(def pass (partial proto/pass writer-monad))
+(def log second)
