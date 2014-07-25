@@ -23,4 +23,45 @@
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(ns cats.monad.writer)
+(ns cats.monad.writer
+  "The Writer Monad."
+  #+clj
+  (:require [cats.core :refer [with-context with-monad]])
+  #+cljs
+  (:require-macros [cats.core :refer (with-context with-monad)])
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]
+            [cats.data :as d]))
+
+
+(def writer-monad
+  (reify
+    proto/Monad
+    (mreturn [_ v]
+      (d/pair v []))
+
+    (mbind [_ mv f]
+      (let [[v log] mv
+            [v' log'] (f v)]
+        (d/pair v' (into log log'))))
+
+    proto/MonadWriter
+    (tell [_ v]
+      (d/pair nil [v]))
+
+    (listen [_ mv]
+      (d/pair mv (second mv)))
+
+    (pass [_ mv]
+      (let [[v f] (first mv)]
+        (d/pair v (f (second mv)))))
+))
+
+
+(def tell (partial proto/tell writer-monad))
+
+(def log second)
+
+(def value first)
+
+(def listen (partial proto/listen writer-monad))

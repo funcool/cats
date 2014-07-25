@@ -66,6 +66,15 @@
   (ask [m] "Return the current environment.")
   (local [m f reader] "Create a reader in a modified version of the environment."))
 
+(defprotocol MonadWriter
+  "A `Monad` that accumulates a log."
+  (listen [m mv] "Given a writer, yield a (value, log) pair as a value.")
+  (tell [m v] "Add the given value to the log.")
+  (pass [m mv]
+    "Given a writer whose value is a pair with a function as its second element,
+     yield a writer which has the first element of the pair as the value and
+     the result of applying the aforementioned function to the log as the new log."))
+
 (defprotocol MonadTrans
   (base [mt] "Return the base monad of this transformer.")
   (inner [mt] "Return the monad that this transformer wraps.")
