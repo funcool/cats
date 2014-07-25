@@ -36,8 +36,8 @@
 
 (deftype Reader [mfn]
   proto/Context
-  (get-context [_]
-    reader-monad)
+  (get-context [_] reader-monad)
+  (get-value [_] mfn)
 
   #+clj  clojure.lang.IFn
   #+cljs cljs.core/IFn
