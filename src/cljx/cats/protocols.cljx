@@ -28,7 +28,8 @@
 
 (defprotocol Context
   "A type that is part of a computational context."
-  (get-context [_]))
+  (get-context [_] "Get the monad instance for curent value.")
+  (get-value [_] "Unwrap the value from context."))
 
 (defprotocol Functor
   (fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
