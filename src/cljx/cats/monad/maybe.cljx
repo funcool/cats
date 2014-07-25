@@ -35,8 +35,8 @@
 
 (deftype Just [v]
   proto/Context
-  (get-context [_]
-    maybe-monad)
+  (get-context [_] maybe-monad)
+  (get-value [_] v)
 
   #+clj
   Object
@@ -59,8 +59,8 @@
 
 (deftype Nothing []
   proto/Context
-  (get-context [_]
-    maybe-monad)
+  (get-context [_] maybe-monad)
+  (get-value [_] nil)
 
   #+clj
   Object

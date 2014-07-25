@@ -36,8 +36,8 @@
 
 (deftype Identity [v]
   proto/Context
-  (get-context [_]
-    identity-monad)
+  (get-context [_] identity-monad)
+  (get-value [_] v)
 
   #+clj
   Object
