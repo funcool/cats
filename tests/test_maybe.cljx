@@ -22,6 +22,10 @@
     (is (= 1 (maybe/from-maybe (maybe/just 1))))
     (is (= nil (maybe/from-maybe (maybe/nothing)))))
 
+  (testing "get-value function"
+    (is (= (p/get-value (maybe/just 1)) 1))
+    (is (= (p/get-value (maybe/nothing)) nil)))
+
   (testing "Test predicates"
     (let [m1 (maybe/just 1)]
       (is (maybe/maybe? m1))

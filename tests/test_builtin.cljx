@@ -2,6 +2,7 @@
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.builtin :as b]
+            [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
             [cats.core :as m])
   #+cljs
@@ -11,16 +12,19 @@
   #+clj
   (:require [clojure.test :refer :all]
             [cats.builtin :as b]
+            [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
             [cats.core :as m :refer [mlet with-context]]))
 
-
-(deftest test-nil-as-nothing
+(deftest test-nil-as-maybe
   (testing "Nil works like nothing (for avoid unnecesary null pointers)."
     (is (= (m/>>= nil (fn [_] (m/return 1))) nil))
     (is (= (m/fmap inc nil) nil))
     (is (maybe/nothing? nil))
-    (is (maybe/maybe? nil))))
+    (is (maybe/maybe? nil)))
+
+  (testing "get-value function"
+    (is (= (p/get-value nil) nil))))
 
 (deftest test-vector-monad
   (testing "The first monad law: left identity"
