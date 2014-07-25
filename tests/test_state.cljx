@@ -2,7 +2,7 @@
   #+cljs
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
-            [cats.data :as data]
+            [cats.data :as d]
             [cats.monad.state :as state])
   #+cljs
   (:require-macros [cemerick.cljs.test
