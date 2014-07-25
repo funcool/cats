@@ -83,3 +83,18 @@
 
     (mbind [_ mv f]
       (f (.-v mv)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad transformer definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn identity-trans [inner-monad]
+  (reify
+    proto/Monad
+    (mreturn [_ v]
+      (identity (proto/mreturn inner-monad v)))
+
+    (mbind [_ mv f]
+      nil)
+
+))

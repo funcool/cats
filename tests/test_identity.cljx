@@ -3,6 +3,7 @@
   (:require [cemerick.cljs.test :as ts]
             [cats.core :as m]
             [cats.protocols :as p]
+            [cats.builtin :as b]
             [cats.monad.identity :as id])
    #+cljs
   (:require-macros [cemerick.cljs.test
@@ -36,4 +37,13 @@
            (m/>>= (id/identity 2)
                   (fn [x] (m/>>= (id/identity (inc x))
                                  (fn [y] (id/identity (inc y)))))))))
+)
+
+(deftest test-identity-trans
+  (let [identity-vector-trans (id/identity-trans b/vector-monad)]
+
+    (testing "It is a trivial transformer which yields the inner monad"
+      (is (= (id/identity [2])
+             (with-monad identity-vector-trans
+               (m/return 2))))))
 )
