@@ -39,13 +39,14 @@
 
 (deftype Continuation [mfn]
   proto/Context
-  (get-context [_]
-    continuation-monad)
+  (get-context [_] continuation-monad)
+  (get-value [_] mfn)
 
-  #+clj   clojure.lang.IFn
-  #+cljs  cljs.core/IFn
-  (#+clj invoke #+cljs -invoke [self f]
-    (mfn f)))
+  #+clj  clojure.lang.IFn
+  #+cljs cljs.core/IFn
+  (#+clj invoke #+cljs -invoke [self seed]
+    (mfn seed)))
+
 
 (defn continuation
   "Default constructor for continuation."
