@@ -363,8 +363,10 @@
 (defn >>
   "Performs a Haskell-style left-associative bind,
   ignoring the values produced by the monad computations."
-  [mv mv']
-  (bind mv (fn [_] mv')))
+  ([mv mv']
+     (bind mv (fn [_] mv')))
+  ([mv mv' & mvs]
+     (reduce >> mv (cons mv' mvs))))
 
 (defn =<<
   "Same as the two argument version of `>>=` but with the
