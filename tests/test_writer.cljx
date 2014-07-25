@@ -41,7 +41,7 @@
         (is (= ["Hello" "world"]
                (second w)))))
 
-  (testing "The `listen` function yields a pair with the value and the log"
+  (testing "The `pass` function can be used to apply a function to the log"
     (let [w (with-monad writer/writer-monad
               (m/>> (writer/tell "Hello")
                     (writer/tell "world")
