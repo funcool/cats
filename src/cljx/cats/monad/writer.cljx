@@ -58,10 +58,12 @@
 ))
 
 
-(def tell (partial proto/tell writer-monad))
-
 (def log second)
 
 (def value first)
 
 (def listen (partial proto/listen writer-monad))
+
+(def tell (partial proto/tell writer-monad))
+
+(def pass (partial proto/pass writer-monad))

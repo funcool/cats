@@ -41,5 +41,14 @@
         (is (= ["Hello" "world"]
                (second w)))))
 
-  ; TODO: test `pass`
+  (testing "The `listen` function yields a pair with the value and the log"
+    (let [w (with-monad writer/writer-monad
+              (m/>> (writer/tell "Hello")
+                    (writer/tell "world")
+                    (m/return [42 reverse])))
+          w (writer/listen (writer/pass w))]
+        (is (= (d/pair 42 ["world" "Hello"])
+               (first w)))
+        (is (= ["world" "Hello"]
+               (second w)))))
 )
