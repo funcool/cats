@@ -48,11 +48,11 @@
   (testing "The third monad law: associativity"
     (is (= (m/>>= (mlet [x  (maybe/just 2)
                          y  (maybe/just (inc x))]
-                        (m/return y))
+                    (m/return y))
                   (fn [y] (maybe/just (inc y))))
            (m/>>= (maybe/just 2)
                   (fn [x] (m/>>= (maybe/just (inc x))
-                                (fn [y] (maybe/just (inc y))))))))))
+                                 (fn [y] (maybe/just (inc y))))))))))
 
 
 (deftest test-maybe-trans
