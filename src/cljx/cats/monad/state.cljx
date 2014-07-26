@@ -73,9 +73,7 @@
     proto/Functor
     (fmap [_ f fv]
       (state-t (fn [s]
-                 (let [r  (fv s)
-                       v  (.-fst r)
-                       ns (.-snd r)]
+                 (let [[v ns]  (fv s)]
                    (d/pair (f v) ns)))))
 
     proto/Monad
@@ -109,7 +107,48 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; TODO
+(defn state-trans [inner-monad]
+  (reify
+    proto/Functor
+    (fmap [_ f fv]
+      (state-t (fn [s]
+                 (let [wr (fv s)]
+                   (proto/fmap inner-monad
+                               (fn [[v ns]]
+                                 (d/pair (f v) ns))
+                               wr)))))
+
+    proto/Monad
+    (mreturn [_ v]
+      (state-t (fn [s]
+                 (proto/mreturn inner-monad
+                                (d/pair v s)))))
+
+    (mbind [_ self f]
+      (-> (fn [s]
+            (let [mp (self s)]
+              (proto/mbind inner-monad
+                           mp
+                           (fn [[v ns]]
+                             ((f v) ns)))))
+         (state-t)))
+
+    proto/MonadState
+    (get-state [_]
+      (state-t (fn [s]
+                 (proto/mreturn inner-monad
+                                (d/pair s s)))))
+
+    (put-state [_ newstate]
+      (state-t (fn [s]
+                 (proto/mreturn inner-monad
+                                (d/pair s newstate)))))
+
+    (swap-state [_ f]
+      (-> (fn [s]
+           (proto/mreturn inner-monad
+                          (d/pair s (f s))))
+         (state-t)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
