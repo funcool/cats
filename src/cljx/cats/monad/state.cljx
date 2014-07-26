@@ -30,7 +30,8 @@
   #+cljs
   (:require-macros [cats.core :refer (with-context)])
   (:require [cats.protocols :as proto]
-            [cats.data :as d]))
+            [cats.data :as d]
+            [cats.core :as m]))
 
 (declare state-monad)
 
@@ -118,19 +119,19 @@
   "Return a State instance with computation that returns
   the current state."
   []
-  (proto/get-state state-monad))
+  (proto/get-state (m/get-current-context-or state-monad)))
 
 (defn put-state
   "Return a State instance with computation that replaces
   the current state with specified new state."
   [newstate]
-  (proto/put-state state-monad newstate))
+  (proto/put-state (m/get-current-context-or state-monad) newstate))
 
 (defn swap-state
   "Return a State instance with computation that applies the
   specified function to state and returns the old state."
   [f]
-  (proto/swap-state state-monad f))
+  (proto/swap-state (m/get-current-context-or state-monad) f))
 
 (defn run-state
   "Given a State instance, execute the
@@ -146,7 +147,7 @@
 
   This should be return something to: #<Pair [1 2]>"
   [state seed]
-  (with-context state-monad
+  (with-context (m/get-current-context-or state-monad)
     (state seed)))
 
 (defn eval-state
