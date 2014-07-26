@@ -1,7 +1,14 @@
 (ns cats.monad.lazy
   "The Maybe Monad."
+  #+clj
+  (:require [cats.protocols :as proto]
+            [cats.core :as m :refer (with-context)])
+  #+cljs
+  (:require-macros [cats.core :refer (with-context)])
+  #+cljs
   (:require [cats.protocols :as proto]
             [cats.core :as m]))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,7 +31,7 @@
     proto/Monad
     (mbind [m self f]
       (delay
-       (m/with-context m
+       (with-context m
          (proto/get-value (f @self)))))
 
     (mreturn [_ v]

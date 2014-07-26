@@ -49,8 +49,8 @@
 
   (testing "bind function"
     (let [state (atom 0)
-          fv1   (m/mlet [x    (delay 1)
-                         y    (delay 2)]
+          fv1   (mlet [x (delay 1)
+                       y (delay 2)]
                   (swap! state inc)
                   (m/return (+ x y)))]
 
