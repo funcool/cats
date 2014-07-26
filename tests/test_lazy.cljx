@@ -42,7 +42,7 @@
           fv1   (delay (fn [x] (inc x)))
           fv2   (delay (swap! state inc) 1)
           fv3   (m/fapply fv1 fv2)]
-      (is (delay fv3))
+      (is (delay? fv3))
       (is (= @state 0))
       (is (= @fv3 2))
       (is (= @state 1))))
