@@ -31,10 +31,14 @@
       (is (delay? fv1))
       (is (= @fv1 10))))
 
+  (testing "return function"
+    (let [fv1 (m/return lazy/lazy-monad 10)]
+      (is (delay? fv1))
+      (is (= @fv1 10))))
+
   (testing "fapply function"
     (let [fv1 (delay (fn [x] (inc x)))
           fv2 (m/fapply fv1 (maybe/just 1))]
-
       (is (delay? fv2))
       (is (= @fv2 2)))
 
@@ -53,7 +57,6 @@
                        y (delay 2)]
                   (swap! state inc)
                   (m/return (+ x y)))]
-
       (is (= @state 0))
       (is (delay? fv1))
       (is (= @fv1 3))
