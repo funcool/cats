@@ -31,4 +31,14 @@
       (let [res (state/run-state res 1)]
         (is (d/pair? res))
         (is (= 2 (first res)))
+        (is (= 1 (second res))))))
+
+  (testing "State monad computations can be mapped over"
+    (let [res (mlet [s (state/get-state)]
+                (m/return (inc s)))
+          res (m/fmap inc res)]
+      (is (state/state? res))
+      (let [res (state/run-state res 1)]
+        (is (d/pair? res))
+        (is (= 3 (first res)))
         (is (= 1 (second res)))))))

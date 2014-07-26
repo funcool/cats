@@ -69,10 +69,13 @@
 
 (def state-monad
   (reify
-    proto/Functor ; TODO: test functor laws
+    proto/Functor
     (fmap [_ f fv]
       (state-t (fn [s]
-                 (f (fv s)))))
+                 (let [r  (fv s)
+                       v  (.-fst r)
+                       ns (.-snd r)]
+                   (d/pair (f v) ns)))))
 
     proto/Monad
     (mreturn [_ v]
@@ -100,6 +103,12 @@
       (-> (fn [s]
            (d/pair s (f s)))
          (state-t)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad transformer definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; TODO
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
@@ -157,5 +166,3 @@
   returned by `run-state` function."
   [state seed]
   (second (run-state state seed)))
-
-; TODO: State transformer
