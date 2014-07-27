@@ -72,7 +72,7 @@
   ([v]
      #+clj
      (when-not (or (bound? #'*context*)
-                  (bound? #'*forced-context*))
+                   (bound? #'*forced-context*))
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
      (if-not (nil? *forced-context*)
@@ -86,7 +86,7 @@
   ([v]
      #+clj
      (when-not (or (bound? #'*context*)
-                  (bound? #'*forced-context*))
+                   (bound? #'*forced-context*))
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
      (if-not (nil? *forced-context*)
