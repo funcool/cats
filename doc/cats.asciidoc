@@ -146,7 +146,7 @@ One good example of functor wrapper is the **Maybe** type:
 ;; => #<Just [2]>
 ----
 
-**just** is one of two constructors of **Maybe** type and it's only wraps the real 
+**just** is one of two constructors of **Maybe** type and it's only wraps the real
 value. Now, let see one example using **fmap** over **just** instance:
 
 [source, clojure]
@@ -157,7 +157,7 @@ value. Now, let see one example using **fmap** over **just** instance:
 ;; => #<Just [2]>
 ----
 
-But **Maybe** has another constructor: `maybe/nothing`. This constructor makes 
+But **Maybe** has another constructor: `maybe/nothing`. This constructor makes
 empty object that not wraps anything. It represents the failure. Is the safe
 substitute of `nil` and represents the failure.
 
@@ -193,32 +193,52 @@ map works with seqs and doesn't respect the input container:
 ;; => (2 3 4)
 ----
 
-But why fmap works with vectors? Some "container" types of clojure like vectors, lists or sets 
+But why fmap works with vectors? Some "container" types of clojure like vectors, lists or sets
 also implements the functor abstraction.
 
 
-Applicative Functor
-~~~~~~~~~~~~~~~~~~~
+Applicative
+~~~~~~~~~~~
 
-Represents an abstraction lying in between Functor and Monad in expressivity.
+Let continue with applicative function. The Applicative Functor represents
+some sort of "computational context" like plain Functor, but with abilty of
+execute a function wrapped in same context.
 
-.Applicative protocol
+Applicative Functor abstraction consists in two functions: **fapply** and
+**pure**.
+
+.Signature of **fapply** function
 [source, clojure]
 ----
-(defprotocol Applicative
-  (fapply [af av]
-    "Applies the function(s) inside ag's context to the value(s)
-     inside av's context while preserving the context.")
-  (pure [ctx v]
-    "Takes any context monadic value ctx and any value v, and puts
-     the value v in the most minimal context of the same type of ctx"))
+(fapply [af av])
 ----
 
-With the same idea of data inside a context (like `Functor`), what happens if a wrapped value is
-one function/computation? Applicative functors works like plain functors but additionally
-can apply a function wrapped in some context similar to input value.
+NOTE: **pure** function it will be explained later.
 
-Let see one example:
+The use case of Applicative Functors is much same as of plain Functors: safe
+evaluation of some computation in a context.
+
+Let see one exaple for understand better the differences between functor and
+applicative functor:
+
+Imagine, you have some factory function that depending of language, return a
+greater function and you only has support for few languages.
+
+
+[source, clojure]
+----
+(defn make-greeter
+  [^String lang]
+  (condp = lang
+    "es" (fn [name] (str "Hola " name))
+    "en" (fn [name] (str "Hello " name))
+    nil))
+----
+
+Now, if you want to use it, you should always defensively check if returned
+greater is a valid function or is a nil value.
+
+Lets go to convert this factory to use Maybe type:
 
 [source, clojure]
 ----
@@ -228,7 +248,14 @@ Let see one example:
     "es" (just (fn [name] (str "Hola " name)))
     "en" (just (fn [name] (str "Hello " name)))
     (nothing)))
+----
 
+As you can observe, this version of factory differs little bit from the
+original implementation. And this little change makes you superpower: you
+can apply the returned greater to any value without defensive nil checking:
+
+[source, clojure]
+----
 (fapply (make-greeter "es") (just "Alex"))
 ;; => #<Just [Hola Alex]>
 
@@ -239,23 +266,25 @@ Let see one example:
 ;; => #<Nothing >
 ----
 
-Moreover, the applicative functor protocol comes with another function: `pure`. The main purpose of
-this function is, given any value in a context and new value, wrap the new value in a minimal context of the same
-type as the first argument.
+Moreover the applicative functor comes with **pure** function, and main purpose of this function is
+put some value in side effect free contex of the current type.
 
 Examples:
 
 [source, clojure]
 ----
-(pure (just 1) 5)
+(require '[cats.monad.maybe])
+(require '[cats.monad.either])
+
+(pure maybe/maybe-monad 5)
 ;; => #<Just [5]>
 
-(pure (right :foo) :bar)
+(pure either/either-monad :bar)
 ;; => #<Either [:bar :right]>
 ----
 
-You will understand the real purpose of this function when using a **Monad** abstraction.
-
+Possible you will understand the purpose and use case of **pure** function in
+the next section: *Monad*.
 
 Monad
 ~~~~~
@@ -266,44 +295,67 @@ applicatives, monads deal with data in contexts.
 Additionaly, monads can also transform context by unwrapping data, applying functions to it and
 put new values in a completely different context.
 
-.Monad protocol
-[source, clojure]
+The monad abstraction consists on two functions: **bind** and **return**
+
+**bind** function has the following signature:
+
+[source,clojure]
 ----
-(defprotocol Monad
-  "Incomplete monad type definition."
-  (bind [mv f] "Applies the function f to the value(s) inside mv's context."))
+(bind [mv f])
 ----
 
-NOTE: As opposed to haskell type classes, _cats_ protocols only define one method: `bind`. Other
-related methods like `return` are defined as auxiliar functions in `cats.core`.
+Let see one example:
 
-`bind` function, takes a monadic value (any container that implements a `Monad` protocol) and one
-function, applies the function with unwrapped value as first parameter and returns a result. In this
-case, the function is responsible for wrapping the result in a corresponding context.
-
-One of the key features of the bind function is that everything inside a monad context knows the context
-type. Having this, if you apply some computation over a monad and you want to return the result
-in the same container context but you don't know that container is it, you can use `return` or `pure`.
-
-[source, clojure]
+[source,clojure]
 ----
-(bind (just 1) (fn [v] (return (inc v))))
+(bind (just 1)
+      (fn [v] (just (inc v))))
+----
+
+As you can observe, it works much like Functor but with inverted arguments, the main deference is
+that in monad, the function is a responsible of wrapping a retuned value in a context.
+
+One of the key features of the bind function is that any computation executed inside of context of
+bind (monad) knows the context type implicitly. Having this, if you apply some computation over some 
+monadic value  and you want to return the result in the same container context but you don't know 
+that container is it, you can use `return` or `pure` functions:
+
+[source,clojure]
+----
+(bind (just 1)
+      (fn [v]
+        (return (inc v))))
 ;; => #<Just [2]>
 ----
 
-The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context value
-that's set internally by the `bind` function. Therefore you can't use them with one argument out of a `bind` context.
+The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context
+value that's set internally by the `bind` function. Therefore you can't use them with one argument out
+of a `bind` context.
 
-And finally, to make more powerful monadic compositions, _cats_ comes with the `mlet` macro that
-if you are coming from haskell, represents a `do-syntax`:
+At this time, everything is fine, we not can compose any number of computations using monad **bind*
+functions. But that is happens where the number of computations increases:
 
 [source, clojure]
 ----
-(mlet [x (just 1)
-       y (just 2)
-       z (just (+ x y))]
-  (return z))
-;; => #<Just [3]>
+(bind (just 1)
+      (fn [a]
+        (bind (just (inc a))
+              (fn [b]
+                (return (* b 2))))))
+----
+
+This easy grows to very beatiful callback hell. For solve this, _cats_ comes with powerful
+macro: **mlet**
+
+NOTE: If you are coming from haskell, it represents the `do-syntax` of haskell.
+
+Let see the same example but translated to more clear code using mlet macto:
+
+[source, clojure]
+----
+(mlet [a (just 1)
+       b (just (inc b))]
+  (return (* b 2)))
 ----
 
 If you want to use regular (non-monadic) let bindings inside a `mlet` block, you can do so using
@@ -311,115 +363,22 @@ If you want to use regular (non-monadic) let bindings inside a `mlet` block, you
 
 [source, clojure]
 ----
-(mlet [x (just 1)
-       y (just 2)
-       :let [z (+ x y)]]
-  (return z))
-;; => #<Just [3]>
+(mlet [a (just 1)
+       b (just (inc b))
+       :let [z (+ a b)]]
+  (return (* z 2)))
 ----
 
-MonadZero
-^^^^^^^^^
+Monad types
+^^^^^^^^^^^
 
-The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadZero[MonadZero] protocol
-represents a monad that has a notion of an identity element.
-
-.MonadZero protocol
-[source, clojure]
-----
-(defprotocol MonadZero
-  "A `Monad` that supports the notion of an identity element."
-  (mzero [ctx] "The identity element for `ctx`."))
-----
-
-The `bind` operation on the identity element satisfies Left Zero:
-
-[source, clojure]
-----
-(mzero (just 1))
-;; => #<Nothing >
-
-(= (mzero (just 1))
-   (>>= (mzero (just 1)) just))
-;; => true
-----
-
-When a monad instance implements the MonadZero protocol, `:when` clauses can be used in `mlet`
-bindings:
-
-[source, clojure]
-----
-(mlet [i [1 2 3 4 5]
-       :when (> i 2)]
-      (return i))
-;; => [3 4 5]
-
-(mlet [i (t/just 2)
-       :when (> i 2)]
-      (m/return i))
-;; => #<Nothing >
-----
-
-MonadPlus
-^^^^^^^^^
-
-The link:http://www.haskell.org/haskellwiki/MonadPlus_reform_proposal#MonadPlus[MonadPlus] protocol
-represents a MonadZero wich has a plus operation.
-
-.MonadPlus protocol
-[source, clojure]
-----
-(defprotocol MonadPlus
-  "A `MonadZero` that supports the notion of addition."
-  (mplus [mv mv'] "An associative addition operation."))
-----
-
-`mplus` is an associative binary operation for which the value that `mzero` gives is the identity
-element. The `mplus` version contained in the core namespace is variadic.
-
-[source, clojure]
-----
-(require '[cats.monad.maybe :refer [just nothing]])
-(require '[cats.core :refer [mplus]])
-
-(mplus [1 2 3] [4 5 6] [7 8])
-;; => [1 2 3 4 5 6 7 8]
-
-(mplus (nothing))
-;; => #<Nothing >
-
-(mplus (nothing) (just 42))
-;; => #<Just [42]>
-
-(mplus (nothing) (just 42) (just 3))
-;; => #<Just [42]>
-----
-
-Monad Transformers
-~~~~~~~~~~~~~~~~~~
-
-
-What is Monad transformer?
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-TODO
-
-
-How I can use them?
-^^^^^^^^^^^^^^^^^^^
-
-TODO
-
-
-Data Types reference
---------------------
-
-We talked about values in a context, but that is a context? Context per se is any value that
-wraps an other value inside.
+Monad as is, is the abstraction, and we have seen two types in examples that implements
+the monad abstraction: Maybe and Either. But they are the smallest part of types
+that implements the Monad abstraction. In this section we try explain different
+monad types supported by _cats_ library.
 
 Maybe
-~~~~~
-
++++++
 
 This is one of the two most used monad types (commonly named Optional in non-functional programming
 languages).
@@ -446,9 +405,8 @@ _cats_, implements two constructors:
 
 NOTE: Maybe types are: Functors, Applicative Functors and Monads
 
-
 Either
-~~~~~~
+++++++
 
 Either is another type that represents a result of computation, but in contrast with maybe
 it can return some data with a failed computation result.
@@ -471,6 +429,49 @@ In _cats_ it has two constructors:
 
 NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 
+State
++++++
+
+TODO
+
+Reader
+++++++
+
+TODO
+
+Writer
+++++++
+
+TODO
+
+Continuation
+++++++++++++
+
+TODO
+
+Lazy
+++++
+
+TODO
+
+Vector
+++++++
+
+TODO
+
+Monad Transformers
+^^^^^^^^^^^^^^^^^^
+
+With small examples we could use simple monadic compositions, but in some circumstances
+we would combine the effects of two or more monads in one composition. For this purpose
+exists monad transformers.
+
+Almost each monad supported in _cats_ library has it monad transformer for combine
+it with any other monad.
+
+TODO
+
+
 Clojure Types
 -------------
 
@@ -492,9 +493,8 @@ they should not extend any of the previously explained protocols.
 | atom     | No one (in future)
 |=============================================================
 
-
-Special use cases of monads
---------------------------
+Use cases
+---------
 
 State monad
 ~~~~~~~~~~~
