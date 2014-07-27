@@ -26,9 +26,9 @@
 (ns cats.monad.state
   "The State Monad."
   #+clj
-  (:require [cats.core :refer [with-context]])
+  (:require [cats.core :refer [with-monad]])
   #+cljs
-  (:require-macros [cats.core :refer (with-context)])
+  (:require-macros [cats.core :refer (with-monad)])
   (:require [cats.protocols :as proto]
             [cats.data :as d]
             [cats.core :as m]))
@@ -148,7 +148,19 @@
       (-> (fn [s]
            (proto/mreturn inner-monad
                           (d/pair s (f s))))
-         (state-t)))))
+          (state-t)))
+
+    ; TODO
+    proto/MonadTrans
+    (base [_]
+      state-monad)
+
+    (inner [_]
+      inner-monad)
+
+    (lift [_ mv]
+      nil)
+))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State monad functions
@@ -186,7 +198,7 @@
 
   This should be return something to: #<Pair [1 2]>"
   [state seed]
-  (with-context (m/get-current-context-or state-monad)
+  (with-monad (m/get-current-context-or state-monad)
     (state seed)))
 
 (defn eval-state

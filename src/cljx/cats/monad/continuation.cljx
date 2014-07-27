@@ -27,9 +27,9 @@
   "The Continuation Monad."
   (:require [cats.protocols :as proto])
   #+clj
-  (:require [cats.core :refer [with-context]])
+  (:require [cats.core :refer [with-monad]])
   #+cljs
-  (:require-macros [cats.core :refer (with-context)]))
+  (:require-macros [cats.core :refer (with-monad)]))
 
 (declare continuation-monad)
 
@@ -76,7 +76,7 @@
   "Given a Continuation instance, execute the
   wrapped computation and return its value."
   [cont]
-  (with-context continuation-monad
+  (with-monad continuation-monad
     (cont identity)))
 
 (defn call-cc

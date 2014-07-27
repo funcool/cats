@@ -26,9 +26,9 @@
 (ns cats.monad.writer
   "The Writer Monad."
   #+clj
-  (:require [cats.core :refer [with-context with-monad]])
+  (:require [cats.core :refer [with-monad]])
   #+cljs
-  (:require-macros [cats.core :refer (with-context with-monad)])
+  (:require-macros [cats.core :refer (with-monad)])
   (:require [cats.protocols :as proto]
             [cats.core :as m]
             [cats.data :as d]))
@@ -101,8 +101,17 @@
                        (proto/mreturn inner-monad
                                       (d/pair v (f log)))))))
 
-    )
-)
+    ; TODO
+    proto/MonadTrans
+    (base [_]
+      writer-monad)
+
+    (inner [_]
+      inner-monad)
+
+    (lift [_ mv]
+      nil)
+))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions

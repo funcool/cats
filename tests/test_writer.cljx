@@ -72,7 +72,6 @@
         (is (= ["Hello" "world"]
                (writer/log (maybe/from-maybe w))))))
 
-
     (testing "The `listen` function yields a pair with the value and the log"
       (let [w (with-monad maybe-writer
                 (m/>> (writer/tell "Hello")

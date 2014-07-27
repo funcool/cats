@@ -26,9 +26,9 @@
 (ns cats.monad.reader
   "The Reader Monad."
   #+clj
-  (:require [cats.core :refer [with-context with-monad]])
+  (:require [cats.core :refer [with-monad]])
   #+cljs
-  (:require-macros [cats.core :refer (with-context with-monad)])
+  (:require-macros [cats.core :refer (with-monad)])
   (:require [cats.protocols :as proto]
             [cats.core :as m]))
 
@@ -141,7 +141,7 @@
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
   [reader seed]
-  (with-context (m/get-current-context-or reader-monad)
+  (with-monad (m/get-current-context-or reader-monad)
     (reader seed)))
 
 (def ask

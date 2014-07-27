@@ -2,9 +2,9 @@
   "The Lazy Monad."
   #+clj
   (:require [cats.protocols :as proto]
-            [cats.core :as m :refer (with-context)])
+            [cats.core :as m :refer (with-monad)])
   #+cljs
-  (:require-macros [cats.core :refer (with-context)])
+  (:require-macros [cats.core :refer (with-monad)])
   #+cljs
   (:require [cats.protocols :as proto]
             [cats.core :as m]))
@@ -29,7 +29,7 @@
     proto/Monad
     (mbind [m self f]
       (delay
-       (with-context m
+       (with-monad m
          (proto/get-value (f @self)))))
 
     (mreturn [_ v]

@@ -8,13 +8,13 @@
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
-                   [cats.core :refer (mlet with-context)])
+                   [cats.core :refer (mlet with-monad)])
   #+clj
   (:require [clojure.test :refer :all]
             [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
-            [cats.core :as m :refer [mlet with-context]]))
+            [cats.core :as m :refer [mlet with-monad]]))
 
 (deftest test-nil-as-maybe
   (testing "Nil works like nothing (for avoid unnecesary null pointers)."
@@ -50,7 +50,7 @@
         s (val->lazyseq 2)]
     (testing "The first monad law: left identity"
       (is (= s
-             (with-context b/sequence-monad
+             (with-monad b/sequence-monad
                (m/>>= (m/return 2)
                       val->lazyseq)))))
 
@@ -73,7 +73,7 @@
 (deftest test-set-monad
   (testing "The first monad law: left identity"
     (is (= #{2}
-           (with-context b/set-monad
+           (with-monad b/set-monad
              (m/>>= (m/return 2)
                     (fn [x] #{x}))))))
 

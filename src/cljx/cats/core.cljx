@@ -27,7 +27,7 @@
   "Category Theory abstractions for Clojure"
   (:require [cats.protocols :as p])
   #+cljs
-  (:require-macros [cats.core :refer (with-context mlet)])
+  (:require-macros [cats.core :refer (with-monad mlet)])
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -35,24 +35,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^:dynamic *context* nil)
-(def ^:dynamic *forced-context* nil)
-
-#+clj
-(defmacro with-context
-  [ctx & body]
-  `(binding [*context* ~ctx]
-     ~@body))
 
 #+clj
 (defmacro with-monad
   [ctx & body]
-  `(binding [*forced-context* ~ctx]
+  `(binding [*context* ~ctx]
      ~@body))
 
 (defn get-current-context-or
   [default]
   (cond
-    (not (nil? *forced-context*)) *forced-context*
     (not (nil? *context*))        *context*
     :else                         (if (satisfies? p/Context default)
                                     (p/get-context default)
@@ -73,13 +65,10 @@
   value."
   ([v]
      #+clj
-     (when-not (or (bound? #'*context*)
-                   (bound? #'*forced-context*))
+     (when-not (bound? #'*context*)
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
-     (if-not (nil? *forced-context*)
-       (p/pure *forced-context* v)
-       (p/pure *context* v)))
+       (p/pure *context* v))
   ([app v]
      (p/pure app v)))
 
@@ -87,13 +76,10 @@
   "This is a monad version of pure."
   ([v]
      #+clj
-     (when-not (or (bound? #'*context*)
-                   (bound? #'*forced-context*))
+     (when-not (bound? #'*context*)
        (throw (IllegalArgumentException.
                "You are using return/pure function without context.")))
-     (if-not (nil? *forced-context*)
-       (p/mreturn *forced-context* v)
-       (p/mreturn *context* v)))
+       (p/mreturn *context* v))
   ([m v]
      (p/mreturn m v)))
 
@@ -101,16 +87,22 @@
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (if-not (nil? *forced-context*)
-    (p/mbind *forced-context* mv f)
-    (with-context (p/get-context mv)
-      (p/mbind *context* mv f))))
+  (cond
+   (nil? *context*)
+     (with-monad (p/get-context mv)
+       (p/mbind *context* mv f))
+
+   (or (satisfies? p/MonadTrans *context*)
+       (not (satisfies? p/Context mv)))
+     (p/mbind *context* mv f)
+
+   :else
+     (p/mbind (p/get-context mv) mv f)
+))
 
 (defn mzero
   []
-  (if-not (nil? *forced-context*)
-    (p/mzero *forced-context*)
-    (p/mzero *context*)))
+  (p/mzero *context*))
 
 (defn mplus
   [& mvs]
@@ -164,9 +156,7 @@
   "Lift a value from the inner monad of a monad transformer into a value
   of the monad transformer."
   ([mv]
-     (if-not (nil? *forced-context*)
-       (p/lift *forced-context* mv)
-       (p/lift *context* mv)))
+     (p/lift *context* mv))
   ([m mv]
      (p/lift m mv)))
 
@@ -260,7 +250,7 @@
   [mvs]
   {:pre [(not-empty mvs)]}
   (let [ctx (get-current-context-or (first mvs))]
-    (with-context ctx
+    (with-monad ctx
       (reduce (fn [mvs mv]
                  (mlet [v mv
                         vs mvs]
@@ -324,7 +314,7 @@
     ;=> <Nothing>
   "
   [p mv]
-  (with-context (get-current-context-or mv)
+  (with-monad (get-current-context-or mv)
     (mlet [v mv
            :when (p v)]
           (return v))))
@@ -377,7 +367,7 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (with-context (get-current-context-or mf)
+  (with-monad (get-current-context-or mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
@@ -386,7 +376,7 @@
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (with-context (get-current-context-or mf)
+  (with-monad (get-current-context-or mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
