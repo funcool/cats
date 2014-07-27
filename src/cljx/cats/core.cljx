@@ -174,6 +174,27 @@
 
 #+clj
 (defmacro mlet
+  "Monad composition macro that works like clojure
+  let. This allows much easy composition of monadic
+  computations.
+
+  Let see one example for understand how it works, this is
+  a code using bind for compose few number of operations:
+
+
+    (bind (just 1)
+          (fn [a]
+            (bind (just (inc a))
+                  (fn [b]
+                    (return (* b 2))))))
+
+  Now see how this code can be more clear if you
+  are using mlet macro for do it:
+
+    (mlet [a (just 1)
+           b (just (inc b))]
+      (return (* b 2)))
+  "
   [bindings & body]
   (when-not (and (vector? bindings) (even? (count bindings)))
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
