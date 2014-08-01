@@ -16,7 +16,6 @@
             [cats.monad.maybe :as maybe]
             [cats.monad.state :as state]))
 
-
 (deftest test-state-monad
   (testing "get-state should return the identity."
     (let [computation (state/get-state)]
@@ -90,4 +89,18 @@
           (is (maybe/maybe? mres))
           (is (d/pair? res))
           (is (= 3 (first res)))
-          (is (= 1 (second res))))))))
+          (is (= 1 (second res))))))
+
+    (testing "Inner monad values can be lifted into the transformer"
+      (let [lifted-just (mlet [s (state/get-state)
+                               i (m/lift (maybe/just 3))]
+                          (m/return (+ i s)))
+            lifted-nothing (mlet [s (state/get-state)
+                                  i (m/lift (maybe/nothing))]
+                             (m/return (+ s i)))]
+        (is (= (maybe/just (d/pair 45 42))
+               (with-monad maybe-state-monad
+                 (state/run-state lifted-just 42))))
+        (is (= (maybe/nothing)
+               (with-monad maybe-state-monad
+                 (state/run-state lifted-nothing nil))))))))

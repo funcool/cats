@@ -150,7 +150,6 @@
                           (d/pair s (f s))))
           (state-t)))
 
-    ; TODO
     proto/MonadTrans
     (base [_]
       state-monad)
@@ -159,7 +158,12 @@
       inner-monad)
 
     (lift [_ mv]
-      nil)
+      (state-t (fn [s]
+                 (proto/mbind inner-monad
+                              mv
+                              (fn [v]
+                                (proto/mreturn inner-monad
+                                               (d/pair v s)))))))
 ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
