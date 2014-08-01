@@ -101,7 +101,6 @@
                        (proto/mreturn inner-monad
                                       (d/pair v (f log)))))))
 
-    ; TODO
     proto/MonadTrans
     (base [_]
       writer-monad)
@@ -110,7 +109,11 @@
       inner-monad)
 
     (lift [_ mv]
-      nil)
+      (proto/mbind inner-monad
+                   mv
+                   (fn [v]
+                     (proto/mreturn inner-monad
+                                    (d/pair v [])))))
 ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -94,5 +94,19 @@
           (is (= (d/pair 42 ["world" "Hello"])
                  (first (maybe/from-maybe w))))
           (is (= ["world" "Hello"]
-                 (second (maybe/from-maybe w)))))))
+                 (second (maybe/from-maybe w))))))
+
+    (testing "Inner monad values can be lifted into the transformer"
+      (let [lifted-just (with-monad maybe-writer
+                          (m/lift (maybe/just 3)))
+            lifted-nothing (with-monad maybe-writer
+                             (m/lift (maybe/nothing)))]
+        (is (= (maybe/just (d/pair 3 ["Hello"]))
+               (with-monad maybe-writer
+                 (m/>> (writer/tell "Hello")
+                       lifted-just))))
+        (is (= (maybe/nothing)
+               (with-monad maybe-writer
+                 (m/>> (writer/tell "Hello")
+                       lifted-nothing)))))))
 )
