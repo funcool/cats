@@ -39,12 +39,12 @@
   (testing "It works with vectors"
     (is (= (m/sequence [[1 2] [3 4]])
            [[1 3] [1 4] [2 3] [2 4]])))
-;  (testing "It works with lazy seqs"
-;    (is (= (m/sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
-;           '([1 3] [1 4] [2 3] [2 4]))))
-;  (testing "It works with sets"
-;    (is (= (m/sequence [#{1 2} #{3 4}])
-;           #{[1 3] [1 4] [2 3] [2 4]})))
+  (testing "It works with lazy seqs"
+    (is (= (m/sequence [(lazy-seq [1 2]) (lazy-seq [3 4])])
+           [[1 3] [1 4] [2 3] [2 4]])))
+  (testing "It works with sets"
+    (is (= (m/sequence [#{1 2} #{3 4}])
+           #{[1 3] [1 4] [2 3] [2 4]})))
   (testing "It works with Maybe values"
     (is (= (m/sequence [(maybe/just 2) (maybe/just 3)])
            (maybe/just [2 3])))
