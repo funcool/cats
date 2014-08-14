@@ -466,8 +466,8 @@ With small examples we could use simple monadic compositions, but in some circum
 we would combine the effects of two or more monads in one composition. For this purpose
 exists monad transformers.
 
-Almost each monad supported in _cats_ library has it monad transformer for combine
-it with any other monad.
+Almost every monad implemented in _cats_ has a monad transformer for combining it with
+any other monad.
 
 TODO
 
