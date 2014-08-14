@@ -187,16 +187,20 @@
             (bind (just (inc a))
                   (fn [b]
                     (return (* b 2))))))
+    ;=> #<Just [4]>
 
   Now see how this code can be more clear if you
   are using mlet macro for do it:
 
     (mlet [a (just 1)
-           b (just (inc b))]
+           b (just (inc a))]
       (return (* b 2)))
+    ;=> #<Just [4]>
   "
   [bindings & body]
-  (when-not (and (vector? bindings) (even? (count bindings)))
+  (when-not (and (vector? bindings)
+                 (not-empty bindings)
+                 (even? (count bindings)))
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
   (->> (reverse (partition 2 bindings))
        (reduce (fn [acc [l r]]
