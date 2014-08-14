@@ -92,12 +92,11 @@
      (with-monad (p/get-context mv)
        (p/mbind *context* mv f))
 
-   (or (satisfies? p/MonadTrans *context*)
-       (not (satisfies? p/Context mv)))
+   (satisfies? p/MonadTrans *context*)
      (p/mbind *context* mv f)
 
    :else
-     (p/mbind (p/get-context mv) mv f)
+     (p/mbind (get-current-context-or mv) mv f)
 ))
 
 (defn mzero
