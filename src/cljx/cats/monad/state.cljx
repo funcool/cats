@@ -133,6 +133,20 @@
                              ((f v) ns)))))
          (state-t)))
 
+    ; FIXME: Conditionally if `inner-monad` is MonadZero
+    proto/MonadZero
+    (mzero [_]
+      (-> (fn [s]
+            (proto/mzero inner-monad))
+          (state-t)))
+
+    ; FIXME: Conditionally if `inner-monad` is MonadPlus
+    proto/MonadPlus
+    (mplus [_ mv mv']
+      (-> (fn [s]
+            (proto/mplus inner-monad (mv s) (mv' s)))
+          (state-t)))
+
     proto/MonadState
     (get-state [_]
       (state-t (fn [s]
