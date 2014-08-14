@@ -45,10 +45,10 @@
 (defn get-current-context-or
   [default]
   (cond
-    (not (nil? *context*))        *context*
-    :else                         (if (satisfies? p/Context default)
-                                    (p/get-context default)
-                                    default)))
+    (not (nil? *context*)) *context*
+    :else                  (if (satisfies? p/Context default)
+                             (p/get-context default)
+                             default)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
