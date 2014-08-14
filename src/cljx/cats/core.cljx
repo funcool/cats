@@ -203,6 +203,29 @@
                    `(bind ~r (fn [~l] ~acc))))
                `(do ~@body))))
 
+(defmacro mlet-with
+  "A helper macro for using monad transformers, is the
+  same as mlet but specifying the monadic context.
+  So, instead of writing:
+
+    (with-monad (maybe-trans vector-monad)
+      (mlet [a [(just 1) (just 2)]
+             b [(just (inc a))]]
+        (return (* b 2))))
+    ;=> [#<Just [4]> #<Just [6]>]
+
+  You can just write:
+
+    (mlet-with (maybe-trans vector-monad)
+      [a [(just 1) (just 2)]
+       b [(just (inc a))]]
+      (return (* b 2)))
+    ;=> [#<Just [4]> #<Just [6]>]
+  "
+  [monad bindings & body]
+  `(with-monad ~monad
+     (mlet ~bindings ~@body)))
+
 #+clj
 (defmacro lift-m
   "Lifts a function with the given fixed number of arguments to a
