@@ -149,7 +149,8 @@
 
   Otherwise, yields nil in a monadic context."
   [b mv]
-  (when (not b) mv))
+  (when-not b
+    mv))
 
 (defn lift
   "Lift a value from the inner monad of a monad transformer into a value
