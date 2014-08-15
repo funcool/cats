@@ -102,8 +102,7 @@
       [v])
 
     (mbind [_ self f]
-      (into []
-            (apply concat (map f self))))
+      (vec (mapcat f self)))
 
     proto/MonadZero
     (mzero [_]
