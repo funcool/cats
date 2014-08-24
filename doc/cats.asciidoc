@@ -50,8 +50,7 @@ This is an incomplete list of differences with other existing libraries:
 Project Maturity
 ~~~~~~~~~~~~~~~~
 
-Since _cats_ is a young project there can be some link:codox/index.html#id[API]
-breakage.
+Since _cats_ is a young project there can be some link:codox/index.html#id[API] breakage.
 
 
 Install
@@ -70,6 +69,7 @@ it as a dependency in your *_project.clj_*:
 ----
 [cats "0.2.0-SNAPSHOT"]
 ----
+
 
 Maven
 ~~~~~
@@ -108,6 +108,7 @@ You can clone the public repository with this command:
 git clone https://github.com/niwibe/cats
 ----
 
+
 User Guide
 ----------
 
@@ -116,6 +117,7 @@ supports.
 
 And for it, we are using _Maybe_ type for all examples beacuse that type implements
 all protocols. You can read more about it in the next section.
+
 
 Functor
 ~~~~~~~
@@ -193,8 +195,8 @@ map works with seqs and doesn't respect the input container:
 ;; => (2 3 4)
 ----
 
-But why fmap works with vectors? Some "container" types of clojure like vectors, lists or sets
-also implements the functor abstraction.
+But why fmap works with vectors? Because some "container" types of clojure like vectors,
+lists or sets also implements the functor abstraction.
 
 
 Applicative
@@ -283,8 +285,9 @@ Examples:
 ;; => #<Either [:bar :right]>
 ----
 
-Possible you will understand the purpose and use case of **pure** function in
-the next section: *Monad*.
+If you not understand the purpose of **pure** function, it is possible that the next section
+can clarify the real purpose of it.
+
 
 Monad
 ~~~~~
@@ -316,8 +319,8 @@ As you can observe, it works much like Functor but with inverted arguments, the 
 that in monad, the function is a responsible of wrapping a retuned value in a context.
 
 One of the key features of the bind function is that any computation executed inside of context of
-bind (monad) knows the context type implicitly. Having this, if you apply some computation over some 
-monadic value  and you want to return the result in the same container context but you don't know 
+bind (monad) knows the context type implicitly. Having this, if you apply some computation over some
+monadic value  and you want to return the result in the same container context but you don't know
 that container is it, you can use `return` or `pure` functions:
 
 [source,clojure]
@@ -369,10 +372,11 @@ If you want to use regular (non-monadic) let bindings inside a `mlet` block, you
   (return (* z 2)))
 ----
 
+
 Monad types
 ^^^^^^^^^^^
 
-Monad as is, is the abstraction, and we have seen two types in examples that implements
+Monad as is, is an abstraction, and we have seen two types in examples that implements
 the monad abstraction: Maybe and Either. But they are the smallest part of types
 that implements the Monad abstraction. In this section we try explain different
 monad types supported by _cats_ library.
@@ -431,73 +435,6 @@ NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 
 State
 +++++
-
-TODO
-
-Reader
-++++++
-
-TODO
-
-Writer
-++++++
-
-TODO
-
-Continuation
-++++++++++++
-
-TODO
-
-Lazy
-++++
-
-TODO
-
-Vector
-++++++
-
-TODO
-
-Monad Transformers
-^^^^^^^^^^^^^^^^^^
-
-With small examples we could use simple monadic compositions, but in some circumstances
-we would combine the effects of two or more monads in one composition. For this purpose
-exists monad transformers.
-
-Almost every monad implemented in _cats_ has a monad transformer for combining it with
-any other monad.
-
-TODO
-
-
-Clojure Types
--------------
-
-Besides the own types, some clojure types has implementations for previously explained
-category theory abstractions.
-
-NOTE: In contrast to other similar libraries in clojure, _cats_ doesn't intend to extend clojure types
-that don't act like containers. For example, clojure keywords are values but can not be containers so
-they should not extend any of the previously explained protocols.
-
-
-.Summary of clojure types and implemented protocols
-[options="header"]
-|=============================================================
-| Name     | Implemented protocols
-| vector   | Functor, Applicative, Monad, MonadZero, MonadPlus
-| hash-set | Functor, Applicative, Monad, MonadZero, MonadPlus
-| list     | Functor, Applicative, Monad, MonadZero, MonadPlus
-| atom     | No one (in future)
-|=============================================================
-
-Use cases
----------
-
-State monad
-~~~~~~~~~~~
 
 State monad in one of the special use cases of monads most used in haskell. It has different
 purposes including: lazy computation composition and maintaining state without explicit state.
@@ -566,6 +503,66 @@ seems out of the scope of this document.
 
 However, if you have better examples to explain the state monad, documentation for another monad or
 any other contribution is always welcome.
+
+
+Reader
+++++++
+
+TODO
+
+Writer
+++++++
+
+TODO
+
+Continuation
+++++++++++++
+
+TODO
+
+Lazy
+++++
+
+TODO
+
+Vector
+++++++
+
+TODO
+
+Monad Transformers
+^^^^^^^^^^^^^^^^^^
+
+With small examples we could use simple monadic compositions, but in some circumstances
+we would combine the effects of two or more monads in one composition. For this purpose
+exists monad transformers.
+
+Almost every monad implemented in _cats_ has a monad transformer for combining it with
+any other monad.
+
+TODO
+
+
+Clojure Types
+-------------
+
+Besides the own types, some clojure types has implementations for previously explained
+category theory abstractions.
+
+NOTE: In contrast to other similar libraries in clojure, _cats_ doesn't intend to extend clojure types
+that don't act like containers. For example, clojure keywords are values but can not be containers so
+they should not extend any of the previously explained protocols.
+
+
+.Summary of clojure types and implemented protocols
+[options="header"]
+|=============================================================
+| Name     | Implemented protocols
+| vector   | Functor, Applicative, Monad, MonadZero, MonadPlus
+| hash-set | Functor, Applicative, Monad, MonadZero, MonadPlus
+| list     | Functor, Applicative, Monad, MonadZero, MonadPlus
+|=============================================================
+
 
 License
 -------
