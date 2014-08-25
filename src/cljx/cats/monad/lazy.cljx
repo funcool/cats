@@ -35,7 +35,41 @@
     (mreturn [_ v]
       (delay v))))
 
-;; TODO: lazy monad transformer
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monad transformer definition
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn lazy-trans [inner-monad]
+  (reify
+    proto/Functor
+    (fmap [_ f fv]
+      (proto/fmap lazy-monad
+                  (partial proto/fmap inner-monad f)
+                  fv))
+    proto/Monad
+    (mreturn [_ v]
+      (->> (proto/mreturn inner-monad v)
+           (proto/mreturn lazy-monad)))
+
+    (mbind [_ mv f]
+      (proto/mbind lazy-monad
+                   mv
+                   (fn [mv']
+                     (proto/mbind inner-monad mv' f))))
+
+    proto/MonadTrans
+    (base [_]
+      lazy-monad)
+
+    (inner [_]
+      inner-monad)
+
+    (lift [_ mv]
+      (proto/mbind inner-monad
+                   mv
+                   (fn [v]
+                     (->> (proto/mreturn inner-monad v)
+                          (proto/mreturn lazy-monad)))))))
 
 (extend-type #+clj clojure.lang.Delay
              #+cljs cljs.core.Delay
