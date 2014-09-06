@@ -88,7 +88,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn identity-trans [inner-monad]
+(defn identity-transformer [inner-monad]
   (reify
     proto/Monad
     (mreturn [_ v]

@@ -55,27 +55,27 @@
                                  (fn [y] (maybe/just (inc y))))))))))
 
 
-(deftest test-maybe-trans
-  (let [maybe-vector-trans (maybe/maybe-trans b/vector-monad)]
+(deftest test-maybe-transformer
+  (let [maybe-vector-transformer (maybe/maybe-transformer b/vector-monad)]
     (testing "It can be combined with the effects of other monads"
       (is (= [(maybe/just 2)]
-             (with-monad maybe-vector-trans
+             (with-monad maybe-vector-transformer
                (m/return 2))))
 
       (is (= [(maybe/just 1) (maybe/just 2) (maybe/just 2) (maybe/just 3)]
-             (with-monad maybe-vector-trans
+             (with-monad maybe-vector-transformer
                (mlet [x [(maybe/just 0) (maybe/just 1)]
                       y [(maybe/just 1) (maybe/just 2)]]
                      (m/return (+ x y))))))
 
       (is (= [(maybe/just 1) (maybe/just 2) (maybe/just 2) (maybe/just 3)]
-             (with-monad maybe-vector-trans
+             (with-monad maybe-vector-transformer
                (mlet [x (m/lift [0 1])
                       y (m/lift [1 2])]
                      (m/return (+ x y))))))
 
       (is (= [(maybe/just 1) (maybe/nothing) (maybe/just 2) (maybe/nothing)]
-             (with-monad maybe-vector-trans
+             (with-monad maybe-vector-transformer
                (mlet [x [(maybe/just 0) (maybe/just 1)]
                       y [(maybe/just 1) (maybe/nothing)]]
                      (m/return (+ x y)))))))))

@@ -49,8 +49,8 @@
         (is (= 3 (first res)))
         (is (= 1 (second res)))))))
 
-(deftest test-state-trans
-  (let [maybe-state-monad (state/state-trans maybe/maybe-monad)]
+(deftest test-state-transformer
+  (let [maybe-state-monad (state/state-transformer maybe/maybe-monad)]
     (testing "get-state should return the identity wrapped in the inner monad's context."
       (is (= (maybe/just (d/pair :foo :foo))
              (with-monad maybe-state-monad

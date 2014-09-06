@@ -39,11 +39,11 @@
                                  (fn [y] (id/identity (inc y)))))))))
 )
 
-(deftest test-identity-trans
-  (let [identity-vector-trans (id/identity-trans b/vector-monad)]
+(deftest test-identity-transformer
+  (let [identity-vector-transformer (id/identity-transformer b/vector-monad)]
 
     (testing "It is a trivial transformer which yields the inner monad"
       (is (= (id/identity [2])
-             (with-monad identity-vector-trans
+             (with-monad identity-vector-transformer
                (m/return 2))))))
 )

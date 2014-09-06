@@ -160,7 +160,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn maybe-trans [inner-monad]
+(defn maybe-transformer [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]

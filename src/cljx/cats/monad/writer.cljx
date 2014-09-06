@@ -64,7 +64,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn writer-trans [inner-monad]
+(defn writer-transformer [inner-monad]
   (reify
     proto/Monad
     (mreturn [_ v]

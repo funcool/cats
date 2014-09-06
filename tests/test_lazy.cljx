@@ -63,8 +63,8 @@
       (is (= @state 1))))
 )
 
-(deftest test-lazy-trans
-  (let [monad-t (lazy/lazy-trans maybe/maybe-monad)]
+(deftest test-lazy-transformer
+  (let [monad-t (lazy/lazy-transformer maybe/maybe-monad)]
     (testing "It can be combined with the effects of other monads"
       (let [mres (with-monad monad-t
                    (m/return 2))]

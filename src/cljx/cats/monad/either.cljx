@@ -125,7 +125,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn either-trans [inner-monad]
+(defn either-transformer [inner-monad]
   (reify
     proto/Monad
     (mreturn [_ v]

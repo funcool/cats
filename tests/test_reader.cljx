@@ -32,8 +32,8 @@
            42)))
  )
 
-(deftest test-reader-transformer
-  (let [maybe-reader (reader/reader-trans maybe/maybe-monad)]
+(deftest test-reader-transformerformer
+  (let [maybe-reader (reader/reader-transformer maybe/maybe-monad)]
     (testing "The `ask` reader gives you access to the environment"
       (is (= (with-monad maybe-reader
                (reader/run-reader reader/ask {:foo "bar"}))

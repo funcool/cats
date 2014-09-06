@@ -208,7 +208,7 @@
   same as mlet but specifying the monadic context.
   So, instead of writing:
 
-    (with-monad (maybe-trans vector-monad)
+    (with-monad (maybe-transformer vector-monad)
       (mlet [a [(just 1) (just 2)]
              b [(just (inc a))]]
         (return (* b 2))))
@@ -216,7 +216,7 @@
 
   You can just write:
 
-    (mlet-with (maybe-trans vector-monad)
+    (mlet-with (maybe-transformer vector-monad)
       [a [(just 1) (just 2)]
        b [(just (inc a))]]
       (return (* b 2)))

@@ -94,7 +94,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn reader-trans [inner-monad]
+(defn reader-transformer [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]

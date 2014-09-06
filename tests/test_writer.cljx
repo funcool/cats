@@ -55,8 +55,8 @@
                (second w)))))
 )
 
-(deftest test-writer-transformer
-  (let [maybe-writer (writer/writer-trans maybe/maybe-monad)]
+(deftest test-writer-transformerformer
+  (let [maybe-writer (writer/writer-transformer maybe/maybe-monad)]
     (testing "Putting a value in a writer transformer context yields an empty log"
       (let [w (with-monad maybe-writer
                 (m/return 42))]

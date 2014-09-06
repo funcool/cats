@@ -107,7 +107,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn state-trans [inner-monad]
+(defn state-transformer [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]

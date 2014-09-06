@@ -50,27 +50,27 @@
                   (fn [x] (m/>>= (either/right (inc x))
                                 (fn [y] (either/right (inc y))))))))))
 
-(deftest test-either-trans
-  (let [either-vector-trans (either/either-trans b/vector-monad)]
+(deftest test-either-transformer
+  (let [either-vector-transformer (either/either-transformer b/vector-monad)]
     (testing "It can be combined with the effects of other monads"
       (is (= [(either/right 2)]
-             (with-monad either-vector-trans
+             (with-monad either-vector-transformer
                (m/return 2))))
 
       (is (= [(either/right 1) (either/right 2) (either/right 2) (either/right 3)]
-             (with-monad either-vector-trans
+             (with-monad either-vector-transformer
                (mlet [x [(either/right 0) (either/right 1)]
                       y [(either/right 1) (either/right 2)]]
                      (m/return (+ x y))))))
 
       (is (= [(either/right 1) (either/right 2) (either/right 2) (either/right 3)]
-             (with-monad either-vector-trans
+             (with-monad either-vector-transformer
                (mlet [x (m/lift [0 1])
                       y (m/lift [1 2])]
                      (m/return (+ x y))))))
 
       (is (= [(either/right 1) (either/left) (either/right 2) (either/left)]
-             (with-monad either-vector-trans
+             (with-monad either-vector-transformer
                (mlet [x [(either/right 0) (either/right 1)]
                       y [(either/right 1) (either/left)]]
                      (m/return (+ x y)))))))))

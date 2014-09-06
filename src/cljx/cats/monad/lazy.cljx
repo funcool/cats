@@ -39,7 +39,7 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn lazy-trans [inner-monad]
+(defn lazy-transformer [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]
