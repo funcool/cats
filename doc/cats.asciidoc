@@ -533,9 +533,35 @@ TODO
 Monad Transformers
 ^^^^^^^^^^^^^^^^^^
 
-With small examples we could use simple monadic compositions, but in some circumstances
-we would combine the effects of two or more monads in one composition. For this purpose
-exists monad transformers.
+Motivation
++++++++++++
+
+We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
+we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
+
+[source, clojure]
+----
+(ns functor.example
+  (:require [[cats.core :refer [fmap]]
+             [cats.monad.maybe :refer [just]]])
+  (:use [cats.builtin]))
+
+(defn fmap2
+  [f fv]
+  (fmap (partial fmap f) fv))
+
+; Here, 'a' is [] and 'b' is Maybe, so the type of the
+; combined functor is a vector of Maybe values that could
+; be of any type.
+(fmap2 inc [(maybe/just 1) (maybe/just 2)])
+;;=> [#<Just [2]> #<Just [3]>]
+----
+
+However, monads don't compose as nicely as functors do. We have to actually implement
+the composition ourselves.
+
+In some circumstances we would like combine the effects of two monads in another one. We call the
+resulting monad a monad transformer, which is the composition of a "base" and a "inner" monad.
 
 Almost every monad implemented in _cats_ has a monad transformer for combining it with
 any other monad.
