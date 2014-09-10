@@ -552,7 +552,7 @@ we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 
 ; Here, 'a' is [] and 'b' is Maybe, so the type of the
 ; combined functor is a vector of Maybe values that could
-; be of any type.
+; contain a value of any type.
 (fmap2 inc [(maybe/just 1) (maybe/just 2)])
 ;;=> [#<Just [2]> #<Just [3]>]
 ----
