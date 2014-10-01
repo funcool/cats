@@ -641,6 +641,12 @@ The `maybe-state` monad combines the semantics of both State and Maybe. Let's se
     [a any-char
      b any-char]
     (m/return (str a b))))
+
+; We also define a function for applying parser to a given input
+(defn parse [parser input]
+  (m/with-monad maybe-state
+    (let [parse-result (state/run-state parser input)]
+      (maybe/from-maybe parse-result))))
 ----
 
 TODO: Implement simple parser as an example of transformer usage
