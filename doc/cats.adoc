@@ -1,9 +1,12 @@
 Category Theory abstractions for Clojure
 ========================================
 Andrey Antukh & Alejandro Gómez
-0.2.0, 2014-07-15
+0.2.0
+:toc: left
+:numbered:
+:source-highlighter: pygments
+:pygments-style: friendly
 
-:toc:
 
 image:static/logo/logo.png[cats logo]
 
@@ -11,17 +14,6 @@ Introduction
 ------------
 
 Category Theory abstractions for Clojure.
-
-
-Philosophy
-~~~~~~~~~
-
-Four most important rules:
-
-- Beautiful is better than ugly
-- Explicit is better than implicit
-- Simple is better than complex
-- Readability counts
 
 Why another library?
 ~~~~~~~~~~~~~~~~~~~~
@@ -34,21 +26,9 @@ Because cats library:
 - has documentation as first class citizen.
 - licensed under a permissive license (compared to other libraries): BSD (2-Clause)
 
-This is an incomplete list of differences with other existing libraries:
-
-- The official monads library `algo.monads` is very good, but its approach for modeling
-  is slighty limited (e.g. you always need to specify what monad you want use instead of
-  relying on the type). And obviously because it only has monads.
-- Fluokitten is the best library that we found, but the future of it is uncertain. One big
-  difference with fluokitten is that `cats` doesn't aim to extend every clojure type
-  with monadic protocols, for the obvious reason that monad; functor and applicative represents
-  context/wrapper types and it doesn't make sense to implement Functor protocol for `java.lang.String`.
-- `bwo/monads` is the last monads library. It is completely undocumented and its implementation
-  has much unnecesary complexity.
-
 
 Project Maturity
-~~~~~~~~~~~~~~~~
+----------------
 
 Since _cats_ is a young project there can be some link:codox/index.html#id[API] breakage.
 
@@ -115,8 +95,9 @@ User Guide
 This section introduces almost all category theory abstractios that cats library
 supports.
 
-And for it, we are using _Maybe_ type for all examples beacuse that type implements
-all protocols. You can read more about it in the next section.
+We will use the _Maybe_ for the example snippets, because it has support for all
+abstractions and it very easy to understand. You can read more about it in the next
+section of this documentation.
 
 
 Functor
@@ -131,14 +112,15 @@ abstraction consists in one unique function: **fmap**.
 (fmap [f fv])
 ----
 
-**fmap** takes a plain function as first parameter and and value wrapped in functor
-context/wrapper. It, extracts the inner value apply the function to it, and return
-the result wrapped in same type as the second parameter.
+The high order function **fmap** takes a plain function as first parameter and
+value wrapped in functor context as second parameter. It extracts the inner value
+apply the function to it, and return the result wrapped in same type as the second
+parameter.
 
-But, what is the **functor context wrapper*? It sonds more complex that it is. Functor
+But, what is the **functor context*? It sonds more complex that it is. Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocol.
 
-One good example of functor wrapper is the **Maybe** type:
+One good example of functor context is the **Maybe** type:
 
 [source, clojure]
 ----
@@ -160,8 +142,8 @@ value. Now, let see one example using **fmap** over **just** instance:
 ----
 
 But **Maybe** has another constructor: `maybe/nothing`. This constructor makes
-empty object that not wraps anything. It represents the failure. Is the safe
-substitute of `nil` and represents the failure.
+empty object that not wraps anything. Is the safe substitute of `nil` and
+represents the failure.
 
 Let see that is happens if we make same operation of previous example over
 *nothing* instance:
@@ -173,7 +155,6 @@ Let see that is happens if we make same operation of previous example over
 ----
 
 Oh, awesome, instead of raising null pointer exception, it just return *nothing*.
-
 
 An other good advantage of use functor abstraction, is that it always return result
 in the same type of second argument
@@ -671,10 +652,63 @@ they should not extend any of the previously explained protocols.
 | list     | Functor, Applicative, Monad, MonadZero, MonadPlus
 |=============================================================
 
+FAQ
+---
+
+What are the difference with other existing libraries?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is an incomplete list of differences with other existing libraries:
+
+- The official monads library `algo.monads` is very good, but its approach for modeling
+  is slighty limited (e.g. you always need to specify what monad you want use instead of
+  relying on the type). And obviously because it only has monads.
+- Fluokitten is the best library that we found, but the future of it is uncertain. One big
+  difference with fluokitten is that `cats` doesn't aim to extend every clojure type
+  with monadic protocols, for the obvious reason that monad; functor and applicative represents
+  context/wrapper types and it doesn't make sense to implement Functor protocol for `java.lang.String`.
+- `bwo/monads` is the last monads library. It is completely undocumented and its implementation
+  has much unnecesary complexity.
+
+
+How to Contribute?
+------------------
+
+Philosophy
+~~~~~~~~~~
+
+Five most important rules:
+
+- Beautiful is better than ugly.
+- Explicit is better than implicit.
+- Simple is better than complex.
+- Complex is better than complicated.
+- Readability counts.
+
+All contributions to _cats_ should keep these important rules in mind.
+
+
+Procedure
+~~~~~~~~~
+
+_cats_ unlike Clojure and other Clojure contrib libs, does not have many
+restrictions for contributions. Just follow the following steps depending on the
+situation:
+
+**Bugfix**:
+
+- Fork the GitHub repo.
+- Fix a bug/typo on a new branch.
+- Make a pull-request to master.
+
+**New feature**:
+
+- Open new issue with the new feature proposal.
+- If it is accepted, follow the same steps as "bugfix".
+
 
 License
--------
-
+~~~~~~~
 [source,text]
 ----
 Copyright (c) 2014, Andrey Antukh
