@@ -6,9 +6,10 @@ Date: unreleased
 
 - Non recursive mlet macro.
 - Breaking change: split cats.core.types ns into cats.monad.*
-- Reader, writer and lazy monads
-- Monad transformer support
-- Transformer versions all monads under cats.monad (unfinished)
+- New lazy monad (using clojure delay).
+- Reader, writer and lazy monads.
+- Monad transformer support.
+- Transformer versions of some monads.
 
 ## Version 0.1.0 ##
 
