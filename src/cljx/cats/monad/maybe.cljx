@@ -46,16 +46,17 @@
       (= v (.-v other))
       false))
 
+  #+clj
+  (toString [self]
+    (with-out-str (print [v])))
+
   #+cljs
   cljs.core/IEquiv
   #+cljs
   (-equiv [_ other]
     (if (instance? Just other)
       (= v (.-v other))
-      false))
-
-  (toString [self]
-    (with-out-str (print [v]))))
+      false)))
 
 (deftype Nothing []
   proto/Context
@@ -68,14 +69,15 @@
   (equals [_ other]
     (instance? Nothing other))
 
+  #+clj
+  (toString [_]
+    (with-out-str (print "")))
+
   #+cljs
   cljs.core/IEquiv
   #+cljs
   (-equiv [_ other]
-    (instance? Nothing other))
-
-  (toString [_]
-    (with-out-str (print ""))))
+    (instance? Nothing other)))
 
 (defn maybe?
   [v]
