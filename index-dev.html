@@ -505,17 +505,36 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_monad">4.3. Monad</a></li>
 </ul>
 </li>
-<li><a href="#_clojure_types">5. Clojure Types</a></li>
-<li><a href="#_faq">6. FAQ</a>
+<li><a href="#_monad_types">5. Monad types</a>
 <ul class="sectlevel2">
-<li><a href="#_what_are_the_difference_with_other_existing_libraries">6.1. What are the difference with other existing libraries?</a></li>
+<li><a href="#_maybe">5.1. Maybe</a></li>
+<li><a href="#_either">5.2. Either</a></li>
+<li><a href="#_try">5.3. Try</a></li>
+<li><a href="#_state">5.4. State</a></li>
+<li><a href="#_reader">5.5. Reader</a></li>
+<li><a href="#_writer">5.6. Writer</a></li>
+<li><a href="#_continuation">5.7. Continuation</a></li>
+<li><a href="#_lazy">5.8. Lazy</a></li>
+<li><a href="#_vector">5.9. Vector</a></li>
 </ul>
 </li>
-<li><a href="#_how_to_contribute">7. How to Contribute?</a>
+<li><a href="#_monad_transformers">6. Monad Transformers</a>
 <ul class="sectlevel2">
-<li><a href="#_philosophy">7.1. Philosophy</a></li>
-<li><a href="#_procedure">7.2. Procedure</a></li>
-<li><a href="#_license">7.3. License</a></li>
+<li><a href="#_motivation">6.1. Motivation</a></li>
+<li><a href="#_using_monad_transformers">6.2. Using monad transformers</a></li>
+</ul>
+</li>
+<li><a href="#_faq">7. FAQ</a>
+<ul class="sectlevel2">
+<li><a href="#_what_are_the_difference_with_other_existing_libraries">7.1. What are the difference with other existing libraries?</a></li>
+<li><a href="#_what_clojure_types_implements_some_of_the_category_theory_abstractions">7.2. What clojure types implements some of the Category Theory abstractions?</a></li>
+</ul>
+</li>
+<li><a href="#_how_to_contribute">8. How to Contribute?</a>
+<ul class="sectlevel2">
+<li><a href="#_philosophy">8.1. Philosophy</a></li>
+<li><a href="#_procedure">8.2. Procedure</a></li>
+<li><a href="#_license">8.3. License</a></li>
 </ul>
 </li>
 </ul>
@@ -855,26 +874,22 @@ put new values in a completely different context.</p>
 <div class="paragraph">
 <p>The monad abstraction consists on two functions: <strong>bind</strong> and <strong>return</strong></p>
 </div>
-<div class="paragraph">
-<p><strong>bind</strong> function has the following signature:</p>
-</div>
 <div class="listingblock">
+<div class="title">Bind function signature.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">[</span><span class="tok-nv">mv</span> <span class="tok-nv">f</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Let see one example:</p>
+<p>As you can observe, it works much like Functor but with inverted arguments, the main deference is
+that in monad, the function is a responsible of wrapping a retuned value in a context.</p>
 </div>
 <div class="listingblock">
+<div class="title">Usage example of bind high order function.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
       <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span></code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>As you can observe, it works much like Functor but with inverted arguments, the main deference is
-that in monad, the function is a responsible of wrapping a retuned value in a context.</p>
 </div>
 <div class="paragraph">
 <p>One of the key features of the bind function is that any computation executed inside of context of
@@ -883,6 +898,7 @@ monadic value  and you want to return the result in the same container context b
 that container is it, you can use <code>return</code> or <code>pure</code> functions:</p>
 </div>
 <div class="listingblock">
+<div class="title">Usage of return function in bind context.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
       <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span>
@@ -900,6 +916,7 @@ of a <code>bind</code> context.</p>
 functions. But that is happens where the number of computations increases:</p>
 </div>
 <div class="listingblock">
+<div class="title">Composability example of bind function.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
       <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
@@ -912,6 +929,14 @@ functions. But that is happens where the number of computations increases:</p>
 <p>This easy grows to very beatiful callback hell. For solve this, <em>cats</em> comes with powerful
 macro: <strong>mlet</strong></p>
 </div>
+<div class="listingblock">
+<div class="title">Previous example but using <strong>mlet</strong> macro.</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">b</span><span class="tok-p">))]</span>
+  <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
+</div>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -919,20 +944,10 @@ macro: <strong>mlet</strong></p>
 <div class="title">Note</div>
 </td>
 <td class="content">
-If you are coming from haskell, it represents the <code>do-syntax</code> of haskell.
+If you are coming from haskell, it represents the <strong>do-syntax</strong>.
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>Let see the same example but translated to more clear code using mlet macro:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">b</span><span class="tok-p">))]</span>
-  <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
-</div>
 </div>
 <div class="paragraph">
 <p>If you want to use regular (non-monadic) let bindings inside a <code>mlet</code> block, you can do so using
@@ -946,16 +961,20 @@ If you are coming from haskell, it represents the <code>do-syntax</code> of hask
   <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">z</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_monad_types">4.3.1. Monad types</h4>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_monad_types">5. Monad types</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>Monad as is, is an abstraction, and we have seen two types in examples that implements
 the monad abstraction: Maybe and Either. But they are the smallest part of types
 that implements the Monad abstraction. In this section we try explain different
 monad types supported by <em>cats</em> library.</p>
 </div>
-<div class="sect4">
-<h5 id="_maybe">Maybe</h5>
+<div class="sect2">
+<h3 id="_maybe">5.1. Maybe</h3>
 <div class="paragraph">
 <p>This is one of the two most used monad types (commonly named Optional in non-functional programming
 languages).</p>
@@ -980,6 +999,7 @@ encapsulating the original data type A (written Just A or Some A).</p>
 </ul>
 </div>
 <div class="listingblock">
+<div class="title">Usage example of <strong>Maybe</strong> constructors.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
@@ -1001,8 +1021,8 @@ Maybe types are: Functors, Applicative Functors and Monads
 </table>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_either">Either</h5>
+<div class="sect2">
+<h3 id="_either">5.2. Either</h3>
 <div class="paragraph">
 <p>Either is another type that represents a result of computation, but in contrast with maybe
 it can return some data with a failed computation result.</p>
@@ -1021,6 +1041,7 @@ it can return some data with a failed computation result.</p>
 </ul>
 </div>
 <div class="listingblock">
+<div class="title">Usage example of <strong>Either</strong> constructors.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
 
@@ -1044,8 +1065,65 @@ Either is also (like Maybe) Functor, Applicative Functor and Monad.
 </table>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_state">State</h5>
+<div class="sect2">
+<h3 id="_try">5.3. Try</h3>
+<div class="paragraph">
+<p>Also called Exception.</p>
+</div>
+<div class="paragraph">
+<p>The <code>Try</code> type represents a computation that may either result in an exception,
+or return a successfully computed value. It&#8217;s similar to, but semantically
+different from the <code>Either</code> type.</p>
+</div>
+<div class="paragraph">
+<p>In <em>cats</em> it has two constructors and one convenience macro:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>(success v)</code>: constructor for type that represents a successful result.</p>
+</li>
+<li>
+<p><code>(failure e)</code>: constructor for type that represents a failure (with exception as value).</p>
+</li>
+<li>
+<p><code>(try-on)</code>: macro that encapsulates all expresions in a success or failure.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Usage example of <strong>try-on</strong> macro.</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.exception</span> <span class="tok-ss">:as</span> <span class="tok-nv">exc</span><span class="tok-p">])</span>
+
+<span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; #&lt;Success [1]&gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Failure [#&lt;NullPointerException java.lang.NullPointerException&gt;]&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s an analogue for the try-catch block: it replaces try-catch&#8217;s stack based error
+handling with heap based error handling. Instead of having an exception thrown and
+having to deal with it immediately in the same thread, it disconnects the error
+handling and recovery.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Try is also (like Maybe) Functor, Applicative Functor and Monad.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_state">5.4. State</h3>
 <div class="paragraph">
 <p>State monad in one of the special use cases of monads most used in haskell. It has different
 purposes including: lazy computation composition and maintaining state without explicit state.</p>
@@ -1143,41 +1221,43 @@ seems out of the scope of this document.</p>
 any other contribution is always welcome.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_reader">Reader</h5>
+<div class="sect2">
+<h3 id="_reader">5.5. Reader</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_writer">Writer</h5>
+<div class="sect2">
+<h3 id="_writer">5.6. Writer</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_continuation">Continuation</h5>
+<div class="sect2">
+<h3 id="_continuation">5.7. Continuation</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_lazy">Lazy</h5>
+<div class="sect2">
+<h3 id="_lazy">5.8. Lazy</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_vector">Vector</h5>
+<div class="sect2">
+<h3 id="_vector">5.9. Vector</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_monad_transformers">4.3.2. Monad Transformers</h4>
-<div class="sect4">
-<h5 id="_motivation">Motivation</h5>
+</div>
+<div class="sect1">
+<h2 id="_monad_transformers">6. Monad Transformers</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_motivation">6.1. Motivation</h3>
 <div class="paragraph">
 <p>We can combine two functors and get a new one automatically. Given any two functors <em>a</em> and <em>b</em>,
 we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we&#8217;ll call it fmap2:</p>
@@ -1210,8 +1290,8 @@ resulting monad a monad transformer, which is the composition of a "base" and a 
 monad transformer is itself a monad.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_using_monad_transformers">Using monad transformers</h5>
+<div class="sect2">
+<h3 id="_using_monad_transformers">6.2. Using monad transformers</h3>
 <div class="paragraph">
 <p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the transformer
 using State as the base monad, since we want the resulting type to be a stateful computation
@@ -1234,6 +1314,7 @@ return a reified MonadTrans:</p>
 
 <span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
   <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-mi">42</span><span class="tok-p">)</span> <span class="tok-p">{}))</span>
+
 <span class="tok-c1">;;=&gt; #&lt;Just [#&lt;Pair [42 {}]&gt;]&gt;</span></code></pre>
 </div>
 </div>
@@ -1248,10 +1329,10 @@ the binding policy since there is no way to distinguish values from a transforme
 a regular monad.</p>
 </div>
 <div class="paragraph">
-<p>TODO: better explanation of the above</p>
+<p>The <code>maybe-state</code> monad combines the semantics of both State and Maybe.</p>
 </div>
 <div class="paragraph">
-<p>The <code>maybe-state</code> monad combines the semantics of both State and Maybe. Let&#8217;s see it in action:</p>
+<p>Let&#8217;s see it in action:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1300,34 +1381,43 @@ a regular monad.</p>
       <span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-nv">parse-result</span><span class="tok-p">))))</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>TODO: Implement simple parser as an example of transformer usage</p>
-</div>
-</div>
-</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_clojure_types">5. Clojure Types</h2>
+<h2 id="_faq">7. FAQ</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_what_are_the_difference_with_other_existing_libraries">7.1. What are the difference with other existing libraries?</h3>
 <div class="paragraph">
-<p>Besides the own types, some clojure types has implementations for previously explained
-category theory abstractions.</p>
+<p>This is an incomplete list of differences with other existing libraries:</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-In contrast to other similar libraries in clojure, <em>cats</em> doesn&#8217;t intend to extend clojure types
+<div class="ulist">
+<ul>
+<li>
+<p>The official monads library <code>algo.monads</code> is very good, but its approach for modeling
+is slighty limited (e.g. you always need to specify what monad you want use instead of
+relying on the type). And obviously because it only has monads.</p>
+</li>
+<li>
+<p>Fluokitten is the best library that we found, but the future of it is uncertain. One big
+difference with fluokitten is that <code>cats</code> doesn&#8217;t aim to extend every clojure type
+with monadic protocols, for the obvious reason that monad; functor and applicative represents
+context/wrapper types and it doesn&#8217;t make sense to implement Functor protocol for <code>java.lang.String</code>.</p>
+</li>
+<li>
+<p><code>bwo/monads</code> is the last monads library. It is completely undocumented and its implementation
+has much unnecesary complexity.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_what_clojure_types_implements_some_of_the_category_theory_abstractions">7.2. What clojure types implements some of the Category Theory abstractions?</h3>
+<div class="paragraph">
+<p>In contrast to other similar libraries in clojure, <em>cats</em> doesn&#8217;t intend to extend clojure types
 that don&#8217;t act like containers. For example, clojure keywords are values but can not be containers so
-they should not extend any of the previously explained protocols.
-</td>
-</tr>
-</table>
+they should not extend any of the previously explained protocols.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Table 1. Summary of clojure types and implemented protocols</caption>
@@ -1358,41 +1448,12 @@ they should not extend any of the previously explained protocols.
 </table>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_faq">6. FAQ</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_what_are_the_difference_with_other_existing_libraries">6.1. What are the difference with other existing libraries?</h3>
-<div class="paragraph">
-<p>This is an incomplete list of differences with other existing libraries:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The official monads library <code>algo.monads</code> is very good, but its approach for modeling
-is slighty limited (e.g. you always need to specify what monad you want use instead of
-relying on the type). And obviously because it only has monads.</p>
-</li>
-<li>
-<p>Fluokitten is the best library that we found, but the future of it is uncertain. One big
-difference with fluokitten is that <code>cats</code> doesn&#8217;t aim to extend every clojure type
-with monadic protocols, for the obvious reason that monad; functor and applicative represents
-context/wrapper types and it doesn&#8217;t make sense to implement Functor protocol for <code>java.lang.String</code>.</p>
-</li>
-<li>
-<p><code>bwo/monads</code> is the last monads library. It is completely undocumented and its implementation
-has much unnecesary complexity.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
 </div>
 <div class="sect1">
-<h2 id="_how_to_contribute">7. How to Contribute?</h2>
+<h2 id="_how_to_contribute">8. How to Contribute?</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_philosophy">7.1. Philosophy</h3>
+<h3 id="_philosophy">8.1. Philosophy</h3>
 <div class="paragraph">
 <p>Five most important rules:</p>
 </div>
@@ -1420,7 +1481,7 @@ has much unnecesary complexity.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_procedure">7.2. Procedure</h3>
+<h3 id="_procedure">8.2. Procedure</h3>
 <div class="paragraph">
 <p><em>cats</em> unlike Clojure and other Clojure contrib libs, does not have many
 restrictions for contributions. Just follow the following steps depending on the
@@ -1457,7 +1518,7 @@ situation:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_license">7.3. License</h3>
+<h3 id="_license">8.3. License</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="text">Copyright (c) 2014, Andrey Antukh
@@ -1493,7 +1554,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-10-18 20:46:58 CEST
+Last updated 2014-10-19 18:38:53 CEST
 </div>
 </div>
 </body>
