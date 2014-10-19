@@ -281,29 +281,28 @@ put new values in a completely different context.
 
 The monad abstraction consists on two functions: **bind** and **return**
 
-**bind** function has the following signature:
-
+.Bind function signature.
 [source,clojure]
 ----
 (bind [mv f])
 ----
 
-Let see one example:
+As you can observe, it works much like Functor but with inverted arguments, the main deference is
+that in monad, the function is a responsible of wrapping a retuned value in a context.
 
+.Usage example of bind high order function.
 [source,clojure]
 ----
 (bind (just 1)
       (fn [v] (just (inc v))))
 ----
 
-As you can observe, it works much like Functor but with inverted arguments, the main deference is
-that in monad, the function is a responsible of wrapping a retuned value in a context.
-
 One of the key features of the bind function is that any computation executed inside of context of
 bind (monad) knows the context type implicitly. Having this, if you apply some computation over some
 monadic value  and you want to return the result in the same container context but you don't know
 that container is it, you can use `return` or `pure` functions:
 
+.Usage of return function in bind context.
 [source,clojure]
 ----
 (bind (just 1)
@@ -319,6 +318,7 @@ of a `bind` context.
 At this time, everything is fine, we not can compose any number of computations using monad **bind*
 functions. But that is happens where the number of computations increases:
 
+.Composability example of bind function.
 [source, clojure]
 ----
 (bind (just 1)
@@ -331,16 +331,17 @@ functions. But that is happens where the number of computations increases:
 This easy grows to very beatiful callback hell. For solve this, _cats_ comes with powerful
 macro: **mlet**
 
-NOTE: If you are coming from haskell, it represents the `do-syntax` of haskell.
-
-Let see the same example but translated to more clear code using mlet macro:
-
+.Previous example but using *mlet* macro.
 [source, clojure]
 ----
 (mlet [a (just 1)
        b (just (inc b))]
   (return (* b 2)))
 ----
+
+NOTE: If you are coming from haskell, it represents the **do-syntax**.
+
+
 
 If you want to use regular (non-monadic) let bindings inside a `mlet` block, you can do so using
 `:let` and a bindings vector as a pair inside the mlet bindings:
@@ -355,7 +356,7 @@ If you want to use regular (non-monadic) let bindings inside a `mlet` block, you
 
 
 Monad types
-^^^^^^^^^^^
+-----------
 
 Monad as is, is an abstraction, and we have seen two types in examples that implements
 the monad abstraction: Maybe and Either. But they are the smallest part of types
@@ -363,7 +364,7 @@ that implements the Monad abstraction. In this section we try explain different
 monad types supported by _cats_ library.
 
 Maybe
-+++++
+~~~~~
 
 This is one of the two most used monad types (commonly named Optional in non-functional programming
 languages).
@@ -378,7 +379,7 @@ _cats_, implements two constructors:
 - `(just v)`: represents just a value in a context.
 - `(nothing)`: represents a failure or null.
 
-
+.Usage example of **Maybe** constructors.
 [source, clojure]
 ----
 (require '[cats.monad.maybe :refer :all])
@@ -390,8 +391,9 @@ _cats_, implements two constructors:
 
 NOTE: Maybe types are: Functors, Applicative Functors and Monads
 
+
 Either
-++++++
+~~~~~~
 
 Either is another type that represents a result of computation, but in contrast with maybe
 it can return some data with a failed computation result.
@@ -401,6 +403,7 @@ In _cats_ it has two constructors:
 - `(left v)`: represents a failure.
 - `(right v)`: represents a successful result.
 
+.Usage example of **Either** constructors.
 [source, clojure]
 ----
 (require '[cats.monad.either :refer :all])
@@ -414,8 +417,42 @@ In _cats_ it has two constructors:
 
 NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 
+Try
+~~~
+
+Also called Exception.
+
+The `Try` type represents a computation that may either result in an exception,
+or return a successfully computed value. It's similar to, but semantically
+different from the `Either` type.
+
+In _cats_ it has two constructors and one convenience macro:
+
+- `(success v)`: constructor for type that represents a successful result.
+- `(failure e)`: constructor for type that represents a failure (with exception as value).
+- `(try-on)`: macro that encapsulates all expresions in a success or failure.
+
+.Usage example of **try-on** macro.
+[source, clojure]
+----
+(require '[cats.monad.exception :as exc])
+
+(exc/try-on 1)
+;; => #<Success [1]>
+
+(exc/try-on (+ 1 nil))
+;; => #<Failure [#<NullPointerException java.lang.NullPointerException>]>
+----
+
+It's an analogue for the try-catch block: it replaces try-catch's stack based error
+handling with heap based error handling. Instead of having an exception thrown and
+having to deal with it immediately in the same thread, it disconnects the error
+handling and recovery.
+
+NOTE: Try is also (like Maybe) Functor, Applicative Functor and Monad.
+
 State
-+++++
+~~~~~
 
 State monad in one of the special use cases of monads most used in haskell. It has different
 purposes including: lazy computation composition and maintaining state without explicit state.
@@ -487,35 +524,35 @@ any other contribution is always welcome.
 
 
 Reader
-++++++
+~~~~~~
 
 TODO
 
 Writer
-++++++
+~~~~~~
 
 TODO
 
 Continuation
-++++++++++++
+~~~~~~~~~~~~
 
 TODO
 
 Lazy
-++++
+~~~~
 
 TODO
 
 Vector
-++++++
+~~~~~~
 
 TODO
 
 Monad Transformers
-^^^^^^^^^^^^^^^^^^
+------------------
 
 Motivation
-+++++++++++
+~~~~~~~~~~
 
 We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
 we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
@@ -546,7 +583,7 @@ resulting monad a monad transformer, which is the composition of a "base" and a 
 monad transformer is itself a monad.
 
 Using monad transformers
-++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's combine the effects of two monads: State and Maybe. We'll create the transformer
 using State as the base monad, since we want the resulting type to be a stateful computation
@@ -568,6 +605,7 @@ return a reified MonadTrans:
 
 (m/with-monad maybe-state
   (state/run-state (m/return 42) {}))
+
 ;;=> #<Just [#<Pair [42 {}]>]>
 ----
 
@@ -579,9 +617,9 @@ When working with monad transformers we have to be explicit about what monad are
 the binding policy since there is no way to distinguish values from a transformer type from those of
 a regular monad.
 
-TODO: better explanation of the above
+The `maybe-state` monad combines the semantics of both State and Maybe.
 
-The `maybe-state` monad combines the semantics of both State and Maybe. Let's see it in action:
+Let's see it in action:
 
 [source, clojure]
 ----
@@ -630,27 +668,6 @@ The `maybe-state` monad combines the semantics of both State and Maybe. Let's se
       (maybe/from-maybe parse-result))))
 ----
 
-TODO: Implement simple parser as an example of transformer usage
-
-Clojure Types
--------------
-
-Besides the own types, some clojure types has implementations for previously explained
-category theory abstractions.
-
-NOTE: In contrast to other similar libraries in clojure, _cats_ doesn't intend to extend clojure types
-that don't act like containers. For example, clojure keywords are values but can not be containers so
-they should not extend any of the previously explained protocols.
-
-
-.Summary of clojure types and implemented protocols
-[options="header"]
-|=============================================================
-| Name     | Implemented protocols
-| vector   | Functor, Applicative, Monad, MonadZero, MonadPlus
-| hash-set | Functor, Applicative, Monad, MonadZero, MonadPlus
-| list     | Functor, Applicative, Monad, MonadZero, MonadPlus
-|=============================================================
 
 FAQ
 ---
@@ -669,6 +686,24 @@ This is an incomplete list of differences with other existing libraries:
   context/wrapper types and it doesn't make sense to implement Functor protocol for `java.lang.String`.
 - `bwo/monads` is the last monads library. It is completely undocumented and its implementation
   has much unnecesary complexity.
+
+
+What clojure types implements some of the Category Theory abstractions?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In contrast to other similar libraries in clojure, _cats_ doesn't intend to extend clojure types
+that don't act like containers. For example, clojure keywords are values but can not be containers so
+they should not extend any of the previously explained protocols.
+
+
+.Summary of clojure types and implemented protocols
+[options="header"]
+|=============================================================
+| Name     | Implemented protocols
+| vector   | Functor, Applicative, Monad, MonadZero, MonadPlus
+| hash-set | Functor, Applicative, Monad, MonadZero, MonadPlus
+| list     | Functor, Applicative, Monad, MonadZero, MonadPlus
+|=============================================================
 
 
 How to Contribute?
