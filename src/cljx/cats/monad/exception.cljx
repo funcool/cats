@@ -122,7 +122,6 @@
      (catch Throwable e#
        (failure e#))))
 
-
 #+clj
 (defmacro try-or-else
   [expr defaultvalue]
@@ -136,8 +135,8 @@
   [expr func]
   `(let [r# (try-on ~expr)]
      (if (failure? r#)
-       (try-on (func (.-v r#))
-       r#))))
+       (try-on (~func (.-e r#)))
+       r#)))
 
 (defn from-success
   [sv]
