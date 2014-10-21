@@ -1076,20 +1076,10 @@ or return a successfully computed value. It&#8217;s similar to, but semantically
 different from the <code>Either</code> type.</p>
 </div>
 <div class="paragraph">
-<p>In <em>cats</em> it has two constructors and one convenience macro:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>(success v)</code>: constructor for type that represents a successful result.</p>
-</li>
-<li>
-<p><code>(failure e)</code>: constructor for type that represents a failure (with exception as value).</p>
-</li>
-<li>
-<p><code>(try-on)</code>: macro that encapsulates all expresions in a success or failure.</p>
-</li>
-</ul>
+<p>It&#8217;s an analogue for the try-catch block: it replaces try-catch&#8217;s stack based error
+handling with heap based error handling. Instead of having an exception thrown and
+having to deal with it immediately in the same thread, it disconnects the error
+handling and recovery.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <strong>try-on</strong> macro.</div>
@@ -1104,10 +1094,28 @@ different from the <code>Either</code> type.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>It&#8217;s an analogue for the try-catch block: it replaces try-catch&#8217;s stack based error
-handling with heap based error handling. Instead of having an exception thrown and
-having to deal with it immediately in the same thread, it disconnects the error
-handling and recovery.</p>
+<p>For make it more powerfull, <em>cats</em> comes with other sugar syntax macros: <code>try-or-else</code> that
+returns a default value if a computation fails and <code>try-or-recover</code> that make the
+facility of handle yourself the return value executing a function with the exception as
+first parameter.</p>
+</div>
+<div class="listingblock">
+<div class="title">Usage example of <code>try-or-else</code> macro.</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-else</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; #&lt;Success [2]&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Usage example of <code>try-or-recover</code> macro.</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-recover</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span>
+                    <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">e</span><span class="tok-p">]</span>
+                      <span class="tok-p">(</span><span class="tok-nf">cond</span>
+                        <span class="tok-p">(</span><span class="tok-nb">instance? </span><span class="tok-nv">NullPointerException</span> <span class="tok-nv">e</span><span class="tok-p">)</span> <span class="tok-mi">0</span>
+                        <span class="tok-ss">:else</span> <span class="tok-mi">100</span><span class="tok-p">)))</span>
+<span class="tok-c1">;; =&gt; #&lt;Success [0]&gt;</span></code></pre>
+</div>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1120,6 +1128,14 @@ Try is also (like Maybe) Functor, Applicative Functor and Monad.
 </td>
 </tr>
 </table>
+</div>
+<div class="sect3">
+<h4 id="_clojurescript_notes">5.3.1. ClojureScript Notes</h4>
+<div class="paragraph">
+<p>Sugar syntax <code>try-on</code>, <code>try-or-else</code> and <code>try-or-recover</code> macros are only
+compatible with Clojure, if you want use them in your project, you should
+reimplement them in your codebase.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1554,7 +1570,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-10-19 18:38:53 CEST
+Last updated 2014-10-21 21:30:40 CEST
 </div>
 </div>
 </body>
