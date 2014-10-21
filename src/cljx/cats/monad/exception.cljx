@@ -114,12 +114,11 @@
 
 #+clj
 (defmacro try-on
-  [& body]
+  "Wraps a computation and return success of failure."
+  [expr]
   `(try
-     (let [r# (do ~@body)]
-       (if (try? r#)
-         r#
-         (success r#)))
+     (let [r# ~expr]
+       (success r#))
      (catch Throwable e#
        (failure e#))))
 
@@ -167,6 +166,6 @@
 
    (mbind [_ s f]
      (if (success? s)
-       (try-on (f (.-v s)))
+       (f (.-v s))
        s))))
 
