@@ -426,11 +426,10 @@ The `Try` type represents a computation that may either result in an exception,
 or return a successfully computed value. It's similar to, but semantically
 different from the `Either` type.
 
-In _cats_ it has two constructors and one convenience macro:
-
-- `(success v)`: constructor for type that represents a successful result.
-- `(failure e)`: constructor for type that represents a failure (with exception as value).
-- `(try-on)`: macro that encapsulates all expresions in a success or failure.
+It's an analogue for the try-catch block: it replaces try-catch's stack based error
+handling with heap based error handling. Instead of having an exception thrown and
+having to deal with it immediately in the same thread, it disconnects the error
+handling and recovery.
 
 .Usage example of **try-on** macro.
 [source, clojure]
@@ -444,12 +443,39 @@ In _cats_ it has two constructors and one convenience macro:
 ;; => #<Failure [#<NullPointerException java.lang.NullPointerException>]>
 ----
 
-It's an analogue for the try-catch block: it replaces try-catch's stack based error
-handling with heap based error handling. Instead of having an exception thrown and
-having to deal with it immediately in the same thread, it disconnects the error
-handling and recovery.
+For make it more powerfull, _cats_ comes with other sugar syntax macros: `try-or-else` that
+returns a default value if a computation fails and `try-or-recover` that make the
+facility of handle yourself the return value executing a function with the exception as
+first parameter.
+
+
+.Usage example of `try-or-else` macro.
+[source, clojure]
+----
+(exc/try-or-else (+ 1 nil) 2)
+;; => #<Success [2]>
+----
+
+.Usage example of `try-or-recover` macro.
+[source, clojure]
+----
+(exc/try-or-recover (+ 1 nil)
+                    (fn [e]
+                      (cond
+                        (instance? NullPointerException e) 0
+                        :else 100)))
+;; => #<Success [0]>
+----
 
 NOTE: Try is also (like Maybe) Functor, Applicative Functor and Monad.
+
+ClojureScript Notes
+^^^^^^^^^^^^^^^^^^^
+
+Sugar syntax `try-on`, `try-or-else` and `try-or-recover` macros are only
+compatible with Clojure, if you want use them in your project, you should
+reimplement them in your codebase.
+
 
 State
 ~~~~~
