@@ -33,7 +33,7 @@
 ;; Type constructor and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(deftype Either [v type]
+(deftype Right [v]
   proto/Context
   (get-context [_] either-monad)
   (get-value [_] v)
@@ -42,49 +42,73 @@
   Object
   #+clj
   (equals [self other]
-    (if (instance? Either other)
-      (and (= v (.-v other))
-         (= type (.-type other)))
+    (if (instance? Right other)
+      (= v (.-v other))
       false))
 
   #+clj
   (toString [self]
-    (with-out-str (print [v type])))
+    (with-out-str (print [v])))
 
   #+cljs
   cljs.core/IEquiv
   #+cljs
   (-equiv [self other]
-    (if (instance? Either other)
-      (and (= v (.-v other))
-           (= type (.-type other)))
+    (if (instance? Right other)
+      (= v (.-v other))
       false)))
 
-(defn either?
-  [v]
-  (instance? Either v))
+(deftype Left [v]
+  proto/Context
+  (get-context [_] either-monad)
+  (get-value [_] v)
+
+  #+clj
+  Object
+  #+clj
+  (equals [self other]
+    (if (instance? Left other)
+      (= v (.-v other))
+      false))
+
+  #+clj
+  (toString [self]
+    (with-out-str (print [v])))
+
+  #+cljs
+  cljs.core/IEquiv
+  #+cljs
+  (-equiv [self other]
+    (if (instance? Left other)
+      (= v (.-v other))
+      false)))
 
 (defn left
   "Left constructor for Either type."
-  ([v]
-     (Either. v :left))
   ([]
-     (Either. nil :left)))
+     (Left. nil))
+  ([v]
+     (Left. v)))
 
 (defn right
   "Right constructor for Either type."
-  ([v]
-     (Either. v :right))
   ([]
-     (Either. nil :right)))
+     (Right. nil))
+  ([v]
+     (Right. v)))
 
 (defn left?
   [mv]
-  (= (.-type mv) :left))
+  (instance? Left mv))
 
 (defn right?
   [mv]
-  (= (.-type mv) :right))
+  (instance? Right mv))
+
+(defn either?
+  [mv]
+  (or (left? mv)
+      (right? mv)))
 
 (defn from-either
   "Return inner value of either monad."
