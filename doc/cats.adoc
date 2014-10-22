@@ -1,5 +1,5 @@
-Category Theory abstractions for Clojure
-========================================
+Cats Documentation
+==================
 Andrey Antukh & Alejandro Gómez
 0.2.0
 :toc: left
