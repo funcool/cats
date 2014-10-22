@@ -112,6 +112,18 @@
   (or (success? v)
       (failure? v)))
 
+(defn wrap
+  "Wrap a function in a try monad.
+
+  Is a high order function that accept a function
+  as parameter and returns an other that returns
+  success or failure depending of result of the
+  first function."
+  [func]
+  (let [metadata (meta #'func)]
+    (-> (fn [& args] (try-on (apply func args)))
+        (with-meta metadata))))
+
 #+clj
 (defmacro try-on
   "Wraps a computation and return success of failure."
