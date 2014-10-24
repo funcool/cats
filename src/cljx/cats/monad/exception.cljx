@@ -112,43 +112,68 @@
   (or (success? v)
       (failure? v)))
 
-(defn wrap
-  "Wrap a function in a try monad.
+;; (defn wrap
+;;   "Wrap a function in a try monad.
 
-  Is a high order function that accept a function
-  as parameter and returns an other that returns
-  success or failure depending of result of the
-  first function."
+;;   Is a high order function that accept a function
+;;   as parameter and returns an other that returns
+;;   success or failure depending of result of the
+;;   first function."
+;;   [func]
+;;   (let [metadata (meta (var func))]
+;;     (-> (fn [& args] (try-on (apply func args)))
+;;         (with-meta metadata))))
+
+(defn exec-try-on
   [func]
-  (let [metadata (meta #'func)]
-    (-> (fn [& args] (try-on (apply func args)))
-        (with-meta metadata))))
+  (try
+    (let [result (func)]
+      (cond
+       (try? result)
+       result
+
+       (instance? #+clj Exception #+cljs js/Error result)
+       (failure result)
+
+       :else
+       (success result)))
+    #+clj
+    (catch Throwable e (failure e))
+    #+cljs
+    (catch js/Error e (failure e))))
+
+(defn exec-try-or-else
+  [func defaultvalue]
+  (let [result (exec-try-on func)]
+    (if (failure? result)
+      (success defaultvalue)
+      result)))
+
+(defn exec-try-or-recover
+  [func recoverfn]
+  (let [result (exec-try-on func)]
+    (if (failure? result)
+      (success (recoverfn (.-e result)))
+      result)))
 
 #+clj
 (defmacro try-on
   "Wraps a computation and return success of failure."
   [expr]
-  `(try
-     (let [r# ~expr]
-       (success r#))
-     (catch Throwable e#
-       (failure e#))))
+  `(let [func# (fn [] ~expr)]
+     (exec-try-on func#)))
 
 #+clj
 (defmacro try-or-else
   [expr defaultvalue]
-  `(let [r# (try-on ~expr)]
-     (if (failure? r#)
-       (success ~defaultvalue)
-       r#)))
+  `(let [func# (fn [] ~expr)]
+     (exec-try-or-else func# ~defaultvalue)))
 
 #+clj
 (defmacro try-or-recover
   [expr func]
-  `(let [r# (try-on ~expr)]
-     (if (failure? r#)
-       (try-on (~func (.-e r#)))
-       r#)))
+  `(let [func# (fn [] ~expr)]
+     (exec-try-or-recover func# ~func)))
 
 (defn from-success
   [sv]
