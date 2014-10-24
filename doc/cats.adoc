@@ -355,6 +355,127 @@ If you want to use regular (non-monadic) let bindings inside a `mlet` block, you
 ----
 
 
+Monad Transformers
+~~~~~~~~~~~~~~~~~~
+
+Motivation
+^^^^^^^^^^
+
+We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
+we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
+
+[source, clojure]
+----
+(ns functor.example
+  (:require [cats.core :refer [fmap]]
+            [cats.monad.maybe :refer [just]])
+  (:use [cats.builtin]))
+
+(defn fmap2
+  [f fv]
+  (fmap (partial fmap f) fv))
+
+; Here, 'a' is [] and 'b' is Maybe, so the type of the
+; combined functor is a vector of Maybe values that could
+; contain a value of any type.
+(fmap2 inc [(maybe/just 1) (maybe/just 2)])
+;;=> [#<Just [2]> #<Just [3]>]
+----
+
+However, monads don't compose as nicely as functors do. We have to actually implement
+the composition ourselves.
+
+In some circumstances we would like combine the effects of two monads in another one. We call the
+resulting monad a monad transformer, which is the composition of a "base" and a "inner" monad. A
+monad transformer is itself a monad.
+
+
+Using monad transformers
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Let's combine the effects of two monads: State and Maybe. We'll create the transformer
+using State as the base monad, since we want the resulting type to be a stateful computation
+that may fail: `s -> Maybe (a, s)`.
+
+Almost every monad implemented in _cats_ has a monad transformer for combining it with
+any other monad. The transformer creating functions take a Monad as their argument and their
+return a reified MonadTrans:
+
+[source, clojure]
+----
+(ns transformers.example
+  (:require [cats.core :as m]
+            [cats.data :as data]
+            [cats.monad.maybe :as maybe]
+            [cats.monad.state :as state]))
+
+(def maybe-state (state/state-transformer maybe/maybe-monad))
+
+(m/with-monad maybe-state
+  (state/run-state (m/return 42) {}))
+
+;;=> #<Just [#<Pair [42 {}]>]>
+----
+
+As we can see in the example below, the return of the `maybe-state` monad creates a stateful
+function that, when run, yields a Maybe containing a pair (value, next state).
+
+You probably noticed that we had to wrap the state function invocation with `cats.core/with-monad`.
+When working with monad transformers we have to be explicit about what monad are we using to implement
+the binding policy since there is no way to distinguish values from a transformer type from those of
+a regular monad.
+
+The `maybe-state` monad combines the semantics of both State and Maybe.
+
+Let's see it in action:
+
+[source, clojure]
+----
+(defn any-char [s]
+  "A function that takes an input string as an state and
+  consumes one character yielding it as a the value. The
+  new state is the input string with the character consumed.
+
+  It fails when there isn't a character to consume."
+  (if (clojure.string/blank? s)
+    (maybe/nothing)
+    (maybe/just (data/pair (first s)
+                              (.substring s 1)))))
+
+(m/with-monad maybe-state
+  (state/run-state any-char "Foo"))
+;;=> #<Just [#<Pair [F oo]>]>
+
+(def any-two-chars
+  (m/with-monad maybe-state
+    (m/mlet
+      [a any-char
+       b any-char]
+      (m/return (str a b)))))
+
+(m/with-monad maybe-state
+  (state/run-state any-two-chars "Foo"))
+;;=> #<Just [#<Pair [Fo o]>]>
+
+(m/with-monad maybe-state
+  (state/run-state any-two-chars "F"))
+;;=> #<Nothing >
+
+; We could have written `any-two-chars` more succintly using `cats.core/mlet-with`,
+; which is intended as syntactic sugar for transformer usage.
+(def any-two-chars
+  (m/mlet-with maybe-state
+    [a any-char
+     b any-char]
+    (m/return (str a b))))
+
+; We also define a function for applying parser to a given input
+(defn parse [parser input]
+  (m/with-monad maybe-state
+    (let [parse-result (state/run-state parser input)]
+      (maybe/from-maybe parse-result))))
+----
+
 Monad types
 -----------
 
@@ -566,126 +687,6 @@ Vector
 ~~~~~~
 
 TODO
-
-Monad Transformers
-------------------
-
-Motivation
-~~~~~~~~~~
-
-We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
-we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
-
-[source, clojure]
-----
-(ns functor.example
-  (:require [cats.core :refer [fmap]]
-            [cats.monad.maybe :refer [just]])
-  (:use [cats.builtin]))
-
-(defn fmap2
-  [f fv]
-  (fmap (partial fmap f) fv))
-
-; Here, 'a' is [] and 'b' is Maybe, so the type of the
-; combined functor is a vector of Maybe values that could
-; contain a value of any type.
-(fmap2 inc [(maybe/just 1) (maybe/just 2)])
-;;=> [#<Just [2]> #<Just [3]>]
-----
-
-However, monads don't compose as nicely as functors do. We have to actually implement
-the composition ourselves.
-
-In some circumstances we would like combine the effects of two monads in another one. We call the
-resulting monad a monad transformer, which is the composition of a "base" and a "inner" monad. A
-monad transformer is itself a monad.
-
-Using monad transformers
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Let's combine the effects of two monads: State and Maybe. We'll create the transformer
-using State as the base monad, since we want the resulting type to be a stateful computation
-that may fail: `s -> Maybe (a, s)`.
-
-Almost every monad implemented in _cats_ has a monad transformer for combining it with
-any other monad. The transformer creating functions take a Monad as their argument and their
-return a reified MonadTrans:
-
-[source, clojure]
-----
-(ns transformers.example
-  (:require [cats.core :as m]
-            [cats.data :as data]
-            [cats.monad.maybe :as maybe]
-            [cats.monad.state :as state]))
-
-(def maybe-state (state/state-transformer maybe/maybe-monad))
-
-(m/with-monad maybe-state
-  (state/run-state (m/return 42) {}))
-
-;;=> #<Just [#<Pair [42 {}]>]>
-----
-
-As we can see in the example below, the return of the `maybe-state` monad creates a stateful
-function that, when run, yields a Maybe containing a pair (value, next state).
-
-You probably noticed that we had to wrap the state function invocation with `cats.core/with-monad`.
-When working with monad transformers we have to be explicit about what monad are we using to implement
-the binding policy since there is no way to distinguish values from a transformer type from those of
-a regular monad.
-
-The `maybe-state` monad combines the semantics of both State and Maybe.
-
-Let's see it in action:
-
-[source, clojure]
-----
-(defn any-char [s]
-  "A function that takes an input string as an state and
-  consumes one character yielding it as a the value. The
-  new state is the input string with the character consumed.
-
-  It fails when there isn't a character to consume."
-  (if (clojure.string/blank? s)
-    (maybe/nothing)
-    (maybe/just (data/pair (first s)
-                              (.substring s 1)))))
-
-(m/with-monad maybe-state
-  (state/run-state any-char "Foo"))
-;;=> #<Just [#<Pair [F oo]>]>
-
-(def any-two-chars
-  (m/with-monad maybe-state
-    (m/mlet
-      [a any-char
-       b any-char]
-      (m/return (str a b)))))
-
-(m/with-monad maybe-state
-  (state/run-state any-two-chars "Foo"))
-;;=> #<Just [#<Pair [Fo o]>]>
-
-(m/with-monad maybe-state
-  (state/run-state any-two-chars "F"))
-;;=> #<Nothing >
-
-; We could have written `any-two-chars` more succintly using `cats.core/mlet-with`,
-; which is intended as syntactic sugar for transformer usage.
-(def any-two-chars
-  (m/mlet-with maybe-state
-    [a any-char
-     b any-char]
-    (m/return (str a b))))
-
-; We also define a function for applying parser to a given input
-(defn parse [parser input]
-  (m/with-monad maybe-state
-    (let [parse-result (state/run-state parser input)]
-      (maybe/from-maybe parse-result))))
-----
 
 
 FAQ
