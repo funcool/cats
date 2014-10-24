@@ -4,6 +4,7 @@
             [cats.core :as m]
             [cats.protocols :as p]
             [cats.builtin :as b]
+            [cats.monad.either :as either]
             [cats.monad.exception :as exc])
    #+cljs
   (:require-macros [cemerick.cljs.test
@@ -15,18 +16,19 @@
             [cats.core :as m :refer [mlet with-monad]]
             [cats.protocols :as p]
             [cats.builtin :as b]
+            [cats.monad.either :as either]
             [cats.monad.exception :as exc :refer (try-on try-or-else try-or-recover)]))
 
 (deftest test-exception-monad
   #+clj
-  (testing "Basic operations."
+  (testing "Basic operations clj."
     (let [e (Exception. "test")]
       (is (= 1 (exc/from-success (try-on 1))))
       (is (= e (exc/from-failure (try-on (throw e)))))
       (is (= e (exc/from-failure (try-on e))))))
 
   #+cljs
-  (testing "Basic operations."
+  (testing "Basic operations with cljs."
     (let [e (js/Error. "test")]
       (is (= 1 (exc/from-success (try-on 1))))
       (is (= e (exc/from-failure (try-on (throw e)))))
@@ -45,10 +47,30 @@
       (is (= 40 (exc/from-try m1)))))
 
   #+clj
-  (testing "Test try-or-recover macro"
+  (testing "Test try-or-recover macro clj"
     (let [m1 (try-or-recover (+ 1 nil) (fn [e] 60))]
       (is (exc/success? m1))
-      (is (= 60 (exc/from-try m1)))))
+      (is (= 60 (exc/from-try m1))))
+
+    (let [m1 (try-or-recover
+              (+ 1 nil)
+              (fn [e] (either/right 60)))]
+      (is (either/right? m1))
+      (is (= 60 (either/from-either m1)))))
+
+  #+cljs
+  (testing "Test try-or-recover macro with cljs"
+    (let [e  (js/Error. "test")
+          m1 (try-or-recover e (fn [e] 60))]
+      (is (exc/success? m1))
+      (is (= 60 (exc/from-try m1))))
+
+    (let [e  (js/Error. "test")
+          m1 (try-or-recover
+              e
+              (fn [e] (either/right 60)))]
+      (is (either/right? m1))
+      (is (= 60 (either/from-either m1)))))
 
   #+clj
   (testing "Test try-on macro"

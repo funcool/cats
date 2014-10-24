@@ -153,7 +153,10 @@
   [func recoverfn]
   (let [result (exec-try-on func)]
     (if (failure? result)
-      (success (recoverfn (.-e result)))
+      (let [result (recoverfn (.-e result))]
+        (if (satisfies? proto/Context result)
+          result
+          (success result)))
       result)))
 
 #+clj
