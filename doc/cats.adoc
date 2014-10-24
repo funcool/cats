@@ -469,13 +469,6 @@ first parameter.
 
 NOTE: Try is also (like Maybe) Functor, Applicative Functor and Monad.
 
-ClojureScript Notes
-^^^^^^^^^^^^^^^^^^^
-
-Sugar syntax `try-on`, `try-or-else` and `try-or-recover` macros are only
-compatible with Clojure, if you want use them in your project, you should
-reimplement them in your codebase.
-
 
 State
 ~~~~~
