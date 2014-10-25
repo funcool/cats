@@ -120,19 +120,20 @@ parameter.
 But, what is the **functor context*? It sonds more complex that it is. Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocol.
 
-One good example of functor context is the **Maybe** type:
-
+.One good example of functor is the **Maybe** type:
 [source, clojure]
 ----
 (require '[cats.monad.maybe :as maybe])
+
+;; `just` function is one of two constructors of Maybe
 
 (maybe/just 2)
 ;; => #<Just [2]>
 ----
 
-**just** is one of two constructors of **Maybe** type and it's only wraps the real
-value. Now, let see one example using **fmap** over **just** instance:
+Let see one example using **fmap** over *just* instance:
 
+.Example using fmap over *just*.
 [source, clojure]
 ----
 (require '[cats.core :as m])
@@ -141,26 +142,25 @@ value. Now, let see one example using **fmap** over **just** instance:
 ;; => #<Just [2]>
 ----
 
-But **Maybe** has another constructor: `maybe/nothing`. This constructor makes
-empty object that not wraps anything. Is the safe substitute of `nil` and
-represents the failure.
+The **Maybe** type also has another constructor: `nothing`. It that represents the aucense of value.
+Is the safe substitute of `nil` and may represent the failure.
 
-Let see that is happens if we make same operation of previous example over
-*nothing* instance:
+Let see that is happens if we make same operation of previous example over *nothing* instance:
 
+.Example using fmap over *nothing*.
 [source, clojure]
 ----
 (fmap inc (nothing))
 ;; => #<Nothing >
 ----
 
-Oh, awesome, instead of raising null pointer exception, it just return *nothing*.
-
-An other good advantage of use functor abstraction, is that it always return result
-in the same type of second argument
+Oh, awesome, instead of raising null pointer exception, it just return *nothing*. An other good
+advantage of use functor abstraction, is that it always return result
+in the same type of second argument.
 
 Let see one example of apply fmap over clojure vector:
 
+.Example using fmav over *vector*.
 [source, clojure]
 ----
 (fmap inc [1 2 3])
