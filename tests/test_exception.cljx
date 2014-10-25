@@ -48,7 +48,7 @@
 
   #+clj
   (testing "Test try-or-recover macro clj"
-    (let [m1 (try-or-recover (+ 1 nil) (fn [e] 60))]
+    (let [m1 (try-or-recover (+ 1 nil) (fn [e] (m/return 60)))]
       (is (exc/success? m1))
       (is (= 60 (exc/from-try m1))))
 
@@ -61,7 +61,7 @@
   #+cljs
   (testing "Test try-or-recover macro with cljs"
     (let [e  (js/Error. "test")
-          m1 (try-or-recover e (fn [e] 60))]
+          m1 (try-or-recover e (fn [e] (m/return 60)))]
       (is (exc/success? m1))
       (is (= 60 (exc/from-try m1))))
 

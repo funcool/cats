@@ -29,10 +29,16 @@
   The Try type represents a computation that may either result in an exception,
   or return a successfully computed value. It's similar to, but semantically
   different from the Either type."
+  #+clj
+  (:require [cats.protocols :as proto]
+            [cats.core :refer [with-monad]])
+
+  #+cljs
   (:require [cats.protocols :as proto])
 
   #+cljs
-  (:require-macros [cats.monad.exception :refer [try-on]]))
+  (:require-macros [cats.monad.exception :refer [try-on]]
+                   [cats.core :refer [with-monad]]))
 
 (declare exception-monad)
 
@@ -128,15 +134,9 @@
   [func]
   (try
     (let [result (func)]
-      (cond
-       (try? result)
-       result
-
-       (instance? #+clj Exception #+cljs js/Error result)
-       (failure result)
-
-       :else
-       (success result)))
+      (if (instance? #+clj Exception #+cljs js/Error result)
+        (failure result)
+        (success result)))
     #+clj
     (catch Throwable e (failure e))
     #+cljs
@@ -152,12 +152,10 @@
 (defn exec-try-or-recover
   [func recoverfn]
   (let [result (exec-try-on func)]
-    (if (failure? result)
-      (let [result (recoverfn (.-e result))]
-        (if (satisfies? proto/Context result)
-          result
-          (success result)))
-      result)))
+    (with-monad exception-monad
+      (if (failure? result)
+        (recoverfn (.-e result))
+        result))))
 
 #+clj
 (defmacro try-on
