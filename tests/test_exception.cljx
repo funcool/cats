@@ -41,6 +41,18 @@
       (is (exc/failure? m2))))
 
   #+clj
+  (testing "Test wrap"
+    (let [func (fn [x] (+ x nil))
+          func (exc/wrap func)]
+      (is (exc/failure? (func 3)))))
+
+  #+cljs
+  (testing "Test wrap"
+    (let [func (fn [x] (throw (js/Error. "test")))
+          func (exc/wrap func)]
+      (is (exc/failure? (func 3)))))
+
+  #+clj
   (testing "Test try-or-else macro"
     (let [m1 (try-or-else (+ 1 nil) 40)]
       (is (exc/success? m1))

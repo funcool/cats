@@ -118,18 +118,6 @@
   (or (success? v)
       (failure? v)))
 
-;; (defn wrap
-;;   "Wrap a function in a try monad.
-
-;;   Is a high order function that accept a function
-;;   as parameter and returns an other that returns
-;;   success or failure depending of result of the
-;;   first function."
-;;   [func]
-;;   (let [metadata (meta (var func))]
-;;     (-> (fn [& args] (try-on (apply func args)))
-;;         (with-meta metadata))))
-
 (defn exec-try-on
   [func]
   (try
@@ -175,6 +163,18 @@
   [expr func]
   `(let [func# (fn [] ~expr)]
      (exec-try-or-recover func# ~func)))
+
+(defn wrap
+  "Wrap a function in a try monad.
+
+  Is a high order function that accept a function
+  as parameter and returns an other that returns
+  success or failure depending of result of the
+  first function."
+  [func]
+  (let [metadata (meta func)]
+    (-> (fn [& args] (try-on (apply func args)))
+        (with-meta metadata))))
 
 (defn from-success
   [sv]
