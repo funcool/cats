@@ -2,14 +2,13 @@
 
 ## Version 0.2.0 ##
 
-Date: unreleased
+Date: 2014-10-26
 
-- Non recursive mlet macro.
-- Breaking change: split cats.core.types ns into cats.monad.*
-- New lazy monad (using clojure delay).
-- Reader, writer and lazy monads.
-- Monad transformer support.
-- Transformer versions of some monads.
+- Major api redesign.
+- Split monad definition from data type.
+- mlet macro is now not recursive.
+- Bunch of new monads: lazy, error.
+- Monad transformers.
 
 ## Version 0.1.0 ##
 
