@@ -103,7 +103,7 @@ section of the documentation.
 Functor
 ~~~~~~~
 
-Let&rsquo;s start with the functor. The Functor represents some sort of "computational context", and the
+Let's start with the functor. The Functor represents some sort of "computational context", and the
 abstraction consists of one unique function: **fmap**.
 
 .Signature of **fmap** function
@@ -145,7 +145,7 @@ Let see one example using **fmap** over *just* instance:
 The **Maybe** type also has another constructor: `nothing`. It represents the absense of a value.
 It is a safe substitute for `nil` and may represent failure.
 
-Let&rsquo;s see what happens if we perform the same operation as the previous example over a *nothing* instance:
+Let's see what happens if we perform the same operation as the previous example over a *nothing* instance:
 
 .Example using fmap over *nothing*.
 [source, Clojure]
@@ -158,7 +158,7 @@ Oh, awesome, instead of raising a `NullPointerException`, it just returns *nothi
 advantage of using the functor abstraction, is that it always returns a result
 of the same type as its second argument.
 
-Let&rsquo;s see an example of applying fmap over a Clojure vector:
+Let's see an example of applying fmap over a Clojure vector:
 
 .Example using fmav over *vector*.
 [source, Clojure]
@@ -167,8 +167,8 @@ Let&rsquo;s see an example of applying fmap over a Clojure vector:
 ;; => [2 3 4]
 ----
 
-The main difference compared to the previous example with Clojure&rsquo;s map function, is that
-map works with seqs and doesn&rsquo;t respect the input container:
+The main difference compared to the previous example with Clojure's map function, is that
+map works with seqs and doesn't respect the input container:
 
 [source, Clojure]
 ----
@@ -183,7 +183,7 @@ lists, and sets also implement the functor abstraction.
 Applicative
 ~~~~~~~~~~~
 
-Let&rsquo;s continue with applicative functors. The Applicative Functor represents
+Let's continue with applicative functors. The Applicative Functor represents
 some sort of "computational context" like a plain Functor, but with abilty to
 execute a function wrapped in the same context.
 
@@ -201,7 +201,7 @@ NOTE: the **pure** function will be explained later.
 The use case for Applicative Functors is much the same as plain Functors: safe
 evaluation of some computation in a context.
 
-Let&rsquo;s see an exaple to better understand the differences between functor and
+Let's see an exaple to better understand the differences between functor and
 applicative functor:
 
 Imagine you have some factory function that, depending on the language, returns a
@@ -221,7 +221,7 @@ greeter function, and you only support a few languages.
 Now, before using the resulting greeter you should always defensively check if returned
 greeter is a valid function or is a nil value.
 
-Let&rsquo;s convert this factory to use Maybe type:
+Let's convert this factory to use Maybe type:
 
 [source, Clojure]
 ----
@@ -312,7 +312,7 @@ what that container is, you can use `return` or `pure` functions:
 ----
 
 The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context
-value that&rsquo;s set internally by the `bind` function. Therefore, you can&rsquo;t use them with one argument outside of a `bind` context.
+value that's set internally by the `bind` function. Therefore, you can't use them with one argument outside of a `bind` context.
 
 We now can compose any number of computations using monad **bind*
 functions. But observe what happens when the number of computations increases:
@@ -381,7 +381,7 @@ we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 ;;=> [#<Just [2]> #<Just [3]>]
 ----
 
-However, monads don&rsquo;t compose as nicely as functors do. We have to actually implement
+However, monads don't compose as nicely as functors do. We have to actually implement
 the composition ourselves.
 
 In some circumstances we would like combine the effects of two monads into another one. We call the
@@ -392,7 +392,7 @@ monad transformer is itself a monad.
 Using monad transformers
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Let&rsquo;s combine the effects of two monads: State and Maybe. We&rsquo;ll create the transformer
+Let's combine the effects of two monads: State and Maybe. We'll create the transformer
 using State as the base monad since we want the resulting type to be a stateful computation
 that may fail: `s -> Maybe (a, s)`.
 
@@ -426,7 +426,7 @@ a regular monad.
 
 The `maybe-state` monad combines the semantics of both State and Maybe.
 
-Let&rsquo;s see it in action:
+Let's see it in action:
 
 [source, Clojure]
 ----
@@ -543,7 +543,7 @@ Try
 Also called Exception.
 
 The `Try` type represents a computation that may either result in an exception
-or return a successfully computed value. It&rsquo;s similar to, but semantically
+or return a successfully computed value. It's similar to, but semantically
 different from, the `Either` type.
 
 It is an analogue of the try-catch block: it replaces try-catch's stack-based error
@@ -615,7 +615,7 @@ in monad state composition.
 You just saw an example of the low-level primitive state monad. For basic usage
 you do not need to build your own functions, just use some helpers that _cats_ provides.
 
-Let&rsquo;s look at one example before explaining the details:
+Let's look at one example before explaining the details:
 
 .Lazy composition of computations
 [source, Clojure]
@@ -632,7 +632,7 @@ a strange/unknown object is returned of type *State*.
 
 State is simply a wrapper for Clojure functions, nothing more.
 
-Now, it&rsquo;s time to execute the composed computation. For this we can use one of the following
+Now, it's time to execute the composed computation. For this we can use one of the following
 functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
 
 - `run-state` function executes the composed computation and returns both the value and the
