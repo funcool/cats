@@ -605,7 +605,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 <div class="sect2">
 <h3 id="_maven">3.2. Maven</h3>
 <div class="paragraph">
-<p>Also, you can use it with maven. First, add the clojars repository:</p>
+<p>Also, you can use it with Maven. First, add the Clojars repository:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -648,7 +648,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 <h2 id="_user_guide">4. User Guide</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section introduces almost all category theory abstractios that cats library
+<p>This section introduces almost all category theory abstractions that cats library
 supports.</p>
 </div>
 <div class="paragraph">
@@ -659,8 +659,8 @@ section of this documentation.</p>
 <div class="sect2">
 <h3 id="_functor">4.1. Functor</h3>
 <div class="paragraph">
-<p>Let start with functor. The Functor represents some sort of "computational context", and the
-abstraction consists in one unique function: <strong>fmap</strong>.</p>
+<p>Let&#8217;s start with functor. The Functor represents some sort of "computational context", and the
+abstraction consists of one unique function: <strong>fmap</strong>.</p>
 </div>
 <div class="listingblock">
 <div class="title">Signature of <strong>fmap</strong> function</div>
@@ -669,14 +669,14 @@ abstraction consists in one unique function: <strong>fmap</strong>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The high order function <strong>fmap</strong> takes a plain function as first parameter and
-value wrapped in functor context as second parameter. It extracts the inner value
-apply the function to it, and return the result wrapped in same type as the second
+<p>The higher-order function <strong>fmap</strong> takes a plain function as first parameter and a
+value wrapped in a functor context as second parameter. It extracts the inner value
+applies the function to it, and returns the result wrapped in the same type as the second
 parameter.</p>
 </div>
 <div class="paragraph">
-<p>But, what is the <strong>*functor context</strong>? It sonds more complex that it is. Functor
-wrapper is any type that acts as "Box" and implements the <code>Context</code> and <code>Functor</code> protocol.</p>
+<p>But, what is the <strong>*functor context</strong>? It sounds more complex that it is. The functor
+wrapper is any type that acts as "Box" and implements the <code>Context</code> and <code>Functor</code> protocols.</p>
 </div>
 <div class="listingblock">
 <div class="title">One good example of functor is the <strong>Maybe</strong> type:</div>
@@ -690,7 +690,7 @@ wrapper is any type that acts as "Box" and implements the <code>Context</code> a
 </div>
 </div>
 <div class="paragraph">
-<p>Let see one example using <strong>fmap</strong> over <strong>just</strong> instance:</p>
+<p>Let&#8217;s see one example using <strong>fmap</strong> over <strong>just</strong> instance:</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>just</strong>.</div>
@@ -702,11 +702,11 @@ wrapper is any type that acts as "Box" and implements the <code>Context</code> a
 </div>
 </div>
 <div class="paragraph">
-<p>The <strong>Maybe</strong> type also has another constructor: <code>nothing</code>. It that represents the aucense of value.
-Is the safe substitute of <code>nil</code> and may represent the failure.</p>
+<p>The <strong>Maybe</strong> type also has another constructor: <code>nothing</code>. This represents the absense of a value.
+It is the safe substitute for <code>nil</code> and may represent failure.</p>
 </div>
 <div class="paragraph">
-<p>Let see that is happens if we make same operation of previous example over <strong>nothing</strong> instance:</p>
+<p>Let&#8217;s see what happens if we perform the same operation as the previous example over a <strong>nothing</strong> instance:</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>nothing</strong>.</div>
@@ -716,22 +716,22 @@ Is the safe substitute of <code>nil</code> and may represent the failure.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Oh, awesome, instead of raising null pointer exception, it just return <strong>nothing</strong>. An other good
-advantage of use functor abstraction, is that it always return result
-in the same type of second argument.</p>
+<p>Oh, awesome, instead of raising a <code>NullPointerException</code>, it just returns <strong>nothing</strong>. Another
+advantage of using the functor abstraction is that it always returns a result
+of the same type as the second argument.</p>
 </div>
 <div class="paragraph">
-<p>Let see one example of apply fmap over clojure vector:</p>
+<p>Let&#8217;s see one example applying fmap over a Clojure vector:</p>
 </div>
 <div class="listingblock">
-<div class="title">Example using fmav over <strong>vector</strong>.</div>
+<div class="title">Example using fmap over <strong>vector</strong>.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
 <span class="tok-c1">;; =&gt; [2 3 4]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The main difference compared to the previous example with default clojure map, is that the clojure
+<p>The main difference compared to the previous example with a default Clojure map, is that the Clojure
 map works with seqs and doesn&#8217;t respect the input container:</p>
 </div>
 <div class="listingblock">
@@ -741,19 +741,19 @@ map works with seqs and doesn&#8217;t respect the input container:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>But why fmap works with vectors? Because some "container" types of clojure like vectors,
-lists or sets also implements the functor abstraction.</p>
+<p>But why does the fmap version work with vectors? Because some of Clojure&rsquo;s "container" types like vectors,
+lists and sets also implement the functor abstraction.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_applicative">4.2. Applicative</h3>
 <div class="paragraph">
-<p>Let continue with applicative function. The Applicative Functor represents
-some sort of "computational context" like plain Functor, but with abilty of
-execute a function wrapped in same context.</p>
+<p>Let&#8217;s continue with the applicative functor. The Applicative Functor represents
+a sort of "computational context" like a plain Functor, but with abilty to
+execute a function wrapped in the same context.</p>
 </div>
 <div class="paragraph">
-<p>Applicative Functor abstraction consists in two functions: <strong>fapply</strong> and
+<p>The Applicative Functor abstraction consists of two functions: <strong>fapply</strong> and
 <strong>pure</strong>.</p>
 </div>
 <div class="listingblock">
@@ -775,16 +775,16 @@ execute a function wrapped in same context.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>The use case of Applicative Functors is much same as of plain Functors: safe
+<p>The use case of Applicative Functors is much the same as plain Functors: safe
 evaluation of some computation in a context.</p>
 </div>
 <div class="paragraph">
-<p>Let see one exaple for understand better the differences between functor and
+<p>Let&#8217;s see an example to better understand the differences between functor and
 applicative functor:</p>
 </div>
 <div class="paragraph">
-<p>Imagine, you have some factory function that depending of language, return a
-greater function and you only has support for few languages.</p>
+<p>Imagine you have some factory function that&mdash;depending on language&mdash;returns a
+greater function, and you only have support for a few languages.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -797,11 +797,11 @@ greater function and you only has support for few languages.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Now, if you want to use it, you should always defensively check if returned
+<p>Now, if you want to use it, you should always defensively check if the returned
 greater is a valid function or is a nil value.</p>
 </div>
 <div class="paragraph">
-<p>Lets go to convert this factory to use Maybe type:</p>
+<p>Let&#8217;s convert this factory to use Maybe type:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -814,8 +814,8 @@ greater is a valid function or is a nil value.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can observe, this version of factory differs little bit from the
-original implementation. And this little change makes you superpower: you
+<p>As you can see, this version of the factory differs a little bit from the
+original implementation. And this little change gives you a superpower: you
 can apply the returned greater to any value without defensive nil checking:</p>
 </div>
 <div class="listingblock">
@@ -831,8 +831,8 @@ can apply the returned greater to any value without defensive nil checking:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Moreover the applicative functor comes with <strong>pure</strong> function, and main purpose of this function is
-put some value in side effect free contex of the current type.</p>
+<p>Moreover, the applicative functor comes with <strong>pure</strong> function, and the main purpose of this function is
+to put some value in a side-effect-free context of the current type.</p>
 </div>
 <div class="paragraph">
 <p>Examples:</p>
@@ -850,8 +850,8 @@ put some value in side effect free contex of the current type.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>If you not understand the purpose of <strong>pure</strong> function, it is possible that the next section
-can clarify the real purpose of it.</p>
+<p>If you don&rsquo;t understand the purpose of the <strong>pure</strong> function, I hope the next section
+will clarify its true purpose.</p>
 </div>
 </div>
 <div class="sect2">
@@ -861,8 +861,8 @@ can clarify the real purpose of it.</p>
 applicatives, monads deal with data in contexts.</p>
 </div>
 <div class="paragraph">
-<p>Additionaly, monads can also transform context by unwrapping data, applying functions to it and
-put new values in a completely different context.</p>
+<p>Additionaly, monads can also transform contexts by unwrapping data, applying functions to it and
+putting new values into a completely different context.</p>
 </div>
 <div class="paragraph">
 <p>The monad abstraction consists on two functions: <strong>bind</strong> and <strong>return</strong></p>
@@ -874,8 +874,8 @@ put new values in a completely different context.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can observe, it works much like Functor but with inverted arguments, the main deference is
-that in monad, the function is a responsible of wrapping a retuned value in a context.</p>
+<p>As you can see, it works much like Functor but with inverted arguments, the main deference is
+that in a monad, the function is a responsible for wrapping the retuned value in a context.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of bind high order function.</div>
@@ -888,7 +888,7 @@ that in monad, the function is a responsible of wrapping a retuned value in a co
 <p>One of the key features of the bind function is that any computation executed inside of context of
 bind (monad) knows the context type implicitly. Having this, if you apply some computation over some
 monadic value  and you want to return the result in the same container context but you don&#8217;t know
-that container is it, you can use <code>return</code> or <code>pure</code> functions:</p>
+that container is it, you can use the <code>return</code> or <code>pure</code> functions:</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage of return function in bind context.</div>
@@ -905,8 +905,8 @@ value that&#8217;s set internally by the <code>bind</code> function. Therefore y
 of a <code>bind</code> context.</p>
 </div>
 <div class="paragraph">
-<p>At this time, everything is fine, we not can compose any number of computations using monad <strong>*bind</strong>
-functions. But that is happens where the number of computations increases:</p>
+<p>We can compose any number of computations using monad <strong>*bind</strong>
+functions. But look what happens when the number of computations increases:</p>
 </div>
 <div class="listingblock">
 <div class="title">Composability example of bind function.</div>
@@ -919,7 +919,7 @@ functions. But that is happens where the number of computations increases:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This easy grows to very beatiful callback hell. For solve this, <em>cats</em> comes with powerful
+<p>This can quickly grow to become a callback hell. To solve this, <em>cats</em> comes with a powerful
 macro: <strong>mlet</strong></p>
 </div>
 <div class="listingblock">
@@ -937,14 +937,14 @@ macro: <strong>mlet</strong></p>
 <div class="title">Note</div>
 </td>
 <td class="content">
-If you are coming from haskell, it represents the <strong>do-syntax</strong>.
+If you are coming from Haskell, <strong>mlet</strong> is an analog of the <strong>do-syntax</strong>.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
 <p>If you want to use regular (non-monadic) let bindings inside a <code>mlet</code> block, you can do so using
-<code>:let</code> and a bindings vector as a pair inside the mlet bindings:</p>
+<code>:let</code> and a binding vector inside the mlet bindings:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -960,7 +960,7 @@ If you are coming from haskell, it represents the <strong>do-syntax</strong>.
 <div class="sect3">
 <h4 id="_motivation">4.4.1. Motivation</h4>
 <div class="paragraph">
-<p>We can combine two functors and get a new one automatically. Given any two functors <em>a</em> and <em>b</em>,
+<p>We can also combine two functors and get a new one automatically. Given any two functors <em>a</em> and <em>b</em>,
 we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we&#8217;ll call it fmap2:</p>
 </div>
 <div class="listingblock">
@@ -986,8 +986,8 @@ we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we
 the composition ourselves.</p>
 </div>
 <div class="paragraph">
-<p>In some circumstances we would like combine the effects of two monads in another one. We call the
-resulting monad a monad transformer, which is the composition of a "base" and a "inner" monad. A
+<p>In some circumstances, we would like to combine the effects of two monads into another one. We call the
+resulting monad a monad transformer, which is the composition of a "base" and an "inner" monad. A
 monad transformer is itself a monad.</p>
 </div>
 </div>
@@ -1000,7 +1000,7 @@ that may fail: <code>s -&gt; Maybe (a, s)</code>.</p>
 </div>
 <div class="paragraph">
 <p>Almost every monad implemented in <em>cats</em> has a monad transformer for combining it with
-any other monad. The transformer creating functions take a Monad as their argument and their
+any other monad. The transformer creation functions take a Monad as their argument and
 return a reified MonadTrans:</p>
 </div>
 <div class="listingblock">
@@ -1090,9 +1090,9 @@ a regular monad.</p>
 <h2 id="_monad_types">5. Monad types</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Monad as is, is an abstraction, and we have seen two types in examples that implements
+<p>In our examples, we have seen two types that implement
 the monad abstraction: Maybe and Either. But they are the smallest part of types
-that implements the Monad abstraction. In this section we try explain different
+that implement the Monad abstraction. In this section, we&#8217;ll explain the different 
 monad types supported by <em>cats</em> library.</p>
 </div>
 <div class="sect2">
@@ -1146,7 +1146,7 @@ Maybe types are: Functors, Applicative Functors and Monads
 <div class="sect2">
 <h3 id="_either">5.2. Either</h3>
 <div class="paragraph">
-<p>Either is another type that represents a result of computation, but in contrast with maybe
+<p>Either is another type that represents a result of computation, but (in contrast with maybe)
 it can return some data with a failed computation result.</p>
 </div>
 <div class="paragraph">
@@ -1216,10 +1216,9 @@ handling and recovery.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>For make it more powerfull, <em>cats</em> comes with other sugar syntax macros: <code>try-or-else</code> that
-returns a default value if a computation fails and <code>try-or-recover</code> that make the
-facility of handle yourself the return value executing a function with the exception as
-first parameter.</p>
+<p>To make it more powerful, <em>cats</em> comes with other syntactic sugar macros: <code>try-or-else</code> that
+returns a default value if a computation fails and <code>try-or-recover</code> that makes it easy to handle 
+the return value executing a function with the exception as first parameter.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <code>try-or-else</code> macro.</div>
@@ -1276,7 +1275,7 @@ in monad state composition.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Right, you just saw an example of the low level primitive of state monad but for basic usage
+<p>You just saw an example of the low-level primitive <strong>State</strong> monad, but for basic usage
 you do not need to build your own functions, just use some helpers that <em>cats</em> gives you.</p>
 </div>
 <div class="paragraph">
@@ -1292,21 +1291,21 @@ you do not need to build your own functions, just use some helpers that <em>cats
 </div>
 </div>
 <div class="paragraph">
-<p>At the moment of evaluating the previous expression, anything that we have defined
-is executed. Instead of the finished value of the computation, a strange/unknown object is returned of type <strong>State</strong>.</p>
+<p>At the moment of evaluating the previous expression, everything that we have defined is executed. 
+Instead of the finished value of the computation, a strange/unknown object is returned of type <strong>State</strong>.</p>
 </div>
 <div class="paragraph">
-<p>State is a simple wrapper for clojure functions, nothing more.</p>
+<p>State is a simple wrapper for Clojure functions, nothing more.</p>
 </div>
 <div class="paragraph">
-<p>Now, it time to execute the composed computation, for this we can use one of the following
+<p>Now, it&#8217;s time to execute the composed computation. For this, we can use one of the following
 functions exposed by <em>cats</em>: <code>run-state</code>, <code>eval-state</code> and <code>exec-state</code>.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
 <p><code>run-state</code> function executes the composed computation and returns both the value and the
-result state.</p>
+resulting state.</p>
 </li>
 <li>
 <p><code>eval-state</code> function executes the composed computation and returns the resulting value
@@ -1336,7 +1335,7 @@ state, ignoring the resulting value.</p>
 <div class="title">Note</div>
 </td>
 <td class="content">
-the pair instance returned by <code>run-state</code> functions works like any other seq of clojure, with
+the pair instance returned by <code>run-state</code> functions works like any other seq in Clojure, with
 the difference that pairs can only have two slots.
 </td>
 </tr>
