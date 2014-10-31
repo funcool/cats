@@ -73,6 +73,7 @@
              (monad+ (maybe/just 2) (maybe/just 4))))
       (is (= (maybe/nothing)
              (monad+ (maybe/just 1) (maybe/nothing)))))
+    #+clj
     (testing "It can lift a function to a Monad Transformer"
       (let [maybe-sequence-monad (maybe/maybe-transformer sequence-monad)]
         (is (= [(maybe/just 1) (maybe/just 2) (maybe/just  3) (maybe/just  4) (maybe/just  5) (maybe/just 6)]
