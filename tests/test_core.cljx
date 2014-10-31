@@ -71,7 +71,13 @@
       (is (= (maybe/just 6)
              (monad+ (maybe/just 2) (maybe/just 4))))
       (is (= (maybe/nothing)
-             (monad+ (maybe/just 1) (maybe/nothing)))))))
+             (monad+ (maybe/just 1) (maybe/nothing)))))
+    (testing "It can lift a function to a Monad Transformer"
+      (let [maybe-vector-monad (maybe/maybe-transformer sequence-monad)]
+        (is (= [(maybe/just 1) (maybe/just 2) (maybe/just  3) (maybe/just  4) (maybe/just  5) (maybe/just 6)]
+               (m/with-monad maybe-vector-monad
+                 (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
+                         [(maybe/just 1) (maybe/just 2)]))))))))
 
 (deftest test-filter
   (testing "It can filter Maybe monadic values"

@@ -1,4 +1,3 @@
-
 Import namespaces:
 
 (require '[cats.core :as m])
