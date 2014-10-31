@@ -20,7 +20,9 @@
 (deftest test-maybe-monad
   (testing "Basic maybe operations."
     (is (= 1 (maybe/from-maybe (maybe/just 1))))
-    (is (= nil (maybe/from-maybe (maybe/nothing)))))
+    (is (= 1 (maybe/from-maybe (maybe/just 1) 42)))
+    (is (= nil (maybe/from-maybe (maybe/nothing))))
+    (is (= 42 (maybe/from-maybe (maybe/nothing) 42))))
 
   (testing "get-value function"
     (is (= (p/get-value (maybe/just 1)) 1))

@@ -106,19 +106,27 @@
    (instance? Nothing v)))
 
 (defn from-maybe
-  "Return inner value from maybe monad.
+  "Return inner value from maybe monad. Accepts an optional default value.
 
   Examples:
     (from-maybe (just 1))
     ;=> 1
+    (from-maybe (just 1) 42)
+    ;=> 1
     (from-maybe (nothing))
     ;=> nil
+    (from-maybe (nothing) 42)
+    ;=> 42
   "
-  [mv]
-  {:pre [(maybe? mv)]}
-  (cond
-   (just? mv) (.-v mv)
-   (nothing? mv) nil))
+  ([mv]
+   {:pre [(maybe? mv)]}
+   (when (just? mv)
+     (.-v mv)))
+  ([mv default]
+   {:pre [(maybe? mv)]}
+   (if (just? mv)
+     (.-v mv)
+     default)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
