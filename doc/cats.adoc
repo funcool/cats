@@ -153,6 +153,10 @@ extract values wrapped by **just** and you can do that with **from-maybe**.
 
 (from-maybe (just 1))
 ;; => 1
+(from-maybe (nothing))
+;; => nil
+(from-maybe (nothing) 42)
+;; => 42
 ----
 
 The **Maybe** type also has another constructor: `nothing`. It represents the absence of a value.
