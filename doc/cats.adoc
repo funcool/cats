@@ -154,7 +154,7 @@ Let's see what happens if we perform the same operation as the previous example 
 ;; => #<Nothing >
 ----
 
-Oh, awesome, instead of raising a `NullPointerException`, it just returns *nothing*. Another 
+Oh, awesome, instead of raising a `NullPointerException`, it just returns *nothing*. Another
 advantage of using the functor abstraction, is that it always returns a result
 of the same type as its second argument.
 
@@ -168,16 +168,16 @@ Let's see an example of applying fmap over a Clojure vector:
 ----
 
 The main difference compared to the previous example with Clojure's map function, is that
-map works with seqs and doesn't respect the input container:
+map returns lazy seqs no matter what collection we pass to it:
 
 [source, Clojure]
 ----
-(map inc [1 2 3])
-;; => (2 3 4)
+(type (map inc [1 2 3]))
+;; => clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)
 ----
 
-But why does the fmap version "work" with vectors? Because some Clojure container types like vectors,
-lists, and sets also implement the functor abstraction.
+But why can we pass vectors to fmap? Because some Clojure container types like vectors,
+lists and sets also implement the functor abstraction.
 
 
 Applicative
