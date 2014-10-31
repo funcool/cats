@@ -142,7 +142,7 @@ Let see one example using **fmap** over *just* instance:
 ;; => #<Just [2]>
 ----
 
-The **Maybe** type also has another constructor: `nothing`. It represents the absense of a value.
+The **Maybe** type also has another constructor: `nothing`. It represents the absence of a value.
 It is a safe substitute for `nil` and may represent failure.
 
 Let's see what happens if we perform the same operation as the previous example over a *nothing* instance:
@@ -201,7 +201,7 @@ NOTE: the **pure** function will be explained later.
 The use case for Applicative Functors is much the same as plain Functors: safe
 evaluation of some computation in a context.
 
-Let's see an exaple to better understand the differences between functor and
+Let's see an example to better understand the differences between functor and
 applicative functor:
 
 Imagine you have some factory function that, depending on the language, returns a
@@ -249,8 +249,8 @@ can apply the returned greeter to any value without a defensive nil check:
 ;; => #<Nothing >
 ----
 
-Moreover the applicative functor comes with **pure** function, and main purpose of this function is
-put some value in side-effect-free context of the current type.
+Moreover, the applicative functor comes with **pure** function, and the main purpose of this function is
+to put some value in side-effect-free context of the current type.
 
 Examples:
 
@@ -334,7 +334,7 @@ macro: **mlet**
 [source, Clojure]
 ----
 (mlet [a (just 1)
-       b (just (inc b))]
+       b (just (inc a))]
   (return (* b 2)))
 ----
 
@@ -348,7 +348,7 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 [source, Clojure]
 ----
 (mlet [a (just 1)
-       b (just (inc b))
+       b (just (inc a))
        :let [z (+ a b)]]
   (return (* z 2)))
 ----
