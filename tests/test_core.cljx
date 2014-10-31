@@ -1,8 +1,7 @@
 (ns test-core
   #+cljs
   (:require [cats.core :as m]
-            [cats.monad.maybe :as maybe]
-            [cats.builtin :refer :all])
+            [cats.monad.maybe :as maybe])
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
@@ -11,7 +10,8 @@
   (:require [clojure.test :refer :all]
             [cats.core :as m :refer [mlet lift-m]]
             [cats.builtin :refer :all]
-            [cats.monad.maybe :as maybe]))
+            [cats.monad.maybe :as maybe])
+  (:use [cats.builtin :only [sequence-monad]]))
 
 
 (deftest test-mlet
@@ -74,9 +74,9 @@
       (is (= (maybe/nothing)
              (monad+ (maybe/just 1) (maybe/nothing)))))
     (testing "It can lift a function to a Monad Transformer"
-      (let [maybe-vector-monad (maybe/maybe-transformer sequence-monad)]
+      (let [maybe-sequence-monad (maybe/maybe-transformer sequence-monad)]
         (is (= [(maybe/just 1) (maybe/just 2) (maybe/just  3) (maybe/just  4) (maybe/just  5) (maybe/just 6)]
-               (m/with-monad maybe-vector-monad
+               (m/with-monad maybe-sequence-monad
                  (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
                          [(maybe/just 1) (maybe/just 2)]))))))))
 
