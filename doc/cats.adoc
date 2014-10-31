@@ -117,7 +117,7 @@ value wrapped in a functor context as the second parameter. It extracts the inne
 applies the function to it, and returns the result wrapped in same type as the second
 parameter.
 
-But, what is the **functor context*? It sounds more complex than it is. A Functor
+But, what is the *functor context*? It sounds more complex than it is. A Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocols.
 
 .One good example of a functor is the **Maybe** type:
@@ -131,15 +131,28 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 ;; => #<Just [2]>
 ----
 
-Let see one example using **fmap** over *just* instance:
+Let's see one example using **fmap** over *just* instance:
 
 .Example using fmap over *just*.
 [source, Clojure]
 ----
-(require '[cats.core :as m])
+(require '[cats.core :as m]
+         '[cats.monad.maybe :refer [just]])
 
 (m/fmap inc (just 1))
 ;; => #<Just [2]>
+----
+
+We mentioned above that **fmap** extracts the value from the functor context. You will also want to
+extract values wrapped by **just** and you can do that with **from-maybe**.
+
+.Example using *from-maybe* to extract values wrapped by *just*.
+[source, Clojure]
+----
+(require '[cats.monad.maybe :refer [just from-maybe]])
+
+(from-maybe (just 1))
+;; => 1
 ----
 
 The **Maybe** type also has another constructor: `nothing`. It represents the absence of a value.
