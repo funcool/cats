@@ -1,7 +1,8 @@
 (ns test-core
   #+cljs
   (:require [cats.core :as m]
-            [cats.monad.maybe :as maybe])
+            [cats.monad.maybe :as maybe]
+            [cats.builtin :refer :all])
   #+cljs
   (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)]
