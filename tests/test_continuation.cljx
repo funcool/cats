@@ -31,13 +31,15 @@
                (m/>>= cont-42 m/return)))))
 
     (testing "The third monad law: associativity"
-      (is (= (m/>>= (mlet [x  cont-42
-                           y  inc-cont-fn]
-                         (m/return y))
-                         inc-cont-fn))
-             (m/>>= cont-42
-                    (fn [x] (m/>>= (cont/continuation (fn [c] (c (inc x))))
-                                   inc-cont-fn)))))
+      (is (= (cont/run-cont
+              (m/>>= (mlet [x  cont-42
+                            y  (inc-cont-fn x)]
+                       (m/return y))
+                     inc-cont-fn))
+             (cont/run-cont
+              (m/>>= cont-42
+                     (fn [x] (m/>>= (cont/continuation (fn [c] (c (inc x))))
+                                   inc-cont-fn)))))))
 
     (testing "call-cc allows the creation of resumable computations."
       (let [cc (atom nil)]
