@@ -18,7 +18,7 @@
   :plugins [[com.cemerick/clojurescript.test "0.3.1"]
             [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
             [lein-cljsbuild "1.0.3"]
-            [codox "0.8.9"]]
+            [codox "0.8.10"]]
 
   :codox {:sources ["target/classes"]
           :output-dir "doc/codox"}
