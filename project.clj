@@ -7,7 +7,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2411"]]
 
-  :source-paths ["target/classes"]
+  :source-paths ["target/classes" "src/clj"]
   :test-paths ["target/testclasses"]
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
@@ -23,7 +23,7 @@
   :codox {:sources ["target/classes"]
           :output-dir "doc/codox"}
 
-  :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
+  :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store|user.clj"]
   :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
                                             "target/tests.js"]}
               :builds {:test {:source-paths ["target/testclasses"
