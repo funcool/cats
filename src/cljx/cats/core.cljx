@@ -203,6 +203,44 @@
                    `(bind ~r (fn [~l] ~acc))))
                `(do ~@body))))
 
+;; Same as the following but with :let []
+;; (defmacro errlet
+;;   [bindings & body]
+;;   (let [pairs (reverse (partition 2 bindings))]
+;;     (reduce (fn [acc [l r]]
+;;               (condp = l
+;;                 :let  `(let ~r ~acc)
+;;                 `(let [c# (atom 0)
+;;                        ~l (bind ~r (fn [v#]
+;;                                      (swap! c# inc)
+;;                                      (return v#)))]
+;;                    (if (= @c# 0)
+;;                      ~l
+;;                      (with-monad (get-current-context-or ~l)
+;;                        (let [~l (p/get-value ~l)]
+;;                          ~acc))))))
+;;             `(do ~@body)
+;;             pairs)))
+
+(defmacro errlet
+  [bindings & body]
+  (let [pairs (reverse (partition 2 bindings))]
+    (reduce (fn [acc [l r]]
+              `(let [c# (atom 0)]
+                 (if (satisfies? p/Context ~r)
+                   (let [~l (bind ~r (fn [v#]
+                                       (swap! c# inc)
+                                       (return v#)))]
+                     (if (= @c# 0)
+                       ~l
+                       (with-monad (get-current-context-or ~l)
+                         (let [~l (p/get-value ~l)]
+                           ~acc))))
+                   (let [~l ~r]
+                     ~acc))))
+            `(do ~@body)
+            pairs)))
+
 (defmacro mlet-with
   "A helper macro for using monad transformers, is the
   same as mlet but specifying the monadic context.
