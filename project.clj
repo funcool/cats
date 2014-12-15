@@ -1,4 +1,4 @@
-(defproject cats "0.2.0"
+(defproject cats "0.3.0-SNAPSHOT"
   :description "Category Theory abstractions for Clojure"
   :url "https://github.com/niwibe/cats"
   :license {:name "BSD (2 Clause)"
