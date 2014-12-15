@@ -5,7 +5,7 @@
             :url "http://opensource.org/licenses/BSD-2-Clause"}
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2371"]]
+                 [org.clojure/clojurescript "0.0-2411"]]
 
   :source-paths ["target/classes"]
   :test-paths ["target/testclasses"]
