@@ -45,7 +45,7 @@
                    :output-path "target/testclasses"
                    :rules :cljs}]}
   :profiles
-  {:dev {:dependencies [[org.clojure/tools.namespace "0.2.4"]]
+  {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
          ;; Disabled, bacause the user.clj try
          ;; import clojure namespaces before create
          ;; them (ex: after removing target/ directory)
