@@ -12,6 +12,7 @@
             [cats.builtin :as b]
             [cats.protocols :as pt]
             [cats.monad.channel :as c]
+            [cats.monad.either :as either]
             [cats.core :as m]))
 
 (s/describe "channel-monad"
@@ -37,3 +38,18 @@
         (>! ch3 1))
       (s/should= 3 (<!! r))))
 )
+
+
+(def chaneither-m (either/either-transformer c/channel-monad))
+
+(s/describe "channel-monad-with-either"
+  (s/it "channel combination with either"
+    (let [func (fn [x] (go (either/right x)))
+          r    (m/with-monad chaneither-m
+                 (m/mlet [x (func 1)
+                          y (func 2)]
+                   (m/return (+ x y))))]
+
+      (s/should= (either/right 3) (<!! r)))))
+
+
