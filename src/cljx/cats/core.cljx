@@ -25,9 +25,9 @@
 
 (ns cats.core
   "Category Theory abstractions for Clojure"
-  (:require [cats.protocols :as p])
   #+cljs
   (:require-macros [cats.core :refer (with-monad mlet)])
+  (:require [cats.protocols :as p])
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -202,25 +202,6 @@
                                 (fn [~(gensym)] ~acc))
                    `(bind ~r (fn [~l] ~acc))))
                `(do ~@body))))
-
-;; Same as the following but with :let []
-;; (defmacro errlet
-;;   [bindings & body]
-;;   (let [pairs (reverse (partition 2 bindings))]
-;;     (reduce (fn [acc [l r]]
-;;               (condp = l
-;;                 :let  `(let ~r ~acc)
-;;                 `(let [c# (atom 0)
-;;                        ~l (bind ~r (fn [v#]
-;;                                      (swap! c# inc)
-;;                                      (return v#)))]
-;;                    (if (= @c# 0)
-;;                      ~l
-;;                      (with-monad (get-current-context-or ~l)
-;;                        (let [~l (p/get-value ~l)]
-;;                          ~acc))))))
-;;             `(do ~@body)
-;;             pairs)))
 
 (defmacro errlet
   [bindings & body]
