@@ -110,11 +110,8 @@
 (defn return
   "This is a monad version of pure."
   ([v]
-     #+clj
-     (when-not (bound? #'*context*)
-       (throw (IllegalArgumentException.
-               "You are using return/pure function without context.")))
-       (p/mreturn *context* v))
+   (let [ctx (get-current-context)]
+     (p/mreturn ctx v)))
   ([m v]
      (p/mreturn m v)))
 
