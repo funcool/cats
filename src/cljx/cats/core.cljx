@@ -35,20 +35,55 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^:dynamic *context* nil)
+(def ^:dynamic *transformer-context* nil)
 
 #+clj
 (defmacro with-monad
+  "Set current context to specific monad."
   [ctx & body]
-  `(binding [*context* ~ctx]
-     ~@body))
+  `(cond
+     (satisfies? p/MonadTrans ~ctx)
+     (binding [*context* ~ctx
+               *transformer-context* ~ctx]
+       (do ~@body))
+
+     :else
+     (binding [*context* ~ctx]
+       ~@body)))
 
 (defn get-current-context-or
+  "Get current context or obtain it from
+  the provided instance."
   [default]
   (cond
-    (not (nil? *context*)) *context*
-    :else                  (if (satisfies? p/Context default)
-                             (p/get-context default)
-                             default)))
+    (not (nil? *transformer-context*))
+    *transformer-context*
+
+    (not (nil? *context*))
+    *context*
+
+    :else
+    (if (satisfies? p/Context default)
+      (p/get-context default)
+      default)))
+
+(defn get-current-context
+  "Get current context or raise an exception."
+  []
+  (cond
+    (not (nil? *transformer-context*))
+    *transformer-context*
+
+    (not (nil? *context*))
+    *context*
+
+    :else
+    #+clj
+    (throw (IllegalArgumentException.
+            "You are using return/pure function without context."))
+    #+cljs
+    (throw (js/Error.
+            "You are using return/pure function without context."))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
