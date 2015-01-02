@@ -6,10 +6,9 @@
             :url "http://opensource.org/licenses/BSD-2-Clause"}
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2511"]]
+                 [org.clojure/clojurescript "0.0-2629"]]
 
-  :source-paths ["target/classes" "src/clj"]
-  :test-paths ["target/spec/clj"]
+  :source-paths ["target/src" "src/clj"]
 
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
@@ -17,38 +16,45 @@
   :release-tasks [["cljx" "once"]
                   ["deploy" "clojars"]]
 
+  :plugins [[codox "0.8.10"]]
   :codox {:sources ["target/classes"]
           :output-dir "doc/codox"}
 
   :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store|user.clj"]
 
   :cljx {:builds [{:source-paths ["src/cljx"]
-                   :output-path "target/classes"
+                   :output-path "target/src"
                    :rules :clj}
                   {:source-paths ["src/cljx"]
-                   :output-path "target/classes"
+                   :output-path "target/src"
                    :rules :cljs}
                   {:source-paths ["spec"]
                    :output-path "target/spec/clj"
                    :rules :clj}
-                  {:source-paths ["tests"]
+                  {:source-paths ["spec"]
                    :output-path "target/spec/cljs"
                    :rules :cljs}]}
 
-  :cljsbuild {:test-commands {"test" ["phantomjs"  "bin/speclj" "target/tests.js"]}
+  :cljsbuild {:test-commands {"spec" ["phantomjs"  "bin/speclj" "target/tests.js"]}
               :builds [{:id "dev"
                         :source-paths ["target/spec/cljs"
-                                       "target/classes"]
+                                       "target/src"]
+                        :notify-command ["phantomjs" "bin/speclj" "target/tests.js"]
                         :compiler {:output-to "target/tests.js"
                                    :optimizations :simple
-                                   :pretty-print false}}]}
+                                   :pretty-print true}}
+                       {:id "tests"
+                        :source-paths ["target/spec/cljs"
+                                       "target/src"]
+                        :compiler {:output-to "target/tests.js"
+                                   :optimizations :simple
+                                   :pretty-print true}}]}
 
   :profiles {:dev {:dependencies [[speclj "3.1.0"]
                                   [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                                   [org.clojure/tools.namespace "0.2.7"]]
                    :test-paths ["target/spec/clj"]
                    :plugins [[speclj "3.1.0"]
-                             [codox "0.8.10"]
                              [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                              [lein-cljsbuild "1.0.4"]]}})
 
