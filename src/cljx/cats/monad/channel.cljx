@@ -47,11 +47,15 @@
   (reify
     proto/Functor
     (fmap [mn f mv]
-      (let [channel (chan 1)]
+      (let [tctx m/*transformer-context*
+            channel (chan 1)]
         (take! mv (fn [v]
                     (put! channel
-                          (m/with-monad mn ; Set specific context due async nature of go blocks.
-                            (f v)))))
+                          ;; Set double monad for handle properly
+                          ;; monad transformers
+                          (m/with-monad tctx
+                            (m/with-monad mn
+                              (f v))))))
         channel))
 
     proto/Applicative
@@ -72,13 +76,15 @@
         channel))
 
     (mbind [mn mv f]
-      (go
-        (let [v (<! mv)
-              r (m/with-monad mn         ; Set specific context due async nature of go blocks.
-                  (f v))]
-          (if (satisfies? impl/ReadPort r)
-            (<! r)
-            r))))))
+      (let [tctx m/*transformer-context*]
+        (go
+          (let [v (<! mv)
+                r (m/with-monad tctx
+                    (m/with-monad mn
+                      (f v)))]
+            (if (satisfies? impl/ReadPort r)
+              (<! r)
+              r)))))))
 
 (extend-type #+clj clojure.core.async.impl.channels.ManyToManyChannel
              #+cljs cljs.core.async.impl.chanels.ManyToManyChannel
