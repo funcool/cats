@@ -1,10 +1,13 @@
 language: clojure
 lein: lein2
 
-script:
+before_script:
   - lein2 cljx once
-  - lein2 cljsbuild test
-  - lein2 test
+  - lein2 cljsbuild once tests
+
+script:
+  - lein2 cljsbuild test spec
+  - lein2 spec
 
 jdk:
   - openjdk7
