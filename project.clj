@@ -1,53 +1,60 @@
 (defproject cats "0.3.0-SNAPSHOT"
   :description "Category Theory abstractions for Clojure"
-  :url "https://github.com/niwibe/cats"
+  :url "https://github.com/funcool/cats"
+
   :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2411"]]
+                 [org.clojure/clojurescript "0.0-2629"]]
 
-  :source-paths ["target/classes" "src/clj"]
-  :test-paths ["target/testclasses"]
+  :source-paths ["target/src" "src/clj"]
+
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
 
   :release-tasks [["cljx" "once"]
                   ["deploy" "clojars"]]
 
-  :plugins [[com.cemerick/clojurescript.test "0.3.1"]
-            [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
-            [lein-cljsbuild "1.0.3"]
-            [codox "0.8.10"]]
-
+  :plugins [[codox "0.8.10"]]
   :codox {:sources ["target/classes"]
           :output-dir "doc/codox"}
 
   :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store|user.clj"]
-  :cljsbuild {:test-commands {"unit-tests" ["node" :node-runner
-                                            "target/tests.js"]}
-              :builds {:test {:source-paths ["target/testclasses"
-                                             "target/classes"]
-                              :compiler {:output-to "target/tests.js"
-                                         :optimizations :simple
-                                         :pretty-print true}}}}
 
   :cljx {:builds [{:source-paths ["src/cljx"]
-                   :output-path "target/classes"
+                   :output-path "target/src"
                    :rules :clj}
                   {:source-paths ["src/cljx"]
-                   :output-path "target/classes"
+                   :output-path "target/src"
                    :rules :cljs}
-                  {:source-paths ["tests"]
-                   :output-path "target/testclasses"
+                  {:source-paths ["spec"]
+                   :output-path "target/spec/clj"
                    :rules :clj}
-                  {:source-paths ["tests"]
-                   :output-path "target/testclasses"
+                  {:source-paths ["spec"]
+                   :output-path "target/spec/cljs"
                    :rules :cljs}]}
-  :profiles
-  {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
-         ;; Disabled, bacause the user.clj try
-         ;; import clojure namespaces before create
-         ;; them (ex: after removing target/ directory)
-         ;; :source-paths ["dev"]
-         }})
+
+  :cljsbuild {:test-commands {"spec" ["phantomjs"  "bin/speclj" "target/tests.js"]}
+              :builds [{:id "dev"
+                        :source-paths ["target/spec/cljs"
+                                       "target/src"]
+                        :notify-command ["phantomjs" "bin/speclj" "target/tests.js"]
+                        :compiler {:output-to "target/tests.js"
+                                   :optimizations :simple
+                                   :pretty-print true}}
+                       {:id "tests"
+                        :source-paths ["target/spec/cljs"
+                                       "target/src"]
+                        :compiler {:output-to "target/tests.js"
+                                   :optimizations :simple
+                                   :pretty-print true}}]}
+
+  :profiles {:dev {:dependencies [[speclj "3.1.0"]
+                                  [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
+                                  [org.clojure/tools.namespace "0.2.7"]]
+                   :test-paths ["target/spec/clj"]
+                   :plugins [[speclj "3.1.0"]
+                             [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
+                             [lein-cljsbuild "1.0.4"]]}})
+
