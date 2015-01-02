@@ -119,17 +119,9 @@
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (cond
-   (nil? *context*)
-     (with-monad (p/get-context mv)
-       (p/mbind *context* mv f))
-
-   (satisfies? p/MonadTrans *context*)
-     (p/mbind *context* mv f)
-
-   :else
-     (p/mbind (get-current-context-or mv) mv f)
-))
+  (let [ctx (get-current-context-or mv)]
+    (with-monad ctx
+      (p/mbind ctx mv f))))
 
 (defn mzero
   []
