@@ -19,7 +19,21 @@
     (let [ch (m/pure c/channel-monad 1)]
       (s/should= 2 (<!! (m/fmap inc ch)))))
 
-  (s/it "channel as monad"
+  (s/it "channel as monad 1"
     (let [ch (m/pure c/channel-monad 1)]
       (s/should= 2 (<!! (m/>>= ch (fn [x] (m/return (inc x))))))))
+
+  (s/it "channel as monad 2"
+    (let [ch1 (chan 1)
+          ch2 (chan 1)
+          ch3 (chan 1)
+          r   (m/mlet [x ch1
+                       y ch2
+                       z ch3]
+                (m/return (+ x y z)))]
+      (go
+        (>! ch1 1)
+        (>! ch2 1)
+        (>! ch3 1))
+      (s/should= 3 (<!! r))))
 )
