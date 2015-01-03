@@ -1,10 +1,15 @@
 (ns cats.monad.channel-spec
-  ;; #+cljs
-  ;; (:require [speclj.core :as s :include-macros true]
-  ;;           [cats.builtin :as b]
-  ;;           [cats.protocols :as p]
-  ;;           [cats.monad.promise :as prom]
-  ;;           [cats.core :as m :include-macros true])
+  #+cljs
+  (:require-macros [cljs.core.async.macros :refer [go]])
+
+  #+cljs
+  (:require [speclj.core :as s :include-macros true]
+            [cljs.core.async :refer [chan put! take! <! >!]]
+            [cats.builtin :as b]
+            [cats.protocols :as pt]
+            [cats.monad.channel :as c]
+            [cats.monad.either :as either]
+            [cats.core :as m :include-macros true])
 
   #+clj
   (:require [clojure.core.async :refer [go chan put! take! <! >! <!! >!!]]

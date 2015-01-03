@@ -26,12 +26,15 @@
 (ns cats.monad.channel
   #+cljs
   (:require-macros [cljs.core.async.macros :refer [go]])
+
   #+cljs
   (:require [cljs.core.async :refer [chan put! take! <!]]
+            [cljs.core.async.impl.channels :as implch]
             [cljs.core.async.impl.protocols :as impl]
             [cljs.core.async.impl.dispatch :as dispatch]
             [cats.core :as m :include-macros true]
             [cats.protocols :as proto])
+
   #+clj
   (:require [clojure.core.async :refer [go chan put! take! <!]]
             [clojure.core.async.impl.protocols :as impl]
@@ -43,7 +46,6 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
 (def channel-monad
   (reify
     proto/Functor
@@ -87,9 +89,8 @@
               (<! r)
               r)))))))
 
-#+clj
 (extend-type #+clj clojure.core.async.impl.channels.ManyToManyChannel
-             #+cljs cljs.core.async.impl.chanels.ManyToManyChannel
+             #+cljs cljs.core.async.impl.channels.ManyToManyChannel
   proto/Context
   (get-context [_] channel-monad)
   (get-value [self] self))
