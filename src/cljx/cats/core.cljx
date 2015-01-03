@@ -151,11 +151,11 @@
 
   Otherwise, yields nil in a monadic context."
   ([b mv]
-     (when (get-current-context mv) b mv))
+   (when (get-current-context mv) b mv))
   ([ctx b mv]
-     (if b
-       mv
-       (return ctx nil))))
+   (if b
+     mv
+     (return ctx nil))))
 
 (defn unless
   "If the expression is false, returns the monadic value.
@@ -169,9 +169,9 @@
   "Lift a value from the inner monad of a monad transformer into a value
   of the monad transformer."
   ([mv]
-     (p/lift *context* mv))
+   (p/lift *context* mv))
   ([m mv]
-     (p/lift m mv)))
+   (p/lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -381,17 +381,17 @@
 (defn <$>
   "Alias of fmap."
   ([f]
-     (fn [fv]
-       (fmap f fv)))
-  ([f fv]
+   (fn [fv]
      (fmap f fv)))
+  ([f fv]
+   (fmap f fv)))
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
   ([af av]
-     (fapply af av))
+   (fapply af av))
   ([af av & avs]
-     (reduce fapply af (cons av avs))))
+   (reduce fapply af (cons av avs))))
 
 (defn >>=
   "Performs a Haskell-style left-associative bind.
@@ -401,17 +401,17 @@
     ;=> #<Just [3]>
   "
   ([mv f]
-     (bind mv f))
+   (bind mv f))
   ([mv f & fs]
-     (reduce bind mv (cons f fs))))
+   (reduce bind mv (cons f fs))))
 
 (defn >>
   "Performs a Haskell-style left-associative bind,
   ignoring the values produced by the monad computations."
   ([mv mv']
-     (bind mv (fn [_] mv')))
+   (bind mv (fn [_] mv')))
   ([mv mv' & mvs]
-     (reduce >> mv (cons mv' mvs))))
+   (reduce >> mv (cons mv' mvs))))
 
 (defn =<<
   "Same as the two argument version of `>>=` but with the
