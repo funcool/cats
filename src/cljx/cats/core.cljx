@@ -54,7 +54,7 @@
 (defn get-current-context
   "Get current context or obtain it from
   the provided instance."
-  ([] (get-current-context nil))
+  ([] (get-current-context ::noctx))
   ([default]
    (cond
      (not (nil? *transformer-context*))
@@ -63,16 +63,19 @@
      (not (nil? *context*))
      *context*
 
-     (satisfies? p/Context default)
-     (p/get-context default)
-
-     :else
+     (= default ::noctx)
      #+clj
      (throw (IllegalArgumentException.
              "You are using return/pure function without context."))
      #+cljs
      (throw (js/Error.
-             "You are using return/pure function without context.")))))
+             "You are using return/pure function without context."))
+
+     (satisfies? p/Context default)
+     (p/get-context default)
+
+     :else
+     default)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
