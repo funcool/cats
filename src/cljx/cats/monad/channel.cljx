@@ -50,15 +50,14 @@
   (reify
     proto/Functor
     (fmap [mn f mv]
-      (let [tctx m/*transformer-context*
+      (let [ctx m/*context*
             channel (chan 1)]
         (take! mv (fn [v]
                     (put! channel
                           ;; Set double monad for handle properly
                           ;; monad transformers
-                          (m/with-monad tctx
-                            (m/with-monad mn
-                              (f v))))))
+                          (m/with-monad ctx
+                            (f v)))))
         channel))
 
     proto/Applicative
@@ -79,12 +78,11 @@
         channel))
 
     (mbind [mn mv f]
-      (let [tctx m/*transformer-context*]
+      (let [ctx m/*context*]
         (go
           (let [v (<! mv)
-                r (m/with-monad tctx
-                    (m/with-monad mn
-                      (f v)))]
+                r (m/with-monad ctx
+                    (f v))]
             (if (satisfies? impl/ReadPort r)
               (<! r)
               r)))))))

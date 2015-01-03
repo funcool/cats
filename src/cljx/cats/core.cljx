@@ -35,7 +35,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^:dynamic *context* nil)
-(def ^:dynamic *transformer-context* nil)
 
 #+clj
 (defmacro with-monad
@@ -43,9 +42,11 @@
   [ctx & body]
   `(cond
      (satisfies? p/MonadTrans ~ctx)
-     (binding [*context* ~ctx
-               *transformer-context* ~ctx]
-       (do ~@body))
+     (binding [*context* ~ctx]
+       ~@body)
+
+     (satisfies? p/MonadTrans *context*)
+     (do ~@body)
 
      :else
      (binding [*context* ~ctx]
@@ -54,28 +55,25 @@
 (defn get-current-context
   "Get current context or obtain it from
   the provided instance."
-  ([] (get-current-context ::noctx))
+  ([] (get-current-context nil))
   ([default]
    (cond
-     (not (nil? *transformer-context*))
-     *transformer-context*
-
      (not (nil? *context*))
      *context*
 
-     (= default ::noctx)
+     (satisfies? p/Context default)
+     (p/get-context default)
+
+     (satisfies? p/Monad default)
+     default
+
+     :else
      #+clj
      (throw (IllegalArgumentException.
              "You are using return/pure function without context."))
      #+cljs
      (throw (js/Error.
-             "You are using return/pure function without context."))
-
-     (satisfies? p/Context default)
-     (p/get-context default)
-
-     :else
-     default)))
+             "You are using return/pure function without context.")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
@@ -89,29 +87,28 @@
   it uses the dynamic scope to resolve the current
   context. With pure/2, you can force a specific context
   value."
-  ([v]
-     #+clj
-     (when-not (bound? #'*context*)
-       (throw (IllegalArgumentException.
-               "You are using return/pure function without context.")))
-       (p/pure *context* v))
-  ([app v]
-     (p/pure app v)))
+  ([v] (pure (get-current-context) v))
+  ([ctx v] (p/pure ctx v)))
 
 (defn return
   "This is a monad version of pure."
-  ([v]
-   (let [ctx (get-current-context)]
-     (p/mreturn ctx v)))
-  ([m v]
-     (p/mreturn m v)))
+  ([v] (return (get-current-context) v))
+  ([ctx v] (p/mreturn ctx v)))
 
 (defn bind
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (let [ctx (get-current-context mv)]
-    (with-monad ctx
+  (cond
+    (satisfies? p/MonadTrans *context*)
+    (p/mbind *context* mv f)
+
+    (nil? *context*)
+    (with-monad (p/get-context mv)
+      (p/mbind *context* mv f))
+
+    :else
+    (let [ctx (get-current-context mv)]
       (p/mbind ctx mv f))))
 
 (defn mzero
