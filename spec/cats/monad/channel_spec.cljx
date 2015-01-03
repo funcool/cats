@@ -52,12 +52,20 @@
 #+clj
 (s/describe "channel-monad-with-either"
   (s/it "channel combination with either"
-    (let [func (fn [x] (go (either/right x)))
-          r    (m/with-monad chaneither-m
-                 (m/mlet [x (func 1)
-                          y (func 2)]
-                   (m/return (+ x y))))]
+    (let [funcright (fn [x] (go (either/right x)))
+          funcleft (fn [x] (go (either/left x)))
+          r1 (m/with-monad chaneither-m
+               (m/mlet [x (funcright 1)
+                        y (funcright 2)]
+                 (m/return (+ x y))))
 
-      (s/should= (either/right 3) (<!! r)))))
+          r2 (m/with-monad chaneither-m
+               (m/mlet [x (funcright 1)
+                        y (funcleft :foo)
+                        z (funcright 2)]
+                 (m/return (+ x y))))]
+
+      (s/should= (either/right 3) (<!! r1))
+      (s/should= (either/left :foo) (<!! r2)))))
 
 
