@@ -51,40 +51,28 @@
      (binding [*context* ~ctx]
        ~@body)))
 
-(defn get-current-context-or
+(defn get-current-context
   "Get current context or obtain it from
   the provided instance."
-  [default]
-  (cond
-    (not (nil? *transformer-context*))
-    *transformer-context*
+  ([] (get-current-context nil))
+  ([default]
+   (cond
+     (not (nil? *transformer-context*))
+     *transformer-context*
 
-    (not (nil? *context*))
-    *context*
+     (not (nil? *context*))
+     *context*
 
-    :else
-    (if (satisfies? p/Context default)
-      (p/get-context default)
-      default)))
+     (satisfies? p/Context default)
+     (p/get-context default)
 
-(defn get-current-context
-  "Get current context or raise an exception."
-  []
-  (cond
-    (not (nil? *transformer-context*))
-    *transformer-context*
-
-    (not (nil? *context*))
-    *context*
-
-    :else
-    #+clj
-    (throw (IllegalArgumentException.
-            "You are using return/pure function without context."))
-    #+cljs
-    (throw (js/Error.
-            "You are using return/pure function without context."))))
-
+     :else
+     #+clj
+     (throw (IllegalArgumentException.
+             "You are using return/pure function without context."))
+     #+cljs
+     (throw (js/Error.
+             "You are using return/pure function without context.")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
@@ -119,7 +107,7 @@
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
-  (let [ctx (get-current-context-or mv)]
+  (let [ctx (get-current-context mv)]
     (with-monad ctx
       (p/mbind ctx mv f))))
 
@@ -130,7 +118,7 @@
 (defn mplus
   [& mvs]
   {:pre [(not (empty? mvs))]}
-  (let [ctx (get-current-context-or (first mvs))]
+  (let [ctx (get-current-context (first mvs))]
     (reduce (partial p/mplus ctx) mvs)))
 
 (defn guard
@@ -148,21 +136,21 @@
   "Apply a function f to the value inside functor's fv
   preserving the context type."
   [f fv]
-  (p/fmap (get-current-context-or fv) f fv))
+  (p/fmap (get-current-context fv) f fv))
 
 (defn fapply
   "Given function inside af's conext and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
-  (p/fapply (get-current-context-or af) af av))
+  (p/fapply (get-current-context af) af av))
 
 (defn when
   "If the expression is true, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   ([b mv]
-     (when (get-current-context-or mv) b mv))
+     (when (get-current-context mv) b mv))
   ([ctx b mv]
      (if b
        mv
@@ -238,7 +226,7 @@
                                        (return v#)))]
                      (if (= @c# 0)
                        ~l
-                       (with-monad (get-current-context-or ~l)
+                       (with-monad (get-current-context ~l)
                          (let [~l (p/get-value ~l)]
                            ~acc))))
                    (let [~l ~r]
@@ -315,7 +303,7 @@
   "
   [mvs]
   {:pre [(not-empty mvs)]}
-  (let [ctx (get-current-context-or (first mvs))]
+  (let [ctx (get-current-context (first mvs))]
     (with-monad ctx
       (reduce (fn [mvs mv]
                  (mlet [v mv
@@ -380,7 +368,7 @@
     ;=> <Nothing>
   "
   [p mv]
-  (with-monad (get-current-context-or mv)
+  (with-monad (get-current-context mv)
     (mlet [v mv
            :when (p v)]
           (return v))))
@@ -433,7 +421,7 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (with-monad (get-current-context-or mf)
+  (with-monad (get-current-context mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
@@ -442,7 +430,7 @@
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (with-monad (get-current-context-or mf)
+  (with-monad (get-current-context mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))

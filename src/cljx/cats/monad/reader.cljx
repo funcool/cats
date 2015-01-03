@@ -141,18 +141,18 @@
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
   [reader seed]
-  (with-monad (m/get-current-context-or reader-monad)
+  (with-monad (m/get-current-context reader-monad)
     (reader seed)))
 
 (def ask
   (reader
    (fn [env]
-     (let [ctx (m/get-current-context-or reader-monad)]
+     (let [ctx (m/get-current-context reader-monad)]
        ((proto/ask  ctx) env)))))
 
 (def local
   (fn [f mr]
     (reader
      (fn [env]
-       (let [ctx (m/get-current-context-or reader-monad)]
+       (let [ctx (m/get-current-context reader-monad)]
          ((proto/local ctx f mr) env))))))

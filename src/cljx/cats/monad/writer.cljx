@@ -122,15 +122,15 @@
 
 (defn tell
   [v]
-  (proto/tell (m/get-current-context-or writer-monad) v))
+  (proto/tell (m/get-current-context writer-monad) v))
 
 (defn listen
   [mv]
-  (proto/listen (m/get-current-context-or writer-monad) mv))
+  (proto/listen (m/get-current-context writer-monad) mv))
 
 (defn pass
   [mv]
-  (proto/pass (m/get-current-context-or writer-monad) mv))
+  (proto/pass (m/get-current-context writer-monad) mv))
 
 (def value first)
 
