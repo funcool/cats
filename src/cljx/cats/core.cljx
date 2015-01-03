@@ -70,10 +70,10 @@
      :else
      #+clj
      (throw (IllegalArgumentException.
-             "You are using return/pure function without context."))
+             "You are using return/pure/mzero function without context."))
      #+cljs
      (throw (js/Error.
-             "You are using return/pure function without context.")))))
+             "You are using return/pure/mzero function without context.")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
@@ -113,7 +113,8 @@
 
 (defn mzero
   []
-  (p/mzero *context*))
+  (let [ctx (get-current-context)]
+    (p/mzero ctx)))
 
 (defn mplus
   [& mvs]
