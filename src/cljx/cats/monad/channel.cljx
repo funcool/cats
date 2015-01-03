@@ -43,6 +43,7 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+clj
 (def channel-monad
   (reify
     proto/Functor
@@ -86,6 +87,7 @@
               (<! r)
               r)))))))
 
+#+clj
 (extend-type #+clj clojure.core.async.impl.channels.ManyToManyChannel
              #+cljs cljs.core.async.impl.chanels.ManyToManyChannel
   proto/Context

@@ -54,7 +54,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+#+clj
 (deftype Promise [^LinkedList takes ^Lock mutex value state]
   proto/Context
   (get-context [_] promise-monad)
@@ -113,7 +113,7 @@
         (do
           (.unlock mutex)
           (box false))))))
-
+#+clj
 (defn promise
   "Promise constructor."
   ([] (promise nil ::unresolved))
@@ -123,10 +123,12 @@
                    (volatile! v)
                    (volatile! t))))
 
+#+clj
 (defn resolved?
   [^Promise p]
   (= ::resolved @(.-state p)))
 
+#+clj
 (defn then
   "Chain promise."
   [^Promise p handler]
@@ -141,6 +143,7 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+#+clj
 (def promise-monad
   (reify
     proto/Functor

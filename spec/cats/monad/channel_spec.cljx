@@ -15,6 +15,7 @@
             [cats.monad.either :as either]
             [cats.core :as m]))
 
+#+clj
 (s/describe "channel-monad"
   (s/it "channel as functor"
     (let [ch (m/pure c/channel-monad 1)]
@@ -40,8 +41,10 @@
 )
 
 
+#+clj
 (def chaneither-m (either/either-transformer c/channel-monad))
 
+#+clj
 (s/describe "channel-monad-with-either"
   (s/it "channel combination with either"
     (let [func (fn [x] (go (either/right x)))
