@@ -1,7 +1,7 @@
 cats
 ====
 
-[![Travis Badge](https://img.shields.io/travis/niwibe/cats.svg?style=flat)](https://travis-ci.org/niwibe/cats "Travis Badge")
+[![Travis Badge](https://img.shields.io/travis/funcool/cats.svg?style=flat)](https://travis-ci.org/funcool/cats "Travis Badge")
 
 ![](./logo/logo.png "cats logo")
 
@@ -17,10 +17,10 @@ Category Theory abstractions for Clojure.
 
 Stable:
 
-- **Documentation:** http://niwibe.github.io/cats/
-- **API reference:** http://niwibe.github.io/cats/codox/index.html
+- **Documentation:** http://funcool.github.io/cats/
+- **API reference:** http://funcool.github.io/cats/codox/index.html
 
 Development:
 
-- **Documentation:** http://niwibe.github.io/cats/index-dev.html
-- **API reference:** http://niwibe.github.io/cats/codox-dev/index.html
+- **Documentation:** http://funcool.github.io/cats/index-dev.html
+- **API reference:** http://funcool.github.io/cats/codox-dev/index.html
