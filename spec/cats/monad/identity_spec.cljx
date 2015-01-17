@@ -35,6 +35,7 @@
                                      (fn [y] (id/identity (inc y)))))))))
 (def identity-vector-transformer (id/identity-transformer b/vector-monad))
 
+
 (s/describe "identity-transformer"
   (s/it "It is a trivial transformer which yields the inner monad"
     (s/should= (id/identity [2])

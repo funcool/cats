@@ -38,18 +38,42 @@
 
 #+clj
 (defmacro with-monad
+  "Set current context to specific monad."
   [ctx & body]
-  `(binding [*context* ~ctx]
-     ~@body))
+  `(cond
+     (satisfies? p/MonadTrans ~ctx)
+     (binding [*context* ~ctx]
+       ~@body)
 
-(defn get-current-context-or
-  [default]
-  (cond
-    (not (nil? *context*)) *context*
-    :else                  (if (satisfies? p/Context default)
-                             (p/get-context default)
-                             default)))
+     (satisfies? p/MonadTrans *context*)
+     (do ~@body)
 
+     :else
+     (binding [*context* ~ctx]
+       ~@body)))
+
+(defn get-current-context
+  "Get current context or obtain it from
+  the provided instance."
+  ([] (get-current-context nil))
+  ([default]
+   (cond
+     (not (nil? *context*))
+     *context*
+
+     (satisfies? p/Context default)
+     (p/get-context default)
+
+     (satisfies? p/Monad default)
+     default
+
+     :else
+     #+clj
+     (throw (IllegalArgumentException.
+             "You are using return/pure/mzero function without context."))
+     #+cljs
+     (throw (js/Error.
+             "You are using return/pure/mzero function without context.")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
@@ -63,50 +87,39 @@
   it uses the dynamic scope to resolve the current
   context. With pure/2, you can force a specific context
   value."
-  ([v]
-     #+clj
-     (when-not (bound? #'*context*)
-       (throw (IllegalArgumentException.
-               "You are using return/pure function without context.")))
-       (p/pure *context* v))
-  ([app v]
-     (p/pure app v)))
+  ([v] (pure (get-current-context) v))
+  ([ctx v] (p/pure ctx v)))
 
 (defn return
   "This is a monad version of pure."
-  ([v]
-     #+clj
-     (when-not (bound? #'*context*)
-       (throw (IllegalArgumentException.
-               "You are using return/pure function without context.")))
-       (p/mreturn *context* v))
-  ([m v]
-     (p/mreturn m v)))
+  ([v] (return (get-current-context) v))
+  ([ctx v] (p/mreturn ctx v)))
 
 (defn bind
   "Given a value inside monadic context mv and any function,
   applies a function to value of mv."
   [mv f]
   (cond
-   (nil? *context*)
-     (with-monad (p/get-context mv)
-       (p/mbind *context* mv f))
+    (satisfies? p/MonadTrans *context*)
+    (p/mbind *context* mv f)
 
-   (satisfies? p/MonadTrans *context*)
-     (p/mbind *context* mv f)
+    (nil? *context*)
+    (with-monad (p/get-context mv)
+      (p/mbind *context* mv f))
 
-   :else
-     (p/mbind (get-current-context-or mv) mv f)
-))
+    :else
+    (let [ctx (get-current-context mv)]
+      (p/mbind ctx mv f))))
 
 (defn mzero
   []
-  (p/mzero *context*))
+  (let [ctx (get-current-context)]
+    (p/mzero ctx)))
 
 (defn mplus
   [& mvs]
   {:pre [(not (empty? mvs))]}
-  (let [ctx (get-current-context-or (first mvs))]
+  (let [ctx (get-current-context (first mvs))]
     (reduce (partial p/mplus ctx) mvs)))
 
 (defn guard
@@ -124,25 +137,25 @@
   "Apply a function f to the value inside functor's fv
   preserving the context type."
   [f fv]
-  (p/fmap (get-current-context-or fv) f fv))
+  (p/fmap (get-current-context fv) f fv))
 
 (defn fapply
   "Given function inside af's conext and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
-  (p/fapply (get-current-context-or af) af av))
+  (p/fapply (get-current-context af) af av))
 
 (defn when
   "If the expression is true, returns the monadic value.
 
   Otherwise, yields nil in a monadic context."
   ([b mv]
-     (when (get-current-context-or mv) b mv))
+   (when (get-current-context mv) b mv))
   ([ctx b mv]
-     (if b
-       mv
-       (return ctx nil))))
+   (if b
+     mv
+     (return ctx nil))))
 
 (defn unless
   "If the expression is false, returns the monadic value.
@@ -156,9 +169,9 @@
   "Lift a value from the inner monad of a monad transformer into a value
   of the monad transformer."
   ([mv]
-     (p/lift *context* mv))
+   (p/lift *context* mv))
   ([m mv]
-     (p/lift m mv)))
+   (p/lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -214,7 +227,7 @@
                                        (return v#)))]
                      (if (= @c# 0)
                        ~l
-                       (with-monad (get-current-context-or ~l)
+                       (with-monad (get-current-context ~l)
                          (let [~l (p/get-value ~l)]
                            ~acc))))
                    (let [~l ~r]
@@ -291,7 +304,7 @@
   "
   [mvs]
   {:pre [(not-empty mvs)]}
-  (let [ctx (get-current-context-or (first mvs))]
+  (let [ctx (get-current-context (first mvs))]
     (with-monad ctx
       (reduce (fn [mvs mv]
                  (mlet [v mv
@@ -356,7 +369,7 @@
     ;=> <Nothing>
   "
   [p mv]
-  (with-monad (get-current-context-or mv)
+  (with-monad (get-current-context mv)
     (mlet [v mv
            :when (p v)]
           (return v))))
@@ -368,17 +381,17 @@
 (defn <$>
   "Alias of fmap."
   ([f]
-     (fn [fv]
-       (fmap f fv)))
-  ([f fv]
+   (fn [fv]
      (fmap f fv)))
+  ([f fv]
+   (fmap f fv)))
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
   ([af av]
-     (fapply af av))
+   (fapply af av))
   ([af av & avs]
-     (reduce fapply af (cons av avs))))
+   (reduce fapply af (cons av avs))))
 
 (defn >>=
   "Performs a Haskell-style left-associative bind.
@@ -388,17 +401,17 @@
     ;=> #<Just [3]>
   "
   ([mv f]
-     (bind mv f))
+   (bind mv f))
   ([mv f & fs]
-     (reduce bind mv (cons f fs))))
+   (reduce bind mv (cons f fs))))
 
 (defn >>
   "Performs a Haskell-style left-associative bind,
   ignoring the values produced by the monad computations."
   ([mv mv']
-     (bind mv (fn [_] mv')))
+   (bind mv (fn [_] mv')))
   ([mv mv' & mvs]
-     (reduce >> mv (cons mv' mvs))))
+   (reduce >> mv (cons mv' mvs))))
 
 (defn =<<
   "Same as the two argument version of `>>=` but with the
@@ -409,7 +422,7 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (with-monad (get-current-context-or mf)
+  (with-monad (get-current-context mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
@@ -418,7 +431,7 @@
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (with-monad (get-current-context-or mf)
+  (with-monad (get-current-context mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))

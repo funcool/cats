@@ -47,7 +47,6 @@
   (#+clj invoke #+cljs -invoke [self seed]
     (mfn seed)))
 
-
 (defn continuation
   "Default constructor for continuation."
   [mfn]

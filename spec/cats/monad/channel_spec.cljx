@@ -1,0 +1,71 @@
+(ns cats.monad.channel-spec
+  #+cljs
+  (:require-macros [cljs.core.async.macros :refer [go]])
+
+  #+cljs
+  (:require [speclj.core :as s :include-macros true]
+            [cljs.core.async :refer [chan put! take! <! >!]]
+            [cats.builtin :as b]
+            [cats.protocols :as pt]
+            [cats.monad.channel :as c]
+            [cats.monad.either :as either]
+            [cats.core :as m :include-macros true])
+
+  #+clj
+  (:require [clojure.core.async :refer [go chan put! take! <! >! <!! >!!]]
+            [speclj.core :as s]
+            [cats.builtin :as b]
+            [cats.protocols :as pt]
+            [cats.monad.channel :as c]
+            [cats.monad.either :as either]
+            [cats.core :as m]))
+
+#+clj
+(s/describe "channel-monad"
+  (s/it "channel as functor"
+    (let [ch (m/pure c/channel-monad 1)]
+      (s/should= 2 (<!! (m/fmap inc ch)))))
+
+  (s/it "channel as monad 1"
+    (let [ch (m/pure c/channel-monad 1)]
+      (s/should= 2 (<!! (m/>>= ch (fn [x] (m/return (inc x))))))))
+
+  (s/it "channel as monad 2"
+    (let [ch1 (chan 1)
+          ch2 (chan 1)
+          ch3 (chan 1)
+          r   (m/mlet [x ch1
+                       y ch2
+                       z ch3]
+                (m/return (+ x y z)))]
+      (go
+        (>! ch1 1)
+        (>! ch2 1)
+        (>! ch3 1))
+      (s/should= 3 (<!! r))))
+)
+
+
+#+clj
+(def chaneither-m (either/either-transformer c/channel-monad))
+
+#+clj
+(s/describe "channel-monad-with-either"
+  (s/it "channel combination with either"
+    (let [funcright (fn [x] (go (either/right x)))
+          funcleft (fn [x] (go (either/left x)))
+          r1 (m/with-monad chaneither-m
+               (m/mlet [x (funcright 1)
+                        y (funcright 2)]
+                 (m/return (+ x y))))
+
+          r2 (m/with-monad chaneither-m
+               (m/mlet [x (funcright 1)
+                        y (funcleft :foo)
+                        z (funcright 2)]
+                 (m/return (+ x y))))]
+
+      (s/should= (either/right 3) (<!! r1))
+      (s/should= (either/left :foo) (<!! r2)))))
+
+
