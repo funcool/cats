@@ -6,8 +6,7 @@
             :url "http://opensource.org/licenses/BSD-2-Clause"}
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2629"]]
-
+                 [org.clojure/clojurescript "0.0-2760"]]
   :source-paths ["target/src" "src/clj"]
 
   :deploy-repositories {"releases" :clojars
