@@ -40,6 +40,16 @@
   (get-value [_] v)
 
   #+clj
+  clojure.lang.IDeref
+  #+clj
+  (deref [_] v)
+
+  #+cljs
+  IDeref
+  #+cljs
+  (-deref [_] v)
+
+  #+clj
   Object
   #+clj
   (equals [_ other]
