@@ -22,6 +22,10 @@
       (s/should= e (exc/from-failure (exc/try-on (throw e))))
       (s/should= e (exc/from-failure (exc/try-on e)))))
 
+  (s/it "Test IDeref"
+    (s/should= 1 @(exc/success 1))
+    (s/should= 1 @(exc/failure 1)))
+
   #+cljs
   (s/it "Basic operations with cljs."
     (let [e (js/Error. "test")]
