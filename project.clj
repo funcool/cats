@@ -48,7 +48,6 @@
                         :compiler {:output-to "target/tests.js"
                                    :optimizations :simple
                                    :pretty-print true}}]}
-
   :profiles {:dev {:dependencies [[speclj "3.1.0"]
                                   [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                                   [org.clojure/tools.namespace "0.2.7"]]
