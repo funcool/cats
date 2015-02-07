@@ -52,6 +52,16 @@
   (get-value [_] v)
 
   #+clj
+  clojure.lang.IDeref
+  #+clj
+  (deref [_] v)
+
+  #+cljs
+  IDeref
+  #+cljs
+  (-deref [_] v)
+
+  #+clj
   Object
   #+clj
   (equals [self other]
@@ -76,6 +86,16 @@
   proto/Context
   (get-context [_] exception-monad)
   (get-value [_] e)
+
+  #+clj
+  clojure.lang.IDeref
+  #+clj
+  (deref [_] e)
+
+  #+cljs
+  IDeref
+  #+cljs
+  (-deref [_] e)
 
   #+clj
   Object
