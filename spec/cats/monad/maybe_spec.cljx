@@ -23,6 +23,10 @@
     (s/should= (p/get-value (maybe/just 1)) 1)
     (s/should= (p/get-value (maybe/nothing)) nil))
 
+  (s/it "Test IDeref"
+    (s/should= nil @(maybe/nothing))
+    (s/should= 1 @(maybe/just 1)))
+
   (s/it "Test predicates"
     (let [m1 (maybe/just 1)]
       (s/should (maybe/maybe? m1))
