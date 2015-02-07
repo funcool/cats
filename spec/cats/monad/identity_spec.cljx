@@ -13,6 +13,9 @@
             [cats.core :as m]))
 
 (s/describe "identity-monad"
+  (s/it "Test IDeref"
+    (s/should= 1 @(id/identity 1)))
+
   (s/it "Test fmap"
     (s/should= (id/identity 2)
                (m/fmap inc (id/identity 1))))
