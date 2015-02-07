@@ -1,5 +1,5 @@
-;; Copyright (c) 2014, Andrey Antukh
-;; Copyright (c) 2014, Alejandro Gómez
+;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
+;; Copyright (c) 2014-2015 Alejandro Gómez
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,16 @@
   (get-value [_] v)
 
   #+clj
+  clojure.lang.IDeref
+  #+clj
+  (deref [_] v)
+
+  #+cljs
+  IDeref
+  #+cljs
+  (-deref [_] v)
+
+  #+clj
   Object
   #+clj
   (equals [self other]
@@ -62,6 +72,16 @@
   proto/Context
   (get-context [_] maybe-monad)
   (get-value [_] nil)
+
+  #+clj
+  clojure.lang.IDeref
+  #+clj
+  (deref [_] nil)
+
+  #+cljs
+  IDeref
+  #+cljs
+  (-deref [_] nil)
 
   #+clj
   Object

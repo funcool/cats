@@ -17,6 +17,10 @@
     (s/should= 1 (either/from-either (either/right 1)))
     (s/should= nil (either/from-either (either/left))))
 
+  (s/it "Test IDeref"
+    (s/should= 1 @(either/left 1))
+    (s/should= 1 @(either/right 1)))
+
   (s/it "Test predicates"
     (let [m1 (either/right 1)]
       (s/should (either/either? m1))
