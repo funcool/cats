@@ -1,5 +1,21 @@
 # Changelog #
 
+## Version 0.4.0 ##
+
+Date: unreleased
+
+
+## Version 0.3.0 ##
+
+Date: 2015-02-08
+
+- Dependencies versions update.
+- Add new arity to from-maybe function for default value.
+- Update required clojurescript version to 0.0-2760.
+- Use speclj for tests.
+- Add IDeref implementation to either, maybe, identity and exception monads types.
+- Remove maybe useless lazy monad.
+
 ## Version 0.2.0 ##
 
 Date: 2014-10-26
