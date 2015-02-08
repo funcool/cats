@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.1">
+<meta name="generator" content="Asciidoctor 1.5.2">
 <meta name="author" content="Andrey Antukh &amp; Alejandro Gómez">
 <title>Cats Documentation</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
 /* Remove the comments around the @import statement below when using this as a custom stylesheet */
-/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400";*/
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400";*/
 article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}
 audio,canvas,video{display:inline-block}
 audio:not([controls]){display:none;height:0}
@@ -275,8 +275,8 @@ dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
 ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
 ul.unstyled,ol.unnumbered,ul.checklist,ul.none{list-style-type:none}
 ul.unstyled,ol.unnumbered,ul.checklist{margin-left:.625em}
-ul.checklist li>p:first-child>.fa-check-square-o:first-child,ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
-ul.checklist li>p:first-child>input[type="checkbox"]:first-child{position:relative;top:1px}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1em;font-size:.85em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{width:1em;position:relative;top:1px}
 ul.inline{margin:0 auto .625em auto;margin-left:-1.375em;margin-right:0;padding:0;list-style:none;overflow:hidden}
 ul.inline>li{list-style:none;float:left;margin-left:1.375em;display:block}
 ul.inline>li>*{display:block}
@@ -480,7 +480,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Cats Documentation</h1>
 <div class="details">
 <span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">0.2.0</span>
+<span id="revdate">0.3.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -515,8 +515,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_reader">5.5. Reader</a></li>
 <li><a href="#_writer">5.6. Writer</a></li>
 <li><a href="#_continuation">5.7. Continuation</a></li>
-<li><a href="#_lazy">5.8. Lazy</a></li>
-<li><a href="#_vector">5.9. Vector</a></li>
+<li><a href="#_vector">5.8. Vector</a></li>
 </ul>
 </li>
 <li><a href="#_faq">6. FAQ</a>
@@ -598,7 +597,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">cats</span> <span class="tok-s">&quot;0.2.0&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">cats</span> <span class="tok-s">&quot;0.3.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 </div>
@@ -623,7 +622,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 <pre class="pygments highlight"><code data-lang="xml"><span class="tok-nt">&lt;dependency&gt;</span>
     <span class="tok-nt">&lt;groupId&gt;</span>cats<span class="tok-nt">&lt;/groupId&gt;</span>
     <span class="tok-nt">&lt;artifactId&gt;</span>cats<span class="tok-nt">&lt;/artifactId&gt;</span>
-    <span class="tok-nt">&lt;version&gt;</span>0.2.0<span class="tok-nt">&lt;/version&gt;</span>
+    <span class="tok-nt">&lt;version&gt;</span>0.3.0<span class="tok-nt">&lt;/version&gt;</span>
 <span class="tok-nt">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -631,14 +630,14 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 <div class="sect2">
 <h3 id="_get_the_code">3.3. Get the Code</h3>
 <div class="paragraph">
-<p><em>cats</em> is open source and is entirely developed on <a href="https://github.com/niwibe/cats">github</a>.</p>
+<p><em>cats</em> is open source and can be found on <a href="https://github.com/funcool/cats">github</a>.</p>
 </div>
 <div class="paragraph">
 <p>You can clone the public repository with this command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">git clone https://github.com/niwibe/cats</code></pre>
+<pre class="pygments highlight"><code data-lang="text">git clone https://github.com/funcool/cats</code></pre>
 </div>
 </div>
 </div>
@@ -675,7 +674,7 @@ applies the function to it, and returns the result wrapped in same type as the s
 parameter.</p>
 </div>
 <div class="paragraph">
-<p>But, what is the <strong>*functor context</strong>? It sounds more complex than it is. A Functor
+<p>But, what is the <strong>functor context</strong>? It sounds more complex than it is. A Functor
 wrapper is any type that acts as "Box" and implements the <code>Context</code> and <code>Functor</code> protocols.</p>
 </div>
 <div class="listingblock">
@@ -690,19 +689,37 @@ wrapper is any type that acts as "Box" and implements the <code>Context</code> a
 </div>
 </div>
 <div class="paragraph">
-<p>Let see one example using <strong>fmap</strong> over <strong>just</strong> instance:</p>
+<p>Let&#8217;s see one example using <strong>fmap</strong> over <strong>just</strong> instance:</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>just</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">]</span>
+         <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just [2]&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <strong>Maybe</strong> type also has another constructor: <code>nothing</code>. It represents the absense of a value.
+<p>We mentioned above that <strong>fmap</strong> extracts the value from the functor context. You will also want to
+extract values wrapped by <strong>just</strong> and you can do that with <strong>from-maybe</strong>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example using <strong>from-maybe</strong> to extract values wrapped by <strong>just</strong>.</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">from-maybe</span><span class="tok-p">]])</span>
+
+<span class="tok-p">(</span><span class="tok-nf">from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; 1</span>
+<span class="tok-p">(</span><span class="tok-nf">from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; nil</span>
+<span class="tok-p">(</span><span class="tok-nf">from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 42</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong>Maybe</strong> type also has another constructor: <code>nothing</code>. It represents the absence of a value.
 It is a safe substitute for <code>nil</code> and may represent failure.</p>
 </div>
 <div class="paragraph">
@@ -732,17 +749,17 @@ of the same type as its second argument.</p>
 </div>
 <div class="paragraph">
 <p>The main difference compared to the previous example with Clojure&#8217;s map function, is that
-map works with seqs and doesn&#8217;t respect the input container:</p>
+map returns lazy seqs no matter what collection we pass to it:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nb">map inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; (2 3 4)</span></code></pre>
+<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">type</span> <span class="tok-p">(</span><span class="tok-nb">map inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]))</span>
+<span class="tok-c1">;; =&gt; clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>But why does the fmap version "work" with vectors? Because some Clojure container types like vectors,
-lists, and sets also implement the functor abstraction.</p>
+<p>But why can we pass vectors to fmap? Because some Clojure container types like vectors,
+lists and sets also implement the functor abstraction.</p>
 </div>
 </div>
 <div class="sect2">
@@ -779,7 +796,7 @@ the <strong>pure</strong> function will be explained later.
 evaluation of some computation in a context.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see an exaple to better understand the differences between functor and
+<p>Let&#8217;s see an example to better understand the differences between functor and
 applicative functor:</p>
 </div>
 <div class="paragraph">
@@ -831,8 +848,8 @@ can apply the returned greeter to any value without a defensive nil check:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Moreover the applicative functor comes with <strong>pure</strong> function, and main purpose of this function is
-put some value in side-effect-free context of the current type.</p>
+<p>Moreover, the applicative functor comes with <strong>pure</strong> function, and the main purpose of this function is
+to put some value in side-effect-free context of the current type.</p>
 </div>
 <div class="paragraph">
 <p>Examples:</p>
@@ -925,7 +942,7 @@ macro: <strong>mlet</strong></p>
 <div class="title">Previous example but using <strong>mlet</strong> macro.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">b</span><span class="tok-p">))]</span>
+       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))]</span>
   <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
 </div>
 </div>
@@ -948,7 +965,7 @@ If you are coming from Haskell, mlet represents the <strong>do-syntax</strong>.
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">b</span><span class="tok-p">))</span>
+       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
        <span class="tok-ss">:let</span> <span class="tok-p">[</span><span class="tok-nv">z</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)]]</span>
   <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">z</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
 </div>
@@ -1370,13 +1387,7 @@ any other contribution is always welcome.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_lazy">5.8. Lazy</h3>
-<div class="paragraph">
-<p>TODO</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_vector">5.9. Vector</h3>
+<h3 id="_vector">5.8. Vector</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
@@ -1519,8 +1530,8 @@ steps depending on the situation:</p>
 <h3 id="_license">7.3. License</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">Copyright (c) 2014, Andrey Antukh
-Copyright (c) 2014, Alejandro Gómez
+<pre class="pygments highlight"><code data-lang="text">Copyright (c) 2014-2015 Andrey Antukh &lt;niwi@niwi.be&gt;
+Copyright (c) 2014-2015 Alejandro Gómez
 
 All rights reserved.
 
@@ -1552,7 +1563,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-10-30 13:44:23 CET
+Last updated 2015-02-08 14:49:35 CET
 </div>
 </div>
 </body>
