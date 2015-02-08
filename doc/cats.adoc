@@ -1,7 +1,7 @@
 Cats Documentation
 ==================
 Andrey Antukh & Alejandro Gómez
-0.2.0
+0.3.0
 :toc: left
 :numbered:
 :source-highlighter: pygments
@@ -47,7 +47,7 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[cats "0.2.0"]
+[cats "0.3.0"]
 ----
 
 
@@ -71,7 +71,7 @@ Then for cats:
 <dependency>
     <groupId>cats</groupId>
     <artifactId>cats</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ----
 
@@ -79,13 +79,13 @@ Then for cats:
 Get the Code
 ~~~~~~~~~~~~
 
-_cats_ is open source and is entirely developed on link:https://github.com/niwibe/cats[github].
+_cats_ is open source and can be found on link:https://github.com/funcool/cats[github].
 
 You can clone the public repository with this command:
 
 [source,text]
 ----
-git clone https://github.com/niwibe/cats
+git clone https://github.com/funcool/cats
 ----
 
 
@@ -695,11 +695,6 @@ Continuation
 
 TODO
 
-Lazy
-~~~~
-
-TODO
-
 Vector
 ~~~~~~
 
@@ -782,8 +777,8 @@ License
 ~~~~~~~
 [source,text]
 ----
-Copyright (c) 2014, Andrey Antukh
-Copyright (c) 2014, Alejandro Gómez
+Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
+Copyright (c) 2014-2015 Alejandro Gómez
 
 All rights reserved.
 
