@@ -45,6 +45,42 @@
       (t/is (= 3 (<!! r)))))
   )
 
+#+cljs
+(t/deftest channel-monad-tests
+  (t/testing "channel as functor"
+    (t/async done
+      (go
+        (let [ch (m/pure c/channel-monad 1)
+              rs (m/fmap inc ch)]
+          (t/is (= 2 (<! rs)))
+          (done)))))
+
+  (t/testing "channel as monad 1"
+    (t/async done
+      (go
+        (let [ch (m/pure c/channel-monad 1)
+              rs (m/>>= ch (fn [x] (m/return (inc x))))]
+          (t/is (= 3 (<! rs)))
+          (done)))))
+
+
+  (t/testing "channel as monad 2"
+    (t/async done
+      (go
+        (let [ch1 (chan 1)
+              ch2 (chan 1)
+              ch3 (chan 1)
+              r   (m/mlet [x ch1
+                           y ch2
+                           z ch3]
+                    (m/return (+ x y z)))]
+          (>! ch1 1)
+          (>! ch2 1)
+          (>! ch3 1)
+          (t/is (= 3 (<! r))))
+        (done))))
+)
+
 
 #+clj
 (def chaneither-m (either/either-transformer c/channel-monad))
