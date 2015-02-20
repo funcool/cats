@@ -39,6 +39,7 @@
                         :notify-command ["node" "test/run.js"]
                         :compiler {:output-to "output/tests.js"
                                    :output-dir "output/out"
+                                   :source-map true
                                    :optimizations :none
                                    :target :nodejs
                                    :pretty-print true}}]}
