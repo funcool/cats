@@ -54,7 +54,7 @@
   #+clj
   (t/testing "Test try-or-else macro"
     (let [m1 (exc/try-or-else (+ 1 nil) 40)]
-      (s/should (exc/success? m1))
+      (t/is (exc/success? m1))
       (t/is (= 40 (exc/from-try m1)))))
 
   #+clj
