@@ -1,4 +1,5 @@
-(ns cats.test-runner
+#+cljs
+(ns cats.testrunner
   (:require [cljs.test :refer-macros [run-tests]]
             [cats.builtin-spec]
             [cats.core-spec]
@@ -8,9 +9,10 @@
             [cats.monad.maybe-spec]
             [cats.monad.identity-spec]
             [cats.monad.exception-spec]
-            [cats.monad.continuation-spec]))
+            [cats.monad.continuation-spec]
+            [cljs.nodejs :as nodejs]))
 
-(enable-console-print!)
+(nodejs/enable-util-print!)
 
 (defn runner
   []
@@ -25,3 +27,5 @@
                                         'cats.monad.writer-spec))
     0
     1))
+
+(set! *main-cli-fn* runner)

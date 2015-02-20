@@ -33,12 +33,14 @@
                    :output-path "output/test/cljs"
                    :rules :cljs}]}
 
-  :cljsbuild {:test-commands {"test" ["phantomjs" "phantom/unit-test.js" "phantom/unit-test.html"]}
+  :cljsbuild {:test-commands {"test" ["node" "test/run.js"]}
               :builds [{:id "dev"
-                        :source-paths ["output/test/cljs" "output/src" "test"]
-                        :notify-command ["phantomjs" "phantom/unit-test.js" "phantom/unit-test.html"]
+                        :source-paths ["output/test/cljs" "output/src"]
+                        :notify-command ["node" "test/run.js"]
                         :compiler {:output-to "output/tests.js"
-                                   :optimizations :whitespace
+                                   :output-dir "output/out"
+                                   :optimizations :none
+                                   :target :nodejs
                                    :pretty-print true}}]}
 
   :profiles
