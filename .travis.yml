@@ -3,11 +3,11 @@ lein: lein2
 
 before_script:
   - lein2 cljx once
-  - lein2 cljsbuild once tests
+  - lein2 cljsbuild once
 
 script:
-  - lein2 cljsbuild test spec
-  - lein2 spec
+  - lein2 cljsbuild test
+  - lein2 test
 
 jdk:
   - openjdk7
