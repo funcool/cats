@@ -10,3 +10,5 @@ pom.xml.asc
 /*-init.clj
 doc/index.html
 doc/codox
+/output
+/repl
