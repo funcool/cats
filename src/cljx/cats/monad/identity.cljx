@@ -53,13 +53,17 @@
   Object
   #+clj
   (equals [_ other]
-    (= v (.-v other)))
+    (if (instance? Identity other)
+      (= v (.-v other))
+      false))
 
   #+cljs
   cljs.core/IEquiv
   #+cljs
   (-equiv [_ other]
-    (= v (.-v other)))
+    (if (instance? Identity other)
+      (= v (.-v other))
+      false))
 
   #+clj
   (toString [_]
