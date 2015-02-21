@@ -104,15 +104,15 @@ Functor
 ~~~~~~~
 
 Let's start with the functor. The Functor represents some sort of "computational context", and the
-abstraction consists of one unique function: **fmap**.
+abstraction consists of one unique function: *fmap*.
 
-.Signature of **fmap** function
+.Signature of *fmap* function
 [source, Clojure]
 ----
 (fmap [f fv])
 ----
 
-The higher-order function **fmap** takes a plain function as the first parameter and
+The higher-order function *fmap* takes a plain function as the first parameter and
 value wrapped in a functor context as the second parameter. It extracts the inner value
 applies the function to it, and returns the result wrapped in same type as the second
 parameter.
@@ -120,7 +120,7 @@ parameter.
 But, what is the *functor context*? It sounds more complex than it is. A Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocols.
 
-.One good example of a functor is the **Maybe** type:
+.One good example of a functor is the *Maybe* type:
 [source, Clojure]
 ----
 (require '[cats.monad.maybe :as maybe])
@@ -131,7 +131,7 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 ;; => #<Just [2]>
 ----
 
-Let's see one example using **fmap** over *just* instance:
+Let's see one example using *fmap* over *just* instance:
 
 .Example using fmap over *just*.
 [source, Clojure]
@@ -143,8 +143,8 @@ Let's see one example using **fmap** over *just* instance:
 ;; => #<Just [2]>
 ----
 
-We mentioned above that **fmap** extracts the value from the functor context. You will also want to
-extract values wrapped by **just** and you can do that with **from-maybe**.
+We mentioned above that *fmap* extracts the value from the functor context. You will also want to
+extract values wrapped by *just* and you can do that with *from-maybe*.
 
 .Example using *from-maybe* to extract values wrapped by *just*.
 [source, Clojure]
@@ -159,10 +159,11 @@ extract values wrapped by **just** and you can do that with **from-maybe**.
 ;; => 42
 ----
 
-The **Maybe** type also has another constructor: `nothing`. It represents the absence of a value.
+The *Maybe* type also has another constructor: `nothing`. It represents the absence of a value.
 It is a safe substitute for `nil` and may represent failure.
 
-Let's see what happens if we perform the same operation as the previous example over a *nothing* instance:
+Let's see what happens if we perform the same operation as the previous example over a *nothing*
+instance:
 
 .Example using fmap over *nothing*.
 [source, Clojure]
@@ -201,19 +202,19 @@ Applicative
 ~~~~~~~~~~~
 
 Let's continue with applicative functors. The Applicative Functor represents
-some sort of "computational context" like a plain Functor, but with abilty to
+some sort of "computational context" like a plain Functor, but with ability to
 execute a function wrapped in the same context.
 
-The Applicative Functor abstraction consists of two functions: **fapply** and
-**pure**.
+The Applicative Functor abstraction consists of two functions: *fapply* and
+*pure*.
 
-.Signature of **fapply** function
+.Signature of *fapply* function
 [source, Clojure]
 ----
 (fapply [af av])
 ----
 
-NOTE: the **pure** function will be explained later.
+NOTE: the *pure* function will be explained later.
 
 The use case for Applicative Functors is much the same as plain Functors: safe
 evaluation of some computation in a context.
@@ -266,7 +267,7 @@ can apply the returned greeter to any value without a defensive nil check:
 ;; => #<Nothing >
 ----
 
-Moreover, the applicative functor comes with **pure** function, and the main purpose of this function is
+Moreover, the applicative functor comes with *pure* function, and the main purpose of this function is
 to put some value in side-effect-free context of the current type.
 
 Examples:
@@ -283,7 +284,7 @@ Examples:
 ;; => #<Either [:bar :right]>
 ----
 
-If you do not understand the purpose of the **pure** function, the next section
+If you do not understand the purpose of the *pure* function, the next section
 should clarify its purpose.
 
 
@@ -296,7 +297,7 @@ applicatives, monads deal with data in contexts.
 Additionaly, monads can also transform contexts by unwrapping data, applying functions to it and
 putting new values in a completely different context.
 
-The monad abstraction consists of two functions: **bind** and **return**
+The monad abstraction consists of two functions: *bind* and *return*
 
 .Bind function signature.
 [source,Clojure]
@@ -331,7 +332,7 @@ what that container is, you can use `return` or `pure` functions:
 The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context
 value that's set internally by the `bind` function. Therefore, you can't use them with one argument outside of a `bind` context.
 
-We now can compose any number of computations using monad **bind*
+We now can compose any number of computations using monad *bind*
 functions. But observe what happens when the number of computations increases:
 
 .Composability example of bind function.
@@ -345,7 +346,7 @@ functions. But observe what happens when the number of computations increases:
 ----
 
 This can quickly lead to callback hell. To solve this, _cats_ comes with a powerful
-macro: **mlet**
+macro: *mlet*
 
 .Previous example but using *mlet* macro.
 [source, Clojure]
@@ -355,7 +356,7 @@ macro: **mlet**
   (return (* b 2)))
 ----
 
-NOTE: If you are coming from Haskell, mlet represents the **do-syntax**.
+NOTE: If you are coming from Haskell, mlet represents the *do-syntax*.
 
 
 
@@ -516,7 +517,7 @@ _cats_, implements two constructors:
 - `(just v)`: represents just a value in a context.
 - `(nothing)`: represents a failure or null.
 
-.Usage example of **Maybe** constructors.
+.Usage example of *Maybe* constructors.
 [source, Clojure]
 ----
 (require '[cats.monad.maybe :refer :all])
@@ -540,7 +541,7 @@ In _cats_ it has two constructors:
 - `(left v)`: represents a failure.
 - `(right v)`: represents a successful result.
 
-.Usage example of **Either** constructors.
+.Usage example of *Either* constructors.
 [source, Clojure]
 ----
 (require '[cats.monad.either :refer :all])
@@ -568,7 +569,7 @@ handling with heap-based error handling. Instead of having an exception thrown a
 having to deal with it immediately in the same thread, it disconnects the error
 handling and recovery.
 
-.Usage example of **try-on** macro.
+.Usage example of *try-on* macro.
 [source, Clojure]
 ----
 (require '[cats.monad.exception :as exc])
@@ -761,13 +762,13 @@ Procedure
 _cats_ does not have many restrictions for contributions. Just follow these
 steps depending on the situation:
 
-**Bugfix**:
+*Bugfix*:
 
 - Fork the GitHub repo.
 - Fix a bug/typo on a new branch.
 - Make a pull-request to master.
 
-**New feature**:
+*New feature*:
 
 - Open new issue with the new feature proposal.
 - If it is accepted, follow the same steps as "bugfix".
