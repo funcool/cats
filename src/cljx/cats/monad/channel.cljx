@@ -92,3 +92,12 @@
   proto/Context
   (get-context [_] channel-monad)
   (get-value [self] self))
+
+(defn with-value
+  "Simple helper that creates a channel and attach
+  an value to it."
+  ([value] (with-value value (chan)))
+  ([value ch]
+   (put! ch value)
+   ch))
+
