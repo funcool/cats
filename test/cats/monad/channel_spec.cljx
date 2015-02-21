@@ -121,7 +121,6 @@
         (t/is (= (<! rs1) (<! rs2)))
         (done)))))
 
-#+clj
 (def chaneither-m (either/either-transformer c/channel-monad))
 
 #+clj
@@ -142,6 +141,27 @@
 
       (t/is (= (either/right 3) (<!! r1)))
       (t/is (= (either/left :foo) (<!! r2)))))
+  )
+
+#+cljs
+(t/deftest channel-transformer-tests
+  (t/async done
+    (let [funcright #(c/with-value (either/right %))
+          funcleft #(c/with-value (either/left %))
+          r1 (m/with-monad chaneither-m
+               (m/mlet [x (funcright 1)
+                        y (funcright 2)]
+                 (m/return (+ x y))))
+
+          r2 (m/with-monad chaneither-m
+               (m/mlet [x (funcright 1)
+                        y (funcleft :foo)
+                        z (funcright 2)]
+                 (m/return (+ x y))))]
+      (go
+        (t/is (= (either/right 3) (<! r1)))
+        (t/is (= (either/left :foo) (<! r2)))
+        (done))))
   )
 
 
