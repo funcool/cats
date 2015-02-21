@@ -656,6 +656,79 @@ However, if you have better examples to explain the state monad, documentation f
 any other contribution is always welcome.
 
 
+=== Channel
+
+In asynchronous environments with clojure and clojurescript we tends to use core.async, because it
+a very powerfull abstraction.
+
+And would be awesome will be able work with channel as a monadic type, and combine it with error
+monads, short-circuiting async computations.
+
+Let start using channel as a functor:
+[source, clojure]
+----
+(require '[cljs.core.async :refer [chan put! <!!]])
+(require '[cats.monad.channel :as channel])
+
+;; Declare arbitrary channel with initial value
+(def mychan (channel/with-value 2))
+
+;; Use channel as a functor
+(<!! (m/fmap inc mychan))
+;; => 3
+----
+
+The channel type also fulfill the monad abstraction, let see it in action:
+
+[source, clojure]
+----
+(def result (m/mlet [a (channel/with-value 2)
+                     b (channel/with-value 3)]
+              (m/return (+ a b))))
+(<!! result)
+;; => 5
+----
+
+But best of all is coming: combine the channel monad with error monads. It allows build very concise
+and simple asynchronous api. Let see how you can use it your application:
+
+[source, clojure]
+----
+(require '[cats.monad.either :as either])
+
+;; Declare a monad transformer
+(def either-chan-m
+  (either/either-transformer channel/channel-monad))
+
+;; A success example
+(<!! (m/with-monad either-chan-m
+       (m/mlet [a (channel/with-value (either/right 2))
+                b (channel/with-value (either/right 3))]
+         (m/return (+ a b)))))
+;; => #<Right [5]>
+----
+
+As you can see, the code looks very similar to the previos example, with the exception of
+the value in a channel is not a simple plain value, is an either instance.
+
+Let see that is happens if some computation fails in the mlet composition:
+
+[source, clojure]
+----
+(<!! (m/with-monad either-chan-m
+       (m/mlet [a (channel/with-value (either/left "Some error"))
+                b (channel/with-value (either/right 3))]
+         (m/return (+ a b)))))
+;; => #<Left [Some error]>
+----
+
+The result is an expected short-circuiting left, without unexpected nullpointer exceptions
+or something similar.
+
+With compositions like this, you can model your asynchronous api with full and powerfull
+error handling using any error monad (in this case Either).
+
+
 === Reader
 
 TODO
