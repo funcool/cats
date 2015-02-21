@@ -1,5 +1,4 @@
-Cats Documentation
-==================
+= Cats Documentation
 Andrey Antukh & Alejandro Gómez
 0.4.0-SNAPSHOT
 :toc: left
@@ -7,16 +6,13 @@ Andrey Antukh & Alejandro Gómez
 :source-highlighter: pygments
 :pygments-style: friendly
 
-
 image:logo.png[cats logo]
 
-Introduction
-------------
+== Introduction
 
 Category Theory abstractions for Clojure.
 
-Why another library?
-~~~~~~~~~~~~~~~~~~~~
+=== Why another library?
 
 Because the cats library:
 
@@ -27,20 +23,17 @@ Because the cats library:
 - licensed under a permissive license (compared to other libraries): BSD (2-Clause)
 
 
-Project Maturity
-----------------
+== Project Maturity
 
 Since _cats_ is a young project, there can be some link:codox/index.html#id[API] breakage.
 
 
-Install
--------
+== Install
 
 This section covers installing _cats_.
 
 
-Leiningen
-~~~~~~~~~
+=== Leiningen
 
 The simplest way to use _cats_ in a Clojure project is by including
 it as a dependency in your *_project.clj_*:
@@ -51,8 +44,7 @@ it as a dependency in your *_project.clj_*:
 ----
 
 
-Maven
-~~~~~
+=== Maven
 
 Also, you can use it with Maven. First, add the Clojars repository:
 
@@ -76,8 +68,7 @@ Then for cats:
 ----
 
 
-Get the Code
-~~~~~~~~~~~~
+=== Get the Code
 
 _cats_ is open source and can be found on link:https://github.com/funcool/cats[github].
 
@@ -89,8 +80,7 @@ git clone https://github.com/funcool/cats
 ----
 
 
-User Guide
-----------
+== User Guide
 
 This section introduces almost all the category theory abstractions that the _cats_ library
 supports.
@@ -100,8 +90,7 @@ the abstractions and it is very easy to understand. You can read more about it i
 section of the documentation.
 
 
-Functor
-~~~~~~~
+=== Functor
 
 Let's start with the functor. The Functor represents some sort of "computational context", and the
 abstraction consists of one unique function: *fmap*.
@@ -198,8 +187,7 @@ But why can we pass vectors to fmap? Because some Clojure container types like v
 lists and sets also implement the functor abstraction.
 
 
-Applicative
-~~~~~~~~~~~
+=== Applicative
 
 Let's continue with applicative functors. The Applicative Functor represents
 some sort of "computational context" like a plain Functor, but with ability to
@@ -288,8 +276,7 @@ If you do not understand the purpose of the *pure* function, the next section
 should clarify its purpose.
 
 
-Monad
-~~~~~
+=== Monad
 
 Monads are the most discussed programming concept to come from category theory. Like functors and
 applicatives, monads deal with data in contexts.
@@ -359,7 +346,6 @@ macro: *mlet*
 NOTE: If you are coming from Haskell, mlet represents the *do-syntax*.
 
 
-
 If you want to use regular (non-monadic) let bindings inside an `mlet` block, you can do so using
 `:let` and a binding vector inside the mlet bindings:
 
@@ -372,11 +358,9 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 ----
 
 
-Monad Transformers
-~~~~~~~~~~~~~~~~~~
+=== Monad Transformers
 
-Motivation
-^^^^^^^^^^
+==== Motivation
 
 We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
 we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
@@ -407,8 +391,7 @@ resulting monad a monad transformer, which is the composition of a "base" and a 
 monad transformer is itself a monad.
 
 
-Using monad transformers
-^^^^^^^^^^^^^^^^^^^^^^^^
+==== Using monad transformers
 
 Let's combine the effects of two monads: State and Maybe. We'll create the transformer
 using State as the base monad since we want the resulting type to be a stateful computation
@@ -493,16 +476,14 @@ Let's see it in action:
       (maybe/from-maybe parse-result))))
 ----
 
-Monad types
------------
+== Monad types
 
 In our examples we have seen two types that implement
 the monad abstraction: Maybe and Either. But these are only two of the types
 that implements the Monad abstraction. In this section, we will explain the different
 monad types supported by _cats_ library.
 
-Maybe
-~~~~~
+=== Maybe
 
 This is one of the two most used monad types (also named Optional in other programming
 languages).
@@ -527,11 +508,8 @@ _cats_, implements two constructors:
 ;; => #<Nothing >
 ----
 
-NOTE: Maybe types are: Functors, Applicative Functors and Monads
 
-
-Either
-~~~~~~
+=== Either
 
 Either is another type that represents a result of computation, but (in contrast with maybe)
 it can return some data with a failed computation result.
@@ -555,8 +533,8 @@ In _cats_ it has two constructors:
 
 NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 
-Try
-~~~
+
+=== Try
 
 Also called Exception.
 
@@ -605,11 +583,8 @@ first parameter.
 ;; => #<Success [0]>
 ----
 
-NOTE: Try is also (like Maybe) Functor, Applicative Functor and Monad.
 
-
-State
-~~~~~
+=== State
 
 State monad in one of the special cases of monads most used in Haskell. It has different
 purposes including: lazy computation, composition, and maintaining state without explicit state.
@@ -681,32 +656,29 @@ However, if you have better examples to explain the state monad, documentation f
 any other contribution is always welcome.
 
 
-Reader
-~~~~~~
-
-TODO
-
-Writer
-~~~~~~
-
-TODO
-
-Continuation
-~~~~~~~~~~~~
-
-TODO
-
-Vector
-~~~~~~
+=== Reader
 
 TODO
 
 
-FAQ
----
+=== Writer
 
-What are the difference with other existing libraries?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TODO
+
+
+=== Continuation
+
+TODO
+
+
+=== Vector
+
+TODO
+
+
+== FAQ
+
+=== What are the difference with other existing libraries?
 
 This is an incomplete list of differences with other existing libraries:
 
@@ -721,8 +693,7 @@ This is an incomplete list of differences with other existing libraries:
   has much unnecesary complexity.
 
 
-What Clojure types implements some of the Category Theory abstractions?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== What Clojure types implements some of the Category Theory abstractions?
 
 In contrast to other similar libraries in Clojure, _cats_ doesn't intend to extend Clojure types
 that don't act like containers. For example, Clojure keywords are values but can not be containers so
@@ -739,11 +710,9 @@ they should not extend any of the previously explained protocols.
 |=============================================================
 
 
-How to Contribute?
-------------------
+== How to Contribute?
 
-Philosophy
-~~~~~~~~~~
+=== Philosophy
 
 Five most important rules:
 
@@ -756,8 +725,7 @@ Five most important rules:
 All contributions to _cats_ should keep these important rules in mind.
 
 
-Procedure
-~~~~~~~~~
+=== Procedure
 
 _cats_ does not have many restrictions for contributions. Just follow these
 steps depending on the situation:
@@ -774,8 +742,8 @@ steps depending on the situation:
 - If it is accepted, follow the same steps as "bugfix".
 
 
-License
-~~~~~~~
+=== License
+
 [source,text]
 ----
 Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
