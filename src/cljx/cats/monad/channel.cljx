@@ -28,7 +28,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
 
   #+cljs
-  (:require [cljs.core.async :refer [chan put! take! <!]]
+  (:require [cljs.core.async :refer [chan put! take! <! pipe]]
             [cljs.core.async.impl.channels :as implch]
             [cljs.core.async.impl.protocols :as impl]
             [cljs.core.async.impl.dispatch :as dispatch]
@@ -36,7 +36,7 @@
             [cats.protocols :as proto])
 
   #+clj
-  (:require [clojure.core.async :refer [go chan put! take! <!]]
+  (:require [clojure.core.async :refer [go chan put! take! <! pipe]]
             [clojure.core.async.impl.protocols :as impl]
             [clojure.core.async.impl.dispatch :as dispatch]
             [cats.core :as m]
@@ -78,14 +78,12 @@
         channel))
 
     (mbind [mn mv f]
-      (let [ctx m/*context*]
-        (go
-          (let [v (<! mv)
-                r (m/with-monad ctx
-                    (f v))]
-            (if (satisfies? impl/ReadPort r)
-              (<! r)
-              r)))))))
+      (let [ctx m/*context*
+            ch (chan)]
+        (take! mv (fn [v]
+                    (m/with-monad ctx
+                      (pipe (f v) ch))))
+        ch))))
 
 (extend-type #+clj clojure.core.async.impl.channels.ManyToManyChannel
              #+cljs cljs.core.async.impl.channels.ManyToManyChannel
