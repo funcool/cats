@@ -39,6 +39,8 @@
                         :notify-command ["node" "test/run.js"]
                         :compiler {:output-to "output/tests.js"
                                    :output-dir "output/out"
+                                   :static-fns true
+                                   :cache-analysis false
                                    :source-map true
                                    :optimizations :none
                                    :target :nodejs
