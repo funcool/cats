@@ -25,28 +25,25 @@
 
 (ns cats.monad.promise
   #+cljs
-  (:require-macros [cljs.core.async.macros :refer [go]]
-                   [cats.core :refer [with-monad]])
+  (:require-macros [cljs.core.async.macros :refer [go]])
   #+cljs
-  (:require [cljs.core.async :refer [chan put! take! <! >!]]
+  (:require [cljs.core.async :refer [chan put! take! <! >!] :as async]
             [cljs.core.async.impl.protocols :as impl]
             [cljs.core.async.impl.dispatch :as dispatch]
-            [cats.protocols :as proto])
+            [cats.protocols :as proto]
+            [cats.monad.channel])
   #+clj
-  (:require [clojure.core.async :refer [go chan put! take! <! >! close!]]
+  (:require [clojure.core.async :refer [go chan put! take! <! >! close!] :as async]
             [clojure.core.async.impl.protocols :as impl]
-            [clojure.core.async.impl.channels :refer [box]]
-            [clojure.core.async.impl.dispatch :as dispatch]
-            [clojure.core.async.impl.mutex :as mutex]
-            [cats.core :refer [with-monad]]
-            [cats.protocols :as proto])
+            [cats.protocols :as proto]
+            [cats.monad.channel])
+
 
   #+clj
-  (:refer-clojure :exclude [promise])
+  (:refer-clojure :exclude [promise when])
+  #+cljs
+  (:refer-clojure :exclude [when]))
 
-  #+clj
-  (:import java.util.LinkedList
-           java.util.concurrent.locks.Lock))
 
 (declare promise-monad)
 (declare then)
@@ -55,88 +52,51 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
 (defn promise-buffer
-  ([] (promise-buffer (atom nil)))
-  ([state]
-   (reify
-     impl/Buffer
-     (full? [_] false)
-     (remove! [_] @state)
-     (add!* [this item]
-       (swap! state (fn [inner]
-                       (if (nil? inner)
-                         item
-                         inner)))
-        this)
+  ([] (promise-buffer nil))
+  ([v]
+   (let [state (atom v)]
+     (reify
+       impl/Buffer
+       (full? [_] false)
+       (remove! [_] @state)
+       (add!* [this item]
+         (compare-and-set! state nil item)
+         this)
 
-     clojure.lang.Counted
-     (count [_]
-       (if (nil? @state) 0 1)))))
+       #+clj
+       clojure.lang.Counted
+       #+clj
+       (count [_]
+         (if (nil? @state) 0 1024))
 
-#+cljs
-(defn promise-buffer
-  ([] (promise-buffer (atom nil)))
-  ([state]
-   (reify
-     impl/Buffer
-     (full? [_] false)
-     (remove! [_] @state)
-     (add!* [this item]
-       (swap! state (fn [inner]
-                      (if (nil? inner)
-                        item
-                        inner)))
-        this)
-
-     cljs.core/ICounted
-     (-count [this]
-       (if (nil? @state) 0 1)))))
+       #+cljs
+       cljs.core/ICounted
+       #+cljs
+       (-count [this]
+         (if (nil? @state) 0 1))))))
 
 (defn promise
   "Promise constructor."
   ([] (chan (promise-buffer)))
-  ([v] (chan (promise-buffer (atom v)))))
+  ([v] (chan (promise-buffer v))))
 
 (defn then
-  "Chain promise."
+  "Chain promise, mainly usefull if you do not want use
+  the go macro as sugar sintax."
   [p handler]
   (let [np (promise)]
-    (take! p (fn [v]
-               (if (nil? v)
-                 (close! np)
-                 (put! np (handler v))))
-           true)
+    (async/take! p (fn [v]
+                     (if (nil? v)
+                       (async/close! np)
+                       (async/put! np (handler v)))))
     np))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad definition
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; #+clj
-;; (def promise-monad
-;;   (reify
-;;     proto/Functor
-;;     (fmap [_ f mv]
-;;       (then mv f))
-
-;;     proto/Applicative
-;;     (pure [_ v]
-;;       (promise v))
-
-;;     (fapply [m af av]
-;;       (then af (fn [f] (then av f))))
-
-;;     proto/Monad
-;;     (mreturn [_ v]
-;;       (promise v))
-
-;;     (mbind [_ mv f]
-;;       (let [np (promise)]
-;;         (go
-;;           (let [res1 (<! mv)
-;;                 res2 (f res1)]
-;;             (if (instance? Promise res2)
-;;               (>! np (<! res2))
-;;               (>! np res2))))
-;;         np))))
+#+clj
+(defmacro when
+  [& promises]
+  `(let [pr# (promise)]
+     (go
+       (let [rs# [~@(map (fn [p#] `(<! ~p#)) promises)]]
+         (>! pr# rs#)))
+     pr#))
