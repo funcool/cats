@@ -658,13 +658,13 @@ any other contribution is always welcome.
 
 === Channel
 
-In asynchronous environments with clojure and clojurescript we tends to use core.async, because it
-a very powerfull abstraction.
+In asynchronous environments with clojure and clojurescript we tend to use core.async, because it
+is a very powerfull abstraction.
 
-And would be awesome will be able work with channel as a monadic type, and combine it with error
-monads, short-circuiting async computations.
+It would be awesome to be able to work with channel as a monadic type, and combine it with error
+monads for short-circuiting async computations that may fail.
 
-Let start using channel as a functor:
+Let's start using channel as a functor:
 [source, clojure]
 ----
 (require '[cljs.core.async :refer [chan put! <!!]])
@@ -678,7 +678,7 @@ Let start using channel as a functor:
 ;; => 3
 ----
 
-The channel type also fulfill the monad abstraction, let see it in action:
+The channel type also fulfills the monad abstraction, let see it in action:
 
 [source, clojure]
 ----
@@ -689,8 +689,8 @@ The channel type also fulfill the monad abstraction, let see it in action:
 ;; => 5
 ----
 
-But best of all is coming: combine the channel monad with error monads. It allows build very concise
-and simple asynchronous api. Let see how you can use it your application:
+But the best of all is coming: combine the channel monad with error monads. It allows to build very concise
+and simple asynchronous APIs. Let see how you can use it your application:
 
 [source, clojure]
 ----
@@ -708,10 +708,10 @@ and simple asynchronous api. Let see how you can use it your application:
 ;; => #<Right [5]>
 ----
 
-As you can see, the code looks very similar to the previos example, with the exception of
+As you can see, the code looks very similar to the previos example, with the exception that
 the value in a channel is not a simple plain value, is an either instance.
 
-Let see that is happens if some computation fails in the mlet composition:
+Let's see what happens if some computation fails in the mlet composition:
 
 [source, clojure]
 ----
@@ -722,10 +722,10 @@ Let see that is happens if some computation fails in the mlet composition:
 ;; => #<Left [Some error]>
 ----
 
-The result is an expected short-circuiting left, without unexpected nullpointer exceptions
-or something similar.
+The result is the expected short-circuiting left, without unexpected nullpointer exceptions
+or similar issues.
 
-With compositions like this, you can model your asynchronous api with full and powerfull
+With this compositional power, you can model your asynchronous API with a complete
 error handling using any error monad (in this case Either).
 
 
