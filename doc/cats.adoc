@@ -1,5 +1,4 @@
-Cats Documentation
-==================
+= Cats Documentation
 Andrey Antukh & Alejandro Gómez
 0.4.0-SNAPSHOT
 :toc: left
@@ -7,16 +6,13 @@ Andrey Antukh & Alejandro Gómez
 :source-highlighter: pygments
 :pygments-style: friendly
 
-
 image:logo.png[cats logo]
 
-Introduction
-------------
+== Introduction
 
 Category Theory abstractions for Clojure.
 
-Why another library?
-~~~~~~~~~~~~~~~~~~~~
+=== Why another library?
 
 Because the cats library:
 
@@ -27,20 +23,17 @@ Because the cats library:
 - licensed under a permissive license (compared to other libraries): BSD (2-Clause)
 
 
-Project Maturity
-----------------
+== Project Maturity
 
 Since _cats_ is a young project, there can be some link:codox/index.html#id[API] breakage.
 
 
-Install
--------
+== Install
 
 This section covers installing _cats_.
 
 
-Leiningen
-~~~~~~~~~
+=== Leiningen
 
 The simplest way to use _cats_ in a Clojure project is by including
 it as a dependency in your *_project.clj_*:
@@ -51,8 +44,7 @@ it as a dependency in your *_project.clj_*:
 ----
 
 
-Maven
-~~~~~
+=== Maven
 
 Also, you can use it with Maven. First, add the Clojars repository:
 
@@ -76,8 +68,7 @@ Then for cats:
 ----
 
 
-Get the Code
-~~~~~~~~~~~~
+=== Get the Code
 
 _cats_ is open source and can be found on link:https://github.com/funcool/cats[github].
 
@@ -89,8 +80,7 @@ git clone https://github.com/funcool/cats
 ----
 
 
-User Guide
-----------
+== User Guide
 
 This section introduces almost all the category theory abstractions that the _cats_ library
 supports.
@@ -100,19 +90,18 @@ the abstractions and it is very easy to understand. You can read more about it i
 section of the documentation.
 
 
-Functor
-~~~~~~~
+=== Functor
 
 Let's start with the functor. The Functor represents some sort of "computational context", and the
-abstraction consists of one unique function: **fmap**.
+abstraction consists of one unique function: *fmap*.
 
-.Signature of **fmap** function
+.Signature of *fmap* function
 [source, Clojure]
 ----
 (fmap [f fv])
 ----
 
-The higher-order function **fmap** takes a plain function as the first parameter and
+The higher-order function *fmap* takes a plain function as the first parameter and
 value wrapped in a functor context as the second parameter. It extracts the inner value
 applies the function to it, and returns the result wrapped in same type as the second
 parameter.
@@ -120,7 +109,7 @@ parameter.
 But, what is the *functor context*? It sounds more complex than it is. A Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocols.
 
-.One good example of a functor is the **Maybe** type:
+.One good example of a functor is the *Maybe* type:
 [source, Clojure]
 ----
 (require '[cats.monad.maybe :as maybe])
@@ -131,7 +120,7 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 ;; => #<Just [2]>
 ----
 
-Let's see one example using **fmap** over *just* instance:
+Let's see one example using *fmap* over *just* instance:
 
 .Example using fmap over *just*.
 [source, Clojure]
@@ -143,8 +132,8 @@ Let's see one example using **fmap** over *just* instance:
 ;; => #<Just [2]>
 ----
 
-We mentioned above that **fmap** extracts the value from the functor context. You will also want to
-extract values wrapped by **just** and you can do that with **from-maybe**.
+We mentioned above that *fmap* extracts the value from the functor context. You will also want to
+extract values wrapped by *just* and you can do that with *from-maybe*.
 
 .Example using *from-maybe* to extract values wrapped by *just*.
 [source, Clojure]
@@ -159,10 +148,11 @@ extract values wrapped by **just** and you can do that with **from-maybe**.
 ;; => 42
 ----
 
-The **Maybe** type also has another constructor: `nothing`. It represents the absence of a value.
+The *Maybe* type also has another constructor: `nothing`. It represents the absence of a value.
 It is a safe substitute for `nil` and may represent failure.
 
-Let's see what happens if we perform the same operation as the previous example over a *nothing* instance:
+Let's see what happens if we perform the same operation as the previous example over a *nothing*
+instance:
 
 .Example using fmap over *nothing*.
 [source, Clojure]
@@ -197,23 +187,22 @@ But why can we pass vectors to fmap? Because some Clojure container types like v
 lists and sets also implement the functor abstraction.
 
 
-Applicative
-~~~~~~~~~~~
+=== Applicative
 
 Let's continue with applicative functors. The Applicative Functor represents
-some sort of "computational context" like a plain Functor, but with abilty to
+some sort of "computational context" like a plain Functor, but with ability to
 execute a function wrapped in the same context.
 
-The Applicative Functor abstraction consists of two functions: **fapply** and
-**pure**.
+The Applicative Functor abstraction consists of two functions: *fapply* and
+*pure*.
 
-.Signature of **fapply** function
+.Signature of *fapply* function
 [source, Clojure]
 ----
 (fapply [af av])
 ----
 
-NOTE: the **pure** function will be explained later.
+NOTE: the *pure* function will be explained later.
 
 The use case for Applicative Functors is much the same as plain Functors: safe
 evaluation of some computation in a context.
@@ -266,7 +255,7 @@ can apply the returned greeter to any value without a defensive nil check:
 ;; => #<Nothing >
 ----
 
-Moreover, the applicative functor comes with **pure** function, and the main purpose of this function is
+Moreover, the applicative functor comes with *pure* function, and the main purpose of this function is
 to put some value in side-effect-free context of the current type.
 
 Examples:
@@ -283,12 +272,11 @@ Examples:
 ;; => #<Either [:bar :right]>
 ----
 
-If you do not understand the purpose of the **pure** function, the next section
+If you do not understand the purpose of the *pure* function, the next section
 should clarify its purpose.
 
 
-Monad
-~~~~~
+=== Monad
 
 Monads are the most discussed programming concept to come from category theory. Like functors and
 applicatives, monads deal with data in contexts.
@@ -296,7 +284,7 @@ applicatives, monads deal with data in contexts.
 Additionaly, monads can also transform contexts by unwrapping data, applying functions to it and
 putting new values in a completely different context.
 
-The monad abstraction consists of two functions: **bind** and **return**
+The monad abstraction consists of two functions: *bind* and *return*
 
 .Bind function signature.
 [source,Clojure]
@@ -331,7 +319,7 @@ what that container is, you can use `return` or `pure` functions:
 The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context
 value that's set internally by the `bind` function. Therefore, you can't use them with one argument outside of a `bind` context.
 
-We now can compose any number of computations using monad **bind*
+We now can compose any number of computations using monad *bind*
 functions. But observe what happens when the number of computations increases:
 
 .Composability example of bind function.
@@ -345,7 +333,7 @@ functions. But observe what happens when the number of computations increases:
 ----
 
 This can quickly lead to callback hell. To solve this, _cats_ comes with a powerful
-macro: **mlet**
+macro: *mlet*
 
 .Previous example but using *mlet* macro.
 [source, Clojure]
@@ -355,8 +343,7 @@ macro: **mlet**
   (return (* b 2)))
 ----
 
-NOTE: If you are coming from Haskell, mlet represents the **do-syntax**.
-
+NOTE: If you are coming from Haskell, mlet represents the *do-syntax*.
 
 
 If you want to use regular (non-monadic) let bindings inside an `mlet` block, you can do so using
@@ -371,11 +358,9 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 ----
 
 
-Monad Transformers
-~~~~~~~~~~~~~~~~~~
+=== Monad Transformers
 
-Motivation
-^^^^^^^^^^
+==== Motivation
 
 We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
 we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
@@ -406,8 +391,7 @@ resulting monad a monad transformer, which is the composition of a "base" and a 
 monad transformer is itself a monad.
 
 
-Using monad transformers
-^^^^^^^^^^^^^^^^^^^^^^^^
+==== Using monad transformers
 
 Let's combine the effects of two monads: State and Maybe. We'll create the transformer
 using State as the base monad since we want the resulting type to be a stateful computation
@@ -492,16 +476,14 @@ Let's see it in action:
       (maybe/from-maybe parse-result))))
 ----
 
-Monad types
------------
+== Monad types
 
 In our examples we have seen two types that implement
 the monad abstraction: Maybe and Either. But these are only two of the types
 that implements the Monad abstraction. In this section, we will explain the different
 monad types supported by _cats_ library.
 
-Maybe
-~~~~~
+=== Maybe
 
 This is one of the two most used monad types (also named Optional in other programming
 languages).
@@ -516,7 +498,7 @@ _cats_, implements two constructors:
 - `(just v)`: represents just a value in a context.
 - `(nothing)`: represents a failure or null.
 
-.Usage example of **Maybe** constructors.
+.Usage example of *Maybe* constructors.
 [source, Clojure]
 ----
 (require '[cats.monad.maybe :refer :all])
@@ -526,11 +508,8 @@ _cats_, implements two constructors:
 ;; => #<Nothing >
 ----
 
-NOTE: Maybe types are: Functors, Applicative Functors and Monads
 
-
-Either
-~~~~~~
+=== Either
 
 Either is another type that represents a result of computation, but (in contrast with maybe)
 it can return some data with a failed computation result.
@@ -540,7 +519,7 @@ In _cats_ it has two constructors:
 - `(left v)`: represents a failure.
 - `(right v)`: represents a successful result.
 
-.Usage example of **Either** constructors.
+.Usage example of *Either* constructors.
 [source, Clojure]
 ----
 (require '[cats.monad.either :refer :all])
@@ -554,8 +533,8 @@ In _cats_ it has two constructors:
 
 NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 
-Try
-~~~
+
+=== Try
 
 Also called Exception.
 
@@ -568,7 +547,7 @@ handling with heap-based error handling. Instead of having an exception thrown a
 having to deal with it immediately in the same thread, it disconnects the error
 handling and recovery.
 
-.Usage example of **try-on** macro.
+.Usage example of *try-on* macro.
 [source, Clojure]
 ----
 (require '[cats.monad.exception :as exc])
@@ -604,11 +583,8 @@ first parameter.
 ;; => #<Success [0]>
 ----
 
-NOTE: Try is also (like Maybe) Functor, Applicative Functor and Monad.
 
-
-State
-~~~~~
+=== State
 
 State monad in one of the special cases of monads most used in Haskell. It has different
 purposes including: lazy computation, composition, and maintaining state without explicit state.
@@ -680,32 +656,102 @@ However, if you have better examples to explain the state monad, documentation f
 any other contribution is always welcome.
 
 
-Reader
-~~~~~~
+=== Channel
+
+In asynchronous environments with clojure and clojurescript we tend to use core.async, because it
+is a very powerfull abstraction.
+
+It would be awesome to be able to work with channel as a monadic type, and combine it with error
+monads for short-circuiting async computations that may fail.
+
+Let's start using channel as a functor:
+[source, clojure]
+----
+(require '[cljs.core.async :refer [chan put! <!!]])
+(require '[cats.monad.channel :as channel])
+
+;; Declare arbitrary channel with initial value
+(def mychan (channel/with-value 2))
+
+;; Use channel as a functor
+(<!! (m/fmap inc mychan))
+;; => 3
+----
+
+The channel type also fulfills the monad abstraction, let see it in action:
+
+[source, clojure]
+----
+(def result (m/mlet [a (channel/with-value 2)
+                     b (channel/with-value 3)]
+              (m/return (+ a b))))
+(<!! result)
+;; => 5
+----
+
+But the best of all is coming: combine the channel monad with error monads. It allows to build very concise
+and simple asynchronous APIs. Let see how you can use it your application:
+
+[source, clojure]
+----
+(require '[cats.monad.either :as either])
+
+;; Declare a monad transformer
+(def either-chan-m
+  (either/either-transformer channel/channel-monad))
+
+;; A success example
+(<!! (m/with-monad either-chan-m
+       (m/mlet [a (channel/with-value (either/right 2))
+                b (channel/with-value (either/right 3))]
+         (m/return (+ a b)))))
+;; => #<Right [5]>
+----
+
+As you can see, the code looks very similar to the previos example, with the exception that
+the value in a channel is not a simple plain value, is an either instance.
+
+Let's see what happens if some computation fails in the mlet composition:
+
+[source, clojure]
+----
+(<!! (m/with-monad either-chan-m
+       (m/mlet [a (channel/with-value (either/left "Some error"))
+                b (channel/with-value (either/right 3))]
+         (m/return (+ a b)))))
+;; => #<Left [Some error]>
+----
+
+The result is the expected short-circuiting left, without unexpected nullpointer exceptions
+or similar issues.
+
+With this compositional power, you can model your asynchronous API with a complete
+error handling using any error monad (in this case Either).
+
+
+=== Reader
 
 TODO
 
-Writer
-~~~~~~
 
-TODO
-
-Continuation
-~~~~~~~~~~~~
-
-TODO
-
-Vector
-~~~~~~
+=== Writer
 
 TODO
 
 
-FAQ
----
+=== Continuation
 
-What are the difference with other existing libraries?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TODO
+
+
+=== Vector
+
+TODO
+
+
+== FAQ
+
+=== What are the difference with other existing libraries?
 
 This is an incomplete list of differences with other existing libraries:
 
@@ -720,8 +766,7 @@ This is an incomplete list of differences with other existing libraries:
   has much unnecesary complexity.
 
 
-What Clojure types implements some of the Category Theory abstractions?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== What Clojure types implements some of the Category Theory abstractions?
 
 In contrast to other similar libraries in Clojure, _cats_ doesn't intend to extend Clojure types
 that don't act like containers. For example, Clojure keywords are values but can not be containers so
@@ -738,11 +783,9 @@ they should not extend any of the previously explained protocols.
 |=============================================================
 
 
-How to Contribute?
-------------------
+== How to Contribute?
 
-Philosophy
-~~~~~~~~~~
+=== Philosophy
 
 Five most important rules:
 
@@ -755,26 +798,25 @@ Five most important rules:
 All contributions to _cats_ should keep these important rules in mind.
 
 
-Procedure
-~~~~~~~~~
+=== Procedure
 
 _cats_ does not have many restrictions for contributions. Just follow these
 steps depending on the situation:
 
-**Bugfix**:
+*Bugfix*:
 
 - Fork the GitHub repo.
 - Fix a bug/typo on a new branch.
 - Make a pull-request to master.
 
-**New feature**:
+*New feature*:
 
 - Open new issue with the new feature proposal.
 - If it is accepted, follow the same steps as "bugfix".
 
 
-License
-~~~~~~~
+=== License
+
 [source,text]
 ----
 Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
