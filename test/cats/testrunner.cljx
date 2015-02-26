@@ -11,6 +11,7 @@
             [cats.monad.exception-spec]
             [cats.monad.continuation-spec]
             [cats.monad.channel-spec]
+            [cats.monad.promise-spec]
             [cljs.nodejs :as nodejs]))
 
 #+cljs
@@ -29,6 +30,7 @@
                                         'cats.monad.reader-spec
                                         'cats.monad.writer-spec
                                         'cats.monad.channel-spec
+                                        'cats.monad.promise-spec
                                         ))
     0
     1))
