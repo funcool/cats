@@ -512,10 +512,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_either">5.2. Either</a></li>
 <li><a href="#_try">5.3. Try</a></li>
 <li><a href="#_state">5.4. State</a></li>
-<li><a href="#_reader">5.5. Reader</a></li>
-<li><a href="#_writer">5.6. Writer</a></li>
-<li><a href="#_continuation">5.7. Continuation</a></li>
-<li><a href="#_vector">5.8. Vector</a></li>
+<li><a href="#_channel">5.5. Channel</a></li>
+<li><a href="#_reader">5.6. Reader</a></li>
+<li><a href="#_writer">5.7. Writer</a></li>
+<li><a href="#_continuation">5.8. Continuation</a></li>
+<li><a href="#_vector">5.9. Vector</a></li>
 </ul>
 </li>
 <li><a href="#_faq">6. FAQ</a>
@@ -723,7 +724,8 @@ extract values wrapped by <strong>just</strong> and you can do that with <strong
 It is a safe substitute for <code>nil</code> and may represent failure.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see what happens if we perform the same operation as the previous example over a <strong>nothing</strong> instance:</p>
+<p>Let&#8217;s see what happens if we perform the same operation as the previous example over a <strong>nothing</strong>
+instance:</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>nothing</strong>.</div>
@@ -766,7 +768,7 @@ lists and sets also implement the functor abstraction.</p>
 <h3 id="_applicative">4.2. Applicative</h3>
 <div class="paragraph">
 <p>Let&#8217;s continue with applicative functors. The Applicative Functor represents
-some sort of "computational context" like a plain Functor, but with abilty to
+some sort of "computational context" like a plain Functor, but with ability to
 execute a function wrapped in the same context.</p>
 </div>
 <div class="paragraph">
@@ -921,7 +923,7 @@ what that container is, you can use <code>return</code> or <code>pure</code> fun
 value that&#8217;s set internally by the <code>bind</code> function. Therefore, you can&#8217;t use them with one argument outside of a <code>bind</code> context.</p>
 </div>
 <div class="paragraph">
-<p>We now can compose any number of computations using monad <strong>*bind</strong>
+<p>We now can compose any number of computations using monad <strong>bind</strong>
 functions. But observe what happens when the number of computations increases:</p>
 </div>
 <div class="listingblock">
@@ -1012,7 +1014,7 @@ monad transformer is itself a monad.</p>
 <div class="paragraph">
 <p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the transformer
 using State as the base monad since we want the resulting type to be a stateful computation
-that may fail: <code>s -&gt; Maybe (a, s)</code>.</p>
+that may fail: <code>s &#8594; Maybe (a, s)</code>.</p>
 </div>
 <div class="paragraph">
 <p>Almost every monad implemented in <em>cats</em> has a monad transformer for combining it with
@@ -1146,18 +1148,6 @@ encapsulating the original data type A (written Just A or Some A).</p>
 <span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Maybe types are: Functors, Applicative Functors and Monads
-</td>
-</tr>
-</table>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_either">5.2. Either</h3>
@@ -1254,18 +1244,6 @@ first parameter.</p>
                         <span class="tok-ss">:else</span> <span class="tok-mi">100</span><span class="tok-p">)))</span>
 <span class="tok-c1">;; =&gt; #&lt;Success [0]&gt;</span></code></pre>
 </div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Try is also (like Maybe) Functor, Applicative Functor and Monad.
-</td>
-</tr>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -1369,25 +1347,108 @@ any other contribution is always welcome.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reader">5.5. Reader</h3>
+<h3 id="_channel">5.5. Channel</h3>
+<div class="paragraph">
+<p>In asynchronous environments with clojure and clojurescript we tend to use core.async, because it
+is a very powerfull abstraction.</p>
+</div>
+<div class="paragraph">
+<p>It would be awesome to be able to work with channel as a monadic type, and combine it with error
+monads for short-circuiting async computations that may fail.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s start using channel as a functor:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cljs.core.async</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">chan</span> <span class="tok-nv">put!</span> <span class="tok-nv">&lt;!!</span><span class="tok-p">]])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.channel</span> <span class="tok-ss">:as</span> <span class="tok-nv">channel</span><span class="tok-p">])</span>
+
+<span class="tok-c1">;; Declare arbitrary channel with initial value</span>
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">mychan</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-mi">2</span><span class="tok-p">))</span>
+
+<span class="tok-c1">;; Use channel as a functor</span>
+<span class="tok-p">(</span><span class="tok-nf">&lt;!!</span> <span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-nv">mychan</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; 3</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The channel type also fulfills the monad abstraction, let see it in action:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">result</span> <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
+                     <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-mi">3</span><span class="tok-p">)]</span>
+              <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">))))</span>
+<span class="tok-p">(</span><span class="tok-nf">&lt;!!</span> <span class="tok-nv">result</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 5</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But the best of all is coming: combine the channel monad with error monads. It allows to build very concise
+and simple asynchronous APIs. Let see how you can use it your application:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span> <span class="tok-ss">:as</span> <span class="tok-nv">either</span><span class="tok-p">])</span>
+
+<span class="tok-c1">;; Declare a monad transformer</span>
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">either-chan-m</span>
+  <span class="tok-p">(</span><span class="tok-nf">either/either-transformer</span> <span class="tok-nv">channel/channel-monad</span><span class="tok-p">))</span>
+
+<span class="tok-c1">;; A success example</span>
+<span class="tok-p">(</span><span class="tok-nf">&lt;!!</span> <span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">either-chan-m</span>
+       <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-p">(</span><span class="tok-nf">either/right</span> <span class="tok-mi">2</span><span class="tok-p">))</span>
+                <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-p">(</span><span class="tok-nf">either/right</span> <span class="tok-mi">3</span><span class="tok-p">))]</span>
+         <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)))))</span>
+<span class="tok-c1">;; =&gt; #&lt;Right [5]&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, the code looks very similar to the previos example, with the exception that
+the value in a channel is not a simple plain value, is an either instance.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see what happens if some computation fails in the mlet composition:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">&lt;!!</span> <span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">either-chan-m</span>
+       <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-p">(</span><span class="tok-nf">either/left</span> <span class="tok-s">&quot;Some error&quot;</span><span class="tok-p">))</span>
+                <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">channel/with-value</span> <span class="tok-p">(</span><span class="tok-nf">either/right</span> <span class="tok-mi">3</span><span class="tok-p">))]</span>
+         <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)))))</span>
+<span class="tok-c1">;; =&gt; #&lt;Left [Some error]&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The result is the expected short-circuiting left, without unexpected nullpointer exceptions
+or similar issues.</p>
+</div>
+<div class="paragraph">
+<p>With this compositional power, you can model your asynchronous API with a complete
+error handling using any error monad (in this case Either).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reader">5.6. Reader</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_writer">5.6. Writer</h3>
+<h3 id="_writer">5.7. Writer</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_continuation">5.7. Continuation</h3>
+<h3 id="_continuation">5.8. Continuation</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vector">5.8. Vector</h3>
+<h3 id="_vector">5.9. Vector</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
@@ -1563,7 +1624,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-02-21 12:07:49 CET
+Last updated 2015-02-26 22:58:47 CET
 </div>
 </div>
 </body>
