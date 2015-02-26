@@ -7,7 +7,7 @@
             [cljs.core.async :refer [chan put! take! <! >!]]
             [cats.builtin :as b]
             [cats.protocols :as pt]
-            [cats.monad.channel :as c]
+            [cats.monad.channel :as channel]
             [cats.monad.either :as either]
             [cats.core :as m :include-macros true])
 
@@ -16,9 +16,13 @@
             [clojure.core.async :refer [go chan put! take! <! >! <!! >!!]]
             [cats.builtin :as b]
             [cats.protocols :as pt]
-            [cats.monad.channel :as c]
+            [cats.monad.channel :as channel]
             [cats.monad.either :as either]
             [cats.core :as m]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Channel Monad Tests
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn chan-with-value
   [value]
@@ -28,12 +32,12 @@
 
 #+clj
 (t/deftest channel-as-functor
-  (let [ch (m/pure c/channel-monad 1)]
+  (let [ch (m/pure channel/channel-monad 1)]
     (t/is (= 2 (<!! (m/fmap inc ch))))))
 
 #+clj
 (t/deftest channel-as-monad-1
-  (let [ch (m/pure c/channel-monad 1)]
+  (let [ch (m/pure channel/channel-monad 1)]
     (t/is (= 2 (<!! (m/>>= ch (fn [x] (m/return (inc x)))))))))
 
 #+clj
@@ -55,7 +59,7 @@
 (t/deftest channel-as-functor
   (t/async done
     (go
-      (let [ch (m/pure c/channel-monad 1)
+      (let [ch (m/pure channel/channel-monad 1)
             rs (m/fmap inc ch)]
         (t/is (= 2 (<! rs)))
         (done)))))
@@ -64,7 +68,7 @@
 (t/deftest channel-as-monad-1
   (t/async done
     (go
-      (let [ch (m/pure c/channel-monad 3)
+      (let [ch (m/pure channel/channel-monad 3)
             rs (m/>>= ch (fn [x] (m/return (inc x))))]
         (t/is (= 4 (<! rs)))
         (done)))))
@@ -91,8 +95,8 @@
 (t/deftest first-monad-law-left-identity
   (t/async done
     (go
-      (let [ch1 (m/pure c/channel-monad 4)
-            ch2 (m/pure c/channel-monad 4)
+      (let [ch1 (m/pure channel/channel-monad 4)
+            ch2 (m/pure channel/channel-monad 4)
             vl  (m/>>= ch2 chan-with-value)]
         (t/is (= (<! ch1)
                  (<! vl)))
@@ -121,7 +125,7 @@
         (t/is (= (<! rs1) (<! rs2)))
         (done)))))
 
-(def chaneither-m (either/either-transformer c/channel-monad))
+(def chaneither-m (either/either-transformer channel/channel-monad))
 
 #+clj
 (t/deftest channel-transformer-tests
@@ -146,8 +150,8 @@
 #+cljs
 (t/deftest channel-transformer-tests
   (t/async done
-    (let [funcright #(c/with-value (either/right %))
-          funcleft #(c/with-value (either/left %))
+    (let [funcright #(channel/with-value (either/right %))
+          funcleft #(channel/with-value (either/left %))
           r1 (m/with-monad chaneither-m
                (m/mlet [x (funcright 1)
                         y (funcright 2)]
@@ -164,4 +168,112 @@
         (done))))
   )
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Promise Channel Tests
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+#+clj
+(defn do-stuff
+  "Simple function that returns a promise
+  that is resolved in an asyncronous way."
+  [v]
+  (let [pr (channel/promise)]
+    (future
+      (put! pr v))
+    pr))
+
+#+cljs
+(defn do-stuff
+  "Simple function that returns a promise
+  that is resolved in an asyncronous way."
+  [v]
+  (let [pr (channel/promise)]
+    (js/setTimeout (fn []
+                     (put! pr v)) 0)
+    pr))
+
+
+#+clj
+(t/deftest take-from-promise-twice
+  (let [pr (do-stuff 2)
+        r1 (<!! pr)
+        r2 (<!! pr)]
+    (t/is (= r1 2))
+    (t/is (= r2 2)))
+  )
+
+#+cljs
+(t/deftest take-from-promise-twice
+  (t/async done
+    (go
+      (let [pr (do-stuff 2)
+            r1 (<! pr)
+            r2 (<! pr)]
+        (t/is (= r1 2))
+        (t/is (= r2 2))
+        (done))))
+  )
+
+#+clj
+(t/deftest resolve-promise-twice
+  (let [pr (do-stuff 2)
+        r  (<!! pr)]
+    (t/is (= 2 r))
+
+    (>!! pr 3)
+    (t/is (= 2 (<!! pr))))
+  )
+
+#+cljs
+(t/deftest resolve-promise-twice
+  (t/async done
+    (go
+      (let [pr (do-stuff 2)
+            r  (<! pr)]
+        (t/is (= 2 r))
+
+        (>! pr 3)
+        (t/is (= 2 (<! pr)))
+
+        (done))))
+  )
+
+
+#+clj
+(t/deftest promise-chains-with-then
+  (let [pr1 (do-stuff 2)
+        pr2 (channel/then pr1 inc)]
+    (t/is (= 3 (<!! pr2)))))
+
+#+cljs
+(t/deftest promise-chains-with-then
+  (t/async done
+    (go
+      (let [pr1 (do-stuff 2)
+            pr2 (channel/then pr1 inc)
+            r1 (<! pr2)]
+        (t/is (= 3 r1))
+        (done)))))
+
+
+;; #+cljs
+;; (t/deftest promise-chains-with-when
+;;   (let [p1 (do-stuff 2)
+;;         p2 (do-stuff 3)
+;;         p3 (channel/when p1 p2)]
+;;     (.log js/console "foobar" p3)
+;;     (t/async done
+;;       (go
+;;         (let [result (<! p3)]
+;;           (.log js/console "foobar" result)
+;;           (done))))))
+
+;; #+clj
+;; (t/deftest experiments
+;;   (let [p1 (do-stuff 2)
+;;         p2 (do-stuff 3)
+;;         p3 (channel/when1 p1 p2)]
+;;     (let [result (<!! p3)]
+;;       (println "foobar" result))))
 

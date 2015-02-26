@@ -28,19 +28,21 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
 
   #+cljs
-  (:require [cljs.core.async :refer [chan put! take! <! pipe]]
-            [cljs.core.async.impl.channels :as implch]
+  (:require [cljs.core.async :refer [chan put! take! <! pipe] :as async]
             [cljs.core.async.impl.protocols :as impl]
-            [cljs.core.async.impl.dispatch :as dispatch]
             [cats.core :as m :include-macros true]
             [cats.protocols :as proto])
 
   #+clj
-  (:require [clojure.core.async :refer [go chan put! take! <! pipe]]
+  (:require [clojure.core.async :refer [go chan put! take! <! pipe] :as async]
             [clojure.core.async.impl.protocols :as impl]
             [clojure.core.async.impl.dispatch :as dispatch]
             [cats.core :as m]
-            [cats.protocols :as proto]))
+            [cats.protocols :as proto])
+  #+clj
+  (:refer-clojure :exclude [promise when])
+  #+cljs
+  (:refer-clojure :exclude [when]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
@@ -91,6 +93,10 @@
   (get-context [_] channel-monad)
   (get-value [self] self))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helpers
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn with-value
   "Simple helper that creates a channel and attach
   an value to it."
@@ -99,3 +105,56 @@
    (put! ch value)
    ch))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Promise Buffer & Channel
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn promise-buffer
+  ([] (promise-buffer nil))
+  ([v]
+   (let [state (atom v)]
+     (reify
+       impl/Buffer
+       (full? [_] false)
+       (remove! [_] @state)
+       (add!* [this item]
+         (compare-and-set! state nil item)
+         this)
+
+       #+clj
+       clojure.lang.Counted
+       #+clj
+       (count [_]
+         (if (nil? @state) 0 1024))
+
+       #+cljs
+       cljs.core/ICounted
+       #+cljs
+       (-count [this]
+         (if (nil? @state) 0 1))))))
+
+(defn promise
+  "Promise constructor."
+  ([] (chan (promise-buffer)))
+  ([v] (chan (promise-buffer v))))
+
+(defn then
+  "Chain promise, mainly usefull if you do not want use
+  the go macro as sugar sintax."
+  [p handler]
+  (let [np (promise)]
+    (async/take! p (fn [v]
+                     (if (nil? v)
+                       (async/close! np)
+                       (async/put! np (handler v)))))
+    np))
+
+#+clj
+(defmacro when
+  [& promises]
+  `(let [pr# (promise)]
+     (go
+       (let [rs# [~@(map (fn [p#] `(<! ~p#)) promises)]]
+         (>! pr# rs#)))
+     pr#))
