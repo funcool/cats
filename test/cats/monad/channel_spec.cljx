@@ -24,12 +24,6 @@
 ;; Channel Monad Tests
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn chan-with-value
-  [value]
-  (let [c (chan)]
-    (put! c value)
-    c))
-
 #+clj
 (t/deftest channel-as-functor
   (let [ch (m/pure channel/channel-monad 1)]
@@ -97,7 +91,7 @@
     (go
       (let [ch1 (m/pure channel/channel-monad 4)
             ch2 (m/pure channel/channel-monad 4)
-            vl  (m/>>= ch2 chan-with-value)]
+            vl  (m/>>= ch2 channel/with-value)]
         (t/is (= (<! ch1)
                  (<! vl)))
         (done)))))
@@ -106,8 +100,8 @@
 (t/deftest second-monad-law-right-identity
   (t/async done
     (go
-      (let [ch1 (chan-with-value 2)
-            rs  (m/>>= (chan-with-value 2) m/return)]
+      (let [ch1 (channel/with-value 2)
+            rs  (m/>>= (channel/with-value 2) m/return)]
         (t/is (= (<! ch1) (<! rs)))
         (done)))))
 
@@ -115,13 +109,13 @@
 (t/deftest third-monad-law-associativity
   (t/async done
     (go
-      (let [rs1 (m/>>= (m/mlet [x  (chan-with-value 2)
-                                y  (chan-with-value (inc x))]
+      (let [rs1 (m/>>= (m/mlet [x  (channel/with-value 2)
+                                y  (channel/with-value (inc x))]
                          (m/return y))
-                       (fn [y] (chan-with-value (inc y))))
-            rs2 (m/>>= (chan-with-value 2)
-                       (fn [x] (m/>>= (chan-with-value (inc x))
-                                      (fn [y] (chan-with-value (inc y))))))]
+                       (fn [y] (channel/with-value (inc y))))
+            rs2 (m/>>= (channel/with-value 2)
+                       (fn [x] (m/>>= (channel/with-value (inc x))
+                                      (fn [y] (channel/with-value (inc y))))))]
         (t/is (= (<! rs1) (<! rs2)))
         (done)))))
 
