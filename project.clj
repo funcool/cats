@@ -40,13 +40,16 @@
                         :compiler {:output-to "output/tests.js"
                                    :output-dir "output/out"
                                    :source-map true
+                                   :static-fns true
+                                   :cache-analysis false
                                    :main cats.testrunner
                                    :optimizations :none
                                    :target :nodejs
                                    :pretty-print true}}]}
 
   :profiles
-  {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]]
+  {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]
+                        [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
          :test-paths ["output/test/clj"]
          :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT" :exclusions [org.clojure/clojure]]
                    [lein-cljsbuild "1.0.4"]]}})
