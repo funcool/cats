@@ -12,3 +12,4 @@ doc/index.html
 doc/codox
 /output
 /repl
+/node_modules
