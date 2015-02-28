@@ -33,13 +33,14 @@
                    :output-path "output/test/cljs"
                    :rules :cljs}]}
 
-  :cljsbuild {:test-commands {"test" ["node" "test/run.js"]}
+  :cljsbuild {:test-commands {"test" ["node" "output/tests.js"]}
               :builds [{:id "dev"
                         :source-paths ["output/test/cljs" "output/src"]
-                        :notify-command ["node" "test/run.js"]
+                        :notify-command ["node" "output/tests.js"]
                         :compiler {:output-to "output/tests.js"
                                    :output-dir "output/out"
                                    :source-map true
+                                   :main cats.testrunner
                                    :optimizations :none
                                    :target :nodejs
                                    :pretty-print true}}]}
