@@ -86,7 +86,6 @@
         (t/is (= 3 (<! r))))
       (done))))
 
-
 #+cljs
 (t/deftest first-monad-law-left-identity
   (t/async done
@@ -163,5 +162,3 @@
         (t/is (= (either/left :foo) (<! r2)))
         (done))))
   )
-
-
