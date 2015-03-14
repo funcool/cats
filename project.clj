@@ -4,7 +4,7 @@
   :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
   :dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]
-  :source-paths ["target/src" "src/clj"]
+  :source-paths ["output/src" "src/clj"]
 
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
