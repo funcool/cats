@@ -1,7 +1,7 @@
 Cats Documentation
 ==================
 Andrey Antukh & Alejandro Gómez
-0.3.2
+0.3.3
 :toc: left
 :numbered:
 :source-highlighter: pygments
@@ -47,7 +47,7 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[cats "0.3.2"]
+[cats "0.3.3"]
 ----
 
 
@@ -71,7 +71,7 @@ Then for cats:
 <dependency>
     <groupId>cats</groupId>
     <artifactId>cats</artifactId>
-    <version>0.3.2</version>
+    <version>0.3.3</version>
 </dependency>
 ----
 

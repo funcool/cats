@@ -1,12 +1,11 @@
-(defproject cats "0.3.0-SNAPSHOT"
+(defproject cats "0.3.3"
   :description "Category Theory abstractions for Clojure"
   :url "https://github.com/funcool/cats"
 
   :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
 
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2760"]]
+  :dependencies []
   :source-paths ["target/src" "src/clj"]
 
   :deploy-repositories {"releases" :clojars
@@ -48,11 +47,13 @@
                         :compiler {:output-to "target/tests.js"
                                    :optimizations :simple
                                    :pretty-print true}}]}
-  :profiles {:dev {:dependencies [[speclj "3.1.0"]
+
+  :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
+                                  [org.clojure/clojurescript "0.0-3058"]
+                                  [speclj "3.1.0"]
                                   [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                                   [org.clojure/tools.namespace "0.2.7"]]
                    :test-paths ["target/spec/clj"]
                    :plugins [[speclj "3.1.0"]
                              [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                              [lein-cljsbuild "1.0.4"]]}})
-

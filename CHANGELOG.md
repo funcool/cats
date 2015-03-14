@@ -5,6 +5,21 @@
 Date: unreleased
 
 
+## Version 0.3.3 ##
+
+Date: 2015-03-14
+
+- Improvements on project.clj.
+
+
+## Version 0.3.2 ##
+
+Date: 2015-02-08
+
+- Empty version, only exists because clojars does not
+  allow remove wrong uploaded versions.
+
+
 ## Version 0.3.0 ##
 
 Date: 2015-02-08
