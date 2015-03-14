@@ -4,6 +4,12 @@
 
 Date: unreleased
 
+## Version 0.3.4 ##
+
+Date: 2015-03-14
+
+- Improve cljx build process.
+
 
 ## Version 0.3.3 ##
 

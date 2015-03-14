@@ -1,4 +1,4 @@
-(defproject cats "0.3.3"
+(defproject cats "0.3.4"
   :description "Category Theory abstractions for Clojure"
   :url "https://github.com/funcool/cats"
 
@@ -6,7 +6,7 @@
             :url "http://opensource.org/licenses/BSD-2-Clause"}
 
   :dependencies []
-  :source-paths ["target/src" "src/clj"]
+  :source-paths ["output/src" "src/clj"]
 
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
@@ -15,36 +15,36 @@
                   ["deploy" "clojars"]]
 
   :plugins [[codox "0.8.10"]]
-  :codox {:sources ["target/classes"]
+  :codox {:sources ["output/src"]
           :output-dir "doc/codox"}
 
   :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store|user.clj"]
 
   :cljx {:builds [{:source-paths ["src/cljx"]
-                   :output-path "target/src"
+                   :output-path "output/src"
                    :rules :clj}
                   {:source-paths ["src/cljx"]
-                   :output-path "target/src"
+                   :output-path "output/src"
                    :rules :cljs}
                   {:source-paths ["spec"]
-                   :output-path "target/spec/clj"
+                   :output-path "output/spec/clj"
                    :rules :clj}
                   {:source-paths ["spec"]
-                   :output-path "target/spec/cljs"
+                   :output-path "output/spec/cljs"
                    :rules :cljs}]}
 
-  :cljsbuild {:test-commands {"spec" ["phantomjs"  "bin/speclj" "target/tests.js"]}
+  :cljsbuild {:test-commands {"spec" ["phantomjs"  "bin/speclj" "output/tests.js"]}
               :builds [{:id "dev"
-                        :source-paths ["target/spec/cljs"
-                                       "target/src"]
-                        :notify-command ["phantomjs" "bin/speclj" "target/tests.js"]
-                        :compiler {:output-to "target/tests.js"
+                        :source-paths ["output/spec/cljs"
+                                       "output/src"]
+                        :notify-command ["phantomjs" "bin/speclj" "output/tests.js"]
+                        :compiler {:output-to "output/tests.js"
                                    :optimizations :simple
                                    :pretty-print true}}
                        {:id "tests"
-                        :source-paths ["target/spec/cljs"
-                                       "target/src"]
-                        :compiler {:output-to "target/tests.js"
+                        :source-paths ["output/spec/cljs"
+                                       "output/src"]
+                        :compiler {:output-to "output/tests.js"
                                    :optimizations :simple
                                    :pretty-print true}}]}
 
@@ -53,7 +53,7 @@
                                   [speclj "3.1.0"]
                                   [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                                   [org.clojure/tools.namespace "0.2.7"]]
-                   :test-paths ["target/spec/clj"]
+                   :test-paths ["output/spec/clj"]
                    :plugins [[speclj "3.1.0"]
                              [com.keminglabs/cljx "0.5.0" :exclusions [org.clojure/clojure]]
                              [lein-cljsbuild "1.0.4"]]}})
