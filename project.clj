@@ -3,10 +3,8 @@
   :url "https://github.com/funcool/cats"
   :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2913"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
-  :source-paths ["output/src" "src/clj"]
+  :dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]
+  :source-paths ["target/src" "src/clj"]
 
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
@@ -47,10 +45,11 @@
                                    :target :nodejs
                                    :pretty-print true}}]}
 
-  :profiles
-  {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]
-                        [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
-         :test-paths ["output/test/clj"]
-         :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT" :exclusions [org.clojure/clojure]]
-                   [lein-cljsbuild "1.0.4"]]}})
-
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]
+                                  [org.clojure/clojure "1.6.0"]
+                                  [org.clojure/clojurescript "0.0-3058"]
+                                  [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
+                   :test-paths ["output/test/clj"]
+                   :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT"
+                              :exclusions [org.clojure/clojure]]
+                             [lein-cljsbuild "1.0.4"]]}})
