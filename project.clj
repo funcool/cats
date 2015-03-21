@@ -4,19 +4,11 @@
   :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
   :dependencies [[org.clojure/core.async "0.1.346.0-17112a-alpha"]]
-  :source-paths ["output/src" "src/clj"]
-
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
 
-  :release-tasks [["cljx" "once"]
-                  ["deploy" "clojars"]]
-
-  :plugins [[codox "0.8.11" :exclusions [org.clojure/clojure]]]
-  :codox {:sources ["output/src"]
-          :output-dir "doc/codox"}
-
-  :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store|user.clj"]
+  :source-paths ["output/src" "src/clj"]
+  :test-paths ["output/test/clj"]
 
   :cljx {:builds [{:source-paths ["src/cljx"]
                    :output-path "output/src"
@@ -45,11 +37,16 @@
                                    :target :nodejs
                                    :pretty-print true}}]}
 
+  :jar-exclusions [#"\.cljx|\.swp|\.swo|user.clj"]
+
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
                                   [org.clojure/clojure "1.6.0"]
                                   [org.clojure/clojurescript "0.0-3126"]
                                   [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
-                   :test-paths ["output/test/clj"]
+                   :codeina {:sources ["output/src"]
+                             :output-dir "doc/codeina"}
                    :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT"
+                              :exclusions [org.clojure/clojure]]
+                             [funcool/codeina "0.1.0-SNAPSHOT"
                               :exclusions [org.clojure/clojure]]
                              [lein-cljsbuild "1.0.4"]]}})

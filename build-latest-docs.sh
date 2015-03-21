@@ -7,7 +7,7 @@ lein doc
 rm -rf /tmp/cats-doc/
 mkdir -p /tmp/cats-doc/
 mv doc/index.html /tmp/cats-doc/
-mv doc/codox /tmp/cats-doc/codox
+mv doc/codeina /tmp/cats-doc/codeina
 cp logo/logo.png /tmp/cats-doc/logo.png
 
 git checkout gh-pages;
