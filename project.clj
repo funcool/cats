@@ -47,7 +47,7 @@
 
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
                                   [org.clojure/clojure "1.6.0"]
-                                  [org.clojure/clojurescript "0.0-3058"]
+                                  [org.clojure/clojurescript "0.0-3126"]
                                   [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
                    :test-paths ["output/test/clj"]
                    :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT"
