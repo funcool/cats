@@ -12,7 +12,7 @@
   :release-tasks [["cljx" "once"]
                   ["deploy" "clojars"]]
 
-  :plugins [[codox "0.8.10"]]
+  :plugins [[codox "0.8.11" :exclusions [org.clojure/clojure]]]
   :codox {:sources ["output/src"]
           :output-dir "doc/codox"}
 
