@@ -435,3 +435,9 @@
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
+
+(defn get-value
+  "Generic function for unwrap/extract
+  the inner value of a container."
+  [v]
+  (p/get-value v))
