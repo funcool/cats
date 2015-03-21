@@ -85,7 +85,7 @@
 
   This is multiarity function that with arity pure/1
   it uses the dynamic scope to resolve the current
-  context. With pure/2, you can force a specific context
+  context. With `pure/2`, you can force a specific context
   value."
   ([v] (pure (get-current-context) v))
   ([ctx v] (p/pure ctx v)))
@@ -186,21 +186,20 @@
   Let see one example for understand how it works, this is
   a code using bind for compose few number of operations:
 
-
-    (bind (just 1)
-          (fn [a]
-            (bind (just (inc a))
-                  (fn [b]
-                    (return (* b 2))))))
-    ;=> #<Just [4]>
+      (bind (just 1)
+            (fn [a]
+              (bind (just (inc a))
+                    (fn [b]
+                      (return (* b 2))))))
+      ;=> #<Just [4]>
 
   Now see how this code can be more clear if you
   are using mlet macro for do it:
 
-    (mlet [a (just 1)
-           b (just (inc a))]
-      (return (* b 2)))
-    ;=> #<Just [4]>
+      (mlet [a (just 1)
+             b (just (inc a))]
+        (return (* b 2)))
+      ;=> #<Just [4]>
   "
   [bindings & body]
   (when-not (and (vector? bindings)
@@ -240,19 +239,19 @@
   same as mlet but specifying the monadic context.
   So, instead of writing:
 
-    (with-monad (maybe-transformer vector-monad)
-      (mlet [a [(just 1) (just 2)]
-             b [(just (inc a))]]
-        (return (* b 2))))
-    ;=> [#<Just [4]> #<Just [6]>]
+      (with-monad (maybe-transformer vector-monad)
+        (mlet [a [(just 1) (just 2)]
+               b [(just (inc a))]]
+          (return (* b 2))))
+      ;=> [#<Just [4]> #<Just [6]>]
 
   You can just write:
 
-    (mlet-with (maybe-transformer vector-monad)
-      [a [(just 1) (just 2)]
-       b [(just (inc a))]]
-      (return (* b 2)))
-    ;=> [#<Just [4]> #<Just [6]>]
+      (mlet-with (maybe-transformer vector-monad)
+        [a [(just 1) (just 2)]
+         b [(just (inc a))]]
+        (return (* b 2)))
+      ;=> [#<Just [4]> #<Just [6]>]
   "
   [monad bindings & body]
   `(with-monad ~monad
@@ -263,19 +262,19 @@
   "Lifts a function with the given fixed number of arguments to a
   monadic context.
 
-    (require '[cats.monad.maybe :as maybe])
-    (require '[cats.core :as m])
+      (require '[cats.monad.maybe :as maybe])
+      (require '[cats.core :as m])
 
-    (def monad+ (m/lift-m 2 +))
+      (def monad+ (m/lift-m 2 +))
 
-    (monad+ (maybe/just 1) (maybe/just 2))
-    ;=> <Just [3]>
+      (monad+ (maybe/just 1) (maybe/just 2))
+      ;=> <Just [3]>
 
-    (monad+ (maybe/just 1) (maybe/nothing))
-    ;=> <Nothing>
+      (monad+ (maybe/just 1) (maybe/nothing))
+      ;=> <Nothing>
 
-    (monad+ [0 2 4] [1 2])
-    ;=> [1 2 3 4 5 6]
+      (monad+ [0 2 4] [1 2])
+      ;=> [1 2 3 4 5 6]
   "
   [n f]
   (let [val-syms (repeatedly n gensym)
@@ -293,14 +292,14 @@
   "Given a non-empty collection of monadic values, collect
   their values in a vector returned in the monadic context.
 
-    (require '[cats.monad.maybe :as maybe])
-    (require '[cats.core :as m])
+      (require '[cats.monad.maybe :as maybe])
+      (require '[cats.core :as m])
 
-    (m/sequence [(maybe/just 2) (maybe/just 3)])
-    ;=> <Just [[2, 3]]>
+      (m/sequence [(maybe/just 2) (maybe/just 3)])
+      ;=> <Just [[2, 3]]>
 
-    (m/sequence [(maybe/nothing) (maybe/just 3)])
-    ;=> <Nothing>
+      (m/sequence [(maybe/nothing) (maybe/just 3)])
+      ;=> <Nothing>
   "
   [mvs]
   {:pre [(not-empty mvs)]}
@@ -318,18 +317,18 @@
    monadic context, map it into the given collection
    calling sequence on the results.
 
-     (require '[cats.monad.maybe :as maybe])
-     (require '[cats.core :as m])
+       (require '[cats.monad.maybe :as maybe])
+       (require '[cats.core :as m])
 
-     (m/mapseq maybe/just [2 3])
-     ;=> <Just [[2 3]]>
+       (m/mapseq maybe/just [2 3])
+       ;=> <Just [[2 3]]>
 
-     (m/mapseq (fn [v]
-                  (if (odd? v)
-                    (maybe/just v)
-                    (maybe/nothing)))
-                 [1 2])
-     ;=> <Nothing>
+       (m/mapseq (fn [v]
+                    (if (odd? v)
+                      (maybe/just v)
+                      (maybe/nothing)))
+                   [1 2])
+       ;=> <Nothing>
   "
   [mf coll]
   (sequence (map mf coll)))
@@ -337,18 +336,18 @@
 (defn forseq
   "Same as mapseq but with the arguments in reverse order.
 
-    (require '[cats.monad.maybe :as maybe])
-    (require '[cats.core :as m])
+      (require '[cats.monad.maybe :as maybe])
+      (require '[cats.core :as m])
 
-    (m/forseq [2 3] maybe/just)
-    ;=> <Just [[2 3]]>
+      (m/forseq [2 3] maybe/just)
+      ;=> <Just [[2 3]]>
 
-    (m/forseq [1 2]
-              (fn [v]
-                (if (odd? v)
-                  (maybe/just v)
-                  (maybe/nothing))))
-    ;=> <Nothing>
+      (m/forseq [1 2]
+                (fn [v]
+                  (if (odd? v)
+                    (maybe/just v)
+                    (maybe/nothing))))
+      ;=> <Nothing>
   "
   [vs mf]
   (mapseq mf vs))
@@ -359,14 +358,14 @@
 
   Otherwise, returns the instance unchanged.
 
-    (require '[cats.monad.moaybe :as maybe])
-    (require '[cats.core :as m])
+      (require '[cats.monad.moaybe :as maybe])
+      (require '[cats.core :as m])
 
-    (m/filter (partial < 2) (maybe/just 3))
-    ;=> <Just [3]>
+      (m/filter (partial < 2) (maybe/just 3))
+      ;=> <Just [3]>
 
-    (m/filter (partial < 4) (maybe/just 3))
-    ;=> <Nothing>
+      (m/filter (partial < 4) (maybe/just 3))
+      ;=> <Nothing>
   "
   [p mv]
   (with-monad (get-current-context mv)
