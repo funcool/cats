@@ -28,14 +28,19 @@
     (t/is (= e (exc/from-failure (exc/try-on (throw e)))))
     (t/is (= e (exc/from-failure (exc/try-on e))))))
 
+#+cljs
 (t/deftest ideref-test
   (t/is (= 1 @(exc/success 1)))
-  (t/is (= 1 @(exc/failure 1))))
+  (t/is (thrown? js/Error @(exc/failure {:message "foobar"}))))
 
+#+clj
+(t/deftest ideref-test
+  (t/is (= 1 @(exc/success 1)))
+  (t/is (thrown? Exception @(exc/failure {:message "foobar"}))))
 
 (t/deftest predicates-test
   (let [m1 (exc/success 1)
-        m2 (exc/failure 1)]
+        m2 (exc/failure {})]
     (t/is (exc/success? m1))
     (t/is (exc/failure? m2))))
 
@@ -124,3 +129,4 @@
                   (fn [x]
                     (m/>>= (exc/try-on (inc x))
                            (fn [y] (exc/try-on (inc y)))))))))
+

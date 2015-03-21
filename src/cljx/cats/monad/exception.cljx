@@ -40,11 +40,22 @@
   (:require-macros [cats.monad.exception :refer [try-on]]
                    [cats.core :refer [with-monad]]))
 
-(declare exception-monad)
+(defn throw-exception
+  [message]
+  #+clj (throw (IllegalArgumentException. message))
+  #+cljs (throw (js/Error. message)))
+
+(defn exception?
+  "Check if provided parameter is an instance
+  of exception or not."
+  [e]
+  (instance? #+clj Exception #+cljs js/Error e))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Success and Failure Types definition
+;; Types and implementations.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(declare exception-monad)
 
 (deftype Success [v]
   proto/Context
@@ -81,7 +92,6 @@
       (= v (.-v other))
       false)))
 
-
 (deftype Failure [e]
   proto/Context
   (get-context [_] exception-monad)
@@ -90,14 +100,13 @@
   #+clj
   clojure.lang.IDeref
   #+clj
-  (deref [_] e)
+  (deref [_] (throw e))
 
   #+cljs
   IDeref
   #+cljs
-  (-deref [_] e)
+  (-deref [_] (throw e))
 
-  #+clj
   Object
   #+clj
   (equals [self other]
@@ -105,9 +114,9 @@
       (= e (.-e other))
       false))
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [e])))
+  (toString [_]
+    (with-out-str
+      (print [e])))
 
   #+cljs
   cljs.core/IEquiv
@@ -118,31 +127,52 @@
       false)))
 
 (defn success
+  "A Success type constructor.
+
+  It wraps any arbitrary value into
+  success type."
   [v]
   (Success. v))
 
 (defn failure
-  [e]
-  (Failure. e))
+  "A failure type constructor.
+
+  If a provided parameter is an exceptio, it wraps
+  it in a `Failure` instance and return it. But if
+  a provided parameter is arbitrary data, it tries
+  create an exception from it using clojure `ex-info`
+  function.
+
+  Take care that `ex-info` function in clojurescript
+  differs a little bit from clojure."
+  ([e] (failure e ""))
+  ([e message]
+   (if (exception? e)
+     (Failure. e)
+     (Failure. (ex-info message e)))))
 
 (defn success?
+  "Check if a provided parameter is a success instance"
   [v]
   (instance? Success v))
 
 (defn failure?
+  "Check if a provided parameter is a failure instance."
   [v]
   (instance? Failure v))
 
 (defn try?
+  "Check if a provided parameter is instance
+  of Try monad."
   [v]
-  (or (success? v)
-      (failure? v)))
+  (let [m (proto/get-context v)]
+    (= m exception-monad)))
 
 (defn exec-try-on
   [func]
   (try
     (let [result (func)]
-      (if (instance? #+clj Exception #+cljs js/Error result)
+      (if (exception? result)
         (failure result)
         (success result)))
     #+clj
@@ -197,49 +227,54 @@
         (with-meta metadata))))
 
 (defn from-success
+  "Extract value from success container
+  without doing nothing."
   [sv]
-  (.-v sv))
+  (if (success? sv)
+    (proto/get-value sv)
+    (throw-exception "provided paramater is a not success")))
 
 (defn from-failure
+  "Extract value from failure container
+  without doing nothing."
   [fv]
-  (.-e fv))
+  (if (failure? fv)
+    (proto/get-value fv)
+    (throw-exception "provided paramater is a not failure")))
 
 (defn from-try
+  "Generic function for unwrap/extract
+  the inner value of a container."
   [v]
-  (cond
-   (success? v)
-   (from-success v)
-
-   (failure? v)
-   (from-failure v)))
+  (proto/get-value v))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def exception-monad
- (reify
-   proto/Functor
-   (fmap [_ f s]
-     (if (success? s)
-       (try-on (f (.-v s)))
-       s))
+(def ^{:doc "The exception monad type definition."}
+  exception-monad
+  (reify
+    proto/Functor
+    (fmap [_ f s]
+      (if (success? s)
+        (try-on (f (proto/get-value s)))
+        s))
 
-   proto/Applicative
-   (pure [_ v]
-     (success v))
+    proto/Applicative
+    (pure [_ v]
+      (success v))
 
-   (fapply [m af av]
-     (if (success? af)
-       (proto/fmap m (.-v af) av)
-       af))
+    (fapply [m af av]
+      (if (success? af)
+        (proto/fmap m (proto/get-value af) av)
+        af))
 
-   proto/Monad
-   (mreturn [_ v]
-     (success v))
+    proto/Monad
+    (mreturn [_ v]
+      (success v))
 
-   (mbind [_ s f]
-     (if (success? s)
-       (f (.-v s))
-       s))))
-
+    (mbind [_ s f]
+      (if (success? s)
+        (f (proto/get-value s))
+        s))))
