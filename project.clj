@@ -45,7 +45,7 @@
                                    :target :nodejs
                                    :pretty-print true}}]}
 
-  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.7"]
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
                                   [org.clojure/clojure "1.6.0"]
                                   [org.clojure/clojurescript "0.0-3058"]
                                   [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
