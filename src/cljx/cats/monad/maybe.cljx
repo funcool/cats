@@ -99,6 +99,9 @@
   (-equiv [_ other]
     (instance? Nothing other)))
 
+(alter-meta! #'->Nothing assoc :private true)
+(alter-meta! #'->Just assoc :private true)
+
 (defn maybe?
   [v]
   (or (instance? Just v)
@@ -128,15 +131,16 @@
 (defn from-maybe
   "Return inner value from maybe monad. Accepts an optional default value.
 
-  Examples:
-    (from-maybe (just 1))
-    ;=> 1
-    (from-maybe (just 1) 42)
-    ;=> 1
-    (from-maybe (nothing))
-    ;=> nil
-    (from-maybe (nothing) 42)
-    ;=> 42
+  Let see some examples:
+
+      (from-maybe (just 1))
+      ;=> 1
+      (from-maybe (just 1) 42)
+      ;=> 1
+      (from-maybe (nothing))
+      ;=> nil
+      (from-maybe (nothing) 42)
+      ;=> 42
   "
   ([mv]
    {:pre [(maybe? mv)]}

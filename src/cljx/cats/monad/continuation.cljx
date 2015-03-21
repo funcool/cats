@@ -47,6 +47,8 @@
   (#+clj invoke #+cljs -invoke [self seed]
     (mfn seed)))
 
+(alter-meta! #'->Continuation assoc :private true)
+
 (defn continuation
   "Default constructor for continuation."
   [mfn]

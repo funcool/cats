@@ -67,6 +67,8 @@
   (toString [this]
     (with-out-str (print [fst snd]))))
 
+(alter-meta! #'->Pair assoc :private true)
+
 (defn pair
   [fst snd]
   (Pair. fst snd))

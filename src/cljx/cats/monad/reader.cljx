@@ -44,6 +44,8 @@
   (#+clj invoke #+cljs -invoke [self seed]
     (mfn seed)))
 
+(alter-meta! #'->Reader assoc :private true)
+
 (defn reader
   "Transform a simple reader-monad function
   to Reader class instance.

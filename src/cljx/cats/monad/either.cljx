@@ -103,6 +103,9 @@
       (= v (.-v other))
       false)))
 
+(alter-meta! #'->Right assoc :private true)
+(alter-meta! #'->Left assoc :private true)
+
 (defn left
   "Left constructor for Either type."
   ([]

@@ -49,6 +49,8 @@
   (#+clj invoke #+cljs -invoke [self seed]
     (mfn seed)))
 
+(alter-meta! #'->State assoc :private true)
+
 (defn state-t
   "Transform a simple state-monad function
   to State class instance.

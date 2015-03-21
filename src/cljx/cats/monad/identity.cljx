@@ -69,6 +69,8 @@
   (toString [_]
     (str v)))
 
+(alter-meta! #'->Identity assoc :private true)
+
 (defn identity
   "Default constructor for identity type."
   [v]

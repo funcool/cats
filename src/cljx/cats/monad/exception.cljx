@@ -126,6 +126,9 @@
       (= e (.-e other))
       false)))
 
+(alter-meta! #'->Success assoc :private true)
+(alter-meta! #'->Failure assoc :private true)
+
 (defn success
   "A Success type constructor.
 
