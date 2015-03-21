@@ -4,6 +4,14 @@
 
 Date: unreleased
 
+- The exception monad now raises a exception when you deref a failure instance.
+  This will allow easy use of monadic api from libraries or applications that
+  does not  use monads.
+- The `cats.monad.exception/failure` function now coerce all input that not
+  extends from exception to exception type (using `ex-info` clojure function).
+- Add channel monad using core.async channels abstraction.
+  This make easy treat channels as monads and using them in monadic compositions.
+
 ## Version 0.3.4 ##
 
 Date: 2015-03-14
