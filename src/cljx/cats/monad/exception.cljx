@@ -198,10 +198,34 @@
   "Return true in case of `v` is instance
   of Exception monad."
   [v]
-  (let [m (proto/get-context v)]
-    (= m exception-monad)))
+  (if (satisfies? proto/Context v)
+    (identical? (proto/get-context v) exception-monad)
+    false))
 
-(defn exec-try-on
+(defn extract
+  "Return inner value from exception monad.
+
+  This is a specialized version of `cats.core/extract`
+  for Exception monad types that allows set up
+  the default value.
+
+  If a provided `mv` is an instance of Failure type
+  it will re raise the inner exception. If you need
+  extract value without raising it, use `cats.core/extract`
+  function for it."
+  ([mv]
+   {:pre [(exception? mv)]}
+   (if (success? mv)
+     (proto/extract mv)
+     (throw (proto/extract mv))))
+  ([mv default]
+   {:pre [(exception? mv)]}
+   (if (success? mv)
+     (proto/extract mv)
+     default)))
+
+(defn ^{:no-doc true}
+  exec-try-on
   [func]
   (try
     (let [result (func)]
