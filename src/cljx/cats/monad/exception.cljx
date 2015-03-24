@@ -237,14 +237,16 @@
     #+cljs
     (catch js/Error e (failure e))))
 
-(defn exec-try-or-else
+(defn ^{:no-doc true}
+  exec-try-or-else
   [func defaultvalue]
   (let [result (exec-try-on func)]
     (if (failure? result)
       (success defaultvalue)
       result)))
 
-(defn exec-try-or-recover
+(defn ^{:no-doc true}
+  exec-try-or-recover
   [func recoverfn]
   (let [result (exec-try-on func)]
     (with-monad exception-monad
@@ -287,7 +289,7 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^{:doc "The exception monad type definition."}
+(def ^{:no-doc true}
   exception-monad
   (reify
     proto/Functor
