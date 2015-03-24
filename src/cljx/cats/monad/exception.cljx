@@ -24,11 +24,35 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.monad.exception
-  "The Try Monad.
+  "The Exception monad.
 
-  The Try type represents a computation that may either result in an exception,
-  or return a successfully computed value. It's similar to, but semantically
-  different from the Either type."
+  Also known as Try monad, popularized by Scala.
+
+  It represents a computation that may either result
+  in an exception or return a successfully computed
+  value. Is very similar to Either monad, but is
+  semantically different.
+
+  It consists in two types: Success and Failure. The
+  Success type is a simple wrapper like Right of Either
+  monad. But the Failure type is slightly different
+  from Left, because it is forced to wrap an instance
+  of Throwable (or Error in cljs).
+
+  The most common use case of this monad is for wrap
+  third party libraries that uses standard Exception
+  based error handling. In normal circumstances you
+  should use Either instead.
+
+  The types defined for Exception monad (Success and
+  Failure) also implementes the clojure IDeref interface
+  which facilitates libraries developing using monadic
+  composition without forcing a user of that library
+  to use or understand monads.
+
+  That is because when you will dereference the
+  failure instance, it will reraise the containing
+  exception."
   #+clj
   (:require [cats.protocols :as proto]
             [cats.core :refer [with-monad]])
