@@ -168,31 +168,32 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def either-monad
- (reify
-   proto/Functor
-   (fmap [_ f s]
-     (if (right? s)
-       (right (f (.-v s)))
-       s))
+(def ^{:no-doc true}
+  either-monad
+  (reify
+    proto/Functor
+    (fmap [_ f s]
+      (if (right? s)
+        (right (f (.-v s)))
+        s))
 
-   proto/Applicative
-   (pure [_ v]
-     (right v))
+    proto/Applicative
+    (pure [_ v]
+      (right v))
 
-   (fapply [m af av]
-     (if (right? af)
-       (proto/fmap m (.-v af) av)
-       af))
+    (fapply [m af av]
+      (if (right? af)
+        (proto/fmap m (.-v af) av)
+        af))
 
-   proto/Monad
-   (mreturn [_ v]
-     (right v))
+    proto/Monad
+    (mreturn [_ v]
+      (right v))
 
-   (mbind [_ s f]
-     (if (right? s)
-       (f (.-v s))
-       s))))
+    (mbind [_ s f]
+      (if (right? s)
+        (f (.-v s))
+        s))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad transformer definition
