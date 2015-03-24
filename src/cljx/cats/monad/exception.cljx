@@ -168,7 +168,7 @@
 (defn failure
   "A failure type constructor.
 
-  If a provided parameter is an exceptio, it wraps
+  If a provided parameter is an exception, it wraps
   it in a `Failure` instance and return it. But if
   a provided parameter is arbitrary data, it tries
   create an exception from it using clojure `ex-info`
