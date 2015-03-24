@@ -24,7 +24,14 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.monad.maybe
-  "The Maybe Monad."
+  "The Maybe monad implementation and helpers functions
+  for working with maybe related types.
+
+      (require '[cats.monad.maybe :as maybe])
+
+      (maybe/just 1)
+      ;; => #<Just [1]>
+  "
   (:require [cats.protocols :as proto]))
 
 (declare maybe-monad)
