@@ -194,9 +194,9 @@
   [v]
   (instance? Failure v))
 
-(defn try?
-  "Check if a provided parameter is instance
-  of Try monad."
+(defn exception?
+  "Return true in case of `v` is instance
+  of Exception monad."
   [v]
   (let [m (proto/get-context v)]
     (= m exception-monad)))
