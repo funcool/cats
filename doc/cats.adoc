@@ -96,7 +96,7 @@ Let's start with the functor. The Functor represents some sort of "computational
 abstraction consists of one unique function: *fmap*.
 
 .Signature of *fmap* function
-[source, Clojure]
+[source, clojure]
 ----
 (fmap [f fv])
 ----
@@ -110,7 +110,7 @@ But, what is the *functor context*? It sounds more complex than it is. A Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocols.
 
 .One good example of a functor is the *Maybe* type:
-[source, Clojure]
+[source, clojure]
 ----
 (require '[cats.monad.maybe :as maybe])
 
@@ -122,8 +122,8 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 
 Let's see one example using *fmap* over *just* instance:
 
-.Example using fmap over *just*.
-[source, Clojure]
+.Example using fmap over *just* instance.
+[source, clojure]
 ----
 (require '[cats.core :as m]
          '[cats.monad.maybe :refer [just]])
@@ -136,7 +136,7 @@ We mentioned above that *fmap* extracts the value from the functor context. You 
 extract values wrapped by *just* and you can do that with *from-maybe*.
 
 .Example using *from-maybe* to extract values wrapped by *just*.
-[source, Clojure]
+[source, clojure]
 ----
 (require '[cats.monad.maybe :refer [just from-maybe]])
 
@@ -155,7 +155,7 @@ Let's see what happens if we perform the same operation as the previous example 
 instance:
 
 .Example using fmap over *nothing*.
-[source, Clojure]
+[source, clojure]
 ----
 (fmap inc (nothing))
 ;; => #<Nothing >
@@ -168,7 +168,7 @@ of the same type as its second argument.
 Let's see an example of applying fmap over a Clojure vector:
 
 .Example using fmav over *vector*.
-[source, Clojure]
+[source, clojure]
 ----
 (fmap inc [1 2 3])
 ;; => [2 3 4]
@@ -177,7 +177,7 @@ Let's see an example of applying fmap over a Clojure vector:
 The main difference compared to the previous example with Clojure's map function, is that
 map returns lazy seqs no matter what collection we pass to it:
 
-[source, Clojure]
+[source, clojure]
 ----
 (type (map inc [1 2 3]))
 ;; => clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)
@@ -197,7 +197,7 @@ The Applicative Functor abstraction consists of two functions: *fapply* and
 *pure*.
 
 .Signature of *fapply* function
-[source, Clojure]
+[source, clojure]
 ----
 (fapply [af av])
 ----
@@ -214,7 +214,7 @@ Imagine you have some factory function that, depending on the language, returns 
 greeter function, and you only support a few languages.
 
 
-[source, Clojure]
+[source, clojure]
 ----
 (defn make-greeter
   [^String lang]
@@ -229,7 +229,7 @@ greeter is a valid function or is a nil value.
 
 Let's convert this factory to use Maybe type:
 
-[source, Clojure]
+[source, clojure]
 ----
 (defn make-greeter
   [^String lang]
@@ -243,7 +243,7 @@ As you can see, this version of the factory differs only slightly from the
 original implementation. And this tiny change gives you a new superpower: you
 can apply the returned greeter to any value without a defensive nil check:
 
-[source, Clojure]
+[source, clojure]
 ----
 (fapply (make-greeter "es") (just "Alex"))
 ;; => #<Just [Hola Alex]>
@@ -260,7 +260,7 @@ to put some value in side-effect-free context of the current type.
 
 Examples:
 
-[source, Clojure]
+[source, clojure]
 ----
 (require '[cats.monad.maybe])
 (require '[cats.monad.either])
@@ -287,7 +287,7 @@ putting new values in a completely different context.
 The monad abstraction consists of two functions: *bind* and *return*
 
 .Bind function signature.
-[source,Clojure]
+[source,clojure]
 ----
 (bind [mv f])
 ----
@@ -296,7 +296,7 @@ As you can see, bind works much like a Functor but with inverted arguments. The 
 that in a monad, the function is a responsible for wrapping a returned value in a context.
 
 .Example usage of the bind higher-order function.
-[source,Clojure]
+[source,clojure]
 ----
 (bind (just 1)
       (fn [v] (just (inc v))))
@@ -308,7 +308,7 @@ monadic value and you want to return the result in the same container context bu
 what that container is, you can use `return` or `pure` functions:
 
 .Usage of return function in bind context.
-[source,Clojure]
+[source,clojure]
 ----
 (bind (just 1)
       (fn [v]
@@ -323,7 +323,7 @@ We now can compose any number of computations using monad *bind*
 functions. But observe what happens when the number of computations increases:
 
 .Composability example of bind function.
-[source, Clojure]
+[source, clojure]
 ----
 (bind (just 1)
       (fn [a]
@@ -336,7 +336,7 @@ This can quickly lead to callback hell. To solve this, _cats_ comes with a power
 macro: *mlet*
 
 .Previous example but using *mlet* macro.
-[source, Clojure]
+[source, clojure]
 ----
 (mlet [a (just 1)
        b (just (inc a))]
@@ -349,7 +349,7 @@ NOTE: If you are coming from Haskell, mlet represents the *do-syntax*.
 If you want to use regular (non-monadic) let bindings inside an `mlet` block, you can do so using
 `:let` and a binding vector inside the mlet bindings:
 
-[source, Clojure]
+[source, clojure]
 ----
 (mlet [a (just 1)
        b (just (inc a))
@@ -365,7 +365,7 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 We can combine two functors and get a new one automatically. Given any two functors _a_ and _b_,
 we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 
-[source, Clojure]
+[source, clojure]
 ----
 (ns functor.example
   (:require [cats.core :refer [fmap]]
@@ -401,7 +401,7 @@ Almost every monad implemented in _cats_ has a monad transformer for combining i
 any other monad. The transformer functions take a Monad as their argument and they
 return a reified MonadTrans:
 
-[source, Clojure]
+[source, clojure]
 ----
 (ns transformers.example
   (:require [cats.core :as m]
@@ -429,7 +429,7 @@ The `maybe-state` monad combines the semantics of both State and Maybe.
 
 Let's see it in action:
 
-[source, Clojure]
+[source, clojure]
 ----
 (defn any-char [s]
   "A function that takes an input string as an state and
@@ -499,7 +499,7 @@ _cats_, implements two constructors:
 - `(nothing)`: represents a failure or null.
 
 .Usage example of *Maybe* constructors.
-[source, Clojure]
+[source, clojure]
 ----
 (require '[cats.monad.maybe :refer :all])
 (just 1)
@@ -520,7 +520,7 @@ In _cats_ it has two constructors:
 - `(right v)`: represents a successful result.
 
 .Usage example of *Either* constructors.
-[source, Clojure]
+[source, clojure]
 ----
 (require '[cats.monad.either :refer :all])
 
@@ -548,7 +548,7 @@ having to deal with it immediately in the same thread, it disconnects the error
 handling and recovery.
 
 .Usage example of *try-on* macro.
-[source, Clojure]
+[source, clojure]
 ----
 (require '[cats.monad.exception :as exc])
 
@@ -566,14 +566,14 @@ first parameter.
 
 
 .Usage example of `try-or-else` macro.
-[source, Clojure]
+[source, clojure]
 ----
 (exc/try-or-else (+ 1 nil) 2)
 ;; => #<Success [2]>
 ----
 
 .Usage example of `try-or-recover` macro.
-[source, Clojure]
+[source, clojure]
 ----
 (exc/try-or-recover (+ 1 nil)
                     (fn [e]
@@ -594,7 +594,7 @@ as is (without executing it). Obviously, a function should have some special cha
 in monad state composition.
 
 .Valid function for valid state monad
-[source, Clojure]
+[source, clojure]
 ----
 (fn [state]
   "Takes state as argument and return a vector
@@ -611,7 +611,7 @@ you do not need to build your own functions, just use some helpers that _cats_ p
 Let's look at one example before explaining the details:
 
 .Lazy composition of computations
-[source, Clojure]
+[source, clojure]
 ----
 (m/mlet [state (m/get-state)
          _     (m/put-state (next state))]
@@ -636,7 +636,7 @@ functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
   state, ignoring the resulting value.
 
 .This is what happens when we execute these three functions over previously generated `State` instance
-[source, Clojure]
+[source, clojure]
 ----
 (m/run-state s [1 2 3])
 ;;=> #<Pair [1 (2 3)]>
