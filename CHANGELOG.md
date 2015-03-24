@@ -11,6 +11,8 @@ Date: unreleased
   extends from exception to exception type (using `ex-info` clojure function).
 - Add channel monad using core.async channels abstraction.
   This make easy treat channels as monads and using them in monadic compositions.
+- Remove mlet-with macro (bacause it sintax is ugly and with-monad usage is preferable)
+- Remove undocumented errlet macro.
 
 ## Version 0.3.4 ##
 
