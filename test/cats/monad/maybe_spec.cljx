@@ -19,9 +19,9 @@
     (t/is (= nil (maybe/from-maybe (maybe/nothing))))
     (t/is (= 42 (maybe/from-maybe (maybe/nothing) 42))))
 
-  (t/testing "get-value function"
-    (t/is (= (p/get-value (maybe/just 1)) 1))
-    (t/is (= (p/get-value (maybe/nothing)) nil)))
+  (t/testing "extract function"
+    (t/is (= (p/extract (maybe/just 1)) 1))
+    (t/is (= (p/extract (maybe/nothing)) nil)))
 
   (t/testing "Test IDeref"
     (t/is (= nil @(maybe/nothing)))

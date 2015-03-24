@@ -24,17 +24,36 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.protocols
-  "Cathegory theory types definition.")
+  "Abstractions of Category Theory over that
+  cats library is build.
+
+  Functions of this namespace are not indented
+  to be used directly. Is a private api but exposes
+  as public for documentation purposes.")
 
 (defprotocol Context
-  "A type that is part of a computational context."
-  (get-context [_] "Get the monad instance for curent value.")
-  (get-value [_] "Unwrap the value from context."))
+  "Abstraction that establish a membership of types
+  with one concrete monad.
+
+  This is a way that cats establishes the relation
+  between a type and the monad that that should play.
+
+  A great example es Maybe monad type Just. It implements
+  this abstraction for establish that Just is part of
+  Maybe monad."
+  (get-context [_] "Get the monad instance for curent value."))
+
+(defprotocol Extract
+  "A type class responsible of extract the
+  value from a monad context."
+  (extract [mv] "Extract the value from monad context."))
 
 (defprotocol Functor
+  "The Functor abstraction."
   (fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
 
 (defprotocol Applicative
+  "The Applicative abstraction."
   (fapply [app af av]
     "Applies the function(s) inside ag's context to the value(s)
      inside av's context while preserving the context.")
@@ -43,31 +62,39 @@
      the value v in the most minimal context of same type of ctx"))
 
 (defprotocol Monad
+  "The Monad abstraction."
   (mreturn [m v])
   (mbind [m mv f]))
 
 (defprotocol MonadZero
-  "A `Monad` that supports the notion of an identity element."
+  "A complement abstraction for monad that
+  supports the notion of an identity element."
   (mzero [m] "The identity element for `ctx`."))
 
 (defprotocol MonadPlus
-  "A `MonadZero` that supports the notion of addition."
+  "A complement abstraction for Monad that
+  supports the notion of addition."
   (mplus [m mv mv'] "An associative addition operation."))
 
 (defprotocol MonadState
-  "A `Monad` formed by functions from states to a new state
-  and a (poosibly monadic) value."
+  "A specific case of Monad abstraction for
+  work with state in pure functional way."
   (get-state [m] "Return the current state.")
   (put-state [m newstate] "Update the state.")
   (swap-state [m f] "Apply a function to the current state and update it."))
 
 (defprotocol MonadReader
-  "A `Monad` with a read-only access to an environment value."
+  "A specific case of Monad abstraction that
+  allows a read only access to an environment."
   (ask [m] "Return the current environment.")
   (local [m f reader] "Create a reader in a modified version of the environment."))
 
 (defprotocol MonadWriter
-  "A `Monad` that accumulates a log."
+  "A specific case of Monad abstraction that
+  allows emulate write operations in pure functional
+  way.
+
+  A great example is writing a log message."
   (listen [m mv] "Given a writer, yield a (value, log) pair as a value.")
   (tell [m v] "Add the given value to the log.")
   (pass [m mv]

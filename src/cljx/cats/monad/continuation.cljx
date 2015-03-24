@@ -40,7 +40,6 @@
 (deftype Continuation [mfn]
   proto/Context
   (get-context [_] continuation-monad)
-  (get-value [_] mfn)
 
   #+clj  clojure.lang.IFn
   #+cljs cljs.core/IFn

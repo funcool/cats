@@ -42,7 +42,6 @@
 (deftype State [mfn]
   proto/Context
   (get-context [_] state-monad)
-  (get-value [_] mfn)
 
   #+clj  clojure.lang.IFn
   #+cljs cljs.core/IFn

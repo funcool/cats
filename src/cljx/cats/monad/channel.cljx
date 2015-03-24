@@ -88,8 +88,7 @@
 (extend-type #+clj clojure.core.async.impl.channels.ManyToManyChannel
              #+cljs cljs.core.async.impl.channels.ManyToManyChannel
   proto/Context
-  (get-context [_] channel-monad)
-  (get-value [self] self))
+  (get-context [_] channel-monad))
 
 (defn with-value
   "Simple helper that creates a channel and attach

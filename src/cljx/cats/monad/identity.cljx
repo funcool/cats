@@ -37,7 +37,9 @@
 (deftype Identity [v]
   proto/Context
   (get-context [_] identity-monad)
-  (get-value [_] v)
+
+  proto/Extract
+  (extract [_] v)
 
   #+clj
   clojure.lang.IDeref

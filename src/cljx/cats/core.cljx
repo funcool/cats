@@ -405,8 +405,8 @@
            b (mg a)]
           (return b))))
 
-(defn get-value
+(defn extract
   "Generic function for unwrap/extract
   the inner value of a container."
   [v]
-  (p/get-value v))
+  (p/extract v))

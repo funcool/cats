@@ -60,7 +60,9 @@
 (deftype Success [v]
   proto/Context
   (get-context [_] exception-monad)
-  (get-value [_] v)
+
+  proto/Extract
+  (extract [_] v)
 
   #+clj
   clojure.lang.IDeref
@@ -95,7 +97,9 @@
 (deftype Failure [e]
   proto/Context
   (get-context [_] exception-monad)
-  (get-value [_] e)
+
+  proto/Extract
+  (extract [_] e)
 
   #+clj
   clojure.lang.IDeref
@@ -229,28 +233,6 @@
     (-> (fn [& args] (try-on (apply func args)))
         (with-meta metadata))))
 
-(defn from-success
-  "Extract value from success container
-  without doing nothing."
-  [sv]
-  (if (success? sv)
-    (proto/get-value sv)
-    (throw-exception "provided paramater is a not success")))
-
-(defn from-failure
-  "Extract value from failure container
-  without doing nothing."
-  [fv]
-  (if (failure? fv)
-    (proto/get-value fv)
-    (throw-exception "provided paramater is a not failure")))
-
-(defn from-try
-  "Generic function for unwrap/extract
-  the inner value of a container."
-  [v]
-  (proto/get-value v))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -261,7 +243,7 @@
     proto/Functor
     (fmap [_ f s]
       (if (success? s)
-        (try-on (f (proto/get-value s)))
+        (try-on (f (proto/extract s)))
         s))
 
     proto/Applicative
@@ -279,5 +261,5 @@
 
     (mbind [_ s f]
       (if (success? s)
-        (f (proto/get-value s))
+        (f (proto/extract s))
         s))))

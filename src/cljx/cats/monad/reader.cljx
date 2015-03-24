@@ -37,7 +37,6 @@
 (deftype Reader [mfn]
   proto/Context
   (get-context [_] reader-monad)
-  (get-value [_] mfn)
 
   #+clj  clojure.lang.IFn
   #+cljs cljs.core/IFn
@@ -47,17 +46,19 @@
 (alter-meta! #'->Reader assoc :private true)
 
 (defn reader
-  "Transform a simple reader-monad function
-  to Reader class instance.
-  Reader class instance work as simple wrapper
-  for standard clojure function, just for avoid
-  extend plain function type of clojure."
+  "The Reader type constructor.
+
+  The purpose of Reader type is wrap a simple
+  function that fullfill the reader signature.
+
+  It exists just for avoid extend the clojure
+  function type because is very generic type."
   [f]
   (Reader. f))
 
 (defn reader?
-  "Check if value s is instance of
-  Reader type."
+  "Return true if `s` is instance
+  of Reader type."
   [s]
   (instance? Reader s))
 

@@ -36,7 +36,9 @@
 (deftype Right [v]
   proto/Context
   (get-context [_] either-monad)
-  (get-value [_] v)
+
+  proto/Extract
+  (extract [_] v)
 
   #+clj
   clojure.lang.IDeref
@@ -71,7 +73,9 @@
 (deftype Left [v]
   proto/Context
   (get-context [_] either-monad)
-  (get-value [_] v)
+
+  proto/Extract
+  (extract [_] v)
 
   #+clj
   clojure.lang.IDeref
@@ -129,14 +133,24 @@
   (instance? Right mv))
 
 (defn either?
-  [mv]
-  (or (left? mv)
-      (right? mv)))
+  "Return true in case of `v` is instance
+  of Either monad."
+  [v]
+  (if (satisfies? proto/Context v)
+    (identical? (proto/get-context v) either-monad)
+    false))
 
-(defn from-either
-  "Return inner value of either monad."
+(defn ^{:deprecated true}
+  from-either
+  "Return inner value of either monad.
+
+  This is a specialized version of `cats.core/extract`
+  for Either monad.
+
+  The use of this function is DEPRECATED and
+  `cats.core/extract` should be used."
   [mv]
-  (.-v mv))
+  (proto/extract mv))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition

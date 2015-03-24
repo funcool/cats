@@ -36,7 +36,9 @@
 (extend-type nil
   proto/Context
   (get-context [_] maybe/maybe-monad)
-  (get-value [_] nil))
+
+  proto/Extract
+  (extract [_] nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (Lazy) Sequence Monad
@@ -75,8 +77,7 @@
 (extend-type #+clj clojure.lang.LazySeq
              #+cljs cljs.core.LazySeq
   proto/Context
-  (get-context [_] sequence-monad)
-  (get-value [self] (seq self)))
+  (get-context [_] sequence-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vector Monad
@@ -115,8 +116,7 @@
 (extend-type #+clj clojure.lang.PersistentVector
              #+cljs cljs.core.PersistentVector
   proto/Context
-  (get-context [_] vector-monad)
-  (get-value [self] (seq self)))
+  (get-context [_] vector-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set Monad
@@ -155,5 +155,4 @@
 (extend-type #+clj clojure.lang.PersistentHashSet
              #+cljs cljs.core.PersistentHashSet
   proto/Context
-  (get-context [_] set-monad)
-  (get-value [self] (seq self)))
+  (get-context [_] set-monad))

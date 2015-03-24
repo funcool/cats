@@ -19,8 +19,8 @@
     (t/is (maybe/nothing? nil))
     (t/is (maybe/maybe? nil)))
 
-  (t/testing "get-value function"
-    (t/is (= (p/get-value nil) nil))))
+  (t/testing "extract function"
+    (t/is (= (p/extract nil) nil))))
 
 (t/deftest vector-monad
   (t/testing "The first monad law: left identity"

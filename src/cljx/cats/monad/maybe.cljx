@@ -36,7 +36,9 @@
 (deftype Just [v]
   proto/Context
   (get-context [_] maybe-monad)
-  (get-value [_] v)
+
+  proto/Extract
+  (extract [_] v)
 
   #+clj
   clojure.lang.IDeref
@@ -71,7 +73,9 @@
 (deftype Nothing []
   proto/Context
   (get-context [_] maybe-monad)
-  (get-value [_] nil)
+
+  proto/Extract
+  (extract [_] nil)
 
   #+clj
   clojure.lang.IDeref
@@ -145,7 +149,7 @@
   ([mv]
    {:pre [(maybe? mv)]}
    (when (just? mv)
-     (.-v mv)))
+     (proto/extract mv)))
   ([mv default]
    {:pre [(maybe? mv)]}
    (if (just? mv)
