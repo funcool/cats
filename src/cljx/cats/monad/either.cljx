@@ -199,7 +199,9 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn either-transformer [inner-monad]
+(defn either-transformer
+  "The Either transformer constructor."
+  [inner-monad]
   (reify
     proto/Monad
     (mreturn [_ v]
