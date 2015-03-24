@@ -69,9 +69,9 @@
   #+clj (throw (IllegalArgumentException. message))
   #+cljs (throw (js/Error. message)))
 
-(defn exception?
-  "Check if provided parameter is an instance
-  of exception or not."
+(defn throwable?
+  "Return true if `v` is an instance of
+  the Throwable or js/Error type."
   [e]
   (instance? #+clj Exception #+cljs js/Error e))
 
@@ -178,7 +178,7 @@
   differs a little bit from clojure."
   ([e] (failure e ""))
   ([e message]
-   (if (exception? e)
+   (if (throwable? e)
      (Failure. e)
      (Failure. (ex-info message e)))))
 
