@@ -74,7 +74,7 @@
 (alter-meta! #'->Identity assoc :private true)
 
 (defn identity
-  "Default constructor for identity type."
+  "The Identity type constructor."
   [v]
   (Identity. v))
 
@@ -82,7 +82,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def identity-monad
+(def ^{:no-doc true}
+  identity-monad
   (reify
     proto/Functor
     (fmap [_ f iv]
@@ -106,13 +107,13 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn identity-transformer [inner-monad]
+(defn identity-transformer
+  "The Identity transformer constructor."
+  [inner-monad]
   (reify
     proto/Monad
     (mreturn [_ v]
       (identity (proto/mreturn inner-monad v)))
 
     (mbind [_ mv f]
-      nil)
-
-))
+      nil)))
