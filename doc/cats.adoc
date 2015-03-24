@@ -461,13 +461,13 @@ Let's see it in action:
   (state/run-state any-two-chars "F"))
 ;;=> #<Nothing >
 
-; We could have written `any-two-chars` more succinctly by using `cats.core/mlet-with`,
+; We could have written `any-two-chars` more succinctly by using `cats.core/with-monad`,
 ; which is intended as syntactic sugar for transformer usage.
 (def any-two-chars
-  (m/mlet-with maybe-state
-    [a any-char
-     b any-char]
-    (m/return (str a b))))
+  (m/with-monad maybe-state
+    (m/mlet [a any-char
+             b any-char]
+      (m/return (str a b)))))
 
 ; We also define a function for applying parser to a given input
 (defn parse [parser input]
