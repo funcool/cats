@@ -66,7 +66,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def reader-monad
+(def ^{:no-doc true}
+  reader-monad
   (reify
     proto/Functor
     (fmap [_ f fv]
@@ -89,15 +90,15 @@
 
     (local [_ f mr]
       (reader (fn [env]
-                (mr (f env)))))
-
-  ))
+                (mr (f env)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn reader-transformer [inner-monad]
+(defn reader-transformer
+  "The Reader transformer constructor."
+  [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]
@@ -133,8 +134,7 @@
 
     (local [_ f mr]
       (fn [env]
-        (mr (f env))))
-))
+        (mr (f env))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions

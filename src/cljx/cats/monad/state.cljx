@@ -51,17 +51,19 @@
 (alter-meta! #'->State assoc :private true)
 
 (defn state-t
-  "Transform a simple state-monad function
-  to State class instance.
-  State class instance work as simple wrapper
-  for standard clojure function, just for avoid
-  extend plain function type of clojure."
+  "The State type constructor.
+
+  The purpose of State type is wrap a simple
+  function that fullfill the state signature.
+
+  It exists just for avoid extend the clojure
+  function type because is very generic type."
   [f]
   (State. f))
 
 (defn state?
-  "Check if value s is instance of
-  State type."
+  "Return true if `s` is instance of
+  the State type."
   [s]
   (instance? State s))
 
@@ -69,7 +71,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def state-monad
+(def ^{:no-doc true}
+  state-monad
   (reify
     proto/Functor
     (fmap [_ f fv]
@@ -108,7 +111,9 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn state-transformer [inner-monad]
+(defn state-transformer
+  "The State transformer constructor."
+  [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]

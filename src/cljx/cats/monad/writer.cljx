@@ -37,7 +37,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def writer-monad
+(def ^{:no-doc true}
+  writer-monad
   (reify
     proto/Monad
     (mreturn [_ v]
@@ -57,14 +58,15 @@
 
     (pass [_ mv]
       (let [[v f] (first mv)]
-        (d/pair v (f (second mv)))))
-))
+        (d/pair v (f (second mv)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn writer-transformer [inner-monad]
+(defn writer-transformer
+  "The Writer transformer constructor."
+  [inner-monad]
   (reify
     proto/Monad
     (mreturn [_ v]
@@ -113,14 +115,14 @@
                    mv
                    (fn [v]
                      (proto/mreturn inner-monad
-                                    (d/pair v [])))))
-))
+                                    (d/pair v [])))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn tell
+  "Add the value to the log."
   [v]
   (proto/tell (m/get-current-context writer-monad) v))
 
@@ -133,5 +135,4 @@
   (proto/pass (m/get-current-context writer-monad) mv))
 
 (def value first)
-
 (def log second)
