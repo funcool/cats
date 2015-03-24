@@ -34,7 +34,9 @@
 ;; Context Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^:dynamic *context* nil)
+(def ^{:dynamic true
+       :no-doc true}
+  *context* nil)
 
 #+clj
 (defmacro with-monad
@@ -52,7 +54,8 @@
      (binding [*context* ~ctx]
        ~@body)))
 
-(defn get-current-context
+(defn ^{:no-doc true}
+  get-current-context
   "Get current context or obtain it from
   the provided instance."
   ([] (get-current-context nil))
@@ -86,18 +89,34 @@
   This is multiarity function that with arity pure/1
   it uses the dynamic scope to resolve the current
   context. With `pure/2`, you can force a specific context
-  value."
+  value.
+
+  Example:
+
+      (with-monad either/either-monad
+        (pure 1)
+      ;; => #<Right [1]>
+  "
   ([v] (pure (get-current-context) v))
   ([ctx v] (p/pure ctx v)))
 
 (defn return
-  "This is a monad version of pure."
+  "This is a monad version of pure and it works
+  identically to it."
   ([v] (return (get-current-context) v))
   ([ctx v] (p/mreturn ctx v)))
 
 (defn bind
-  "Given a value inside monadic context mv and any function,
-  applies a function to value of mv."
+  "Given a value inside monadic context `mv` and any function,
+  applies a function to value of mv.
+
+      (bind (either/right 1) (fn [v]
+                               (return (inc v))))
+      ;; => #<Right [2]>
+
+  For convenience, you may prefer use a `mlet` macro
+  that add a beautiful, let like syntax for
+  compose operations with `bind` function."
   [mv f]
   (cond
     (satisfies? p/MonadTrans *context*)
@@ -129,7 +148,8 @@
     (mzero)))
 
 (defn join
-  "Remove one level of monadic structure."
+  "Remove one level of monadic structure.
+  This is same as that `(bind mv identity)`"
   [mv]
   (bind mv identity))
 
@@ -137,7 +157,8 @@
   "Apply a function f to the value inside functor's fv
   preserving the context type."
   [f fv]
-  (p/fmap (get-current-context fv) f fv))
+  (-> (get-current-context fv)
+      (p/fmap f fv)))
 
 (defn fapply
   "Given function inside af's conext and value inside
@@ -148,30 +169,24 @@
 
 (defn when
   "If the expression is true, returns the monadic value.
-
   Otherwise, yields nil in a monadic context."
   ([b mv]
    (when (get-current-context mv) b mv))
   ([ctx b mv]
-   (if b
-     mv
-     (return ctx nil))))
+   (if b mv (return ctx nil))))
 
 (defn unless
   "If the expression is false, returns the monadic value.
-
   Otherwise, yields nil in a monadic context."
   [b mv]
   (when-not b
     mv))
 
 (defn lift
-  "Lift a value from the inner monad of a monad transformer into a value
-  of the monad transformer."
-  ([mv]
-   (p/lift *context* mv))
-  ([m mv]
-   (p/lift m mv)))
+  "Lift a value from the inner monad of a monad transformer
+  into a value of the monad transformer."
+  ([mv] (p/lift *context* mv))
+  ([m mv] (p/lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -262,19 +277,16 @@
   "Lifts a function with the given fixed number of arguments to a
   monadic context.
 
-      (require '[cats.monad.maybe :as maybe])
-      (require '[cats.core :as m])
-
-      (def monad+ (m/lift-m 2 +))
+      (def monad+ (lift-m 2 +))
 
       (monad+ (maybe/just 1) (maybe/just 2))
-      ;=> <Just [3]>
+      ;; => <Just [3]>
 
       (monad+ (maybe/just 1) (maybe/nothing))
-      ;=> <Nothing>
+      ;; => <Nothing>
 
       (monad+ [0 2 4] [1 2])
-      ;=> [1 2 3 4 5 6]
+      ;; => [1 2 3 4 5 6]
   "
   [n f]
   (let [val-syms (repeatedly n gensym)
@@ -292,14 +304,11 @@
   "Given a non-empty collection of monadic values, collect
   their values in a vector returned in the monadic context.
 
-      (require '[cats.monad.maybe :as maybe])
-      (require '[cats.core :as m])
+      (sequence [(maybe/just 2) (maybe/just 3)])
+      ;; => <Just [[2, 3]]>
 
-      (m/sequence [(maybe/just 2) (maybe/just 3)])
-      ;=> <Just [[2, 3]]>
-
-      (m/sequence [(maybe/nothing) (maybe/just 3)])
-      ;=> <Nothing>
+      (sequence [(maybe/nothing) (maybe/just 3)])
+      ;; => <Nothing>
   "
   [mvs]
   {:pre [(not-empty mvs)]}
@@ -336,18 +345,19 @@
 (defn forseq
   "Same as mapseq but with the arguments in reverse order.
 
-      (require '[cats.monad.maybe :as maybe])
-      (require '[cats.core :as m])
+  Let se a little example:
 
       (m/forseq [2 3] maybe/just)
-      ;=> <Just [[2 3]]>
+      ;; => <Just [[2 3]]>
+
+  Yet an other example that fails:
 
       (m/forseq [1 2]
                 (fn [v]
                   (if (odd? v)
                     (maybe/just v)
                     (maybe/nothing))))
-      ;=> <Nothing>
+      ;; => <Nothing>
   "
   [vs mf]
   (mapseq mf vs))
@@ -393,11 +403,13 @@
    (reduce fapply af (cons av avs))))
 
 (defn >>=
-  "Performs a Haskell-style left-associative bind.
+  "Performs a Haskell-style left-associative
+  bind.
 
-  Example:
-    (>>= (just 1) (comp just inc) (comp just inc))
-    ;=> #<Just [3]>
+  Let see it in action:
+
+      (>>= (just 1) (comp just inc) (comp just inc))
+      ;; => #<Just [3]>
   "
   ([mv f]
    (bind mv f))
