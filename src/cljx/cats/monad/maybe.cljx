@@ -122,36 +122,47 @@
     false))
 
 (defn just
-  ([v]
-     (Just. v))
-  ([]
-     (Just. nil)))
+  "A Just type constructor.
+
+  Without arguments it returns a Just instance
+  with nil as wrapped value."
+  ([] (Just. nil))
+  ([v] (Just. v)))
 
 (defn nothing
+  "A Nothing type constructor."
   []
   (Nothing.))
 
 (defn just?
+  "Returns true if `v` is an instance
+  of `Just` type."
   [v]
   (instance? Just v))
 
 (defn nothing?
+  "Returns true if `v` is an instance
+  of `Nothing` type or is nil."
   [v]
   (or
    (nil? v)
    (instance? Nothing v)))
 
 (defn from-maybe
-  "Return inner value from maybe monad. Accepts an optional default value.
+  "Return inner value from maybe monad.
+
+  This is a specialized version of `cats.core/extract`
+  for Maybe monad types that allows set up
+  the default value.
 
   Let see some examples:
 
       (from-maybe (just 1))
       ;=> 1
-      (from-maybe (just 1) 42)
-      ;=> 1
+
       (from-maybe (nothing))
       ;=> nil
+
       (from-maybe (nothing) 42)
       ;=> 42
   "
@@ -162,14 +173,15 @@
   ([mv default]
    {:pre [(maybe? mv)]}
    (if (just? mv)
-     (.-v mv)
+     (proto/extract mv)
      default)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def maybe-monad
+(def ^{:no-doc true}
+  maybe-monad
   (reify
     proto/Functor
     (fmap [_ f mv]
@@ -207,7 +219,9 @@
 ;; Monad transformer definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn maybe-transformer [inner-monad]
+(defn maybe-transformer
+  "The maybe transformer constructor."
+  [inner-monad]
   (reify
     proto/Functor
     (fmap [_ f fv]
