@@ -114,10 +114,12 @@
 (alter-meta! #'->Just assoc :private true)
 
 (defn maybe?
+  "Return true in case of `v` is instance
+  of Maybe monad."
   [v]
-  (or (instance? Just v)
-      (instance? Nothing v)
-      (nil? v)))
+  (if (satisfies? proto/Context v)
+    (identical? (proto/get-context v) maybe-monad)
+    false))
 
 (defn just
   ([v]
