@@ -123,26 +123,26 @@
 (alter-meta! #'->Left assoc :private true)
 
 (defn left
-  "Left constructor for Either type."
-  ([]
-     (Left. nil))
-  ([v]
-     (Left. v)))
+  "A Left type constructor."
+  ([] (Left. nil))
+  ([v] (Left. v)))
 
 (defn right
-  "Right constructor for Either type."
-  ([]
-     (Right. nil))
-  ([v]
-     (Right. v)))
+  "A Right type constructor."
+  ([] (Right. nil))
+  ([v] (Right. v)))
 
 (defn left?
-  [mv]
-  (instance? Left mv))
+  "Return true if `v` is an instance
+  of Left type."
+  [v]
+  (instance? Left v))
 
 (defn right?
-  [mv]
-  (instance? Right mv))
+  "Return true if `v` is an instance
+  of Right type."
+  [v]
+  (instance? Right v))
 
 (defn either?
   "Return true in case of `v` is instance
