@@ -304,7 +304,7 @@
 
     (fapply [m af av]
       (if (success? af)
-        (proto/fmap m (proto/get-value af) av)
+        (proto/fmap m (proto/extract af) av)
         af))
 
     proto/Monad
