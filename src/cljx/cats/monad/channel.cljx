@@ -46,7 +46,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def channel-monad
+(def ^{:no-doc true}
+  channel-monad
   (reify
     proto/Functor
     (fmap [mn f mv]
@@ -97,4 +98,3 @@
   ([value ch]
    (put! ch value)
    ch))
-
