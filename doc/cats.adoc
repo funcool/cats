@@ -12,6 +12,7 @@ image:logo.png[cats logo]
 
 Category Theory abstractions for Clojure.
 
+
 === Why another library?
 
 Because the cats library:
@@ -87,7 +88,7 @@ supports.
 
 We will use the _Maybe_ for the example snippets, because it has support for all
 the abstractions and it is very easy to understand. You can read more about it in the next
-section of the documentation.
+section of this documentation.
 
 
 === Functor
@@ -114,38 +115,21 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 ----
 (require '[cats.monad.maybe :as maybe])
 
-;; `just` function is one of two constructors of Maybe
-
 (maybe/just 2)
 ;; => #<Just [2]>
 ----
+
+The `just` function is a constructor of Just type that is part of Maybe monad.
 
 Let's see one example using *fmap* over *just* instance:
 
 .Example using fmap over *just* instance.
 [source, clojure]
 ----
-(require '[cats.core :as m]
-         '[cats.monad.maybe :refer [just]])
+(require '[cats.core :as m])
 
-(m/fmap inc (just 1))
+(m/fmap inc (maybe/just 1))
 ;; => #<Just [2]>
-----
-
-We mentioned above that *fmap* extracts the value from the functor context. You will also want to
-extract values wrapped by *just* and you can do that with *from-maybe*.
-
-.Example using *from-maybe* to extract values wrapped by *just*.
-[source, clojure]
-----
-(require '[cats.monad.maybe :refer [just from-maybe]])
-
-(from-maybe (just 1))
-;; => 1
-(from-maybe (nothing))
-;; => nil
-(from-maybe (nothing) 42)
-;; => 42
 ----
 
 The *Maybe* type also has another constructor: `nothing`. It represents the absence of a value.
@@ -485,28 +469,54 @@ monad types supported by _cats_ library.
 
 === Maybe
 
-This is one of the two most used monad types (also named Optional in other programming
+This is one of the two most used monad types (also known as Optional in other programming
 languages).
 
-Maybe/Optional is a polymorphic type that represents encapsulation of an optional value; e.g. it is
-used as the return type of functions which may or may not return a meaningful value when they
-are applied. It consists of either an empty constructor (called None or Nothing), or a constructor
+Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type 
+of functions which may or may not return a meaningful value when they are applied. It consists 
+of either an empty constructor (called None or Nothing), or a constructor
 encapsulating the original data type A (written Just A or Some A).
 
-_cats_, implements two constructors:
+_cats_, implements two types:
+ 
+- `Just` that represents just a value in a context.
+- `Nothing` that represents the abscense of value.
 
-- `(just v)`: represents just a value in a context.
-- `(nothing)`: represents a failure or null.
-
-.Usage example of *Maybe* constructors.
+.Example creating instances of `Just` and `Nothing` types
 [source, clojure]
 ----
-(require '[cats.monad.maybe :refer :all])
-(just 1)
+(maybe/just 1)
 ;; => #<Just [1]>
-(nothing)
+
+(maybe/nothing)
 ;; => #<Nothing >
 ----
+
+In the same ns, it there other usefull functions for work with maybe monad types. See the api
+documentation for see a full list of them. But here we will exaplain a little relevant subset
+of they.
+
+We mentioned above that *fmap* extracts the value from the functor context. You will also want to
+extract values wrapped by *just* and you can do that with *from-maybe*.
+
+The Just or Nothing instances as we said previously, acts like a wrappers and in some circumstances
+you will want extract the plain value from them. For it, cats offers the `from-maybe` function.
+
+.Example using *from-maybe* to extract values wrapped by *just*.
+[source, clojure]
+----
+(maybe/from-maybe (maybe/just 1))
+;; => 1
+
+(maybe/from-maybe (maybe/nothing))
+;; => nil
+
+(maybe/from-maybe (maybe/nothing) 42)
+;; => 42
+----
+
+The `from-maybe` function is a specialized version more generic one: `cats.core/extract`. The generic
+version is a polymorphic function and will work also with different types of different monads.
 
 
 === Either
