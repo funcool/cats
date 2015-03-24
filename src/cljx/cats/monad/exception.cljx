@@ -183,12 +183,14 @@
      (Failure. (ex-info message e)))))
 
 (defn success?
-  "Check if a provided parameter is a success instance"
+  "Return true if `v` is an instance of
+  the Success type."
   [v]
   (instance? Success v))
 
 (defn failure?
-  "Check if a provided parameter is a failure instance."
+  "Return true if `v` is an instance of
+  the Failure type."
   [v]
   (instance? Failure v))
 
