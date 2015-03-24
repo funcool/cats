@@ -103,6 +103,7 @@
      the result of applying the aforementioned function to the log as the new log."))
 
 (defprotocol MonadTrans
+  "A common abstraction for all monad transformers."
   (base [mt] "Return the base monad of this transformer.")
   (inner [mt] "Return the monad that this transformer wraps.")
   (lift [m mv]
