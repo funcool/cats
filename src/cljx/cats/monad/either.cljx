@@ -24,7 +24,19 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.monad.either
-  "The Either (Error) Monad."
+  "The Either monad implementation and helper functions
+  for working with either related types.
+
+  Also commonly known as Error monad.
+
+      (require '[cats.monad.either :as either])
+
+      (either/right 1)
+      ;; => #<Right [1]>
+
+      (either/left 1)
+      ;; => #<Left [1]>
+  "
   (:require [cats.protocols :as proto]))
 
 (declare either-monad)
