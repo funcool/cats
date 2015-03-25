@@ -480,55 +480,51 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Cats Documentation</h1>
 <div class="details">
 <span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">0.3.4</span>
+<span id="revdate">0.4.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_introduction">1. Introduction</a>
+<li><a href="#_introduction">1. Introduction</a></li>
+<li><a href="#_rationale">2. Rationale</a></li>
+<li><a href="#_project_maturity">3. Project Maturity</a></li>
+<li><a href="#_install">4. Install</a>
 <ul class="sectlevel2">
-<li><a href="#_why_another_library">1.1. Why another library?</a></li>
+<li><a href="#_leiningen">4.1. Leiningen</a></li>
+<li><a href="#_get_the_code">4.2. Get the Code</a></li>
 </ul>
 </li>
-<li><a href="#_project_maturity">2. Project Maturity</a></li>
-<li><a href="#_install">3. Install</a>
+<li><a href="#_user_guide">5. User Guide</a>
 <ul class="sectlevel2">
-<li><a href="#_leiningen">3.1. Leiningen</a></li>
-<li><a href="#_maven">3.2. Maven</a></li>
-<li><a href="#_get_the_code">3.3. Get the Code</a></li>
+<li><a href="#_functor">5.1. Functor</a></li>
+<li><a href="#_applicative">5.2. Applicative</a></li>
+<li><a href="#_monad">5.3. Monad</a></li>
+<li><a href="#_monad_transformers">5.4. Monad Transformers</a></li>
 </ul>
 </li>
-<li><a href="#_user_guide">4. User Guide</a>
+<li><a href="#_monad_types">6. Monad types</a>
 <ul class="sectlevel2">
-<li><a href="#_functor">4.1. Functor</a></li>
-<li><a href="#_applicative">4.2. Applicative</a></li>
-<li><a href="#_monad">4.3. Monad</a></li>
-<li><a href="#_monad_transformers">4.4. Monad Transformers</a></li>
+<li><a href="#_maybe">6.1. Maybe</a></li>
+<li><a href="#_either">6.2. Either</a></li>
+<li><a href="#_exception">6.3. Exception</a></li>
+<li><a href="#_state">6.4. State</a></li>
+<li><a href="#_reader">6.5. Reader</a></li>
+<li><a href="#_writer">6.6. Writer</a></li>
+<li><a href="#_continuation">6.7. Continuation</a></li>
+<li><a href="#_vector">6.8. Vector</a></li>
+<li><a href="#_other_monads">6.9. Other monads</a></li>
 </ul>
 </li>
-<li><a href="#_monad_types">5. Monad types</a>
+<li><a href="#_faq">7. FAQ</a>
 <ul class="sectlevel2">
-<li><a href="#_maybe">5.1. Maybe</a></li>
-<li><a href="#_either">5.2. Either</a></li>
-<li><a href="#_try">5.3. Try</a></li>
-<li><a href="#_state">5.4. State</a></li>
-<li><a href="#_reader">5.5. Reader</a></li>
-<li><a href="#_writer">5.6. Writer</a></li>
-<li><a href="#_continuation">5.7. Continuation</a></li>
-<li><a href="#_vector">5.8. Vector</a></li>
+<li><a href="#_what_clojure_types_implements_some_of_the_category_theory_abstractions">7.1. What Clojure types implements some of the Category Theory abstractions?</a></li>
 </ul>
 </li>
-<li><a href="#_faq">6. FAQ</a>
+<li><a href="#_how_to_contribute">8. How to Contribute?</a>
 <ul class="sectlevel2">
-<li><a href="#_what_are_the_difference_with_other_existing_libraries">6.1. What are the difference with other existing libraries?</a></li>
-<li><a href="#_what_clojure_types_implements_some_of_the_category_theory_abstractions">6.2. What Clojure types implements some of the Category Theory abstractions?</a></li>
-</ul>
-</li>
-<li><a href="#_how_to_contribute">7. How to Contribute?</a>
-<ul class="sectlevel2">
-<li><a href="#_philosophy">7.1. Philosophy</a></li>
-<li><a href="#_procedure">7.2. Procedure</a></li>
-<li><a href="#_license">7.3. License</a></li>
+<li><a href="#_philosophy">8.1. Philosophy</a></li>
+<li><a href="#_procedure">8.2. Procedure</a></li>
+<li><a href="#_license">8.3. License</a></li>
 </ul>
 </li>
 </ul>
@@ -548,87 +544,88 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>Category Theory abstractions for Clojure.</p>
 </div>
-<div class="sect2">
-<h3 id="_why_another_library">1.1. Why another library?</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rationale">2. Rationale</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Because the cats library:</p>
+<p>The main motivations for writting this library are:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>targets both of the most-used Clojure implementations:  <strong>Clojure (jvm)</strong> and <strong>ClojureScript(js)</strong></p>
+<p>The existing libraries does not have support for ClojureScript.</p>
 </li>
 <li>
-<p>aims to have the simplest implementation of the supported abstractions.</p>
+<p>We do not intend to write a little haskell inside the clojure. We have adopted a
+practical and clojure like approach, always with corectness in mind.</p>
 </li>
 <li>
-<p>aims to have more abstractions that are simple monads.</p>
+<p>We do not like viral/copyleft like licenses and with difference with other libraries
+cats is licensed under BSD (2 clauses) license.</p>
 </li>
 <li>
-<p>has documentation as first class citizen.</p>
-</li>
-<li>
-<p>licensed under a permissive license (compared to other libraries): BSD (2-Clause)</p>
+<p>We do not intend implement only monads. Other category theory abstractions are also
+first class in cats.</p>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p><strong>Alternatives:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>algo.monads</strong>: This is the clojure official library for monads. Its approach for modeling
+monads is slightly limited, only supports the monad abstraction and does not has support for
+ClojureScript.</p>
+</li>
+<li>
+<p><strong>fluokitten</strong>: Slightly unmaintaned by the original author. It is focused on to be very practictical
+without take care of corectness (as example, it extends clojure types with monadic abstractions
+that not make sense). Also does not has support for ClojureScript.</p>
+</li>
+<li>
+<p><strong>monads</strong>: is the most advanced monads library, supports also functors, applicatives and other
+related abstractions. It lacks of good and readable documentation, fucused on correctness, has
+haskell like sugar syntax (instead of clojure like syntax) and not has support for ClojureScript.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All listed alternatives are licensed with EPL or similar licenses.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_project_maturity">2. Project Maturity</h2>
+<h2 id="_project_maturity">3. Project Maturity</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Since <em>cats</em> is a young project, there can be some <a href="codox/index.html#id">API</a> breakage.</p>
+<p>Since <em>cats</em> is a young project, there can be some <a href="api/index.html#id">API</a> breakage.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_install">3. Install</h2>
+<h2 id="_install">4. Install</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section covers installing <em>cats</em>.</p>
 </div>
 <div class="sect2">
-<h3 id="_leiningen">3.1. Leiningen</h3>
+<h3 id="_leiningen">4.1. Leiningen</h3>
 <div class="paragraph">
 <p>The simplest way to use <em>cats</em> in a Clojure project is by including
 it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">cats</span> <span class="tok-s">&quot;0.3.4&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">cats</span> <span class="tok-s">&quot;0.4.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_maven">3.2. Maven</h3>
-<div class="paragraph">
-<p>Also, you can use it with Maven. First, add the Clojars repository:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="xml"><span class="tok-nt">&lt;repository&gt;</span>
-    <span class="tok-nt">&lt;id&gt;</span>clojars.org<span class="tok-nt">&lt;/id&gt;</span>
-    <span class="tok-nt">&lt;url&gt;</span>http://clojars.org/repo<span class="tok-nt">&lt;/url&gt;</span>
-<span class="tok-nt">&lt;/repository&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then for cats:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="xml"><span class="tok-nt">&lt;dependency&gt;</span>
-    <span class="tok-nt">&lt;groupId&gt;</span>cats<span class="tok-nt">&lt;/groupId&gt;</span>
-    <span class="tok-nt">&lt;artifactId&gt;</span>cats<span class="tok-nt">&lt;/artifactId&gt;</span>
-    <span class="tok-nt">&lt;version&gt;</span>0.3.4<span class="tok-nt">&lt;/version&gt;</span>
-<span class="tok-nt">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_get_the_code">3.3. Get the Code</h3>
+<h3 id="_get_the_code">4.2. Get the Code</h3>
 <div class="paragraph">
 <p><em>cats</em> is open source and can be found on <a href="https://github.com/funcool/cats">github</a>.</p>
 </div>
@@ -644,7 +641,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_user_guide">4. User Guide</h2>
+<h2 id="_user_guide">5. User Guide</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section introduces almost all the category theory abstractions that the <em>cats</em> library
@@ -653,10 +650,10 @@ supports.</p>
 <div class="paragraph">
 <p>We will use the <em>Maybe</em> for the example snippets, because it has support for all
 the abstractions and it is very easy to understand. You can read more about it in the next
-section of the documentation.</p>
+section of this documentation.</p>
 </div>
 <div class="sect2">
-<h3 id="_functor">4.1. Functor</h3>
+<h3 id="_functor">5.1. Functor</h3>
 <div class="paragraph">
 <p>Let&#8217;s start with the functor. The Functor represents some sort of "computational context", and the
 abstraction consists of one unique function: <strong>fmap</strong>.</p>
@@ -664,7 +661,7 @@ abstraction consists of one unique function: <strong>fmap</strong>.</p>
 <div class="listingblock">
 <div class="title">Signature of <strong>fmap</strong> function</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-p">[</span><span class="tok-nv">f</span> <span class="tok-nv">fv</span><span class="tok-p">])</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-p">[</span><span class="tok-nv">f</span> <span class="tok-nv">fv</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -680,42 +677,25 @@ wrapper is any type that acts as "Box" and implements the <code>Context</code> a
 <div class="listingblock">
 <div class="title">One good example of a functor is the <strong>Maybe</strong> type:</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
-
-<span class="tok-c1">;; `just` function is one of two constructors of Maybe</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Just [2]&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
+<p>The <code>just</code> function is a constructor of Just type that is part of Maybe monad.</p>
+</div>
+<div class="paragraph">
 <p>Let&#8217;s see one example using <strong>fmap</strong> over <strong>just</strong> instance:</p>
 </div>
 <div class="listingblock">
-<div class="title">Example using fmap over <strong>just</strong>.</div>
+<div class="title">Example using fmap over <strong>just</strong> instance.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">]</span>
-         <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span><span class="tok-p">]])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
-<span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
+<span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just [2]&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We mentioned above that <strong>fmap</strong> extracts the value from the functor context. You will also want to
-extract values wrapped by <strong>just</strong> and you can do that with <strong>from-maybe</strong>.</p>
-</div>
-<div class="listingblock">
-<div class="title">Example using <strong>from-maybe</strong> to extract values wrapped by <strong>just</strong>.</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">from-maybe</span><span class="tok-p">]])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; 1</span>
-<span class="tok-p">(</span><span class="tok-nf">from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; nil</span>
-<span class="tok-p">(</span><span class="tok-nf">from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 42</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -723,12 +703,13 @@ extract values wrapped by <strong>just</strong> and you can do that with <strong
 It is a safe substitute for <code>nil</code> and may represent failure.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see what happens if we perform the same operation as the previous example over a <strong>nothing</strong> instance:</p>
+<p>Let&#8217;s see what happens if we perform the same operation as the previous example over a <strong>nothing</strong>
+instance:</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>nothing</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
 </div>
 </div>
@@ -743,7 +724,7 @@ of the same type as its second argument.</p>
 <div class="listingblock">
 <div class="title">Example using fmav over <strong>vector</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
 <span class="tok-c1">;; =&gt; [2 3 4]</span></code></pre>
 </div>
 </div>
@@ -753,20 +734,20 @@ map returns lazy seqs no matter what collection we pass to it:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">type</span> <span class="tok-p">(</span><span class="tok-nb">map inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">type</span> <span class="tok-p">(</span><span class="tok-nb">map inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]))</span>
 <span class="tok-c1">;; =&gt; clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>But why can we pass vectors to fmap? Because some Clojure container types like vectors,
-lists and sets also implement the functor abstraction.</p>
+<p>But why can we pass vectors to <code>fmap</code> function? Because some Clojure container types like vectors,
+lists and sets, also implement the functor abstraction.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_applicative">4.2. Applicative</h3>
+<h3 id="_applicative">5.2. Applicative</h3>
 <div class="paragraph">
 <p>Let&#8217;s continue with applicative functors. The Applicative Functor represents
-some sort of "computational context" like a plain Functor, but with abilty to
+some sort of "computational context" like a plain Functor, but with ability to
 execute a function wrapped in the same context.</p>
 </div>
 <div class="paragraph">
@@ -776,7 +757,7 @@ execute a function wrapped in the same context.</p>
 <div class="listingblock">
 <div class="title">Signature of <strong>fapply</strong> function</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">[</span><span class="tok-nv">af</span> <span class="tok-nv">av</span><span class="tok-p">])</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">[</span><span class="tok-nv">af</span> <span class="tok-nv">av</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -805,7 +786,7 @@ greeter function, and you only support a few languages.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
   <span class="tok-p">[</span><span class="tok-o">^</span><span class="tok-nv">String</span> <span class="tok-nv">lang</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-nf">condp</span> <span class="tok-nb">= </span><span class="tok-nv">lang</span>
     <span class="tok-s">&quot;es&quot;</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">name</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">str </span><span class="tok-s">&quot;Hola &quot;</span> <span class="tok-nv">name</span><span class="tok-p">))</span>
@@ -822,7 +803,7 @@ greeter is a valid function or is a nil value.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
   <span class="tok-p">[</span><span class="tok-o">^</span><span class="tok-nv">String</span> <span class="tok-nv">lang</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-nf">condp</span> <span class="tok-nb">= </span><span class="tok-nv">lang</span>
     <span class="tok-s">&quot;es&quot;</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">name</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">str </span><span class="tok-s">&quot;Hola &quot;</span> <span class="tok-nv">name</span><span class="tok-p">)))</span>
@@ -837,7 +818,7 @@ can apply the returned greeter to any value without a defensive nil check:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;es&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;es&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just [Hola Alex]&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;en&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
@@ -856,14 +837,10 @@ to put some value in side-effect-free context of the current type.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">pure</span> <span class="tok-nv">maybe/maybe-monad</span> <span class="tok-mi">5</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; #&lt;Just [5]&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">pure</span> <span class="tok-nv">either/either-monad</span> <span class="tok-ss">:bar</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; #&lt;Either [:bar :right]&gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Just [5]&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -872,7 +849,7 @@ should clarify its purpose.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monad">4.3. Monad</h3>
+<h3 id="_monad">5.3. Monad</h3>
 <div class="paragraph">
 <p>Monads are the most discussed programming concept to come from category theory. Like functors and
 applicatives, monads deal with data in contexts.</p>
@@ -887,7 +864,7 @@ putting new values in a completely different context.</p>
 <div class="listingblock">
 <div class="title">Bind function signature.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">[</span><span class="tok-nv">mv</span> <span class="tok-nv">f</span><span class="tok-p">])</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">[</span><span class="tok-nv">mv</span> <span class="tok-nv">f</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -897,8 +874,9 @@ that in a monad, the function is a responsible for wrapping a returned value in 
 <div class="listingblock">
 <div class="title">Example usage of the bind higher-order function.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-      <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+        <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just [2]&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -910,9 +888,9 @@ what that container is, you can use <code>return</code> or <code>pure</code> fun
 <div class="listingblock">
 <div class="title">Usage of return function in bind context.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-      <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span>
-        <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+        <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span>
+          <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just [2]&gt;</span></code></pre>
 </div>
 </div>
@@ -921,17 +899,17 @@ what that container is, you can use <code>return</code> or <code>pure</code> fun
 value that&#8217;s set internally by the <code>bind</code> function. Therefore, you can&#8217;t use them with one argument outside of a <code>bind</code> context.</p>
 </div>
 <div class="paragraph">
-<p>We now can compose any number of computations using monad <strong>*bind</strong>
+<p>We now can compose any number of computations using monad <strong>bind</strong>
 functions. But observe what happens when the number of computations increases:</p>
 </div>
 <div class="listingblock">
 <div class="title">Composability example of bind function.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-      <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
-        <span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
-              <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">b</span><span class="tok-p">]</span>
-                <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">))))))</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+        <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
+          <span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
+                  <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">b</span><span class="tok-p">]</span>
+                    <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">))))))</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -941,9 +919,9 @@ macro: <strong>mlet</strong></p>
 <div class="listingblock">
 <div class="title">Previous example but using <strong>mlet</strong> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))]</span>
-  <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+         <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))]</span>
+  <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -964,27 +942,27 @@ If you are coming from Haskell, mlet represents the <strong>do-syntax</strong>.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-       <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
-       <span class="tok-ss">:let</span> <span class="tok-p">[</span><span class="tok-nv">z</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)]]</span>
-  <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">z</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+         <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
+         <span class="tok-ss">:let</span> <span class="tok-p">[</span><span class="tok-nv">z</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)]]</span>
+  <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">z</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monad_transformers">4.4. Monad Transformers</h3>
+<h3 id="_monad_transformers">5.4. Monad Transformers</h3>
 <div class="sect3">
-<h4 id="_motivation">4.4.1. Motivation</h4>
+<h4 id="_motivation">5.4.1. Motivation</h4>
 <div class="paragraph">
 <p>We can combine two functors and get a new one automatically. Given any two functors <em>a</em> and <em>b</em>,
 we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we&#8217;ll call it fmap2:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">functor.example</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">functor.example</span>
   <span class="tok-p">(</span><span class="tok-ss">:require</span> <span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">fmap</span><span class="tok-p">]]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span><span class="tok-p">]])</span>
-  <span class="tok-p">(</span><span class="tok-ss">:use</span> <span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">]))</span>
+            <span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">]</span>
+            <span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span><span class="tok-p">]]))</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">fmap2</span>
   <span class="tok-p">[</span><span class="tok-nv">f</span> <span class="tok-nv">fv</span><span class="tok-p">]</span>
@@ -1008,11 +986,11 @@ monad transformer is itself a monad.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_monad_transformers">4.4.2. Using monad transformers</h4>
+<h4 id="_using_monad_transformers">5.4.2. Using monad transformers</h4>
 <div class="paragraph">
 <p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the transformer
 using State as the base monad since we want the resulting type to be a stateful computation
-that may fail: <code>s -&gt; Maybe (a, s)</code>.</p>
+that may fail: <code>s &#8594; Maybe (a, s)</code>.</p>
 </div>
 <div class="paragraph">
 <p>Almost every monad implemented in <em>cats</em> has a monad transformer for combining it with
@@ -1021,18 +999,18 @@ return a reified MonadTrans:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">transformers.example</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">transformers.example</span>
   <span class="tok-p">(</span><span class="tok-ss">:require</span> <span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">]</span>
             <span class="tok-p">[</span><span class="tok-nv">cats.data</span> <span class="tok-ss">:as</span> <span class="tok-nv">data</span><span class="tok-p">]</span>
             <span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">]</span>
             <span class="tok-p">[</span><span class="tok-nv">cats.monad.state</span> <span class="tok-ss">:as</span> <span class="tok-nv">state</span><span class="tok-p">]))</span>
 
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">maybe-state</span> <span class="tok-p">(</span><span class="tok-nf">state/state-transformer</span> <span class="tok-nv">maybe/maybe-monad</span><span class="tok-p">))</span>
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">maybe-state</span>
+  <span class="tok-p">(</span><span class="tok-nf">state/state-transformer</span> <span class="tok-nv">maybe/maybe-monad</span><span class="tok-p">))</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
   <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-mi">42</span><span class="tok-p">)</span> <span class="tok-p">{}))</span>
-
-<span class="tok-c1">;;=&gt; #&lt;Just [#&lt;Pair [42 {}]&gt;]&gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Just [#&lt;Pair [42 {}]&gt;]&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1048,119 +1026,81 @@ a regular monad.</p>
 <div class="paragraph">
 <p>The <code>maybe-state</code> monad combines the semantics of both State and Maybe.</p>
 </div>
-<div class="paragraph">
-<p>Let&#8217;s see it in action:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">any-char</span> <span class="tok-p">[</span><span class="tok-nv">s</span><span class="tok-p">]</span>
-  <span class="tok-s">&quot;A function that takes an input string as an state and</span>
-<span class="tok-s">  consumes one character yielding it as a the value. The</span>
-<span class="tok-s">  new state is the input string with the character consumed.</span>
-
-<span class="tok-s">  It fails when there isn&#39;t a character to consume.&quot;</span>
-  <span class="tok-p">(</span><span class="tok-k">if </span><span class="tok-p">(</span><span class="tok-nf">Clojure.string/blank?</span> <span class="tok-nv">s</span><span class="tok-p">)</span>
-    <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span>
-    <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nf">data/pair</span> <span class="tok-p">(</span><span class="tok-nb">first </span><span class="tok-nv">s</span><span class="tok-p">)</span>
-                              <span class="tok-p">(</span><span class="tok-nf">.substring</span> <span class="tok-nv">s</span> <span class="tok-mi">1</span><span class="tok-p">)))))</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
-  <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-nv">any-char</span> <span class="tok-s">&quot;Foo&quot;</span><span class="tok-p">))</span>
-<span class="tok-c1">;;=&gt; #&lt;Just [#&lt;Pair [F oo]&gt;]&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">any-two-chars</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
-    <span class="tok-p">(</span><span class="tok-nf">m/mlet</span>
-      <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-nv">any-char</span>
-       <span class="tok-nv">b</span> <span class="tok-nv">any-char</span><span class="tok-p">]</span>
-      <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">str </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)))))</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
-  <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-nv">any-two-chars</span> <span class="tok-s">&quot;Foo&quot;</span><span class="tok-p">))</span>
-<span class="tok-c1">;;=&gt; #&lt;Just [#&lt;Pair [Fo o]&gt;]&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
-  <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-nv">any-two-chars</span> <span class="tok-s">&quot;F&quot;</span><span class="tok-p">))</span>
-<span class="tok-c1">;;=&gt; #&lt;Nothing &gt;</span>
-
-<span class="tok-c1">; We could have written `any-two-chars` more succinctly by using `cats.core/mlet-with`,</span>
-<span class="tok-c1">; which is intended as syntactic sugar for transformer usage.</span>
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">any-two-chars</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/mlet-with</span> <span class="tok-nv">maybe-state</span>
-    <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-nv">any-char</span>
-     <span class="tok-nv">b</span> <span class="tok-nv">any-char</span><span class="tok-p">]</span>
-    <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">str </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">))))</span>
-
-<span class="tok-c1">; We also define a function for applying parser to a given input</span>
-<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nb">parse </span><span class="tok-p">[</span><span class="tok-nv">parser</span> <span class="tok-nv">input</span><span class="tok-p">]</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
-    <span class="tok-p">(</span><span class="tok-k">let </span><span class="tok-p">[</span><span class="tok-nv">parse-result</span> <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-nv">parser</span> <span class="tok-nv">input</span><span class="tok-p">)]</span>
-      <span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-nv">parse-result</span><span class="tok-p">))))</span></code></pre>
-</div>
-</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_monad_types">5. Monad types</h2>
+<h2 id="_monad_types">6. Monad types</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>In our examples we have seen two types that implement
-the monad abstraction: Maybe and Either. But these are only two of the types
-that implements the Monad abstraction. In this section, we will explain the different
-monad types supported by <em>cats</em> library.</p>
-</div>
 <div class="sect2">
-<h3 id="_maybe">5.1. Maybe</h3>
+<h3 id="_maybe">6.1. Maybe</h3>
 <div class="paragraph">
-<p>This is one of the two most used monad types (also named Optional in other programming
+<p>This is one of the two most used monad types (also known as Optional in other programming
 languages).</p>
 </div>
 <div class="paragraph">
-<p>Maybe/Optional is a polymorphic type that represents encapsulation of an optional value; e.g. it is
-used as the return type of functions which may or may not return a meaningful value when they
-are applied. It consists of either an empty constructor (called None or Nothing), or a constructor
+<p>Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type
+of functions which may or may not return a meaningful value when they are applied. It consists
+of either an empty constructor (called None or Nothing), or a constructor
 encapsulating the original data type A (written Just A or Some A).</p>
 </div>
 <div class="paragraph">
-<p><em>cats</em>, implements two constructors:</p>
+<p><em>cats</em>, implements two types:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>(just v)</code>: represents just a value in a context.</p>
+<p><code>Just</code> that represents just a value in a context.</p>
 </li>
 <li>
-<p><code>(nothing)</code>: represents a failure or null.</p>
+<p><code>Nothing</code> that represents the abscense of value.</p>
 </li>
 </ul>
 </div>
 <div class="listingblock">
-<div class="title">Usage example of <strong>Maybe</strong> constructors.</div>
+<div class="title">Example creating instances of <code>Just</code> and <code>Nothing</code> types</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Just [1]&gt;</span>
-<span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Maybe types are: Functors, Applicative Functors and Monads
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>In the same ns, it there other usefull functions for work with maybe monad types. See the api
+documentation for see a full list of them. But here we will exaplain a little relevant subset
+of they.</p>
+</div>
+<div class="paragraph">
+<p>We mentioned above that <strong>fmap</strong> extracts the value from the functor context. You will also want to
+extract values wrapped by <strong>just</strong> and you can do that with <strong>from-maybe</strong>.</p>
+</div>
+<div class="paragraph">
+<p>The Just or Nothing instances as we said previously, acts like a wrappers and in some circumstances
+you will want extract the plain value from them. For it, cats offers the <code>from-maybe</code> function.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example using <strong>from-maybe</strong> to extract values wrapped by <strong>just</strong>.</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; 1</span>
+
+<span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; nil</span>
+
+<span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 42</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>from-maybe</code> function is a specialized version more generic one: <code>cats.core/extract</code>. The generic
+version is a polymorphic function and will work also with different types of different monads.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_either">5.2. Either</h3>
+<h3 id="_either">6.2. Either</h3>
 <div class="paragraph">
 <p>Either is another type that represents a result of computation, but (in contrast with maybe)
 it can return some data with a failed computation result.</p>
@@ -1181,7 +1121,7 @@ it can return some data with a failed computation result.</p>
 <div class="listingblock">
 <div class="title">Usage example of <strong>Either</strong> constructors.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nb">right </span><span class="tok-ss">:valid-value</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Right [:valid-value :right]&gt;</span>
@@ -1204,25 +1144,32 @@ Either is also (like Maybe) Functor, Applicative Functor and Monad.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_try">5.3. Try</h3>
+<h3 id="_exception">6.3. Exception</h3>
 <div class="paragraph">
-<p>Also called Exception.</p>
+<p>Also known as Try monad, popularized by Scala.</p>
 </div>
 <div class="paragraph">
-<p>The <code>Try</code> type represents a computation that may either result in an exception
-or return a successfully computed value. It&#8217;s similar to, but semantically
-different from, the <code>Either</code> type.</p>
+<p>It represents a computation that may either result in an exception or return a successfully computed
+value. Is very similar to Either monad, but is semantically different.</p>
 </div>
 <div class="paragraph">
-<p>It is an analogue of the try-catch block: it replaces try-catch&#8217;s stack-based error
-handling with heap-based error handling. Instead of having an exception thrown and
-having to deal with it immediately in the same thread, it disconnects the error
-handling and recovery.</p>
+<p>It consists in two types: Success and Failure. The Success type is a simple wrapper like Right of
+Either monad. But the Failure type is slightly different from Left, because it is forced to wrap an
+instance of Throwable (or Error in cljs).</p>
+</div>
+<div class="paragraph">
+<p>The most common use case of this monad is for wrap third party libraries that uses standard Exception
+based error handling. In normal circumstances you should use Either instead.</p>
+</div>
+<div class="paragraph">
+<p>It is an analogue of the try-catch block: it replaces try-catch&#8217;s stack-based error handling with
+heap-based error handling. Instead of having an exception thrown and having to deal with it immediately
+in the same thread, it disconnects the error handling and recovery.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <strong>try-on</strong> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.exception</span> <span class="tok-ss">:as</span> <span class="tok-nv">exc</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.exception</span> <span class="tok-ss">:as</span> <span class="tok-nv">exc</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Success [1]&gt;</span>
@@ -1232,22 +1179,21 @@ handling and recovery.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><em>cats</em> comes with other syntactic sugar macros: <code>try-or-else</code> that
-returns a default value if a computation fails, and <code>try-or-recover</code> that lets
-you handle the return value when executing a function with the exception as
-first parameter.</p>
+<p><em>cats</em> comes with other syntactic sugar macros: <code>try-or-else</code> that returns a default value if a
+computation fails, and <code>try-or-recover</code> that lets you handle the return value when executing a
+function with the exception as first parameter.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <code>try-or-else</code> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-else</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-else</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Success [2]&gt;</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <code>try-or-recover</code> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-recover</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-recover</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span>
                     <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">e</span><span class="tok-p">]</span>
                       <span class="tok-p">(</span><span class="tok-nf">cond</span>
                         <span class="tok-p">(</span><span class="tok-nb">instance? </span><span class="tok-nv">NullPointerException</span> <span class="tok-nv">e</span><span class="tok-p">)</span> <span class="tok-mi">0</span>
@@ -1255,21 +1201,27 @@ first parameter.</p>
 <span class="tok-c1">;; =&gt; #&lt;Success [0]&gt;</span></code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Try is also (like Maybe) Functor, Applicative Functor and Monad.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>The types defined for Exception monad (Success and Failure) also implementes the clojure IDeref
+interface, which facilitates libraries developing using monadic composition without forcing a user of
+that library to use or understand monads.</p>
+</div>
+<div class="paragraph">
+<p>That is because when you will dereference the failure instance, it will reraise the containing
+exception.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example dereferencing a failure instance</div>
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">f</span> <span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)))</span>
+
+<span class="tok-o">@</span><span class="tok-nv">f</span>
+<span class="tok-c1">;; =&gt; NullPointerException   clojure.lang.Numbers.ops (Numbers.java:961)</span></code></pre>
+</div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_state">5.4. State</h3>
+<h3 id="_state">6.4. State</h3>
 <div class="paragraph">
 <p>State monad in one of the special cases of monads most used in Haskell. It has different
 purposes including: lazy computation, composition, and maintaining state without explicit state.</p>
@@ -1282,7 +1234,7 @@ in monad state composition.</p>
 <div class="listingblock">
 <div class="title">Valid function for valid state monad</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">state</span><span class="tok-p">]</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">state</span><span class="tok-p">]</span>
   <span class="tok-s">&quot;Takes state as argument and return a vector</span>
 <span class="tok-s">  with first argument with procesed value and</span>
 <span class="tok-s">  second argument the transformed new state.&quot;</span>
@@ -1301,19 +1253,20 @@ you do not need to build your own functions, just use some helpers that <em>cats
 <div class="listingblock">
 <div class="title">Lazy composition of computations</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">state</span> <span class="tok-p">(</span><span class="tok-nf">m/get-state</span><span class="tok-p">)</span>
-         <span class="tok-nv">_</span>     <span class="tok-p">(</span><span class="tok-nf">m/put-state</span> <span class="tok-p">(</span><span class="tok-nb">next </span><span class="tok-nv">state</span><span class="tok-p">))]</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.state</span> <span class="tok-ss">:as</span> <span class="tok-nv">st</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">state</span> <span class="tok-p">(</span><span class="tok-nf">st/get-state</span><span class="tok-p">)</span>
+         <span class="tok-nv">_</span>     <span class="tok-p">(</span><span class="tok-nf">st/put-state</span> <span class="tok-p">(</span><span class="tok-nb">next </span><span class="tok-nv">state</span><span class="tok-p">))]</span>
   <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">first </span><span class="tok-nv">state</span><span class="tok-p">)))</span>
 <span class="tok-c1">;;=&gt; #&lt;State cats.monad.state.State@2eebabb6&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>At the moment of evaluation in the previous expression, anything that we have defined
+<p>At the moment of evaluation in the previous expression, nothing of that we have defined
 is executed. But instead of returning the unadorned final value of the computation,
 a strange/unknown object is returned of type <strong>State</strong>.</p>
 </div>
 <div class="paragraph">
-<p>State is simply a wrapper for Clojure functions, nothing more.</p>
+<p>The State type is simply a wrapper for Clojure functions, nothing more.</p>
 </div>
 <div class="paragraph">
 <p>Now, it&#8217;s time to execute the composed computation. For this we can use one of the following
@@ -1336,94 +1289,68 @@ state, ignoring the resulting value.</p>
 </ul>
 </div>
 <div class="listingblock">
-<div class="title">This is what happens when we execute these three functions over previously generated <code>State</code> instance</div>
+<div class="title">Example of resuls of using the previosly listed functions</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="Clojure"><span class="tok-p">(</span><span class="tok-nf">m/run-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/run-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
 <span class="tok-c1">;;=&gt; #&lt;Pair [1 (2 3)]&gt;</span>
+
 <span class="tok-p">(</span><span class="tok-nf">m/eval-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
 <span class="tok-c1">;;=&gt; 1</span>
+
 <span class="tok-p">(</span><span class="tok-nf">m/exec-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
 <span class="tok-c1">;;=&gt; (2 3)</span></code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-the pair instance returned by <code>run-state</code> function works like any other seq in Clojure, with
-the difference that pairs can only have two slots.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
-<p>This is a very basic example of the state monad, it has a lot of use cases and explaining all them
-seems out of the scope of this document.</p>
-</div>
-<div class="paragraph">
-<p>However, if you have better examples to explain the state monad, documentation for another monad or
-any other contribution is always welcome.</p>
+<p>The <code>run-state</code> function returns an instance of Pair type. The Pair type acts like any other seq in
+clojure with the exception that it only can contain two values.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reader">5.5. Reader</h3>
+<h3 id="_reader">6.5. Reader</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_writer">5.6. Writer</h3>
+<h3 id="_writer">6.6. Writer</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_continuation">5.7. Continuation</h3>
+<h3 id="_continuation">6.7. Continuation</h3>
 <div class="paragraph">
 <p>TODO</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_vector">5.8. Vector</h3>
+<h3 id="_vector">6.8. Vector</h3>
 <div class="paragraph">
 <p>TODO</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_other_monads">6.9. Other monads</h3>
+<div class="paragraph">
+<p>Some monads are defined as separated package for avoid add additional
+and unnecesary dependencies to cats library.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Channel monad: <a href="https://github.com/funcool/cats-channel" class="bare">https://github.com/funcool/cats-channel</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_faq">6. FAQ</h2>
+<h2 id="_faq">7. FAQ</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_what_are_the_difference_with_other_existing_libraries">6.1. What are the difference with other existing libraries?</h3>
-<div class="paragraph">
-<p>This is an incomplete list of differences with other existing libraries:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>The official monads library <code>algo.monads</code> is very good, but its approach for modeling
-is slighty limited (e.g. you always need to specify what monad you want use instead of
-relying on the type). And obviously because it only has monads.</p>
-</li>
-<li>
-<p>Fluokitten is the best library that we found, but the future of it is uncertain. One big
-difference with fluokitten is that <code>cats</code> doesn&#8217;t aim to extend every Clojure type
-with monadic protocols, for the obvious reason that monad; functor and applicative represents
-context/wrapper types and it doesn&#8217;t make sense to implement Functor protocol for <code>java.lang.String</code>.</p>
-</li>
-<li>
-<p><code>bwo/monads</code> is the last monads library. It is completely undocumented and its implementation
-has much unnecesary complexity.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_what_clojure_types_implements_some_of_the_category_theory_abstractions">6.2. What Clojure types implements some of the Category Theory abstractions?</h3>
+<h3 id="_what_clojure_types_implements_some_of_the_category_theory_abstractions">7.1. What Clojure types implements some of the Category Theory abstractions?</h3>
 <div class="paragraph">
 <p>In contrast to other similar libraries in Clojure, <em>cats</em> doesn&#8217;t intend to extend Clojure types
 that don&#8217;t act like containers. For example, Clojure keywords are values but can not be containers so
@@ -1460,10 +1387,10 @@ they should not extend any of the previously explained protocols.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_how_to_contribute">7. How to Contribute?</h2>
+<h2 id="_how_to_contribute">8. How to Contribute?</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_philosophy">7.1. Philosophy</h3>
+<h3 id="_philosophy">8.1. Philosophy</h3>
 <div class="paragraph">
 <p>Five most important rules:</p>
 </div>
@@ -1491,7 +1418,7 @@ they should not extend any of the previously explained protocols.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_procedure">7.2. Procedure</h3>
+<h3 id="_procedure">8.2. Procedure</h3>
 <div class="paragraph">
 <p><em>cats</em> does not have many restrictions for contributions. Just follow these
 steps depending on the situation:</p>
@@ -1527,7 +1454,7 @@ steps depending on the situation:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_license">7.3. License</h3>
+<h3 id="_license">8.3. License</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="text">Copyright (c) 2014-2015 Andrey Antukh &lt;niwi@niwi.be&gt;
@@ -1563,7 +1490,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-14 16:38:38 CET
+Last updated 2015-03-25 20:42:52 CET
 </div>
 </div>
 </body>
