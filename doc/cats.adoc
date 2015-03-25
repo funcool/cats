@@ -642,79 +642,6 @@ The `run-state` function returns an instance of Pair type. The Pair type acts li
 clojure with the exception that it only can contain two values.
 
 
-=== Channel
-
-In asynchronous environments with clojure and clojurescript we tend to use core.async, because it
-is a very powerfull abstraction.
-
-It would be awesome to be able to work with channel as a monadic type, and combine it with error
-monads for short-circuiting async computations that may fail.
-
-Let's start using channel as a functor:
-[source, clojure]
-----
-(require '[cljs.core.async :refer [chan put! <!!]])
-(require '[cats.monad.channel :as channel])
-
-;; Declare arbitrary channel with initial value
-(def mychan (channel/with-value 2))
-
-;; Use channel as a functor
-(<!! (m/fmap inc mychan))
-;; => 3
-----
-
-The channel type also fulfills the monad abstraction, let see it in action:
-
-[source, clojure]
-----
-(def result (m/mlet [a (channel/with-value 2)
-                     b (channel/with-value 3)]
-              (m/return (+ a b))))
-(<!! result)
-;; => 5
-----
-
-But the best of all is coming: combine the channel monad with error monads. It allows to build very
-concise and simple asynchronous APIs. Let see how you can use it your application:
-
-[source, clojure]
-----
-(require '[cats.monad.either :as either])
-
-;; Declare a monad transformer
-(def either-chan-m
-  (either/either-transformer channel/channel-monad))
-
-;; A success example
-(<!! (m/with-monad either-chan-m
-       (m/mlet [a (channel/with-value (either/right 2))
-                b (channel/with-value (either/right 3))]
-         (m/return (+ a b)))))
-;; => #<Right [5]>
-----
-
-As you can see, the code looks very similar to the previos example, with the exception that
-the value in a channel is not a simple plain value, is an either instance.
-
-Let's see what happens if some computation fails in the mlet composition:
-
-[source, clojure]
-----
-(<!! (m/with-monad either-chan-m
-       (m/mlet [a (channel/with-value (either/left "Some error"))
-                b (channel/with-value (either/right 3))]
-         (m/return (+ a b)))))
-;; => #<Left [Some error]>
-----
-
-The result is the expected short-circuiting left, without unexpected nullpointer exceptions
-or similar issues.
-
-With this compositional power, you can model your asynchronous API with a complete
-error handling using any error monad (in this case Either).
-
-
 === Reader
 
 TODO
@@ -733,6 +660,14 @@ TODO
 === Vector
 
 TODO
+
+
+=== Other monads
+
+Some monads are defined as separated package for avoid add additional
+and unnecesary dependencies to cats library.
+
+* Channel monad: https://github.com/funcool/cats-channel
 
 
 == FAQ

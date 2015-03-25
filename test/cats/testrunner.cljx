@@ -24,8 +24,7 @@
                   'cats.monad.maybe-spec
                   'cats.monad.identity-spec
                   'cats.monad.reader-spec
-                  'cats.monad.writer-spec
-                  'cats.monad.channel-spec))
+                  'cats.monad.writer-spec))
 
 #+cljs
 (set! *main-cli-fn* main)
