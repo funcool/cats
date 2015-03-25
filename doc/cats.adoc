@@ -35,7 +35,7 @@ The main motivations for writting this library are:
   that not make sense). Also does not has support for ClojureScript.
 * **monads**: is the most advanced monads library, supports also functors, applicatives and other
   related abstractions. It lacks of good and readable documentation, fucused on correctness, has
-  haskell like sugar syntax (instead of clojure like syntax) and does not support for ClojureScript.
+  haskell like sugar syntax (instead of clojure like syntax) and not has support for ClojureScript.
 
 All listed alternatives are licensed with EPL or similar licenses.
 
@@ -157,7 +157,7 @@ instance:
 .Example using fmap over *nothing*.
 [source, clojure]
 ----
-(fmap inc (nothing))
+(m/fmap inc (nothing))
 ;; => #<Nothing >
 ----
 
@@ -170,7 +170,7 @@ Let's see an example of applying fmap over a Clojure vector:
 .Example using fmav over *vector*.
 [source, clojure]
 ----
-(fmap inc [1 2 3])
+(m/fmap inc [1 2 3])
 ;; => [2 3 4]
 ----
 
@@ -183,8 +183,8 @@ map returns lazy seqs no matter what collection we pass to it:
 ;; => clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)
 ----
 
-But why can we pass vectors to fmap? Because some Clojure container types like vectors,
-lists and sets also implement the functor abstraction.
+But why can we pass vectors to `fmap` function? Because some Clojure container types like vectors,
+lists and sets, also implement the functor abstraction.
 
 
 === Applicative
@@ -262,14 +262,10 @@ Examples:
 
 [source, clojure]
 ----
-(require '[cats.monad.maybe])
-(require '[cats.monad.either])
+(require '[cats.monad.maybe :as maybe])
 
 (pure maybe/maybe-monad 5)
 ;; => #<Just [5]>
-
-(pure either/either-monad :bar)
-;; => #<Either [:bar :right]>
 ----
 
 If you do not understand the purpose of the *pure* function, the next section
@@ -298,8 +294,9 @@ that in a monad, the function is a responsible for wrapping a returned value in 
 .Example usage of the bind higher-order function.
 [source,clojure]
 ----
-(bind (just 1)
-      (fn [v] (just (inc v))))
+(m/bind (maybe/just 1)
+        (fn [v] (maybe/just (inc v))))
+;; => #<Just [2]>
 ----
 
 One of the key features of the bind function is that any computation executed within the context of
@@ -310,9 +307,9 @@ what that container is, you can use `return` or `pure` functions:
 .Usage of return function in bind context.
 [source,clojure]
 ----
-(bind (just 1)
-      (fn [v]
-        (return (inc v))))
+(m/bind (maybe/just 1)
+        (fn [v]
+          (m/return (inc v))))
 ;; => #<Just [2]>
 ----
 
@@ -325,11 +322,11 @@ functions. But observe what happens when the number of computations increases:
 .Composability example of bind function.
 [source, clojure]
 ----
-(bind (just 1)
-      (fn [a]
-        (bind (just (inc a))
-              (fn [b]
-                (return (* b 2))))))
+(m/bind (maybe/just 1)
+        (fn [a]
+          (m/bind (maybe/just (inc a))
+                  (fn [b]
+                    (m/return (* b 2))))))
 ----
 
 This can quickly lead to callback hell. To solve this, _cats_ comes with a powerful
@@ -338,9 +335,9 @@ macro: *mlet*
 .Previous example but using *mlet* macro.
 [source, clojure]
 ----
-(mlet [a (just 1)
-       b (just (inc a))]
-  (return (* b 2)))
+(m/mlet [a (maybe/just 1)
+         b (maybe/just (inc a))]
+  (m/return (* b 2)))
 ----
 
 NOTE: If you are coming from Haskell, mlet represents the *do-syntax*.
@@ -351,10 +348,10 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 
 [source, clojure]
 ----
-(mlet [a (just 1)
-       b (just (inc a))
-       :let [z (+ a b)]]
-  (return (* z 2)))
+(m/mlet [a (maybe/just 1)
+         b (maybe/just (inc a))
+         :let [z (+ a b)]]
+  (m/return (* z 2)))
 ----
 
 
@@ -369,8 +366,8 @@ we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 ----
 (ns functor.example
   (:require [cats.core :refer [fmap]]
-            [cats.monad.maybe :refer [just]])
-  (:use [cats.builtin]))
+            [cats.builtin]
+            [cats.monad.maybe :refer [just]]))
 
 (defn fmap2
   [f fv]
@@ -409,12 +406,12 @@ return a reified MonadTrans:
             [cats.monad.maybe :as maybe]
             [cats.monad.state :as state]))
 
-(def maybe-state (state/state-transformer maybe/maybe-monad))
+(def maybe-state
+  (state/state-transformer maybe/maybe-monad))
 
 (m/with-monad maybe-state
   (state/run-state (m/return 42) {}))
-
-;;=> #<Just [#<Pair [42 {}]>]>
+;; => #<Just [#<Pair [42 {}]>]>
 ----
 
 As we can see in the example below, the return of the `maybe-state` monad creates a stateful
@@ -427,74 +424,21 @@ a regular monad.
 
 The `maybe-state` monad combines the semantics of both State and Maybe.
 
-Let's see it in action:
-
-[source, clojure]
-----
-(defn any-char [s]
-  "A function that takes an input string as an state and
-  consumes one character yielding it as a the value. The
-  new state is the input string with the character consumed.
-
-  It fails when there isn't a character to consume."
-  (if (Clojure.string/blank? s)
-    (maybe/nothing)
-    (maybe/just (data/pair (first s)
-                              (.substring s 1)))))
-
-(m/with-monad maybe-state
-  (state/run-state any-char "Foo"))
-;;=> #<Just [#<Pair [F oo]>]>
-
-(def any-two-chars
-  (m/with-monad maybe-state
-    (m/mlet
-      [a any-char
-       b any-char]
-      (m/return (str a b)))))
-
-(m/with-monad maybe-state
-  (state/run-state any-two-chars "Foo"))
-;;=> #<Just [#<Pair [Fo o]>]>
-
-(m/with-monad maybe-state
-  (state/run-state any-two-chars "F"))
-;;=> #<Nothing >
-
-; We could have written `any-two-chars` more succinctly by using `cats.core/with-monad`,
-; which is intended as syntactic sugar for transformer usage.
-(def any-two-chars
-  (m/with-monad maybe-state
-    (m/mlet [a any-char
-             b any-char]
-      (m/return (str a b)))))
-
-; We also define a function for applying parser to a given input
-(defn parse [parser input]
-  (m/with-monad maybe-state
-    (let [parse-result (state/run-state parser input)]
-      (maybe/from-maybe parse-result))))
-----
 
 == Monad types
-
-In our examples we have seen two types that implement
-the monad abstraction: Maybe and Either. But these are only two of the types
-that implements the Monad abstraction. In this section, we will explain the different
-monad types supported by _cats_ library.
 
 === Maybe
 
 This is one of the two most used monad types (also known as Optional in other programming
 languages).
 
-Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type 
-of functions which may or may not return a meaningful value when they are applied. It consists 
+Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type
+of functions which may or may not return a meaningful value when they are applied. It consists
 of either an empty constructor (called None or Nothing), or a constructor
 encapsulating the original data type A (written Just A or Some A).
 
 _cats_, implements two types:
- 
+
 - `Just` that represents just a value in a context.
 - `Nothing` that represents the abscense of value.
 
@@ -560,18 +504,23 @@ In _cats_ it has two constructors:
 NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
 
 
-=== Try
+=== Exception
 
-Also called Exception.
+Also known as Try monad, popularized by Scala.
 
-The `Try` type represents a computation that may either result in an exception
-or return a successfully computed value. It's similar to, but semantically
-different from, the `Either` type.
+It represents a computation that may either result in an exception or return a successfully computed
+value. Is very similar to Either monad, but is semantically different.
 
-It is an analogue of the try-catch block: it replaces try-catch's stack-based error
-handling with heap-based error handling. Instead of having an exception thrown and
-having to deal with it immediately in the same thread, it disconnects the error
-handling and recovery.
+It consists in two types: Success and Failure. The Success type is a simple wrapper like Right of
+Either monad. But the Failure type is slightly different from Left, because it is forced to wrap an
+instance of Throwable (or Error in cljs).
+
+The most common use case of this monad is for wrap third party libraries that uses standard Exception
+based error handling. In normal circumstances you should use Either instead.
+
+It is an analogue of the try-catch block: it replaces try-catch's stack-based error handling with
+heap-based error handling. Instead of having an exception thrown and having to deal with it immediately
+in the same thread, it disconnects the error handling and recovery.
 
 .Usage example of *try-on* macro.
 [source, clojure]
@@ -585,11 +534,9 @@ handling and recovery.
 ;; => #<Failure [#<NullPointerException java.lang.NullPointerException>]>
 ----
 
-_cats_ comes with other syntactic sugar macros: `try-or-else` that
-returns a default value if a computation fails, and `try-or-recover` that lets
-you handle the return value when executing a function with the exception as
-first parameter.
-
+_cats_ comes with other syntactic sugar macros: `try-or-else` that returns a default value if a
+computation fails, and `try-or-recover` that lets you handle the return value when executing a
+function with the exception as first parameter.
 
 .Usage example of `try-or-else` macro.
 [source, clojure]
@@ -607,6 +554,22 @@ first parameter.
                         (instance? NullPointerException e) 0
                         :else 100)))
 ;; => #<Success [0]>
+----
+
+The types defined for Exception monad (Success and Failure) also implementes the clojure IDeref
+interface, which facilitates libraries developing using monadic composition without forcing a user of
+that library to use or understand monads.
+
+That is because when you will dereference the failure instance, it will reraise the containing
+exception.
+
+.Example dereferencing a failure instance
+[source, clojure]
+----
+(def f (exc/try-on (+ 1 nil)))
+
+@f
+;; => NullPointerException   clojure.lang.Numbers.ops (Numbers.java:961)
 ----
 
 
@@ -639,17 +602,18 @@ Let's look at one example before explaining the details:
 .Lazy composition of computations
 [source, clojure]
 ----
-(m/mlet [state (m/get-state)
-         _     (m/put-state (next state))]
+(require '[cats.monad.state :as st])
+(m/mlet [state (st/get-state)
+         _     (st/put-state (next state))]
   (return (first state)))
 ;;=> #<State cats.monad.state.State@2eebabb6>
 ----
 
-At the moment of evaluation in the previous expression, anything that we have defined
+At the moment of evaluation in the previous expression, nothing of that we have defined
 is executed. But instead of returning the unadorned final value of the computation,
 a strange/unknown object is returned of type *State*.
 
-State is simply a wrapper for Clojure functions, nothing more.
+The State type is simply a wrapper for Clojure functions, nothing more.
 
 Now, it's time to execute the composed computation. For this we can use one of the following
 functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
@@ -661,25 +625,21 @@ functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
 - `exec-state` function executes the composed computation and return only the resulting
   state, ignoring the resulting value.
 
-.This is what happens when we execute these three functions over previously generated `State` instance
+.Example of resuls of using the previosly listed functions
 [source, clojure]
 ----
 (m/run-state s [1 2 3])
 ;;=> #<Pair [1 (2 3)]>
+
 (m/eval-state s [1 2 3])
 ;;=> 1
+
 (m/exec-state s [1 2 3])
 ;;=> (2 3)
 ----
 
-NOTE: the pair instance returned by `run-state` function works like any other seq in Clojure, with
-the difference that pairs can only have two slots.
-
-This is a very basic example of the state monad, it has a lot of use cases and explaining all them
-seems out of the scope of this document.
-
-However, if you have better examples to explain the state monad, documentation for another monad or
-any other contribution is always welcome.
+The `run-state` function returns an instance of Pair type. The Pair type acts like any other seq in
+clojure with the exception that it only can contain two values.
 
 
 === Channel
@@ -715,8 +675,8 @@ The channel type also fulfills the monad abstraction, let see it in action:
 ;; => 5
 ----
 
-But the best of all is coming: combine the channel monad with error monads. It allows to build very concise
-and simple asynchronous APIs. Let see how you can use it your application:
+But the best of all is coming: combine the channel monad with error monads. It allows to build very
+concise and simple asynchronous APIs. Let see how you can use it your application:
 
 [source, clojure]
 ----
