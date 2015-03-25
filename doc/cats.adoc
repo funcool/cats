@@ -12,16 +12,32 @@ image:logo.png[cats logo]
 
 Category Theory abstractions for Clojure.
 
+== Rationale
 
-=== Why another library?
+The main motivations for writting this library are:
 
-Because the cats library:
+* The existing libraries does not have support for ClojureScript.
+* We do not intend to write a little haskell inside the clojure. We have adopted a
+  practical and clojure like approach, always with corectness in mind.
+* We do not like viral/copyleft like licenses and with difference with other libraries
+  cats is licensed under BSD (2 clauses) license.
+* We do not intend implement only monads. Other category theory abstractions are also
+  first class in cats.
 
-- targets both of the most-used Clojure implementations:  *Clojure (jvm)* and *ClojureScript(js)*
-- aims to have the simplest implementation of the supported abstractions.
-- aims to have more abstractions that are simple monads.
-- has documentation as first class citizen.
-- licensed under a permissive license (compared to other libraries): BSD (2-Clause)
+
+*Alternatives:*
+
+* **algo.monads**: This is the clojure official library for monads. Its approach for modeling
+  monads is slightly limited, only supports the monad abstraction and does not has support for
+  ClojureScript.
+* **fluokitten**: Slightly unmaintaned by the original author. It is focused on to be very practictical
+  without take care of corectness (as example, it extends clojure types with monadic abstractions
+  that not make sense). Also does not has support for ClojureScript.
+* **monads**: is the most advanced monads library, supports also functors, applicatives and other
+  related abstractions. It lacks of good and readable documentation, fucused on correctness, has
+  haskell like sugar syntax (instead of clojure like syntax) and does not support for ClojureScript.
+
+All listed alternatives are licensed with EPL or similar licenses.
 
 
 == Project Maturity
@@ -760,21 +776,6 @@ TODO
 
 
 == FAQ
-
-=== What are the difference with other existing libraries?
-
-This is an incomplete list of differences with other existing libraries:
-
-- The official monads library `algo.monads` is very good, but its approach for modeling
-  is slighty limited (e.g. you always need to specify what monad you want use instead of
-  relying on the type). And obviously because it only has monads.
-- Fluokitten is the best library that we found, but the future of it is uncertain. One big
-  difference with fluokitten is that `cats` doesn't aim to extend every Clojure type
-  with monadic protocols, for the obvious reason that monad; functor and applicative represents
-  context/wrapper types and it doesn't make sense to implement Functor protocol for `java.lang.String`.
-- `bwo/monads` is the last monads library. It is completely undocumented and its implementation
-  has much unnecesary complexity.
-
 
 === What Clojure types implements some of the Category Theory abstractions?
 
