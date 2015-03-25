@@ -1,6 +1,6 @@
 = Cats Documentation
 Andrey Antukh & Alejandro Gómez
-0.4.0-SNAPSHOT
+0.4.0
 :toc: left
 :numbered:
 :source-highlighter: pygments
@@ -57,33 +57,8 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[cats "0.4.0-SNAPSHOT"]
+[cats "0.4.0"]
 ----
-
-
-=== Maven
-
-Also, you can use it with Maven. First, add the Clojars repository:
-
-[source,xml]
-----
-<repository>
-    <id>clojars.org</id>
-    <url>http://clojars.org/repo</url>
-</repository>
-----
-
-Then for cats:
-
-[source,xml]
-----
-<dependency>
-    <groupId>cats</groupId>
-    <artifactId>cats</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
-</dependency>
-----
-
 
 === Get the Code
 

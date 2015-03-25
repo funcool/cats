@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION="devel"
+VERSION="latest"
 
 lein doc
 (cd doc; make)

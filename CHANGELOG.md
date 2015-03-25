@@ -2,14 +2,14 @@
 
 ## Version 0.4.0 ##
 
-Date: unreleased
+Date: 2015-03-25
 
 - The exception monad now raises a exception when you deref a failure instance.
   This will allow easy use of monadic api from libraries or applications that
   does not  use monads.
 - The `cats.monad.exception/failure` function now coerce all input that not
   extends from exception to exception type (using `ex-info` clojure function).
-- Add channel monad using core.async channels abstraction.
+- Add channel monad using core.async channels abstraction (as separated repository)
   This make easy treat channels as monads and using them in monadic compositions.
 - Remove mlet-with macro (bacause it sintax is ugly and with-monad usage is preferable)
 - Remove undocumented errlet macro.

@@ -18,9 +18,5 @@ Category Theory abstractions for Clojure.
 Stable:
 
 - **Documentation:** http://funcool.github.io/cats/latest/
-- **API reference:** http://funcool.github.io/cats/latest/codox/
+- **API reference:** http://funcool.github.io/cats/latest/api/
 
-Development:
-
-- **Documentation:** http://funcool.github.io/cats/devel/
-- **API reference:** http://funcool.github.io/cats/devel/codox/
