@@ -229,11 +229,12 @@
   [func]
   (try
     (let [result (func)]
-      (if (exception? result)
-        (failure result)
-        (success result)))
+      (cond
+        (throwable? result) (failure result)
+        (exception? result) result
+        :else (success result)))
     #+clj
-    (catch Throwable e (failure e))
+    (catch Exception e (failure e))
     #+cljs
     (catch js/Error e (failure e))))
 

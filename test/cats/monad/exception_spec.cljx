@@ -82,11 +82,9 @@
     (t/is (= 60 (exc/extract m1))))
 
   (let [e  (js/Error. "test")
-        m1 (exc/try-or-recover
-            e
-            (fn [e] (either/right 60)))]
+        m1 (exc/try-or-recover e (fn [e] (either/right 60)))]
     (t/is (either/right? m1))
-    (t/is (= 60 (either/from-either m1)))))
+    (t/is (= 60 (m/extract m1)))))
 
 #+clj
 (t/deftest try-on-macro-test
