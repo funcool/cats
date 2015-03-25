@@ -9,8 +9,7 @@
             [cats.monad.maybe-spec]
             [cats.monad.identity-spec]
             [cats.monad.exception-spec]
-            [cats.monad.continuation-spec]
-            [cats.monad.channel-spec]))
+            [cats.monad.continuation-spec]))
 
 #+cljs
 (defn main []
