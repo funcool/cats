@@ -32,7 +32,8 @@
       (maybe/just 1)
       ;; => #<Just [1]>
   "
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]))
 
 (declare maybe-monad)
 
@@ -183,6 +184,18 @@
 (def ^{:no-doc true}
   maybe-monad
   (reify
+    proto/Semigroup
+    (mappend [_ mv mv']
+      (cond
+        (nothing? mv) mv'
+        (nothing? mv') mv
+        :else (just (m/mappend (proto/extract mv)
+                               (proto/extract mv')))))
+
+    proto/Monoid
+    (mempty [_]
+      (nothing))
+
     proto/Functor
     (fmap [_ f mv]
       (if (nothing? mv)
