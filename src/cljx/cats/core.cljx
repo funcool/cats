@@ -82,6 +82,17 @@
 ;; Context-aware funcionts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn mempty
+  []
+  (let [ctx (get-current-context)]
+    (p/mempty ctx)))
+
+(defn mappend
+  [& svs]
+  {:pre [(not (empty? svs))]}
+  (let [ctx (get-current-context (first svs))]
+    (reduce (partial p/mappend ctx) svs)))
+
 (defn pure
   "Given any value v, return it wrapped in
   default/effect free context.

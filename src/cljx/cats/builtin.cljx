@@ -46,6 +46,14 @@
 
 (def sequence-monad
   (reify
+    proto/Semigroup
+    (mappend [_ sv sv']
+      (concat sv sv'))
+
+    proto/Monoid
+    (mempty [_]
+      (lazy-seq []))
+
     proto/Functor
     (fmap [_ f v]
       (map f v))
@@ -85,6 +93,14 @@
 
 (def vector-monad
   (reify
+    proto/Semigroup
+    (mappend [_ sv sv']
+      (into sv sv'))
+
+    proto/Monoid
+    (mempty [_]
+      [])
+
     proto/Functor
     (fmap [_ f v]
       (vec (map f v)))
@@ -124,6 +140,14 @@
 
 (def set-monad
   (reify
+    proto/Semigroup
+    (mappend [_ sv sv']
+      (s/union sv sv'))
+
+    proto/Monoid
+    (mempty [_]
+      #{})
+
     proto/Functor
     (fmap [_ self f]
       (set (map f self)))

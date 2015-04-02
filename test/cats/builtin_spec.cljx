@@ -23,6 +23,15 @@
     (t/is (= (p/extract nil) nil))))
 
 (t/deftest vector-monad
+  (t/testing "Forms a semigroup"
+    (t/is (= [1 2 3 4 5]
+             (m/mappend [1 2 3] [4 5]))))
+
+  (t/testing "Forms a monoid"
+    (t/is (= [1 2 3]
+             (m/with-monad b/vector-monad
+               (m/mappend [1 2 3] (m/mempty))))))
+
   (t/testing "The first monad law: left identity"
     (t/is (= [1 2 3 4 5]
              (m/>>= [0 1 2 3 4]
@@ -46,6 +55,15 @@
   (let [val->lazyseq (fn [x] (lazy-seq [x]))
         s (val->lazyseq 2)]
 
+  (t/testing "Forms a semigroup"
+    (t/is (= [1 2 3 4 5]
+             (m/mappend (lazy-seq [1 2 3]) (lazy-seq [4 5])))))
+
+  (t/testing "Forms a monoid"
+    (t/is (= [1 2 3]
+             (m/with-monad b/sequence-monad
+               (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
+
     (t/testing "The first monad law: left identity"
       (t/is (= s (m/with-monad b/sequence-monad
                    (m/>>= (m/return 2)
@@ -66,6 +84,15 @@
 
 
 (t/deftest set-monad
+  (t/testing "Forms a semigroup"
+    (t/is (= #{1 2 3 4 5}
+             (m/mappend #{1 2 3} #{4 5}))))
+
+  (t/testing "Forms a monoid"
+    (t/is (= #{1 2 3}
+             (m/with-monad b/set-monad
+               (m/mappend #{1 2 3} (m/mempty))))))
+
   (t/testing "The first monad law: left identity"
     (t/is (= #{2} (m/with-monad b/set-monad
                     (m/>>= (m/return 2)
