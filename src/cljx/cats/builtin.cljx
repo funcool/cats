@@ -142,7 +142,7 @@
   (reify
     proto/Semigroup
     (mappend [_ sv sv']
-      (s/union sv sv'))
+      (s/union sv (set sv')))
 
     proto/Monoid
     (mempty [_]

@@ -47,12 +47,25 @@
     (t/is (= (d/pair 42 ["world" "Hello"])
              (first w)))
     (t/is (= ["world" "Hello"]
+             (second w))))
+
+  ;; The log values are accumulated using Semigroup's `mappend` operation
+  (let [w (m/with-monad writer/writer-monad
+            (m/>> (writer/pass (m/return [42 set]))
+                  (writer/tell "Hello")
+                  (writer/tell "Hello")
+                  (writer/tell "world")
+                  (writer/tell "world")
+                  (writer/tell "Hello")
+                  (writer/tell "world")))
+        w (writer/listen w)]
+    (t/is (= #{"world" "Hello"}
              (second w)))))
 
 
 (def writer-maybe-t (writer/writer-transformer maybe/maybe-monad))
 
-(t/deftest writer-transformerformer-tests
+(t/deftest writer-transformer-tests
   ;; Putting a value in a writer transformer context yields an empty log
   (let [w (m/with-monad writer-maybe-t
             (m/return 42))]
@@ -88,6 +101,20 @@
     (t/is (= (d/pair 42 ["world" "Hello"])
              (first (maybe/from-maybe w))))
     (t/is (= ["world" "Hello"]
+             (second (maybe/from-maybe w)))))
+
+  ;; The log values are accumulated using Semigroup's `mappend` operation
+  (let [w (m/with-monad writer-maybe-t
+            (m/>> (writer/pass (m/return [42 set]))
+                  (writer/tell "Hello")
+                  (writer/tell "Hello")
+                  (writer/tell "world")
+                  (writer/tell "world")
+                  (writer/tell "Hello")
+                  (writer/tell "world")))
+        w (m/with-monad writer-maybe-t
+            (writer/listen w))]
+    (t/is (= #{"world" "Hello"}
              (second (maybe/from-maybe w)))))
 
   ;; Inner monad values can be lifted into the transformer
