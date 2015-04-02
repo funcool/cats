@@ -172,7 +172,7 @@
       (p/fmap f fv)))
 
 (defn fapply
-  "Given function inside af's conext and value inside
+  "Given function inside af's context and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
