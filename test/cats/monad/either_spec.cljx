@@ -21,9 +21,12 @@
   (t/is (= 1 @(either/right 1))))
 
 (t/deftest predicates-test
-  (let [m1 (either/right 1)]
+  (let [m1 (either/right 1)
+        m2 (either/left 42)]
     (t/is (either/either? m1))
-    (t/is (either/right? m1))))
+    (t/is (either/either? m2))
+    (t/is (either/right? m1))
+    (t/is (either/left? m2))))
 
 (t/deftest functor-test
   (let [m1 (either/right 1)
