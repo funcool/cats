@@ -421,3 +421,5 @@
   the inner value of a container."
   [v]
   (p/extract v))
+
+(def <> mappend)
