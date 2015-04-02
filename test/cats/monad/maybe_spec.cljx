@@ -38,6 +38,15 @@
       (t/is (= (m/fmap inc m1) (maybe/just 2)))
       (t/is (= (m/fmap inc m2) (maybe/nothing)))))
 
+  (t/testing "Forms a Semigroup when its values form a Semigroup"
+    (t/is (= (maybe/just [1 2 3 4 5])
+             (m/mappend (maybe/just [1 2 3]) (maybe/just [4 5])))))
+
+  (t/testing "Its identity element is Nothing"
+    (t/is (= (maybe/nothing)
+             (m/with-monad maybe/maybe-monad
+               (m/mempty)))))
+
   (t/testing "The first monad law: left identity"
     (t/is (= (maybe/just 2)
              (m/>>= (p/mreturn maybe/maybe-monad 2) maybe/just))))

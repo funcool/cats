@@ -43,13 +43,21 @@
   Maybe monad."
   (get-context [_] "Get the monad instance for curent value."))
 
+(defprotocol Semigroup
+  "A structure with an associative binary operation."
+  (mappend [s sv sv'] "An associative addition operation."))
+
+(defprotocol Monoid
+  "A Semigroup which has an identity element for is associative binary operation."
+  (mempty [s] "The identity element for the given monoid."))
+
 (defprotocol Extract
   "A type class responsible of extract the
   value from a monad context."
   (extract [mv] "Extract the value from monad context."))
 
 (defprotocol Functor
-  "The Functor abstraction."
+  "A data type that can be mapped over without altering its context."
   (fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
 
 (defprotocol Applicative
@@ -69,7 +77,7 @@
 (defprotocol MonadZero
   "A complement abstraction for monad that
   supports the notion of an identity element."
-  (mzero [m] "The identity element for `ctx`."))
+  (mzero [m] "The identity element for the given monadzero."))
 
 (defprotocol MonadPlus
   "A complement abstraction for Monad that

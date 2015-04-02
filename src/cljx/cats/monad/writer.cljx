@@ -30,6 +30,7 @@
   #+cljs
   (:require-macros [cats.core :refer (with-monad)])
   (:require [cats.protocols :as proto]
+            [cats.builtin :as b]
             [cats.core :as m]
             [cats.data :as d]))
 
@@ -42,12 +43,12 @@
   (reify
     proto/Monad
     (mreturn [_ v]
-      (d/pair v []))
+      (d/pair v (proto/mempty b/vector-monad)))
 
     (mbind [_ mv f]
       (let [[v log] mv
             [v' log'] (f v)]
-        (d/pair v' (into log log'))))
+        (d/pair v' (proto/mappend (proto/get-context log) log log'))))
 
     proto/MonadWriter
     (tell [_ v]
@@ -71,7 +72,7 @@
     proto/Monad
     (mreturn [_ v]
       (proto/mreturn inner-monad
-                     (d/pair v [])))
+                     (d/pair v (proto/mempty b/vector-monad))))
 
     (mbind [_ mv f]
       (proto/mbind inner-monad
@@ -81,7 +82,7 @@
                                  (f v)
                                  (fn [[v' log']]
                                    (proto/mreturn inner-monad
-                                                  (d/pair v' (into log log'))))))))
+                                                  (d/pair v' (proto/mappend (proto/get-context log) log log'))))))))
 
     proto/MonadWriter
     (tell [_ v]
@@ -115,7 +116,7 @@
                    mv
                    (fn [v]
                      (proto/mreturn inner-monad
-                                    (d/pair v [])))))))
+                                    (d/pair v (proto/mempty b/vector-monad))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions
@@ -127,11 +128,13 @@
   (proto/tell (m/get-current-context writer-monad) v))
 
 (defn listen
+  "Get the value from the log."
   [mv]
   (proto/listen (m/get-current-context writer-monad) mv))
 
 (defn pass
   [mv]
+  "Apply a function to the log."
   (proto/pass (m/get-current-context writer-monad) mv))
 
 (def value first)

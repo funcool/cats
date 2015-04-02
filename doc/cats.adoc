@@ -10,18 +10,18 @@ image:logo.png[cats logo]
 
 == Introduction
 
-Category Theory abstractions for Clojure.
+Category Theory and algebraic abstractions for Clojure.
 
 == Rationale
 
 The main motivations for writting this library are:
 
-* The existing libraries does not have support for ClojureScript.
-* We do not intend to write a little haskell inside the clojure. We have adopted a
+* The existing libraries do not have support for ClojureScript.
+* We do not intend to write a little haskell inside Clojure. We have adopted a
   practical and clojure like approach, always with corectness in mind.
 * We do not like viral/copyleft like licenses and with difference with other libraries
   cats is licensed under BSD (2 clauses) license.
-* We do not intend implement only monads. Other category theory abstractions are also
+* We do not intend implement only monads. Other category theory and algebraic abstractions are also
   first class in cats.
 
 
@@ -74,17 +74,61 @@ git clone https://github.com/funcool/cats
 
 == User Guide
 
-This section introduces almost all the category theory abstractions that the _cats_ library
+This section introduces almost all the category theory and algebraic abstractions that the _cats_ library
 supports.
 
 We will use the _Maybe_ for the example snippets, because it has support for all
 the abstractions and it is very easy to understand. You can read more about it in the next
 section of this documentation.
 
+=== Semigroup
+
+A semigroup is an algebraic structure with an associative binary operation (`mappend`). Most of the builtin collections
+form a semigroup because its associative binary operation is analogous to Clojure's `into`.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+
+(m/mappend [1 2 3] [4 5 6])
+;; => [1 2 3 4 5 6]
+----
+
+Given that the values it contains form a Semigroup, we can `mappend` multiple _Maybe_ values.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mappend (maybe/just [1 2 3])
+           (maybe/just [4 5 6]))
+;; => #<Just [1 2 3 4 5 6]>
+----
+
+=== Monoid
+
+A Monoid is a Semigroup with an identity element (`mempty`). For the collection types the `mempty`
+function is analogous to Clojure's `empty`.
+
+Given that the values it contains form a Semigroup, we can `mappend` multiple _Maybe_, Nothing being
+the identity element.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mappend (maybe/just [1 2 3])
+           (maybe/nothing)
+           (maybe/just [4 5 6])
+           (maybe/nothing))
+;; => #<Just [1 2 3 4 5 6]>
+----
 
 === Functor
 
-Let's start with the functor. The Functor represents some sort of "computational context", and the
+Let's dive into the functor. The Functor represents some sort of "computational context", and the
 abstraction consists of one unique function: *fmap*.
 
 .Signature of *fmap* function
@@ -107,7 +151,7 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 (require '[cats.monad.maybe :as maybe])
 
 (maybe/just 2)
-;; => #<Just [2]>
+;; => #<Just 2>
 ----
 
 The `just` function is a constructor of Just type that is part of Maybe monad.
@@ -120,7 +164,7 @@ Let's see one example using *fmap* over *just* instance:
 (require '[cats.core :as m])
 
 (m/fmap inc (maybe/just 1))
-;; => #<Just [2]>
+;; => #<Just 2>
 ----
 
 The *Maybe* type also has another constructor: `nothing`. It represents the absence of a value.
@@ -221,10 +265,10 @@ can apply the returned greeter to any value without a defensive nil check:
 [source, clojure]
 ----
 (fapply (make-greeter "es") (just "Alex"))
-;; => #<Just [Hola Alex]>
+;; => #<Just "Hola Alex">
 
 (fapply (make-greeter "en") (just "Alex"))
-;; => #<Just [Hello Alex]>
+;; => #<Just "Hello Alex">
 
 (fapply (make-greeter "it") (just "Alex"))
 ;; => #<Nothing >
@@ -240,7 +284,7 @@ Examples:
 (require '[cats.monad.maybe :as maybe])
 
 (pure maybe/maybe-monad 5)
-;; => #<Just [5]>
+;; => #<Just 5>
 ----
 
 If you do not understand the purpose of the *pure* function, the next section
@@ -271,7 +315,7 @@ that in a monad, the function is a responsible for wrapping a returned value in 
 ----
 (m/bind (maybe/just 1)
         (fn [v] (maybe/just (inc v))))
-;; => #<Just [2]>
+;; => #<Just 2>
 ----
 
 One of the key features of the bind function is that any computation executed within the context of
@@ -285,7 +329,7 @@ what that container is, you can use `return` or `pure` functions:
 (m/bind (maybe/just 1)
         (fn [v]
           (m/return (inc v))))
-;; => #<Just [2]>
+;; => #<Just 2>
 ----
 
 The `return` or `pure` functions, when called with one argument, try to use the dynamic scope context
@@ -352,7 +396,7 @@ we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 ; combined functor is a vector of Maybe values that could
 ; contain a value of any type.
 (fmap2 inc [(maybe/just 1) (maybe/just 2)])
-;;=> [#<Just [2]> #<Just [3]>]
+;;=> [#<Just 2> #<Just 3>]
 ----
 
 However, monads don't compose as nicely as functors do. We have to actually implement
@@ -386,7 +430,7 @@ return a reified MonadTrans:
 
 (m/with-monad maybe-state
   (state/run-state (m/return 42) {}))
-;; => #<Just [#<Pair [42 {}]>]>
+;; => #<Just #<Pair [42 {}]>>
 ----
 
 As we can see in the example below, the return of the `maybe-state` monad creates a stateful
@@ -421,7 +465,7 @@ _cats_, implements two types:
 [source, clojure]
 ----
 (maybe/just 1)
-;; => #<Just [1]>
+;; => #<Just 1>
 
 (maybe/nothing)
 ;; => #<Nothing >
