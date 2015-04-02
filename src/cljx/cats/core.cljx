@@ -366,10 +366,10 @@
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
-  ([af av]
-   (fapply af av))
-  ([af av & avs]
-   (reduce fapply af (cons av avs))))
+  [& avs]
+  {:pre [(not (empty? avs))]}
+  (let [ctx (get-current-context (first avs))]
+    (reduce (partial p/fapply ctx) avs)))
 
 (defn >>=
   "Performs a Haskell-style left-associative
