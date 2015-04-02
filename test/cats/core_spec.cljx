@@ -27,6 +27,7 @@
              (m/mlet [i [1 2 3 4 5]
                       :when (> i 2)]
                (m/return i)))))
+
   (t/testing "The body runs in an implicit do"
     (t/is (= (maybe/just 3)
              (m/mlet [i (maybe/just 2)
@@ -78,7 +79,6 @@
       (t/is (= (maybe/nothing)
                (monad+ (maybe/just 1) (maybe/nothing)))))
 
-    #+clj
     (t/testing "It can lift a function to a Monad Transformer"
       (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
