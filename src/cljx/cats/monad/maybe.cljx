@@ -279,3 +279,47 @@
                    mv
                    (fn [v]
                      (proto/mreturn inner-monad (just v)))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn maybe
+  "Given a default value, a maybe and a function, return the default
+  if the maybe is a nothing; if its a just, apply the function to the
+  value it contains and return the result."
+  [default m f]
+  {:pre [(maybe? m)]}
+  (if (nothing? m)
+    default
+    (f (m/extract m))))
+
+(defn seq->maybe
+  "Given a collection, return a nothing if its empty or a just with its
+  first element if its not."
+  [coll]
+  (if (empty? coll)
+    (nothing)
+    (just (first coll))))
+
+(defn maybe->seq
+  "Given a maybe, return an empty seq if its nothing or a one-element seq
+  with its value if its not."
+  [m]
+  {:pre [(maybe? m)]}
+  (if (nothing? m)
+    (lazy-seq [])
+    (lazy-seq [(m/extract m)])))
+
+;; TODO: use a transducer when we support 1.7.0+
+(defn cat-maybes
+  "Given a collection of maybes, return a sequence of the values that the
+   just's contain."
+  [coll]
+  (map m/extract (filter just? coll)))
+
+(defn map-maybe
+  "Given a maybe-returning function and a collection, map the function over
+  the collection returning the values contained in the just values."
+  [mf coll]
+  (cat-maybes (map mf coll)))
