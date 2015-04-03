@@ -241,3 +241,19 @@
   (if (left? e)
     (lf (m/extract e))
     (rf (m/extract e))))
+
+(def lefts
+  "Given a collection of eithers, return only the values that are left."
+  (partial filter left?))
+
+(def rights
+  "Given a collection of eithers, return only the values that are left."
+  (partial filter right?))
+
+(def first-left
+  "Given a collection of either, return the first value that is left"
+  (comp first lefts))
+
+(def first-right
+  "Given a collection of either, return the first value that is right"
+  (comp first rights))

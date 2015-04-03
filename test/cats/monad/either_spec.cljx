@@ -93,6 +93,16 @@
   (let [l (either/left "oh no")
         r (either/right 42)]
     (t/is (= "OH NO" (either/branch l s/upper-case inc)))
-    (t/is (= 43 (either/branch r s/upper-case inc)))
+    (t/is (= 43 (either/branch r s/upper-case inc)))))
 
-))
+
+(t/deftest filtering-test
+  (let [l1 (either/left "oh no")
+        l2 (either/left "yo ho ho ho")
+        r1 (either/right 42)
+        r2 (either/right 99)
+        es [l1 l2 r1 r2]]
+    (t/is (every? either/left? (either/lefts es)))
+    (t/is (every? either/right? (either/rights es)))
+    (t/is (= l1 (either/first-left es)))
+    (t/is (= r1 (either/first-right es)))))
