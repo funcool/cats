@@ -238,6 +238,7 @@
    left apply the first function to the value it contains; if the
    either is a right apply the second function to its value."
   [e lf rf]
+  {:pre [(either? e)]}
   (if (left? e)
     (lf (m/extract e))
     (rf (m/extract e))))
@@ -257,3 +258,11 @@
 (def first-right
   "Given a collection of either, return the first value that is right"
   (comp first rights))
+
+(defn invert
+  "Convert a left to a right or viceversa, preserving content."
+  [e]
+  {:pre [(either? e)]}
+  (if (left? e)
+    (right (m/extract e))
+    (left (m/extract e))))

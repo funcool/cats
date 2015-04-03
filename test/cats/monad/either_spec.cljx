@@ -106,3 +106,9 @@
     (t/is (every? either/right? (either/rights es)))
     (t/is (= l1 (either/first-left es)))
     (t/is (= r1 (either/first-right es)))))
+
+(t/deftest invert-test
+  (let [l (either/left "oh no")
+        r (either/right "oh no")]
+    (t/is (= r (either/invert l)))
+    (t/is (= l (either/invert r)))))
