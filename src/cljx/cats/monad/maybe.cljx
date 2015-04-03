@@ -320,6 +320,7 @@
 
 (defn map-maybe
   "Given a maybe-returning function and a collection, map the function over
-  the collection returning the values contained in the just values."
+  the collection returning the values contained in the just values of the
+  resulting collection."
   [mf coll]
   (cat-maybes (map mf coll)))
