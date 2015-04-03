@@ -19,35 +19,27 @@
 ;; INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
 ;; NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 ;; DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-;; THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+;; THEORY OF LIABILITtY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 ;; (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+;; THIS SOFTWARE, EVE N IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-(ns cats.monad.either
-  "The Either monad implementation and helper functions
-  for working with either related types.
-
-  Also commonly known as Error monad.
-
-      (require '[cats.monad.either :as either])
-
-      (either/right 1)
-      ;; => #<Right [1]>
-
-      (either/left 1)
-      ;; => #<Left [1]>
+(ns cats.applicative.validation
+  "The Validation applicative implementation and helper functions
+  for validating values. Isomorphic to Either.
   "
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]
+            [cats.monad.either :as either]))
 
-(declare either-monad)
+(declare validation-applicative)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(deftype Right [v]
+(deftype Ok [v]
   proto/Context
-  (get-context [_] either-monad)
+  (get-context [_] validation-applicative)
 
   proto/Extract
   (extract [_] v)
@@ -66,7 +58,7 @@
   Object
   #+clj
   (equals [self other]
-    (if (instance? Right other)
+    (if (instance? Ok other)
       (= v (.-v other))
       false))
 
@@ -78,13 +70,13 @@
   cljs.core/IEquiv
   #+cljs
   (-equiv [self other]
-    (if (instance? Right other)
+    (if (instance? Ok other)
       (= v (.-v other))
       false)))
 
-(deftype Left [v]
+(deftype Fail [v]
   proto/Context
-  (get-context [_] either-monad)
+  (get-context [_] validation-applicative)
 
   proto/Extract
   (extract [_] v)
@@ -103,7 +95,7 @@
   Object
   #+clj
   (equals [self other]
-    (if (instance? Left other)
+    (if (instance? Fail other)
       (= v (.-v other))
       false))
 
@@ -115,115 +107,96 @@
   cljs.core/IEquiv
   #+cljs
   (-equiv [self other]
-    (if (instance? Left other)
+    (if (instance? Fail other)
       (= v (.-v other))
       false)))
 
-(alter-meta! #'->Right assoc :private true)
-(alter-meta! #'->Left assoc :private true)
+(alter-meta! #'->Ok assoc :private true)
+(alter-meta! #'->Fail assoc :private true)
 
-(defn left
-  "A Left type constructor."
-  ([] (Left. nil))
-  ([v] (Left. v)))
-
-(defn right
-  "A Right type constructor."
-  ([] (Right. nil))
-  ([v] (Right. v)))
-
-(defn left?
-  "Return true if `v` is an instance
-  of Left type."
+(defn ok
+  "An Ok type constructor."
   [v]
-  (instance? Left v))
+  (Ok. v))
 
-(defn right?
+
+(defn fail
+  "A Fail type constructor."
+  ([]
+   (Fail. []))
+  ([v]
+   (Fail. v)))
+
+(defn ok?
   "Return true if `v` is an instance
-  of Right type."
+  of Ok type."
   [v]
-  (instance? Right v))
+  (instance? Ok v))
 
-(defn either?
+(defn fail?
+  "Return true if `v` is an instance
+  of Fail type."
+  [v]
+  (instance? Fail v))
+
+(defn validation?
   "Return true in case of `v` is instance
-  of Either monad."
+  of the Validation applicative."
   [v]
   (if (satisfies? proto/Context v)
-    (identical? (proto/get-context v) either-monad)
+    (identical? (proto/get-context v) validation-applicative)
     false))
 
-(defn ^{:deprecated true}
-  from-either
-  "Return inner value of either monad.
-
-  This is a specialized version of `cats.core/extract`
-  for Either monad.
-
-  The use of this function is DEPRECATED and
-  `cats.core/extract` should be used."
-  [mv]
-  (proto/extract mv))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad definition
+;; Applicative definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  either-monad
+  validation-applicative
   (reify
+    proto/Semigroup
+    (mappend [_ sv sv']
+      (cond
+        (and (fail? sv) (fail? sv')) (fail (m/mappend (m/extract sv)
+                                                      (m/extract sv')))
+        (ok? sv) sv
+        :else sv'))
+
+    proto/Monoid
+    (mempty [_]
+      (fail))
+
     proto/Functor
     (fmap [_ f s]
-      (if (right? s)
-        (right (f (.-v s)))
+      (if (ok? s)
+        (ok (f (.-v s)))
         s))
 
     proto/Applicative
     (pure [_ v]
-      (right v))
+      (ok v))
 
-    (fapply [m af av]
-      (if (right? af)
-        (proto/fmap m (.-v af) av)
-        af))
-
-    proto/Monad
-    (mreturn [_ v]
-      (right v))
-
-    (mbind [_ s f]
-      (if (right? s)
-        (f (.-v s))
-        s))))
+    (fapply [_ af av]
+      (cond
+        (and (ok? af) (ok? av)) (ok ((m/extract af) (m/extract av)))
+        (and (fail? af) (fail? av)) (fail (m/mappend (m/extract af) (m/extract av)))
+        (ok? af) av
+        :else af))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
+;; Either isomorphism
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn either-transformer
-  "The Either transformer constructor."
-  [inner-monad]
-  (reify
-    proto/Monad
-    (mreturn [_ v]
-      (proto/mreturn inner-monad (right v)))
+(defn validation->either
+  [av]
+  {:pre [(validation? av)]}
+  (if (ok? av)
+    (either/right (.-v av))
+    (either/left (.-v av))))
 
-    (mbind [_ mv f]
-      (proto/mbind inner-monad
-                   mv
-                   (fn [either-v]
-                     (if (left? either-v)
-                       (proto/mreturn inner-monad either-v)
-                       (f (from-either either-v))))))
-
-    proto/MonadTrans
-    (base [_]
-      either-monad)
-
-    (inner [_]
-      inner-monad)
-
-    (lift [m mv]
-      (proto/mbind inner-monad
-                   mv
-                   (fn [v]
-                     (proto/mreturn inner-monad (right v)))))))
+(defn either->validation
+  [ae]
+  {:pre [(either/either? ae)]}
+  (if (either/right? ae)
+    (ok (.-v ae))
+    (fail (.-v ae))))

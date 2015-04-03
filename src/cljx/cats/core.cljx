@@ -172,7 +172,7 @@
       (p/fmap f fv)))
 
 (defn fapply
-  "Given function inside af's conext and value inside
+  "Given function inside af's context and value inside
   av's context, applies the function to value and return
   a result wrapped in context of same type of av context."
   [af av]
@@ -366,10 +366,10 @@
 
 (defn <*>
   "Performs a Haskell-style left-associative fapply."
-  ([af av]
-   (fapply af av))
-  ([af av & avs]
-   (reduce fapply af (cons av avs))))
+  [& avs]
+  {:pre [(not (empty? avs))]}
+  (let [ctx (get-current-context (first avs))]
+    (reduce (partial p/fapply ctx) avs)))
 
 (defn >>=
   "Performs a Haskell-style left-associative
@@ -421,3 +421,5 @@
   the inner value of a container."
   [v]
   (p/extract v))
+
+(def <> mappend)

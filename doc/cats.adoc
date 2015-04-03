@@ -444,7 +444,7 @@ a regular monad.
 The `maybe-state` monad combines the semantics of both State and Maybe.
 
 
-== Monad types
+== Types
 
 === Maybe
 
@@ -675,18 +675,67 @@ TODO
 
 TODO
 
+=== Lazy sequences
+
+TODO
 
 === Vector
 
 TODO
 
+=== Set
 
-=== Other monads
+TODO
 
-Some monads are defined as separated package for avoid add additional
-and unnecesary dependencies to cats library.
+=== Map
+
+TODO
+
+=== Validation
+
+The validation type is similar to Either or Exception types but it doesn't implement a Monad instance. It
+has two constructors: `ok` and `fail`, representing success and failure respectively.
+
+[source, clojure]
+----
+(require '[cats.applicative.validation :as v])
+(require '[cats.core :as m])
+
+(v/ok 42)
+;;=> #<Ok 42>
+
+(v/fail [])
+;;=> #<Fail []>
+----
+
+It implements the Applicative protocol, and its intended usage is as an Applicative. Applying Validation
+values together errs on the side of the failure, and applying failures together aggregates their values
+using the Semigroup's `mappend` function.
+
+[source, clojure]
+----
+(require '[cats.applicative.validation :as v])
+(require '[cats.core :as m])
+
+(m/fapply (v/ok 42) (v/fail "OH NOES"))
+;;=> #<Fail "OH NOES">
+
+;; Note that `<*>` is a variadic fapply
+(m/<*> (v/ok 42)
+       (v/fail {:foo "bar"})
+       (v/fail {:baz "fubar"})
+       (v/ok 99))
+;;=> #<Fail {:baz "fubar", :foo "bar"}>
+----
+
+=== Complementary libraries
+
+Some monads are defined as separated package for avoiding additional
+and unnecesary dependencies to cats. Also, there are some libraries
+that build higher-level abstractions on top of what cats offers.
 
 * Channel monad: https://github.com/funcool/cats-channel
+* Higher-level validation: https://github.com/funcool/vale
 
 
 == FAQ
@@ -700,12 +749,13 @@ they should not extend any of the previously explained protocols.
 
 .Summary of Clojure types and implemented protocols
 [options="header"]
-|=============================================================
+|================================================================================
 | Name     | Implemented protocols
-| vector   | Functor, Applicative, Monad, MonadZero, MonadPlus
-| hash-set | Functor, Applicative, Monad, MonadZero, MonadPlus
-| list     | Functor, Applicative, Monad, MonadZero, MonadPlus
-|=============================================================
+| sequence | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
+| vector   | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
+| hash-set | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
+| hash-map | Semigroup, Monoid
+|================================================================================
 
 
 == How to Contribute?
@@ -745,7 +795,7 @@ steps depending on the situation:
 [source,text]
 ----
 Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
-Copyright (c) 2014-2015 Alejandro Gómez
+Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
 
 All rights reserved.
 

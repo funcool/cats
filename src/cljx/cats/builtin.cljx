@@ -180,3 +180,27 @@
              #+cljs cljs.core.PersistentHashSet
   proto/Context
   (get-context [_] set-monad))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Map Monoid
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def map-monoid
+  (reify
+    proto/Semigroup
+    (mappend [_ sv sv']
+      (merge sv sv'))
+
+    proto/Monoid
+    (mempty [_]
+      {})))
+
+(extend-type #+clj clojure.lang.PersistentHashMap
+             #+cljs cljs.core.PersistentHashMap
+  proto/Context
+  (get-context [_] map-monoid))
+
+#+clj
+(extend-type clojure.lang.PersistentArrayMap
+  proto/Context
+  (get-context [_] map-monoid))
