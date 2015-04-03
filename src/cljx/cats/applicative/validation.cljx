@@ -152,6 +152,14 @@
 (def ^{:no-doc true}
   validation-applicative
   (reify
+    proto/Semigroup
+    (mappend [_ sv sv']
+      (cond
+        (and (fail? sv) (fail? sv')) (fail (m/mappend (m/extract sv)
+                                                      (m/extract sv')))
+        (ok? sv) sv
+        :else sv'))
+
     proto/Functor
     (fmap [_ f s]
       (if (ok? s)
