@@ -37,7 +37,8 @@
       (either/left 1)
       ;; => #<Left [1]>
   "
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]))
 
 (declare either-monad)
 
@@ -227,3 +228,16 @@
                    mv
                    (fn [v]
                      (proto/mreturn inner-monad (right v)))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn branch
+  "Given an either value and two functions, if the either is a
+   left apply the first function to the value it contains; if the
+   either is a right apply the second function to its value."
+  [e lf rf]
+  (if (left? e)
+    (lf (m/extract e))
+    (rf (m/extract e))))
