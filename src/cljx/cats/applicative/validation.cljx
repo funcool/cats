@@ -122,8 +122,10 @@
 
 (defn fail
   "A Fail type constructor."
-  [v]
-  (Fail. v))
+  ([]
+   (Fail. []))
+  ([v]
+   (Fail. v)))
 
 (defn ok?
   "Return true if `v` is an instance
@@ -159,6 +161,10 @@
                                                       (m/extract sv')))
         (ok? sv) sv
         :else sv'))
+
+    proto/Monoid
+    (mempty [_]
+      (fail))
 
     proto/Functor
     (fmap [_ f s]

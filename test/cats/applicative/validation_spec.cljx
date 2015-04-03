@@ -44,6 +44,10 @@
     (t/is (= ok1
              (m/mappend ok1 ok2)))))
 
+(t/deftest monoid-test
+  (m/with-monad validation/validation-applicative
+    (t/is (= (validation/fail) (m/mempty)))))
+
 (t/deftest functor-test
   (let [m1 (validation/ok 1)
         m2 (validation/fail 42)]
