@@ -234,7 +234,7 @@
     (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
   (->> (reverse (partition 2 bindings))
        (reduce (fn [acc [l r]]
-                 (condp = l
+                 (case l
                    :let  `(let ~r ~acc)
                    :when `(bind (guard ~r)
                                 (fn [~(gensym)] ~acc))
