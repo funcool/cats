@@ -14,28 +14,28 @@ Category Theory and algebraic abstractions for Clojure.
 
 == Rationale
 
-The main motivations for writting this library are:
+The main motivations for writing this library are:
 
 * The existing libraries do not have support for ClojureScript.
-* We do not intend to write a little haskell inside Clojure. We have adopted a
-  practical and clojure like approach, always with corectness in mind.
-* We do not like viral/copyleft like licenses and with difference with other libraries
-  cats is licensed under BSD (2 clauses) license.
-* We do not intend implement only monads. Other category theory and algebraic abstractions are also
-  first class in cats.
+* We do not intend to write a little Haskell inside Clojure. We have adopted a
+  practical and Clojure like approach, always with correctness in mind.
+* We do not like viral/copyleft like licenses and in contrast to other libraries
+  cats is licensed under the BSD (2 clauses) license.
+* We do not intend to only implement monads. Other category theory and algebraic abstractions 
+  are also first class in cats.
 
 
 *Alternatives:*
 
-* **algo.monads**: This is the clojure official library for monads. Its approach for modeling
-  monads is slightly limited, only supports the monad abstraction and does not has support for
+* **algo.monads**: This is the official Clojure library for monads. Its approach for modeling
+  monads is slightly limited, only supports the monad abstraction and does not have support for
   ClojureScript.
-* **fluokitten**: Slightly unmaintaned by the original author. It is focused on to be very practictical
-  without take care of corectness (as example, it extends clojure types with monadic abstractions
-  that not make sense). Also does not has support for ClojureScript.
-* **monads**: is the most advanced monads library, supports also functors, applicatives and other
-  related abstractions. It lacks of good and readable documentation, fucused on correctness, has
-  haskell like sugar syntax (instead of clojure like syntax) and not has support for ClojureScript.
+* **fluokitten**: Slightly unmaintaned by the original author. It is focused on being very practical
+  without taking care of correctness (for example, it extends Clojure types with monadic abstractions
+  that do not make sense). It has no support for ClojureScript either.
+* **monads**: Is the most advanced monads library, supports also functors, applicatives and other
+  related abstractions. It lacks a good and readable documentation, focus on correctness, has
+  Haskell like sugar syntax (instead of Clojure like syntax) and does not have support for ClojureScript.
 
 All listed alternatives are licensed with EPL or similar licenses.
 
@@ -77,14 +77,14 @@ git clone https://github.com/funcool/cats
 This section introduces almost all the category theory and algebraic abstractions that the _cats_ library
 supports.
 
-We will use the _Maybe_ for the example snippets, because it has support for all
-the abstractions and it is very easy to understand. You can read more about it in the next
+We will use _Maybe_ for the example snippets, because it has support for all
+the abstractions and is very easy to understand. You can read more about it in the next
 section of this documentation.
 
 === Semigroup
 
 A semigroup is an algebraic structure with an associative binary operation (`mappend`). Most of the builtin collections
-form a semigroup because its associative binary operation is analogous to Clojure's `into`.
+form a semigroup because their associative binary operation is analogous to Clojure's `into`.
 
 [source, clojure]
 ----
@@ -111,8 +111,8 @@ Given that the values it contains form a Semigroup, we can `mappend` multiple _M
 A Monoid is a Semigroup with an identity element (`mempty`). For the collection types the `mempty`
 function is analogous to Clojure's `empty`.
 
-Given that the values it contains form a Semigroup, we can `mappend` multiple _Maybe_, Nothing being
-the identity element.
+Given that the values it contains form a Semigroup, we can `mappend` multiple
+_Maybe_, with Nothing being the identity element.
 
 [source, clojure]
 ----
@@ -138,11 +138,11 @@ abstraction consists of one unique function: *fmap*.
 ----
 
 The higher-order function *fmap* takes a plain function as the first parameter and
-value wrapped in a functor context as the second parameter. It extracts the inner value
-applies the function to it, and returns the result wrapped in same type as the second
-parameter.
+a value wrapped in a functor context as the second parameter. It extracts the
+inner value, applies the function to it and returns the result wrapped in same type
+as the second parameter.
 
-But, what is the *functor context*? It sounds more complex than it is. A Functor
+But what is the *functor context*? It sounds more complex than it is. A Functor
 wrapper is any type that acts as "Box" and implements the `Context` and `Functor` protocols.
 
 .One good example of a functor is the *Maybe* type:
@@ -154,9 +154,9 @@ wrapper is any type that acts as "Box" and implements the `Context` and `Functor
 ;; => #<Just 2>
 ----
 
-The `just` function is a constructor of Just type that is part of Maybe monad.
+The `just` function is a constructor of the Just type that is part of the Maybe monad.
 
-Let's see one example using *fmap* over *just* instance:
+Let's see one example of using *fmap* over a *just* instance:
 
 .Example using fmap over *just* instance.
 [source, clojure]
@@ -202,14 +202,14 @@ map returns lazy seqs no matter what collection we pass to it:
 ;; => clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)
 ----
 
-But why can we pass vectors to `fmap` function? Because some Clojure container types like vectors,
+But why can we pass vectors to the `fmap` function? Because some Clojure container types like vectors,
 lists and sets, also implement the functor abstraction.
 
 
 === Applicative
 
 Let's continue with applicative functors. The Applicative Functor represents
-some sort of "computational context" like a plain Functor, but with ability to
+some sort of "computational context" like a plain Functor, but with the ability to
 execute a function wrapped in the same context.
 
 The Applicative Functor abstraction consists of two functions: *fapply* and
@@ -223,7 +223,7 @@ The Applicative Functor abstraction consists of two functions: *fapply* and
 
 NOTE: the *pure* function will be explained later.
 
-The use case for Applicative Functors is much the same as plain Functors: safe
+The use case for Applicative Functors is roughly the same as for plain Functors: safe
 evaluation of some computation in a context.
 
 Let's see an example to better understand the differences between functor and
@@ -243,10 +243,10 @@ greeter function, and you only support a few languages.
     nil))
 ----
 
-Now, before using the resulting greeter you should always defensively check if returned
-greeter is a valid function or is a nil value.
+Now, before using the resulting greeter you should always defensively check if
+the returned greeter is a valid function or a nil value.
 
-Let's convert this factory to use Maybe type:
+Let's convert this factory to use the Maybe type:
 
 [source, clojure]
 ----
@@ -274,8 +274,8 @@ can apply the returned greeter to any value without a defensive nil check:
 ;; => #<Nothing >
 ----
 
-Moreover, the applicative functor comes with *pure* function, and the main purpose of this function is
-to put some value in side-effect-free context of the current type.
+Moreover, the applicative functor comes with the *pure* function, which allows
+you to put some value in side-effect-free context of the current type.
 
 Examples:
 
@@ -296,7 +296,7 @@ should clarify its purpose.
 Monads are the most discussed programming concept to come from category theory. Like functors and
 applicatives, monads deal with data in contexts.
 
-Additionaly, monads can also transform contexts by unwrapping data, applying functions to it and
+Additionally, monads can also transform contexts by unwrapping data, applying functions to it and
 putting new values in a completely different context.
 
 The monad abstraction consists of two functions: *bind* and *return*
@@ -308,7 +308,7 @@ The monad abstraction consists of two functions: *bind* and *return*
 ----
 
 As you can see, bind works much like a Functor but with inverted arguments. The main difference is
-that in a monad, the function is a responsible for wrapping a returned value in a context.
+that in a monad, the function is responsible for wrapping a returned value in a context.
 
 .Example usage of the bind higher-order function.
 [source,clojure]
@@ -403,7 +403,7 @@ However, monads don't compose as nicely as functors do. We have to actually impl
 the composition ourselves.
 
 In some circumstances we would like combine the effects of two monads into another one. We call the
-resulting monad a monad transformer, which is the composition of a "base" and a "inner" monad. A
+resulting monad a monad transformer, which is the composition of a "base" and "inner" monad. A
 monad transformer is itself a monad.
 
 
@@ -451,14 +451,14 @@ The `maybe-state` monad combines the semantics of both State and Maybe.
 This is one of the two most used monad types (also known as Optional in other programming
 languages).
 
-Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type
+The Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type
 of functions which may or may not return a meaningful value when they are applied. It consists
 of either an empty constructor (called None or Nothing), or a constructor
-encapsulating the original data type A (written Just A or Some A).
+encapsulating the original data type A (e.g. Just A or Some A).
 
 _cats_, implements two types:
 
-- `Just` that represents just a value in a context.
+- `Just` that represents a value in a context.
 - `Nothing` that represents the abscense of value.
 
 .Example creating instances of `Just` and `Nothing` types
@@ -471,15 +471,15 @@ _cats_, implements two types:
 ;; => #<Nothing >
 ----
 
-In the same ns, it there other usefull functions for work with maybe monad types. See the api
-documentation for see a full list of them. But here we will exaplain a little relevant subset
-of they.
+there are other useful functions for working with maybe monad types in the same namespace. 
+See the API documentation for a full list of them. But here we will explain a little relevant subset
+of them.
 
-We mentioned above that *fmap* extracts the value from the functor context. You will also want to
+We mentioned above that *fmap* extracts the value from a functor context. You will also want to
 extract values wrapped by *just* and you can do that with *from-maybe*.
 
-The Just or Nothing instances as we said previously, acts like a wrappers and in some circumstances
-you will want extract the plain value from them. For it, cats offers the `from-maybe` function.
+As we said previously, the Just or Nothing instances, act like wrappers and in some circumstances
+you will want extract the plain value from them. cats offers the `from-maybe` function for that.
 
 .Example using *from-maybe* to extract values wrapped by *just*.
 [source, clojure]
@@ -494,13 +494,13 @@ you will want extract the plain value from them. For it, cats offers the `from-m
 ;; => 42
 ----
 
-The `from-maybe` function is a specialized version more generic one: `cats.core/extract`. The generic
-version is a polymorphic function and will work also with different types of different monads.
-
+The `from-maybe` function is a specialized version of a more generic one: `cats.core/extract`.
+The generic version is a polymorphic function and will also work with different
+types of different monads.
 
 === Either
 
-Either is another type that represents a result of computation, but (in contrast with maybe)
+Either is another type that represents a result of a computation, but (in contrast with maybe)
 it can return some data with a failed computation result.
 
 In _cats_ it has two constructors:
@@ -520,22 +520,21 @@ In _cats_ it has two constructors:
 ;; => #<Either [Error message :left]>
 ----
 
-NOTE: Either is also (like Maybe) Functor, Applicative Functor and Monad.
-
+NOTE: Either is also (like Maybe) a Functor, Applicative Functor and Monad.
 
 === Exception
 
-Also known as Try monad, popularized by Scala.
+Also known as the Try monad, as popularized by Scala.
 
 It represents a computation that may either result in an exception or return a successfully computed
-value. Is very similar to Either monad, but is semantically different.
+value. Is very similar to the Either monad, but is semantically different.
 
-It consists in two types: Success and Failure. The Success type is a simple wrapper like Right of
-Either monad. But the Failure type is slightly different from Left, because it is forced to wrap an
-instance of Throwable (or Error in cljs).
+It consists of two types: Success and Failure. The Success type is a simple
+wrapper, like Right of the Either monad. But the Failure type is slightly different
+from Left, because it always wraps an instance of Throwable (or Error in cljs).
 
-The most common use case of this monad is for wrap third party libraries that uses standard Exception
-based error handling. In normal circumstances you should use Either instead.
+The most common use case of this monad is to wrap third party libraries that use standard Exception
+based error handling. In normal circumstances, however, you should use Either instead.
 
 It is an analogue of the try-catch block: it replaces try-catch's stack-based error handling with
 heap-based error handling. Instead of having an exception thrown and having to deal with it immediately
@@ -575,12 +574,12 @@ function with the exception as first parameter.
 ;; => #<Success [0]>
 ----
 
-The types defined for Exception monad (Success and Failure) also implementes the clojure IDeref
-interface, which facilitates libraries developing using monadic composition without forcing a user of
+The types defined for the Exception monad (Success and Failure) also implement the Clojure IDeref
+interface, which allows library development using monadic composition without forcing a user of
 that library to use or understand monads.
 
-That is because when you will dereference the failure instance, it will reraise the containing
-exception.
+That is because when you dereference the failure instance, it will reraise the
+enclosed exception.
 
 .Example dereferencing a failure instance
 [source, clojure]
@@ -594,27 +593,28 @@ exception.
 
 === State
 
-State monad in one of the special cases of monads most used in Haskell. It has different
-purposes including: lazy computation, composition, and maintaining state without explicit state.
+The State monad is one of the special cases of monads most commonly used in
+Haskell. It has several purposes including: lazy computation, composition, and
+maintaining state without explicit state.
 
-The de-facto monadic type of the state monad is a plain function. Function represents a computation
-as is (without executing it). Obviously, a function should have some special characteristics to work
-in monad state composition.
+The de-facto monadic type of the state monad is a plain function. A function
+represents a computation as is (without executing it). Obviously, a function
+should have some special characteristics to work in monad state composition.
 
 .Valid function for valid state monad
 [source, clojure]
 ----
 (fn [state]
-  "Takes state as argument and return a vector
-  with first argument with procesed value and
-  second argument the transformed new state."
+  "Takes a state as argument and returns a vector
+  with the first element being the processed value and
+  the second element being the new transformed state."
   (let [newvalue (first state)
         newstate (next state)]
     [newvalue newstate]))
 ----
 
 You just saw an example of the low-level primitive state monad. For basic usage
-you do not need to build your own functions, just use some helpers that _cats_ provides.
+you do not need to write your own functions, just use some helpers that _cats_ provides.
 
 Let's look at one example before explaining the details:
 
@@ -628,20 +628,20 @@ Let's look at one example before explaining the details:
 ;;=> #<State cats.monad.state.State@2eebabb6>
 ----
 
-At the moment of evaluation in the previous expression, nothing of that we have defined
+At the moment of evaluation in the previous expression, nothing of what we have defined
 is executed. But instead of returning the unadorned final value of the computation,
-a strange/unknown object is returned of type *State*.
+a strange/unknown object of type *State* is returned.
 
 The State type is simply a wrapper for Clojure functions, nothing more.
 
-Now, it's time to execute the composed computation. For this we can use one of the following
-functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
+Now, it's time to execute the composed computation. We can use one of the following
+functions exposed by _cats_ for that: `run-state`, `eval-state` and `exec-state`.
 
-- `run-state` function executes the composed computation and returns both the value and the
+- `run-state` executes the composed computation and returns both the value and the
   result state.
-- `eval-state` function executes the composed computation and returns the resulting value
-  discarding the state.
-- `exec-state` function executes the composed computation and return only the resulting
+- `eval-state` executes the composed computation and returns the resulting
+  value, discarding the state.
+- `exec-state` executes the composed computation and returns only the resulting
   state, ignoring the resulting value.
 
 .Example of resuls of using the previosly listed functions
@@ -657,8 +657,8 @@ functions exposed by _cats_: `run-state`, `eval-state` and `exec-state`.
 ;;=> (2 3)
 ----
 
-The `run-state` function returns an instance of Pair type. The Pair type acts like any other seq in
-clojure with the exception that it only can contain two values.
+The `run-state` function returns an instance of the Pair type. The Pair type acts like any other seq in
+Clojure with the exception that it can only contain two values.
 
 
 === Reader
@@ -693,8 +693,9 @@ TODO
 
 === Validation
 
-The validation type is similar to Either or Exception types but it doesn't implement a Monad instance. It
-has two constructors: `ok` and `fail`, representing success and failure respectively.
+The validation type is similar to the Either or Exception types except that it
+doesn't implement a Monad instance. It has two constructors: `ok` and `fail`,
+representing success and failure respectively.
 
 [source, clojure]
 ----
@@ -730,7 +731,7 @@ using the Semigroup's `mappend` function.
 
 === Complementary libraries
 
-Some monads are defined as separated package for avoiding additional
+Some monads are defined as separated package to avoid additional
 and unnecesary dependencies to cats. Also, there are some libraries
 that build higher-level abstractions on top of what cats offers.
 
@@ -740,7 +741,7 @@ that build higher-level abstractions on top of what cats offers.
 
 == FAQ
 
-=== What Clojure types implements some of the Category Theory abstractions?
+=== What Clojure types implement some of the Category Theory abstractions?
 
 In contrast to other similar libraries in Clojure, _cats_ doesn't intend to extend Clojure types
 that don't act like containers. For example, Clojure keywords are values but can not be containers so
