@@ -98,3 +98,29 @@
                (m/mlet [x [(maybe/just 0) (maybe/just 1)]
                         y [(maybe/just 1) (maybe/nothing)]]
                  (m/return (+ x y))))))))
+
+(t/deftest maybe-test
+  (let [n (maybe/nothing)
+        j (maybe/just 42)]
+    (t/is (= 42 (maybe/maybe 42 n inc)))
+    (t/is (= 43 (maybe/maybe 42 j inc)))))
+
+(t/deftest seq-conversion-test
+  (let [n (maybe/nothing)
+        j (maybe/just 42)]
+    (t/is (= n (maybe/seq->maybe [])))
+    (t/is (= j (maybe/seq->maybe [42 99])))
+    (t/is (= [] (maybe/maybe->seq n)))
+    (t/is (= [42] (maybe/maybe->seq j)))))
+
+(t/deftest cat-maybes-test
+  (let [n1 (maybe/nothing)
+        n2 (maybe/nothing)
+        j1 (maybe/just 42)
+        j2 (maybe/just 99)
+        ms [n1 n2 j1 j2]]
+    (t/is (= [42 99] (maybe/cat-maybes ms)))))
+
+(t/deftest map-maybe-test
+  (let [just-evens #(if (even? %) (maybe/just %) (maybe/nothing))]
+    (t/is (= [42 100] (maybe/map-maybe just-evens [41 42 99 100])))))

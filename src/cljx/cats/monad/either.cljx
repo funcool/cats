@@ -37,7 +37,8 @@
       (either/left 1)
       ;; => #<Left [1]>
   "
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]))
 
 (declare either-monad)
 
@@ -227,3 +228,41 @@
                    mv
                    (fn [v]
                      (proto/mreturn inner-monad (right v)))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn branch
+  "Given an either value and two functions, if the either is a
+   left apply the first function to the value it contains; if the
+   either is a right apply the second function to its value."
+  [e lf rf]
+  {:pre [(either? e)]}
+  (if (left? e)
+    (lf (m/extract e))
+    (rf (m/extract e))))
+
+(def lefts
+  "Given a collection of eithers, return only the values that are left."
+  (partial filter left?))
+
+(def rights
+  "Given a collection of eithers, return only the values that are left."
+  (partial filter right?))
+
+(def first-left
+  "Given a collection of either, return the first value that is left"
+  (comp first lefts))
+
+(def first-right
+  "Given a collection of either, return the first value that is right"
+  (comp first rights))
+
+(defn invert
+  "Convert a left to a right or viceversa, preserving content."
+  [e]
+  {:pre [(either? e)]}
+  (if (left? e)
+    (right (m/extract e))
+    (left (m/extract e))))

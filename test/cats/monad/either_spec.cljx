@@ -1,12 +1,14 @@
 (ns cats.monad.either-spec
   #+cljs
   (:require [cljs.test :as t]
+            [clojure.string :as s]
             [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.either :as either]
             [cats.core :as m :include-macros true])
   #+clj
   (:require [clojure.test :as t]
+            [clojure.string :as s]
             [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.either :as either]
@@ -86,3 +88,27 @@
              (m/mlet [x [(either/right 0) (either/right 1)]
                       y [(either/right 1) (either/left)]]
                (m/return (+ x y)))))))
+
+(t/deftest branch-test
+  (let [l (either/left "oh no")
+        r (either/right 42)]
+    (t/is (= "OH NO" (either/branch l s/upper-case inc)))
+    (t/is (= 43 (either/branch r s/upper-case inc)))))
+
+
+(t/deftest filtering-test
+  (let [l1 (either/left "oh no")
+        l2 (either/left "yo ho ho ho")
+        r1 (either/right 42)
+        r2 (either/right 99)
+        es [l1 l2 r1 r2]]
+    (t/is (every? either/left? (either/lefts es)))
+    (t/is (every? either/right? (either/rights es)))
+    (t/is (= l1 (either/first-left es)))
+    (t/is (= r1 (either/first-right es)))))
+
+(t/deftest invert-test
+  (let [l (either/left "oh no")
+        r (either/right "oh no")]
+    (t/is (= r (either/invert l)))
+    (t/is (= l (either/invert r)))))
