@@ -21,7 +21,7 @@ The main motivations for writing this library are:
   practical and Clojure like approach, always with correctness in mind.
 * We do not like viral/copyleft like licenses and in contrast to other libraries
   cats is licensed under the BSD (2 clauses) license.
-* We do not intend to only implement monads. Other category theory and algebraic abstractions 
+* We do not intend to only implement monads. Other category theory and algebraic abstractions
   are also first class in cats.
 
 
@@ -189,6 +189,8 @@ Let's see an example of applying fmap over a Clojure vector:
 .Example using fmav over *vector*.
 [source, clojure]
 ----
+(require '[cats.builtin])
+
 (m/fmap inc [1 2 3])
 ;; => [2 3 4]
 ----
@@ -461,7 +463,7 @@ _cats_, implements two types:
 - `Just` that represents a value in a context.
 - `Nothing` that represents the abscense of value.
 
-.Example creating instances of `Just` and `Nothing` types
+.Example creating instances of `Just` and `Nothing` types:
 [source, clojure]
 ----
 (maybe/just 1)
@@ -471,7 +473,7 @@ _cats_, implements two types:
 ;; => #<Nothing >
 ----
 
-there are other useful functions for working with maybe monad types in the same namespace. 
+There are other useful functions for working with maybe monad types in the same namespace.
 See the API documentation for a full list of them. But here we will explain a little relevant subset
 of them.
 
