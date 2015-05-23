@@ -40,8 +40,8 @@
   :jar-exclusions [#"\.cljx|\.swp|\.swo|user.clj"]
 
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
-                                  [org.clojure/clojure "1.6.0"]
-                                  [org.clojure/clojurescript "0.0-3126"]
+                                  [org.clojure/clojure "1.7.0-RC1"]
+                                  [org.clojure/clojurescript "0.0-3269"]
                                   [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
                    :codeina {:sources ["output/src"]
                              :output-dir "doc/codeina"}
