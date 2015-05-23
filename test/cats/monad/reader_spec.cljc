@@ -1,18 +1,18 @@
 (ns cats.monad.reader-spec
-  #+cljs
-  (:require [cljs.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.monad.reader :as reader]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m :include-macros true])
-  #+clj
-  (:require [clojure.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.monad.reader :as reader]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m]))
+  #?(:cljs
+     (:require [cljs.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.monad.reader :as reader]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m :include-macros true])
+     :clj
+     (:require [clojure.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.monad.reader :as reader]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m])))
 
 (t/deftest access-to-the-environment-test
   ;;The `ask` reader gives you access to the environment

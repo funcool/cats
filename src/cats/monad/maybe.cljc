@@ -48,35 +48,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Just other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Just other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (with-out-str (print [v])))])
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [v])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [_ other]
-    (if (instance? Just other)
-      (= v (.-v other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Just other)
+                  (= v (.-v other))
+                  false))]))
 
 (deftype Nothing []
   proto/Context
@@ -85,31 +76,22 @@
   proto/Extract
   (extract [_] nil)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] nil)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] nil)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] nil)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (instance? Nothing other))
 
-  #+clj
-  Object
-  #+clj
-  (equals [_ other]
-    (instance? Nothing other))
+       (toString [self]
+         (with-out-str (print "")))])
 
-  #+clj
-  (toString [_]
-    (with-out-str (print "")))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [_ other]
-    (instance? Nothing other)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (instance? Nothing other))]))
 
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)

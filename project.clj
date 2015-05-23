@@ -7,28 +7,15 @@
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
 
-  :source-paths ["output/src" "src/clj"]
-  :test-paths ["output/test/clj"]
-
-  :cljx {:builds [{:source-paths ["src/cljx"]
-                   :output-path "output/src"
-                   :rules :clj}
-                  {:source-paths ["src/cljx"]
-                   :output-path "output/src"
-                   :rules :cljs}
-                  {:source-paths ["test"]
-                   :output-path "output/test/clj"
-                   :rules :clj}
-                  {:source-paths ["test"]
-                   :output-path "output/test/cljs"
-                   :rules :cljs}]}
+  :source-paths ["src"]
+  :test-paths ["test"]
 
   :cljsbuild {:test-commands {"test" ["node" "output/tests.js"]}
-              :builds [{:id "dev"
-                        :source-paths ["output/test/cljs" "output/src"]
+              :builds [{:id "test"
+                        :source-paths ["src" "test"]
                         :notify-command ["node" "output/tests.js"]
                         :compiler {:output-to "output/tests.js"
-                                   :output-dir "output/out"
+                                   :output-dir "output"
                                    :source-map true
                                    :static-fns true
                                    :cache-analysis false
@@ -37,16 +24,14 @@
                                    :target :nodejs
                                    :pretty-print true}}]}
 
-  :jar-exclusions [#"\.cljx|\.swp|\.swo|user.clj"]
+  :jar-exclusions [#"\.swp|\.swo"]
 
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
                                   [org.clojure/clojure "1.7.0-RC1"]
                                   [org.clojure/clojurescript "0.0-3269"]
                                   [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
-                   :codeina {:sources ["output/src"]
+                   :codeina {:sources ["src"]
                              :output-dir "doc/codeina"}
-                   :plugins [[org.clojars.cemerick/cljx "0.6.0-SNAPSHOT"
-                              :exclusions [org.clojure/clojure]]
-                             [funcool/codeina "0.1.0-SNAPSHOT"
+                   :plugins [[funcool/codeina "0.1.0-SNAPSHOT"
                               :exclusions [org.clojure/clojure]]
                              [lein-cljsbuild "1.0.4"]]}})

@@ -1,20 +1,20 @@
 (ns cats.monad.state-spec
-  #+cljs
-  (:require [cljs.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.data :as d]
-            [cats.monad.state :as state]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m :include-macros true])
-  #+clj
-  (:require [clojure.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.data :as d]
-            [cats.monad.state :as state]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m]))
+  #?(:cljs
+     (:require [cljs.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.data :as d]
+               [cats.monad.state :as state]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m :include-macros true])
+     :clj
+     (:require [clojure.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.data :as d]
+               [cats.monad.state :as state]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m])))
 
 (t/deftest get-state-should-return-the-identity-test
   (let [computation (state/get-state)]

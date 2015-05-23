@@ -25,8 +25,8 @@
 
 (ns cats.core
   "Category Theory abstractions for Clojure"
-  #+cljs
-  (:require-macros [cats.core :refer (with-monad mlet)])
+  #?(:cljs
+     (:require-macros [cats.core :refer (with-monad mlet)]))
   (:require [cats.protocols :as p])
   (:refer-clojure :exclude [when unless filter sequence]))
 
@@ -38,21 +38,21 @@
        :no-doc true}
   *context* nil)
 
-#+clj
-(defmacro with-monad
-  "Set current context to specific monad."
-  [ctx & body]
-  `(cond
-     (satisfies? p/MonadTrans ~ctx)
-     (binding [*context* ~ctx]
-       ~@body)
+#?(:clj
+   (defmacro with-monad
+    "Set current context to specific monad."
+    [ctx & body]
+    `(cond
+       (satisfies? p/MonadTrans ~ctx)
+       (binding [*context* ~ctx]
+         ~@body)
 
-     (satisfies? p/MonadTrans *context*)
-     (do ~@body)
+       (satisfies? p/MonadTrans *context*)
+       (do ~@body)
 
-     :else
-     (binding [*context* ~ctx]
-       ~@body)))
+       :else
+       (binding [*context* ~ctx]
+         ~@body))))
 
 (defn ^{:no-doc true}
   get-current-context
@@ -71,11 +71,8 @@
      default
 
      :else
-     #+clj
-     (throw (IllegalArgumentException.
-             "You are using return/pure/mzero function without context."))
-     #+cljs
-     (throw (js/Error.
+     (throw (#?(:clj IllegalArgumentException.
+                :cljs js/Error.)
              "You are using return/pure/mzero function without context.")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -203,67 +200,67 @@
 ;; Monadic Let Macro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#+clj
-(defmacro mlet
-  "Monad composition macro that works like clojure
-  let. This allows much easy composition of monadic
-  computations.
+#?(:clj
+   (defmacro mlet
+    "Monad composition macro that works like clojure
+    let. This allows much easy composition of monadic
+    computations.
 
-  Let see one example for understand how it works, this is
-  a code using bind for compose few number of operations:
+    Let see one example for understand how it works, this is
+    a code using bind for compose few number of operations:
 
-      (bind (just 1)
-            (fn [a]
-              (bind (just (inc a))
-                    (fn [b]
-                      (return (* b 2))))))
-      ;=> #<Just [4]>
+    (bind (just 1)
+    (fn [a]
+    (bind (just (inc a))
+    (fn [b]
+    (return (* b 2))))))
+    ;=> #<Just [4]>
 
-  Now see how this code can be more clear if you
-  are using mlet macro for do it:
+    Now see how this code can be more clear if you
+    are using mlet macro for do it:
 
-      (mlet [a (just 1)
-             b (just (inc a))]
-        (return (* b 2)))
-      ;=> #<Just [4]>
-  "
-  [bindings & body]
-  (when-not (and (vector? bindings)
-                 (not-empty bindings)
-                 (even? (count bindings)))
-    (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-  (->> (reverse (partition 2 bindings))
-       (reduce (fn [acc [l r]]
-                 (case l
-                   :let  `(let ~r ~acc)
-                   :when `(bind (guard ~r)
-                                (fn [~(gensym)] ~acc))
-                   `(bind ~r (fn [~l] ~acc))))
-               `(do ~@body))))
+    (mlet [a (just 1)
+    b (just (inc a))]
+    (return (* b 2)))
+    ;=> #<Just [4]>
+    "
+    [bindings & body]
+    (when-not (and (vector? bindings)
+                   (not-empty bindings)
+                   (even? (count bindings)))
+      (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
+    (->> (reverse (partition 2 bindings))
+         (reduce (fn [acc [l r]]
+                   (case l
+                     :let  `(let ~r ~acc)
+                     :when `(bind (guard ~r)
+                                  (fn [~(gensym)] ~acc))
+                     `(bind ~r (fn [~l] ~acc))))
+                 `(do ~@body)))))
 
-#+clj
-(defmacro lift-m
-  "Lifts a function with the given fixed number of arguments to a
-  monadic context.
+#?(:clj
+   (defmacro lift-m
+    "Lifts a function with the given fixed number of arguments to a
+    monadic context.
 
-      (def monad+ (lift-m 2 +))
+    (def monad+ (lift-m 2 +))
 
-      (monad+ (maybe/just 1) (maybe/just 2))
-      ;; => <Just [3]>
+    (monad+ (maybe/just 1) (maybe/just 2))
+    ;; => <Just [3]>
 
-      (monad+ (maybe/just 1) (maybe/nothing))
-      ;; => <Nothing>
+    (monad+ (maybe/just 1) (maybe/nothing))
+    ;; => <Nothing>
 
-      (monad+ [0 2 4] [1 2])
-      ;; => [1 2 3 4 5 6]
-  "
-  [n f]
-  (let [val-syms (repeatedly n gensym)
-        mval-syms (repeatedly n gensym)
-        mlet-bindings (interleave val-syms mval-syms)]
-    `(fn [~@mval-syms]
-       (mlet [~@mlet-bindings]
-         (return (~f ~@val-syms))))))
+    (monad+ [0 2 4] [1 2])
+    ;; => [1 2 3 4 5 6]
+    "
+    [n f]
+    (let [val-syms (repeatedly n gensym)
+          mval-syms (repeatedly n gensym)
+          mlet-bindings (interleave val-syms mval-syms)]
+      `(fn [~@mval-syms]
+         (mlet [~@mlet-bindings]
+           (return (~f ~@val-syms)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sequences.

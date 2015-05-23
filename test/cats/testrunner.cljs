@@ -1,4 +1,3 @@
-#+cljs
 (ns cats.testrunner
   (:require [cljs-testrunners.node :as node]
             [cats.builtin-spec]
@@ -11,7 +10,6 @@
             [cats.monad.exception-spec]
             [cats.monad.continuation-spec]))
 
-#+cljs
 (defn main []
   (node/run-tests
    'cats.core-spec
@@ -25,5 +23,4 @@
    'cats.monad.writer-spec
    ))
 
-#+cljs
 (set! *main-cli-fn* main)

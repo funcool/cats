@@ -1,13 +1,9 @@
 language: clojure
 lein: lein2
 
-before_script:
-  - lein2 cljx once
-  - lein2 cljsbuild once
-
 script:
-  - lein2 cljsbuild test
-  - lein2 test
+  - ./.travis/test-cljs.sh
+  - ./.travis/test-clj.sh
 
 jdk:
   - openjdk7

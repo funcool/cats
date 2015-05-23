@@ -1,20 +1,20 @@
 (ns cats.monad.writer-spec
-  #+cljs
-  (:require [cljs.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.data :as d]
-            [cats.monad.writer :as writer]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m :include-macros true])
-  #+clj
-  (:require [clojure.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.data :as d]
-            [cats.monad.writer :as writer]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m]))
+  #?(:cljs
+     (:require [cljs.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.data :as d]
+               [cats.monad.writer :as writer]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m :include-macros true])
+     :clj
+     (:require [clojure.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.data :as d]
+               [cats.monad.writer :as writer]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m])))
 
 (t/deftest writer-monad-tests
   ;; Putting a value in a writer context yields an empty log

@@ -25,10 +25,10 @@
 
 (ns cats.monad.writer
   "The Writer Monad."
-  #+clj
-  (:require [cats.core :refer [with-monad]])
-  #+cljs
-  (:require-macros [cats.core :refer (with-monad)])
+  #?(:clj
+     (:require [cats.core :refer [with-monad]]))
+  #?(:cljs
+     (:require-macros [cats.core :refer (with-monad)]))
   (:require [cats.protocols :as proto]
             [cats.builtin :as b]
             [cats.core :as m]
