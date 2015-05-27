@@ -19,7 +19,7 @@
                                    :source-map true
                                    :static-fns true
                                    :cache-analysis false
-                                   :main cats.testrunner
+                                   :main cats.runner
                                    :optimizations :none
                                    :target :nodejs
                                    :pretty-print true}}]}
@@ -28,10 +28,9 @@
 
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
                                   [org.clojure/clojure "1.7.0-RC1"]
-                                  [org.clojure/clojurescript "0.0-3269"]
-                                  [funcool/cljs-testrunners "0.1.0-SNAPSHOT"]]
+                                  [org.clojure/clojurescript "0.0-3297"]]
                    :codeina {:sources ["src"]
                              :output-dir "doc/codeina"}
                    :plugins [[funcool/codeina "0.1.0-SNAPSHOT"
                               :exclusions [org.clojure/clojure]]
-                             [lein-cljsbuild "1.0.4"]]}})
+                             [lein-cljsbuild "1.0.6"]]}})
