@@ -31,41 +31,41 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Pair [fst snd]
-  #+clj  clojure.lang.Seqable
-  #+cljs cljs.core/ISeqable
-  (#+cljs -seq #+clj seq [_]
+  #?(:clj  clojure.lang.Seqable
+     :cljs cljs.core/ISeqable)
+  (#?(:clj seq :cljs -seq) [_]
     (list fst snd))
 
-  #+clj  clojure.lang.Indexed
-  #+cljs cljs.core/IIndexed
-  (#+clj nth #+cljs -nth [_ i]
+  #?(:clj  clojure.lang.Indexed
+     :cljs cljs.core/IIndexed)
+  (#?(:clj nth :cljs -nth) [_ i]
     (case i
       0 fst
       1 snd
-      (throw #+clj (IndexOutOfBoundsException.)
-             #+cljs (js/Error. "Out of index"))))
+      (throw #?(:clj (IndexOutOfBoundsException.)
+                :cljs (js/Error. "Out of index")))))
 
-  (#+clj nth #+cljs -nth [_ i notfound]
+  (#?(:clj nth :cljs -nth) [_ i notfound]
     (case i
       0 fst
       1 snd
       notfound))
 
-  #+clj  clojure.lang.Counted
-  #+cljs cljs.core/ICounted
-  (#+clj count #+cljs -count [_] 2)
+  #?(:clj  clojure.lang.Counted
+     :cljs cljs.core/ICounted)
+  (#?(:clj count :cljs -count) [_] 2)
 
-  #+clj  java.lang.Object
-  #+cljs cljs.core/IEquiv
-  (#+clj equals #+cljs -equiv [this other]
+  #?(:clj  java.lang.Object
+     :cljs cljs.core/IEquiv)
+  (#?(:clj equals :cljs -equiv) [this other]
     (if (instance? Pair other)
       (and (= (.-fst this) (.-fst other))
            (= (.-snd this) (.-snd other)))
       false))
 
-  #+clj
-  (toString [this]
-    (with-out-str (print [fst snd]))))
+  #?(:clj
+      (toString [this]
+                (with-out-str (print [fst snd])))))
 
 (alter-meta! #'->Pair assoc :private true)
 

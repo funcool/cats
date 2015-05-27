@@ -53,27 +53,27 @@
   That is because when you will dereference the
   failure instance, it will reraise the containing
   exception."
-  #+clj
-  (:require [cats.protocols :as proto]
-            [cats.core :refer [with-monad]])
+  #?(:clj
+     (:require [cats.protocols :as proto]
+               [cats.core :refer [with-monad]]))
 
-  #+cljs
-  (:require [cats.protocols :as proto])
+  #?@(:cljs
+      [(:require [cats.protocols :as proto])
 
-  #+cljs
-  (:require-macros [cats.monad.exception :refer [try-on]]
-                   [cats.core :refer [with-monad]]))
+       (:require-macros [cats.monad.exception :refer [try-on]]
+                        [cats.core :refer [with-monad]])]))
 
 (defn throw-exception
   [message]
-  #+clj (throw (IllegalArgumentException. message))
-  #+cljs (throw (js/Error. message)))
+  (throw (#?(:clj IllegalArgumentException.
+             :cljs js/Error.)
+            message)))
 
 (defn throwable?
   "Return true if `v` is an instance of
   the Throwable or js/Error type."
   [e]
-  (instance? #+clj Exception #+cljs js/Error e))
+  (instance? #?(:clj Exception :cljs js/Error) e))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Types and implementations.
@@ -88,35 +88,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Success other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Success other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (with-out-str (print [v])))])
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [v])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [self other]
-    (if (instance? Success other)
-      (= v (.-v other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Success other)
+                  (= v (.-v other))
+                  false))]))
 
 (deftype Failure [e]
   proto/Context
@@ -125,34 +116,26 @@
   proto/Extract
   (extract [_] e)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] (throw e))
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] (throw e))
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] (throw e))
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Failure other)
+           (= e (.-e other))
+           false))
 
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Failure other)
-      (= e (.-e other))
-      false))
+       (toString [self]
+         (with-out-str (print [e])))])
 
-  (toString [_]
-    (with-out-str
-      (print [e])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [self other]
-    (if (instance? Failure other)
-      (= e (.-e other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Failure other)
+                  (= e (.-e other))
+                  false))]))
 
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
@@ -233,10 +216,8 @@
         (throwable? result) (failure result)
         (exception? result) result
         :else (success result)))
-    #+clj
-    (catch Exception e (failure e))
-    #+cljs
-    (catch js/Error e (failure e))))
+    (catch #?(:clj Exception
+              :cljs js/Error) e (failure e))))
 
 (defn ^{:no-doc true}
   exec-try-or-else
@@ -255,24 +236,24 @@
         (recoverfn (.-e result))
         result))))
 
-#+clj
-(defmacro try-on
-  "Wraps a computation and return success of failure."
-  [expr]
-  `(let [func# (fn [] ~expr)]
-     (exec-try-on func#)))
+#?(:clj
+   (defmacro try-on
+    "Wraps a computation and return success of failure."
+    [expr]
+    `(let [func# (fn [] ~expr)]
+       (exec-try-on func#))))
 
-#+clj
-(defmacro try-or-else
-  [expr defaultvalue]
-  `(let [func# (fn [] ~expr)]
-     (exec-try-or-else func# ~defaultvalue)))
+#?(:clj
+   (defmacro try-or-else
+     [expr defaultvalue]
+     `(let [func# (fn [] ~expr)]
+        (exec-try-or-else func# ~defaultvalue))))
 
-#+clj
-(defmacro try-or-recover
-  [expr func]
-  `(let [func# (fn [] ~expr)]
-     (exec-try-or-recover func# ~func)))
+#?(:clj
+   (defmacro try-or-recover
+     [expr func]
+     `(let [func# (fn [] ~expr)]
+        (exec-try-or-recover func# ~func))))
 
 (defn wrap
   "Wrap a function in a try monad.

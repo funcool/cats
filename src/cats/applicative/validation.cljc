@@ -44,35 +44,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Ok other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Ok other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (with-out-str (print [v])))])
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [v])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [self other]
-    (if (instance? Ok other)
-      (= v (.-v other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Ok other)
+                  (= v (.-v other))
+                  false))]))
 
 (deftype Fail [v]
   proto/Context
@@ -81,35 +72,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Fail other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Fail other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (with-out-str (print [v])))])
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [v])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [self other]
-    (if (instance? Fail other)
-      (= v (.-v other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Fail other)
+                  (= v (.-v other))
+                  false))]))
 
 (alter-meta! #'->Ok assoc :private true)
 (alter-meta! #'->Fail assoc :private true)

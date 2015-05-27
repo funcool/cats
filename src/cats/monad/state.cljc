@@ -25,10 +25,10 @@
 
 (ns cats.monad.state
   "The State Monad."
-  #+clj
-  (:require [cats.core :refer [with-monad]])
-  #+cljs
-  (:require-macros [cats.core :refer (with-monad)])
+  #?(:clj
+     (:require [cats.core :refer [with-monad]]))
+  #?(:cljs
+     (:require-macros [cats.core :refer (with-monad)]))
   (:require [cats.protocols :as proto]
             [cats.data :as d]
             [cats.core :as m]))
@@ -43,9 +43,9 @@
   proto/Context
   (get-context [_] state-monad)
 
-  #+clj  clojure.lang.IFn
-  #+cljs cljs.core/IFn
-  (#+clj invoke #+cljs -invoke [self seed]
+  #?(:clj  clojure.lang.IFn
+     :cljs cljs.core/IFn)
+  (#?(:clj invoke :cljs -invoke) [self seed]
     (mfn seed)))
 
 (alter-meta! #'->State assoc :private true)

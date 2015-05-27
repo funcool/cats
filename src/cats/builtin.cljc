@@ -82,8 +82,8 @@
     (mplus [_ mv mv']
       (concat mv mv'))))
 
-(extend-type #+clj clojure.lang.LazySeq
-             #+cljs cljs.core.LazySeq
+(extend-type #?(:clj  clojure.lang.LazySeq
+                :cljs cljs.core.LazySeq)
   proto/Context
   (get-context [_] sequence-monad))
 
@@ -129,8 +129,8 @@
     (mplus [_ mv mv']
       (into mv mv'))))
 
-(extend-type #+clj clojure.lang.PersistentVector
-             #+cljs cljs.core.PersistentVector
+(extend-type #?(:clj clojure.lang.PersistentVector
+                :cljs cljs.core.PersistentVector)
   proto/Context
   (get-context [_] vector-monad))
 
@@ -176,8 +176,8 @@
     (mplus [_ mv mv']
       (s/union mv mv'))))
 
-(extend-type #+clj clojure.lang.PersistentHashSet
-             #+cljs cljs.core.PersistentHashSet
+(extend-type #?(:clj clojure.lang.PersistentHashSet
+                :cljs cljs.core.PersistentHashSet)
   proto/Context
   (get-context [_] set-monad))
 
@@ -195,12 +195,12 @@
     (mempty [_]
       {})))
 
-(extend-type #+clj clojure.lang.PersistentHashMap
-             #+cljs cljs.core.PersistentHashMap
+(extend-type #?(:clj clojure.lang.PersistentHashMap
+                :cljs cljs.core.PersistentHashMap)
   proto/Context
   (get-context [_] map-monoid))
 
-#+clj
-(extend-type clojure.lang.PersistentArrayMap
-  proto/Context
-  (get-context [_] map-monoid))
+#?(:clj
+   (extend-type clojure.lang.PersistentArrayMap
+     proto/Context
+     (get-context [_] map-monoid)))

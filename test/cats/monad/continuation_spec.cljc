@@ -1,18 +1,18 @@
 (ns cats.monad.continuation-spec
-  #+cljs
-  (:require [cljs.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.monad.continuation :as cont]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m :include-macros true])
-  #+clj
-  (:require [clojure.test :as t]
-            [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.monad.continuation :as cont]
-            [cats.monad.maybe :as maybe]
-            [cats.core :as m]))
+  #?(:cljs
+     (:require [cljs.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.monad.continuation :as cont]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m :include-macros true])
+     :clj
+     (:require [clojure.test :as t]
+               [cats.builtin :as b]
+               [cats.protocols :as p]
+               [cats.monad.continuation :as cont]
+               [cats.monad.maybe :as maybe]
+               [cats.core :as m])))
 
 (def cont-42 (cont/continuation (fn [c] (c 42))))
 (def inc-cont-fn (fn [x]

@@ -26,10 +26,10 @@
 (ns cats.monad.continuation
   "The Continuation Monad."
   (:require [cats.protocols :as proto])
-  #+clj
-  (:require [cats.core :refer [with-monad]])
-  #+cljs
-  (:require-macros [cats.core :refer (with-monad)]))
+  #?(:clj
+     (:require [cats.core :refer [with-monad]])
+     :cljs
+     (:require-macros [cats.core :refer (with-monad)])))
 
 (declare continuation-monad)
 
@@ -41,9 +41,9 @@
   proto/Context
   (get-context [_] continuation-monad)
 
-  #+clj  clojure.lang.IFn
-  #+cljs cljs.core/IFn
-  (#+clj invoke #+cljs -invoke [self seed]
+  #?(:clj  clojure.lang.IFn
+     :cljs cljs.core/IFn)
+  (#?(:clj invoke :cljs -invoke) [self seed]
     (mfn seed)))
 
 (alter-meta! #'->Continuation assoc :private true)

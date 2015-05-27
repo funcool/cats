@@ -41,35 +41,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Identity other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [_ other]
-    (if (instance? Identity other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (str v))])
 
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [_ other]
-    (if (instance? Identity other)
-      (= v (.-v other))
-      false))
-
-  #+clj
-  (toString [_]
-    (str v)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Identity other)
+                  (= v (.-v other))
+                  false))]))
 
 (alter-meta! #'->Identity assoc :private true)
 

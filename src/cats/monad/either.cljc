@@ -53,35 +53,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Right other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Right other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (with-out-str (print [v])))])
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [v])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [self other]
-    (if (instance? Right other)
-      (= v (.-v other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Right other)
+                  (= v (.-v other))
+                  false))]))
 
 (deftype Left [v]
   proto/Context
@@ -90,35 +81,26 @@
   proto/Extract
   (extract [_] v)
 
-  #+clj
-  clojure.lang.IDeref
-  #+clj
-  (deref [_] v)
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref :cljs -deref) [_] v)
 
-  #+cljs
-  IDeref
-  #+cljs
-  (-deref [_] v)
+  #?@(:clj
+      [Object
+       (equals [self other]
+         (if (instance? Left other)
+           (= v (.-v other))
+           false))
 
-  #+clj
-  Object
-  #+clj
-  (equals [self other]
-    (if (instance? Left other)
-      (= v (.-v other))
-      false))
+       (toString [self]
+         (with-out-str (print [v])))])
 
-  #+clj
-  (toString [self]
-    (with-out-str (print [v])))
-
-  #+cljs
-  cljs.core/IEquiv
-  #+cljs
-  (-equiv [self other]
-    (if (instance? Left other)
-      (= v (.-v other))
-      false)))
+  #?@(:cljs
+       [cljs.core/IEquiv
+        (-equiv [_ other]
+                (if (instance? Left other)
+                  (= v (.-v other))
+                  false))]))
 
 (alter-meta! #'->Right assoc :private true)
 (alter-meta! #'->Left assoc :private true)
