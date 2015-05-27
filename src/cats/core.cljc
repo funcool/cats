@@ -209,20 +209,20 @@
     Let see one example for understand how it works, this is
     a code using bind for compose few number of operations:
 
-    (bind (just 1)
-    (fn [a]
-    (bind (just (inc a))
-    (fn [b]
-    (return (* b 2))))))
-    ;=> #<Just [4]>
+        (bind (just 1)
+        (fn [a]
+        (bind (just (inc a))
+        (fn [b]
+        (return (* b 2))))))
+        ;=> #<Just [4]>
 
     Now see how this code can be more clear if you
     are using mlet macro for do it:
 
-    (mlet [a (just 1)
-    b (just (inc a))]
-    (return (* b 2)))
-    ;=> #<Just [4]>
+        (mlet [a (just 1)
+        b (just (inc a))]
+        (return (* b 2)))
+        ;=> #<Just [4]>
     "
     [bindings & body]
     (when-not (and (vector? bindings)
@@ -243,16 +243,16 @@
     "Lifts a function with the given fixed number of arguments to a
     monadic context.
 
-    (def monad+ (lift-m 2 +))
+        (def monad+ (lift-m 2 +))
 
-    (monad+ (maybe/just 1) (maybe/just 2))
-    ;; => <Just [3]>
+        (monad+ (maybe/just 1) (maybe/just 2))
+        ;; => <Just [3]>
 
-    (monad+ (maybe/just 1) (maybe/nothing))
-    ;; => <Nothing>
+        (monad+ (maybe/just 1) (maybe/nothing))
+        ;; => <Nothing>
 
-    (monad+ [0 2 4] [1 2])
-    ;; => [1 2 3 4 5 6]
+        (monad+ [0 2 4] [1 2])
+        ;; => [1 2 3 4 5 6]
     "
     [n f]
     (let [val-syms (repeatedly n gensym)
