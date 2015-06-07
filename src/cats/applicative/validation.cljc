@@ -1,4 +1,4 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
+;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
 ;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
