@@ -234,12 +234,14 @@
   (branch e lf right))
 
 (defn branch-right
-  "Given an either value and a function, if the either is a
+  "Either-specific synonym for #'cats.core/bind
+
+  Given an either value and a function, if the either is a
   right, apply the function to the value it contains; if the
   either is a left, return it."
   [e rf]
   {:pre [(either? e)]}
-  (branch e left rf))
+  (m/bind e rf))
 
 (def lefts
   "Given a collection of eithers, return only the values that are left."
