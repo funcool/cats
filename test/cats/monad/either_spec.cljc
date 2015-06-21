@@ -95,6 +95,18 @@
     (t/is (= "OH NO" (either/branch l s/upper-case inc)))
     (t/is (= 43 (either/branch r s/upper-case inc)))))
 
+(t/deftest branch-left-test
+  (let [l (either/left "oh no")
+        r (either/right 42)]
+    (t/is (= "OH NO" (either/branch-left l s/upper-case)))
+    (t/is (= r (either/branch-left r s/upper-case)))))
+
+(t/deftest branch-right-test
+  (let [l (either/left "oh no")
+        r (either/right 42)]
+    (t/is (= l (either/branch-right l inc)))
+    (t/is (= 43 (either/branch-right r inc)))))
+
 
 (t/deftest filtering-test
   (let [l1 (either/left "oh no")

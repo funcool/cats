@@ -225,6 +225,22 @@
     (lf (m/extract e))
     (rf (m/extract e))))
 
+(defn branch-left
+  "Given an either value and a function, if the either is a
+  left, apply the function to the value it contains; if the
+  either is a right, return it."
+  [e lf]
+  {:pre [(either? e)]}
+  (branch e lf right))
+
+(defn branch-right
+  "Given an either value and a function, if the either is a
+  right, apply the function to the value it contains; if the
+  either is a left, return it."
+  [e rf]
+  {:pre [(either? e)]}
+  (branch e left rf))
+
 (def lefts
   "Given a collection of eithers, return only the values that are left."
   (partial filter left?))
