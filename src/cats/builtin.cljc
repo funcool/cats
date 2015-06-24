@@ -149,7 +149,7 @@
       #{})
 
     proto/Functor
-    (fmap [_ self f]
+    (fmap [_ f self]
       (set (map f self)))
 
     proto/Applicative

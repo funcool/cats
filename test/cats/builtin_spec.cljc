@@ -95,6 +95,11 @@
              (m/with-monad b/set-monad
                (m/mappend #{1 2 3} (m/mempty))))))
 
+
+  (t/testing "Is a functor"
+    (t/is (= #{2 3 4}
+             (m/fmap inc #{1 2 3}))))
+
   (t/testing "The first monad law: left identity"
     (t/is (= #{2} (m/with-monad b/set-monad
                     (m/>>= (m/return 2)
