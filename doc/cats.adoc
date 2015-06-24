@@ -693,22 +693,6 @@ TODO
 
 TODO
 
-=== Lazy sequences
-
-TODO
-
-=== Vector
-
-TODO
-
-=== Set
-
-TODO
-
-=== Map
-
-TODO
-
 === Validation
 
 The validation type is similar to the Either or Exception types except that it
@@ -746,6 +730,128 @@ using the Semigroup's `mappend` function.
        (v/ok 99))
 ;;=> #<Fail {:baz "fubar", :foo "bar"}>
 ----
+
+=== Built in types
+
+Some of the abstractions in _cats_ are implemented for built-in types but you can't use them directly. First,
+you must load the `cats.builtin` namespace:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/fmap inc [1 2 3 4])
+;;=> [2 3 4 5]
+----
+
+==== nil
+
+Given the fact that `nil` is both a value and a type, we have extended the `nil` type to be equivalent
+to Maybe monad's `Nothing`. This means that you can use `nil` as if were a `Just` instance like in the
+following example:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mlet [x (maybe/just 42)
+         y nil]
+  (m/return (+ x y)))
+;;=> nil
+----
+
+As you can see, the `mlet` short-circuits when encountering a `nil` value.
+
+
+==== Vector
+
+Clojure vectors also participate in several of the abstractions implemented in _cats_, most notably
+as a monad. Compare the following `for` comprehension:
+
+[source, clojure]
+----
+(for [x [1 2]
+      y [3 4 5]]
+   (+ x y))
+;;=> (4 5 6 5 6 7)
+----
+
+with the equivalent using _mlet_:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/mlet [x [1 2]
+         y [3 4 5]]
+  (m/return (+ x y)))
+;;=> [4 5 6 5 6 7]
+----
+
+Note the symmetry between `for` and `mlet`. This is not accidental, both are what is called a monad comprehension,
+the difference is that `for` is limited to sequences and `mlet` can work with arbitrary monads.
+
+Also, since `mlet` desugars into calls to the Monad's `bind` function, its result keeps the type of the monadic values.
+
+==== Lazy sequences
+
+Lazy sequences implement the same abstractions as vectors with practically an identical implementation. If you don't need
+the results right away or are interested in a subset of the final results, you can use lazy sequence comprehensions.
+
+Using `mlet` with lazy sequences yields exactly the same result as using `for`:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/mlet [x (lazy-seq [1 2])
+         y (lazy-seq [3 4 5])]
+  (m/return (+ x y)))
+;;=> (4 5 6 5 6 7)
+----
+
+==== Set
+
+Sets implement almost every abstraction in _cats_, from Semigroup to Monad.
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/pure set-monad 42)
+;;=> #{42}
+
+(m/fmap inc #{1 2 3 4})
+;;=> #{4 3 2 5}
+
+(m/bind #{1 2 3}
+        (fn [v] #{v (inc v)}))
+;;=> #{1 4 3 2}
+----
+
+==== Map
+
+Maps implement the _Semigroup_ protocol, since we can use `merge` as their associative binary operation. Using
+`mappend` on maps is a way to merge them together:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/mappend {:a "A"} {:b "B"})
+;;=> {:a "A", :b "B"}
+----
+
+Since we can consider the empty map an identity element for the `mappend` associative binary operation maps also
+implement _Monoid_ and the `mempty` function gives an empty map.
+
 
 === Complementary libraries
 
