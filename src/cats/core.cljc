@@ -139,9 +139,11 @@
       (p/mbind ctx mv f))))
 
 (defn mzero
-  []
-  (let [ctx (get-current-context)]
-    (p/mzero ctx)))
+  ([]
+   (let [ctx (get-current-context)]
+     (p/mzero ctx)))
+  ([ctx]
+   (p/mzero ctx)))
 
 (defn mplus
   [& mvs]

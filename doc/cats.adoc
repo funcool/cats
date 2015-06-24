@@ -205,7 +205,7 @@ map returns lazy seqs no matter what collection we pass to it:
 ----
 
 But why can we pass vectors to the `fmap` function? Because some Clojure container types like vectors,
-lists and sets, also implement the functor abstraction.
+lists and sets, also implement the functor abstraction. See the section on built-in types for more information.
 
 
 === Applicative
@@ -376,6 +376,106 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 ----
 
 
+=== MonadZero
+
+Some monads also have the notion of an identity element analogous to that of Monoid. When calling `bind` on a identity element
+for a monad, the same value is returned. This means that whenever we encounter the identity element in a monadic composition it will
+short-circuit.
+
+For the already familiar Maybe type the identity element is Nothing:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mzero maybe/maybe-monad)
+;; => #<Nothing >
+----
+
+Having an identity element we can make a monadic composition short-circuit using a predicate:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/bind (maybe/just 1)
+        (fn [a]
+          (m/bind (if (= a 2)
+                    (m/return nil)
+                    (m/mzero))
+                  (fn [_]
+                    (m/return (* a 2))))))
+;; => #<Nothing >
+----
+
+As you can see in the above example the predicate `(= a 2)` returns either a monadic value `(m/return nil)` or the identity value
+for the maybe monad. This can be captured in a function, which is available in `cats.core` namespace:
+
+[source, clojure]
+----
+(defn guard
+  [b]
+  (if b
+    (return nil)
+    (mzero)))
+----
+
+The above example could be rewritten as:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/bind (maybe/just 1)
+        (fn [a]
+          (m/bind (m/guard (= a 2))
+                  (fn [_]
+                    (m/return (* a 2))))))
+;; => #<Nothing >
+----
+
+`mlet` has support for using guards using a `:when` clause, analogous to the one used in `for`. We could rewrite the above example
+using `bind` with `mlet` and `:when`:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mlet [a (maybe/just 1)
+         :when (= a 2)]
+   (m/return (* a 2)))
+;; => #<Nothing >
+----
+
+Any monadic type that implements `MonadZero` can be combined with guards inside `mlet` bindings.
+
+=== MonadPlus
+
+MonadPlus is a complementary abstraction for Monads that support an associative binary operation, analogous to that of a
+Semigroup. If the monad implements the MonadZero and MonadPlus protocols it forms a monoid.
+
+For the Maybe type, `mplus` acts similarly to a logical OR that treats `Nothing` values as falsey.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mplus (maybe/nothing))
+;; => #<Nothing >
+
+(m/mplus (maybe/nothing) (maybe/just 1))
+;; => #<Just 1>
+
+(m/mplus (maybe/just 1) (maybe/just 2))
+;; => #<Just 1>
+----
+
+
 === Monad Transformers
 
 ==== Motivation
@@ -398,7 +498,7 @@ we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 ; combined functor is a vector of Maybe values that could
 ; contain a value of any type.
 (fmap2 inc [(maybe/just 1) (maybe/just 2)])
-;;=> [#<Just 2> #<Just 3>]
+;; => [#<Just 2> #<Just 3>]
 ----
 
 However, monads don't compose as nicely as functors do. We have to actually implement
@@ -480,7 +580,7 @@ of them.
 We mentioned above that *fmap* extracts the value from a functor context. You will also want to
 extract values wrapped by *just* and you can do that with *from-maybe*.
 
-As we said previously, the Just or Nothing instances, act like wrappers and in some circumstances
+As we said previously, the Just or Nothing instances act like wrappers and in some circumstances
 you will want extract the plain value from them. cats offers the `from-maybe` function for that.
 
 .Example using *from-maybe* to extract values wrapped by *just*.
@@ -499,6 +599,19 @@ you will want extract the plain value from them. cats offers the `from-maybe` fu
 The `from-maybe` function is a specialized version of a more generic one: `cats.core/extract`.
 The generic version is a polymorphic function and will also work with different
 types of different monads.
+
+For interoperability with Clojure and ClojureScript's `IDeref` abstraction, maybe values are
+derrefable.
+
+.Example using *deref* to extract values wrapped by *just*.
+[source, clojure]
+----
+(deref (maybe/just 1))
+;; => 1
+
+(deref (maybe/nothing))
+;; => nil
+----
 
 === Either
 
@@ -524,6 +637,8 @@ In _cats_ it has two constructors:
 
 NOTE: Either is also (like Maybe) a Functor, Applicative Functor and Monad.
 
+Like Maybe, Either values can be dereferenced returning the value they contain.
+
 === Exception
 
 Also known as the Try monad, as popularized by Scala.
@@ -533,10 +648,11 @@ value. Is very similar to the Either monad, but is semantically different.
 
 It consists of two types: Success and Failure. The Success type is a simple
 wrapper, like Right of the Either monad. But the Failure type is slightly different
-from Left, because it always wraps an instance of Throwable (or Error in cljs).
+from Left, because it always wraps an instance of Throwable (or any value in cljs since you can
+throw arbitrary values in the JavaScript host).
 
 The most common use case of this monad is to wrap third party libraries that use standard Exception
-based error handling. In normal circumstances, however, you should use Either instead.
+based error handling. Under normal circumstances, however, you should use Either instead.
 
 It is an analogue of the try-catch block: it replaces try-catch's stack-based error handling with
 heap-based error handling. Instead of having an exception thrown and having to deal with it immediately
@@ -597,13 +713,13 @@ enclosed exception.
 
 The State monad is one of the special cases of monads most commonly used in
 Haskell. It has several purposes including: lazy computation, composition, and
-maintaining state without explicit state.
+maintaining state without explicitly passing it to every function manualy.
 
 The de-facto monadic type of the state monad is a plain function. A function
 represents a computation as is (without executing it). Obviously, a function
 should have some special characteristics to work in monad state composition.
 
-.Valid function for valid state monad
+.Valid function for the state monad
 [source, clojure]
 ----
 (fn [state]
@@ -623,11 +739,13 @@ Let's look at one example before explaining the details:
 .Lazy composition of computations
 [source, clojure]
 ----
+(require '[cats.core :as m])
 (require '[cats.monad.state :as st])
+
 (m/mlet [state (st/get-state)
          _     (st/put-state (next state))]
-  (return (first state)))
-;;=> #<State cats.monad.state.State@2eebabb6>
+  (m/return (first state)))
+;; => #<State cats.monad.state.State@2eebabb6>
 ----
 
 At the moment of evaluation in the previous expression, nothing of what we have defined
@@ -640,7 +758,7 @@ Now, it's time to execute the composed computation. We can use one of the follow
 functions exposed by _cats_ for that: `run-state`, `eval-state` and `exec-state`.
 
 - `run-state` executes the composed computation and returns both the value and the
-  result state.
+  final state.
 - `eval-state` executes the composed computation and returns the resulting
   value, discarding the state.
 - `exec-state` executes the composed computation and returns only the resulting
@@ -650,13 +768,13 @@ functions exposed by _cats_ for that: `run-state`, `eval-state` and `exec-state`
 [source, clojure]
 ----
 (m/run-state s [1 2 3])
-;;=> #<Pair [1 (2 3)]>
+;; => #<Pair [1 (2 3)]>
 
 (m/eval-state s [1 2 3])
-;;=> 1
+;; => 1
 
 (m/exec-state s [1 2 3])
-;;=> (2 3)
+;; => (2 3)
 ----
 
 The `run-state` function returns an instance of the Pair type. The Pair type acts like any other seq in
@@ -665,31 +783,92 @@ Clojure with the exception that it can only contain two values.
 
 === Reader
 
-TODO
+The reader monad is another commonly used monad in Haskell. It's used for gluing together computations that
+depend on a read-only environment. As with the state monad, we don't have to thread the environment manualy
+since the monadic bind does it for us. The type of the reader monad are one-argument functions.
 
+The Reader type is analogous to State, simply a wrapper for regular Clojure functions. If we want our functions
+to participate in the reader abstraction we have to wrap them in a Reader instance.
+
+.Valid function for the reader monad
+[source, clojure]
+----
+(require '[cats.monad.reader :as r])
+
+(def start-server
+  (r/reader
+    (fn [env]
+      "Takes an environment with options as an argument and runs a web
+       server in the address specified by `:host` and `:port`."
+      (run-http-server (:host env) (:port env)))))
+----
+
+cats provides a few reader functions already. `ask` is the simplest reader, simply returns the environment. We
+can execute readers using the `run-reader` function which accepts a reader and an environment.
+
+.Example of running the ask reader
+[source, clojure]
+----
+(require '[cats.monad.reader :as r])
+
+(r/run-reader r/ask [1 2 3])
+;; => [1 2 3]
+----
+
+Let's use `mlet` for building new readers out of existing ones:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.reader :as r])
+
+(m/mlet [env r/ask]
+  (m/return (inc env)))
+;; => #<Reader cats.monad.reader.Reader@2eebabb6>
+----
+
+We can then run it using `run-reader`:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.reader :as r])
+
+(r/run-reader (m/mlet [env r/ask]
+                (m/return (inc env)))
+              41)
+;; => 42
+----
+
+We can also alter the reader's environment in a context using the `local` function which given a function and
+a reader returns a new reader whose environment is the result of applying the first function given to `local` to
+the original environment. Let's see it in action to understand it better:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.reader :as r])
+
+(r/run-reader (m/mlet [env (r/local #(* 2 %) r/ask)]
+                (m/return (+ env 2)))
+              20)
+;; => 42
+----
+
+Note that since we executed `ask` with the function `#(*2 %)` altering its original environment (20), the resulting
+`env` value is two times the original environment.
 
 === Writer
 
-TODO
+The writer monad comes from Haskell too. It's used for accumulating a log together with the values generated by
+computations. As with the state and reader monads, we don't have to explicitly thread the log manually since
+the monadic bind takes care of that. The type
 
 
 === Continuation
-
-TODO
-
-=== Lazy sequences
-
-TODO
-
-=== Vector
-
-TODO
-
-=== Set
-
-TODO
-
-=== Map
 
 TODO
 
@@ -705,10 +884,10 @@ representing success and failure respectively.
 (require '[cats.core :as m])
 
 (v/ok 42)
-;;=> #<Ok 42>
+;; => #<Ok 42>
 
 (v/fail [])
-;;=> #<Fail []>
+;; => #<Fail []>
 ----
 
 It implements the Applicative protocol, and its intended usage is as an Applicative. Applying Validation
@@ -721,15 +900,137 @@ using the Semigroup's `mappend` function.
 (require '[cats.core :as m])
 
 (m/fapply (v/ok 42) (v/fail "OH NOES"))
-;;=> #<Fail "OH NOES">
+;; => #<Fail "OH NOES">
 
 ;; Note that `<*>` is a variadic fapply
 (m/<*> (v/ok 42)
        (v/fail {:foo "bar"})
        (v/fail {:baz "fubar"})
        (v/ok 99))
-;;=> #<Fail {:baz "fubar", :foo "bar"}>
+;; => #<Fail {:baz "fubar", :foo "bar"}>
 ----
+
+=== Built in types
+
+Some of the abstractions in _cats_ are implemented for built-in types but you can't use them directly. First,
+you must load the `cats.builtin` namespace:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/fmap inc [1 2 3 4])
+;; => [2 3 4 5]
+----
+
+==== nil
+
+Given the fact that `nil` is both a value and a type, we have extended the `nil` type to be equivalent
+to Maybe monad's `Nothing`. This means that you can use `nil` as if were a `Just` instance like in the
+following example:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mlet [x (maybe/just 42)
+         y nil]
+  (m/return (+ x y)))
+;; => nil
+----
+
+As you can see, the `mlet` short-circuits when encountering a `nil` value.
+
+
+==== Vector
+
+Clojure vectors also participate in several of the abstractions implemented in _cats_, most notably
+as a monad. Compare the following `for` comprehension:
+
+[source, clojure]
+----
+(for [x [1 2]
+      y [3 4 5]]
+   (+ x y))
+;; => (4 5 6 5 6 7)
+----
+
+with the equivalent using _mlet_:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/mlet [x [1 2]
+         y [3 4 5]]
+  (m/return (+ x y)))
+;; => [4 5 6 5 6 7]
+----
+
+Note the symmetry between `for` and `mlet`. This is not accidental, both are what is called a monad comprehension,
+the difference is that `for` is limited to sequences and `mlet` can work with arbitrary monads.
+
+Also, since `mlet` desugars into calls to the Monad's `bind` function, its result keeps the type of the monadic values.
+
+==== Lazy sequences
+
+Lazy sequences implement the same abstractions as vectors with practically an identical implementation. If you don't need
+the results right away or are interested in a subset of the final results, you can use lazy sequence comprehensions.
+
+Using `mlet` with lazy sequences yields exactly the same result as using `for`:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/mlet [x (lazy-seq [1 2])
+         y (lazy-seq [3 4 5])]
+  (m/return (+ x y)))
+;; => (4 5 6 5 6 7)
+----
+
+==== Set
+
+Sets implement almost every abstraction in _cats_, from Semigroup to Monad.
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/pure set-monad 42)
+;; => #{42}
+
+(m/fmap inc #{1 2 3 4})
+;; => #{4 3 2 5}
+
+(m/bind #{1 2 3}
+        (fn [v] #{v (inc v)}))
+;; => #{1 4 3 2}
+----
+
+==== Map
+
+Maps implement the _Semigroup_ protocol, since we can use `merge` as their associative binary operation. Using
+`mappend` on maps is a way to merge them together:
+
+[source, clojure]
+----
+(use 'cats.builtin)
+(require '[cats.core :as m])
+
+(m/mappend {:a "A"} {:b "B"})
+;; => {:a "A", :b "B"}
+----
+
+Since we can consider the empty map an identity element for the `mappend` associative binary operation maps also
+implement _Monoid_ and the `mempty` function gives an empty map.
+
 
 === Complementary libraries
 
@@ -737,8 +1038,9 @@ Some monads are defined as separated package to avoid additional
 and unnecesary dependencies to cats. Also, there are some libraries
 that build higher-level abstractions on top of what cats offers.
 
-* Channel monad: https://github.com/funcool/cats-channel
-* Higher-level validation: https://github.com/funcool/vale
+* Channel monad: https://github.com/funcool/canal
+* Promise monad: https://github.com/funcool/promesa
+* Concurrent data fetching: https://github.com/kachayev/muse
 
 
 == FAQ
