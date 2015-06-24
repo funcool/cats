@@ -500,6 +500,19 @@ The `from-maybe` function is a specialized version of a more generic one: `cats.
 The generic version is a polymorphic function and will also work with different
 types of different monads.
 
+For interoperability with Clojure and ClojureScript's `IDeref` abstraction, maybe values are
+derrefable.
+
+.Example using *deref* to extract values wrapped by *just*.
+[source, clojure]
+----
+(deref (maybe/just 1))
+;; => 1
+
+(deref (maybe/nothing))
+;; => nil
+----
+
 === Either
 
 Either is another type that represents a result of a computation, but (in contrast with maybe)
@@ -524,6 +537,8 @@ In _cats_ it has two constructors:
 
 NOTE: Either is also (like Maybe) a Functor, Applicative Functor and Monad.
 
+Like Maybe, Either values can be dereferenced returning the value they contain.
+
 === Exception
 
 Also known as the Try monad, as popularized by Scala.
@@ -533,10 +548,11 @@ value. Is very similar to the Either monad, but is semantically different.
 
 It consists of two types: Success and Failure. The Success type is a simple
 wrapper, like Right of the Either monad. But the Failure type is slightly different
-from Left, because it always wraps an instance of Throwable (or Error in cljs).
+from Left, because it always wraps an instance of Throwable (or any value in cljs since you can
+throw arbitrary values in the JavaScript host).
 
 The most common use case of this monad is to wrap third party libraries that use standard Exception
-based error handling. In normal circumstances, however, you should use Either instead.
+based error handling. Under normal circumstances, however, you should use Either instead.
 
 It is an analogue of the try-catch block: it replaces try-catch's stack-based error handling with
 heap-based error handling. Instead of having an exception thrown and having to deal with it immediately
