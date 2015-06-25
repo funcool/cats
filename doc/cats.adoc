@@ -205,7 +205,7 @@ map returns lazy seqs no matter what collection we pass to it:
 ----
 
 But why can we pass vectors to the `fmap` function? Because some Clojure container types like vectors,
-lists and sets, also implement the functor abstraction.
+lists and sets, also implement the functor abstraction. See the section on built-in types for more information.
 
 
 === Applicative
@@ -378,7 +378,20 @@ If you want to use regular (non-monadic) let bindings inside an `mlet` block, yo
 
 === MonadZero
 
-TODO
+Some monads also have the notion of an identity element analogous to that of Monoid. When calling `bind` on a identity element
+for a monad, the same value is returned. This means that whenever we encounter the identity element in a monadic composition it will
+short-circuit.
+
+For the already familiar Maybe type the identity element is Nothing:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mzero maybe/maybe-monad)
+;; => #<Nothing >
+----
 
 
 === MonadPlus
