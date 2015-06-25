@@ -408,7 +408,7 @@ we can implement a generic `fmap` for the type _a (b Any)_, we'll call it fmap2:
 ; combined functor is a vector of Maybe values that could
 ; contain a value of any type.
 (fmap2 inc [(maybe/just 1) (maybe/just 2)])
-;;=> [#<Just 2> #<Just 3>]
+;; => [#<Just 2> #<Just 3>]
 ----
 
 However, monads don't compose as nicely as functors do. We have to actually implement
@@ -653,7 +653,7 @@ Let's look at one example before explaining the details:
 (m/mlet [state (st/get-state)
          _     (st/put-state (next state))]
   (return (first state)))
-;;=> #<State cats.monad.state.State@2eebabb6>
+;; => #<State cats.monad.state.State@2eebabb6>
 ----
 
 At the moment of evaluation in the previous expression, nothing of what we have defined
@@ -676,13 +676,13 @@ functions exposed by _cats_ for that: `run-state`, `eval-state` and `exec-state`
 [source, clojure]
 ----
 (m/run-state s [1 2 3])
-;;=> #<Pair [1 (2 3)]>
+;; => #<Pair [1 (2 3)]>
 
 (m/eval-state s [1 2 3])
-;;=> 1
+;; => 1
 
 (m/exec-state s [1 2 3])
-;;=> (2 3)
+;; => (2 3)
 ----
 
 The `run-state` function returns an instance of the Pair type. The Pair type acts like any other seq in
@@ -715,10 +715,10 @@ representing success and failure respectively.
 (require '[cats.core :as m])
 
 (v/ok 42)
-;;=> #<Ok 42>
+;; => #<Ok 42>
 
 (v/fail [])
-;;=> #<Fail []>
+;; => #<Fail []>
 ----
 
 It implements the Applicative protocol, and its intended usage is as an Applicative. Applying Validation
@@ -731,14 +731,14 @@ using the Semigroup's `mappend` function.
 (require '[cats.core :as m])
 
 (m/fapply (v/ok 42) (v/fail "OH NOES"))
-;;=> #<Fail "OH NOES">
+;; => #<Fail "OH NOES">
 
 ;; Note that `<*>` is a variadic fapply
 (m/<*> (v/ok 42)
        (v/fail {:foo "bar"})
        (v/fail {:baz "fubar"})
        (v/ok 99))
-;;=> #<Fail {:baz "fubar", :foo "bar"}>
+;; => #<Fail {:baz "fubar", :foo "bar"}>
 ----
 
 === Built in types
@@ -752,7 +752,7 @@ you must load the `cats.builtin` namespace:
 (require '[cats.core :as m])
 
 (m/fmap inc [1 2 3 4])
-;;=> [2 3 4 5]
+;; => [2 3 4 5]
 ----
 
 ==== nil
@@ -770,7 +770,7 @@ following example:
 (m/mlet [x (maybe/just 42)
          y nil]
   (m/return (+ x y)))
-;;=> nil
+;; => nil
 ----
 
 As you can see, the `mlet` short-circuits when encountering a `nil` value.
@@ -786,7 +786,7 @@ as a monad. Compare the following `for` comprehension:
 (for [x [1 2]
       y [3 4 5]]
    (+ x y))
-;;=> (4 5 6 5 6 7)
+;; => (4 5 6 5 6 7)
 ----
 
 with the equivalent using _mlet_:
@@ -799,7 +799,7 @@ with the equivalent using _mlet_:
 (m/mlet [x [1 2]
          y [3 4 5]]
   (m/return (+ x y)))
-;;=> [4 5 6 5 6 7]
+;; => [4 5 6 5 6 7]
 ----
 
 Note the symmetry between `for` and `mlet`. This is not accidental, both are what is called a monad comprehension,
@@ -822,7 +822,7 @@ Using `mlet` with lazy sequences yields exactly the same result as using `for`:
 (m/mlet [x (lazy-seq [1 2])
          y (lazy-seq [3 4 5])]
   (m/return (+ x y)))
-;;=> (4 5 6 5 6 7)
+;; => (4 5 6 5 6 7)
 ----
 
 ==== Set
@@ -835,14 +835,14 @@ Sets implement almost every abstraction in _cats_, from Semigroup to Monad.
 (require '[cats.core :as m])
 
 (m/pure set-monad 42)
-;;=> #{42}
+;; => #{42}
 
 (m/fmap inc #{1 2 3 4})
-;;=> #{4 3 2 5}
+;; => #{4 3 2 5}
 
 (m/bind #{1 2 3}
         (fn [v] #{v (inc v)}))
-;;=> #{1 4 3 2}
+;; => #{1 4 3 2}
 ----
 
 ==== Map
@@ -856,7 +856,7 @@ Maps implement the _Semigroup_ protocol, since we can use `merge` as their assoc
 (require '[cats.core :as m])
 
 (m/mappend {:a "A"} {:b "B"})
-;;=> {:a "A", :b "B"}
+;; => {:a "A", :b "B"}
 ----
 
 Since we can consider the empty map an identity element for the `mappend` associative binary operation maps also
