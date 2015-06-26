@@ -455,7 +455,25 @@ Any monadic type that implements `MonadZero` can be combined with guards inside 
 
 === MonadPlus
 
-TODO
+MonadPlus is a complementary abstraction for Monads that support an associative binary operation, analogous to that of a
+Semigroup. If the monad implements the MonadZero and MonadPlus protocols it forms a monoid.
+
+For the Maybe type, `mplus` acts similarly to a logical OR that treats `Nothing` values as falsey.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mplus (maybe/nothing))
+;; => #<Nothing >
+
+(m/mplus (maybe/nothing) (maybe/just 1))
+;; => #<Just 1>
+
+(m/mplus (maybe/just 1) (maybe/just 2))
+;; => #<Just 1>
+----
 
 
 === Monad Transformers
