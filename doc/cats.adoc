@@ -393,6 +393,65 @@ For the already familiar Maybe type the identity element is Nothing:
 ;; => #<Nothing >
 ----
 
+Having an identity element we can make a monadic composition short-circuit using a predicate:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/bind (maybe/just 1)
+        (fn [a]
+          (m/bind (if (= a 2)
+                    (m/return nil)
+                    (m/mzero))
+                  (fn [_]
+                    (m/return (* a 2))))))
+;; => #<Nothing >
+----
+
+As you can see in the above example the predicate `(= a 2)` returns either a monadic value `(m/return nil)` or the identity value
+for the maybe monad. This can be captured in a function, which is available in `cats.core` namespace:
+
+[source, clojure]
+----
+(defn guard
+  [b]
+  (if b
+    (return nil)
+    (mzero)))
+----
+
+The above example could be rewritten as:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/bind (maybe/just 1)
+        (fn [a]
+          (m/bind (m/guard (= a 2))
+                  (fn [_]
+                    (m/return (* a 2))))))
+;; => #<Nothing >
+----
+
+`mlet` has support for using guards using a `:when` clause, analogous to the one used in `for`. We could rewrite the above example
+using `bind` with `mlet` and `:when`:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :as maybe])
+
+(m/mlet [a (maybe/just 1)
+         :when (= a 2)]
+   (m/return (* a 2)))
+;; => #<Nothing >
+----
+
+Any monadic type that implements `MonadZero` can be combined with guards inside `mlet` bindings.
 
 === MonadPlus
 
