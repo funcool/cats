@@ -169,13 +169,17 @@
   "Return true if `v` is an instance of
   the Success type."
   [v]
-  (instance? Success v))
+  (or (instance? Success v)
+      (and (satisfies? proto/Context v)
+           (not (instance? Throwable v)))))
 
 (defn failure?
   "Return true if `v` is an instance of
   the Failure type."
   [v]
-  (instance? Failure v))
+  (or (instance? Failure v)
+      (and (satisfies? proto/Context v)
+           (instance? Throwable v))))
 
 (defn exception?
   "Return true in case of `v` is instance
