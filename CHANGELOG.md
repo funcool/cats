@@ -1,5 +1,20 @@
 # Changelog #
 
+## Version 0.5.0 ##
+
+Date: unreleased
+
+- Set default and required clojure version to 1.7.0.
+- Replace cljx with clojure 1.7 conditional reader.
+- Add more util functions for treat for maybe monad types.
+- Add more util functions for treat for either monad types.
+- Add semigroup and monoid abstractions.
+- Add validation applicative (similar to either).
+- Minor performance improvements.
+- Minor improvements to the `<*>` function.
+- Add more tests.
+
+
 ## Version 0.4.0 ##
 
 Date: 2015-03-25
