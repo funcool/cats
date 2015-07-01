@@ -25,10 +25,9 @@
                                    :pretty-print true}}]}
 
   :jar-exclusions [#"\.swp|\.swo"]
-
-  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.10"]
-                                  [org.clojure/clojure "1.7.0-RC2"]
-                                  [org.clojure/clojurescript "0.0-3308"]]
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
+                                  [org.clojure/clojure "1.7.0"]
+                                  [org.clojure/clojurescript "0.0-3297"]]
                    :codeina {:sources ["src"]
                              :output-dir "doc/codeina"}
                    :plugins [[funcool/codeina "0.1.0-SNAPSHOT"
