@@ -151,7 +151,7 @@
   (reader
    (fn [env]
      (let [ctx (m/get-current-context reader-monad)]
-       ((proto/ask  ctx) env)))))
+       ((proto/ask ctx) env)))))
 
 (def local
   (fn [f mr]

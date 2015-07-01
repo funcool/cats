@@ -719,7 +719,7 @@ The de-facto monadic type of the state monad is a plain function. A function
 represents a computation as is (without executing it). Obviously, a function
 should have some special characteristics to work in monad state composition.
 
-.Valid function for valid state monad
+.Valid function for the state monad
 [source, clojure]
 ----
 (fn [state]
@@ -739,10 +739,12 @@ Let's look at one example before explaining the details:
 .Lazy composition of computations
 [source, clojure]
 ----
+(require '[cats.core :as m])
 (require '[cats.monad.state :as st])
+
 (m/mlet [state (st/get-state)
          _     (st/put-state (next state))]
-  (return (first state)))
+  (m/return (first state)))
 ;; => #<State cats.monad.state.State@2eebabb6>
 ----
 
@@ -781,8 +783,83 @@ Clojure with the exception that it can only contain two values.
 
 === Reader
 
-TODO
+The reader monad is another commonly used monad in Haskell. It's used for gluing together computations that
+depend on a read-only environment. As with the state monad, we don't have to thread the environment manualy
+since the monadic bind does it for us. The type of the reader monad are one-argument functions.
 
+The Reader type is analogous to State, simply a wrapper for regular Clojure functions. If we want our functions
+to participate in the reader abstraction we have to wrap them in a Reader instance.
+
+.Valid function for the reader monad
+[source, clojure]
+----
+(require '[cats.monad.reader :as r])
+
+(def start-server
+  (r/reader
+    (fn [env]
+      "Takes an environment with options as an argument and runs a web
+       server in the address specified by `:host` and `:port`."
+      (run-http-server (:host env) (:port env)))))
+----
+
+cats provides a few reader functions already. `ask` is the simplest reader, simply returns the environment. We
+can execute readers using the `run-reader` function which accepts a reader and an environment.
+
+.Example of running the ask reader
+[source, clojure]
+----
+(require '[cats.monad.reader :as r])
+
+(r/run-reader r/ask [1 2 3])
+;; => [1 2 3]
+----
+
+Let's use `mlet` for building new readers out of existing ones:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.reader :as r])
+
+(m/mlet [env r/ask]
+  (m/return (inc env)))
+;; => #<Reader cats.monad.reader.Reader@2eebabb6>
+----
+
+We can then run it using `run-reader`:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.reader :as r])
+
+(r/run-reader (m/mlet [env r/ask]
+                (m/return (inc env)))
+              41)
+;; => 42
+----
+
+We can also alter the reader's environment in a context using the `local` function which given a function and
+a reader returns a new reader whose environment is the result of applying the first function given to `local` to
+the original environment. Let's see it in action to understand it better:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.reader :as r])
+
+(r/run-reader (m/mlet [env (r/local #(* 2 %) r/ask)]
+                (m/return (+ env 2)))
+              20)
+;; => 42
+----
+
+Note that since we executed `ask` with the function `#(*2 %)` altering its original environment (20), the resulting
+`env` value is two times the original environment.
 
 === Writer
 
