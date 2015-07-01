@@ -176,10 +176,12 @@
 (defn failure?
   "Return true if `v` is an instance of
   the Failure type."
-  [v]
-  (or (instance? Failure v)
-      (and (satisfies? proto/Context v)
-           (instance? Throwable v))))
+  ([v] (failure? v false))
+  ([v strict]
+   (or (instance? Failure v)
+       (and (satisfies? proto/Context v)
+            (instance? Throwable v)
+            (not strict)))))
 
 (defn exception?
   "Return true in case of `v` is instance
@@ -300,4 +302,6 @@
     (mbind [_ s f]
       (if (success? s)
         (f (proto/extract s))
-        s))))
+        (if (failure? s true)
+          s
+          (failure s))))))
