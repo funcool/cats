@@ -289,9 +289,9 @@
   (let [ctx (get-current-context (first mvs))]
     (with-monad ctx
       (reduce (fn [mvs mv]
-                 (mlet [v mv
-                        vs mvs]
-                       (return (cons v vs))))
+                (mlet [v mv
+                       vs mvs]
+                  (return (cons v vs))))
               (return '())
               (reverse mvs)))))
 
