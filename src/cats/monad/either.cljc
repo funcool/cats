@@ -37,14 +37,13 @@
       (either/left 1)
       ;; => #<Left [1]>
   "
-  (:require [cats.protocols :as proto]
-            [cats.core :as m]))
-
-(declare either-monad)
+  (:require [cats.protocols :as proto]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(declare either-monad)
 
 (deftype Right [v]
   proto/Context
@@ -205,13 +204,13 @@
 
 (defn branch
   "Given an either value and two functions, if the either is a
-   left apply the first function to the value it contains; if the
-   either is a right apply the second function to its value."
+  left apply the first function to the value it contains; if the
+  either is a right apply the second function to its value."
   [e lf rf]
   {:pre [(either? e)]}
   (if (left? e)
-    (lf (m/extract e))
-    (rf (m/extract e))))
+    (lf (proto/extract e))
+    (rf (proto/extract e))))
 
 (defn branch-left
   "Given an either value and a function, if the either is a
@@ -229,7 +228,8 @@
   either is a left, return it."
   [e rf]
   {:pre [(either? e)]}
-  (m/bind e rf))
+  (let [context either-monad]
+    (proto/mbind context e rf)))
 
 (def lefts
   "Given a collection of eithers, return only the values that are left."
@@ -252,5 +252,5 @@
   [e]
   {:pre [(either? e)]}
   (if (left? e)
-    (right (m/extract e))
-    (left (m/extract e))))
+    (right (proto/extract e))
+    (left (proto/extract e))))
