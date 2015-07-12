@@ -34,4 +34,8 @@
                              :src-uri "http://github.com/funcool/cats/blob/master/"
                              :src-uri-prefix "#L"}
                    :plugins [[funcool/codeina "0.2.0"]
-                             [lein-cljsbuild "1.0.6"]]}})
+                             [lein-cljsbuild "1.0.6"]]}
+             :bench [:dev {:dependencies [[criterium "0.4.3"]]
+                           :main ^:skip-aot benchmarks
+                           :jvm-opts ^:replace []
+                           :source-paths ["dev"]}]})
