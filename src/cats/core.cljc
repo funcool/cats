@@ -289,11 +289,11 @@
   (let [ctx (get-current-context (first mvs))]
     (with-monad ctx
       (reduce (fn [mvs mv]
-                 (mlet [v mv
-                        vs mvs]
-                       (return (cons v vs))))
-              (return '())
-              (reverse mvs)))))
+                (mlet [v mv
+                       vs mvs]
+                  (return (conj vs v))))
+              (return [])
+              mvs))))
 
 (defn mapseq
    "Given a function that takes a value and puts it into a
