@@ -60,6 +60,7 @@ it as a dependency in your *_project.clj_*:
 [cats "0.4.0"]
 ----
 
+
 === Get the Code
 
 _cats_ is open source and can be found on link:https://github.com/funcool/cats[github].
@@ -80,6 +81,7 @@ supports.
 We will use _Maybe_ for the example snippets, because it has support for all
 the abstractions and is very easy to understand. You can read more about it in the next
 section of this documentation.
+
 
 === Semigroup
 
@@ -106,6 +108,7 @@ Given that the values it contains form a Semigroup, we can `mappend` multiple _M
 ;; => #<Just [1 2 3 4 5 6]>
 ----
 
+
 === Monoid
 
 A Monoid is a Semigroup with an identity element (`mempty`). For the collection types the `mempty`
@@ -125,6 +128,7 @@ _Maybe_, with Nothing being the identity element.
            (maybe/nothing))
 ;; => #<Just [1 2 3 4 5 6]>
 ----
+
 
 === Functor
 
@@ -639,6 +643,7 @@ NOTE: Either is also (like Maybe) a Functor, Applicative Functor and Monad.
 
 Like Maybe, Either values can be dereferenced returning the value they contain.
 
+
 === Exception
 
 Also known as the Try monad, as popularized by Scala.
@@ -747,6 +752,7 @@ using the Semigroup's `mappend` function.
 ;; => #<Fail {:baz "fubar", :foo "bar"}>
 ----
 
+
 === Built in types
 
 Some of the abstractions in _cats_ are implemented for built-in types but you can't use them directly. First,
@@ -760,6 +766,7 @@ you must load the `cats.builtin` namespace:
 (m/fmap inc [1 2 3 4])
 ;; => [2 3 4 5]
 ----
+
 
 ==== nil
 
@@ -813,6 +820,7 @@ the difference is that `for` is limited to sequences and `mlet` can work with ar
 
 Also, since `mlet` desugars into calls to the Monad's `bind` function, its result keeps the type of the monadic values.
 
+
 ==== Lazy sequences
 
 Lazy sequences implement the same abstractions as vectors with practically an identical implementation. If you don't need
@@ -830,6 +838,7 @@ Using `mlet` with lazy sequences yields exactly the same result as using `for`:
   (m/return (+ x y)))
 ;; => (4 5 6 5 6 7)
 ----
+
 
 ==== Set
 
@@ -850,6 +859,7 @@ Sets implement almost every abstraction in _cats_, from Semigroup to Monad.
         (fn [v] #{v (inc v)}))
 ;; => #{1 4 3 2}
 ----
+
 
 ==== Map
 
