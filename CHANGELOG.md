@@ -2,7 +2,7 @@
 
 ## Version 0.5.0 ##
 
-Date: unreleased
+Date: 2015-07-13
 
 - Set default and required clojure version to 1.7.0.
 - Replace cljx with clojure 1.7 conditional reader.
@@ -13,8 +13,11 @@ Date: unreleased
 - Minor performance improvements.
 - Fix inconsistences between fmap / fapply public functions
   and its haskell-style aliases.
-- Add more tests.
-
+- Add more documentation.
+- Deprecate the state, reader, writer and continuation
+  monads. They will be moved to a separated library for
+  future version.
+- Remove already deprecated `from-either` function.
 
 
 ## Version 0.4.0 ##
