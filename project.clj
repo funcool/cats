@@ -27,7 +27,7 @@
   :jar-exclusions [#"\.swp|\.swo"]
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [org.clojure/clojure "1.7.0"]
-                                  [org.clojure/clojurescript "0.0-3297"]]
+                                  [org.clojure/clojurescript "0.0-3308"]]
                    :codeina {:sources ["src"]
                              :reader :clojure
                              :target "doc/dist/latest/api"
