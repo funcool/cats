@@ -55,7 +55,7 @@
                (+ 1 nil)
                (fn [e] (either/right 60)))]
        (t/is (either/right? m1))
-       (t/is (= 60 (either/from-either m1))))))
+       (t/is (= 60 (m/extract m1))))))
 
 #?(:cljs
    (t/deftest try-or-recover-test

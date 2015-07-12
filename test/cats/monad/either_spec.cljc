@@ -15,8 +15,8 @@
                [cats.core :as m])))
 
 (t/deftest basic-operations-test
-  (t/is (= 1 (either/from-either (either/right 1))))
-  (t/is (= nil (either/from-either (either/left)))))
+  (t/is (= 1 (m/extract (either/right 1))))
+  (t/is (= nil (m/extract (either/left)))))
 
 (t/deftest ideref-test
   (t/is (= 1 @(either/left 1)))

@@ -135,18 +135,6 @@
     (identical? (proto/get-context v) either-monad)
     false))
 
-(defn ^{:deprecated true}
-  from-either
-  "Return inner value of either monad.
-
-  This is a specialized version of `cats.core/extract`
-  for Either monad.
-
-  The use of this function is DEPRECATED and
-  `cats.core/extract` should be used."
-  [mv]
-  (proto/extract mv))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -196,7 +184,7 @@
                    (fn [either-v]
                      (if (left? either-v)
                        (proto/mreturn inner-monad either-v)
-                       (f (from-either either-v))))))
+                       (f (proto/extract either-v))))))
 
     proto/MonadTrans
     (base [_]
