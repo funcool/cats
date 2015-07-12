@@ -10,6 +10,13 @@
                [cats.monad.maybe :as maybe]
                [cats.core :as m])))
 
+(t/deftest fapply-test
+  (t/testing "Simple fapply run."
+    (t/is (= 2 @(m/fapply (maybe/just inc) (maybe/just 1)))))
+  (t/testing "Variadic fapply run."
+    (t/is (= 3 @(m/fapply (maybe/just #(partial + %))
+                          (maybe/just 1)
+                          (maybe/just 2))))))
 
 (t/deftest mlet-tests
   (t/testing "Support regular let bindings inside mlet"
