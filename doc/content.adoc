@@ -1,6 +1,6 @@
 = Cats Documentation
 Andrey Antukh & Alejandro Gómez
-0.4.0
+0.5.0
 :toc: left
 :numbered:
 :source-highlighter: pygments
@@ -57,19 +57,7 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[cats "0.4.0"]
-----
-
-
-=== Get the Code
-
-_cats_ is open source and can be found on link:https://github.com/funcool/cats[github].
-
-You can clone the public repository with this command:
-
-[source,text]
-----
-git clone https://github.com/funcool/cats
+[funcool/cats "0.5.0"]
 ----
 
 
