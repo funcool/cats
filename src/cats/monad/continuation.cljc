@@ -25,6 +25,7 @@
 
 (ns cats.monad.continuation
   "The Continuation Monad."
+  {:no-doc true}
   (:require [cats.protocols :as proto])
   #?(:clj
      (:require [cats.core :refer [with-monad]])
@@ -50,6 +51,7 @@
 
 (defn continuation
   "Default constructor for continuation."
+  {:deprecated true}
   [mfn]
   (Continuation. mfn))
 
@@ -57,7 +59,7 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def continuation-monad
+(def ^:deprecated continuation-monad
   (reify
     proto/Monad
     (mreturn [_ v]
@@ -75,11 +77,13 @@
 (defn run-cont
   "Given a Continuation instance, execute the
   wrapped computation and return its value."
+  {:deprecated true}
   [cont]
   (with-monad continuation-monad
     (cont identity)))
 
 (defn call-cc
+  {:deprecated true}
   [f]
   (continuation
     (fn [cc]

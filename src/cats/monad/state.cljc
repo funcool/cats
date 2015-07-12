@@ -25,6 +25,7 @@
 
 (ns cats.monad.state
   "The State Monad."
+  {:no-doc true}
   #?(:clj
      (:require [cats.core :refer [with-monad]]))
   #?(:cljs
@@ -58,12 +59,14 @@
 
   It exists just for avoid extend the clojure
   function type because is very generic type."
+  {:deprecated true}
   [f]
   (State. f))
 
 (defn state?
   "Return true if `s` is instance of
   the State type."
+  {:deprecated true}
   [s]
   (instance? State s))
 
@@ -71,7 +74,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^{:no-doc true}
+(def ^{:no-doc true
+       :deprecated true}
   state-monad
   (reify
     proto/Functor
@@ -113,6 +117,7 @@
 
 (defn state-transformer
   "The State transformer constructor."
+  {:deprecated true}
   [inner-monad]
   (reify
     proto/Functor
@@ -193,18 +198,21 @@
 (defn get-state
   "Return a State instance with computation that returns
   the current state."
+  {:deprecated true}
   []
   (proto/get-state (m/get-current-context state-monad)))
 
 (defn put-state
   "Return a State instance with computation that replaces
   the current state with specified new state."
+  {:deprecated true}
   [newstate]
   (proto/put-state (m/get-current-context state-monad) newstate))
 
 (defn swap-state
   "Return a State instance with computation that applies the
   specified function to state and returns the old state."
+  {:deprecated true}
   [f]
   (proto/swap-state (m/get-current-context state-monad) f))
 
@@ -221,6 +229,7 @@
     (run-state computation initial-state)
 
   This should be return something to: #<Pair [1 2]>"
+  {:deprecated true}
   [state seed]
   (with-monad (m/get-current-context state-monad)
     (state seed)))
@@ -231,6 +240,7 @@
   value, ignoring the state.
   Equivalent to taking the first value of the pair instance
   returned by `run-state` function."
+  {:deprecated true}
   [state seed]
   (first (run-state state seed)))
 
@@ -240,5 +250,6 @@
   state.
   Equivalent to taking the second value of the pair instance
   returned by `run-state` function."
+  {:deprecated true}
   [state seed]
   (second (run-state state seed)))

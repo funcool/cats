@@ -25,6 +25,7 @@
 
 (ns cats.monad.reader
   "The Reader Monad."
+  {:no-doc true}
   #?(:clj
      (:require [cats.core :refer [with-monad]]))
   #?(:cljs
@@ -53,12 +54,14 @@
 
   It exists just for avoid extend the clojure
   function type because is very generic type."
+  {:deprecated true}
   [f]
   (Reader. f))
 
 (defn reader?
   "Return true if `s` is instance
   of Reader type."
+  {:deprecated true}
   [s]
   (instance? Reader s))
 
@@ -66,7 +69,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^{:no-doc true}
+(def ^{:no-doc true
+       :deprecated true}
   reader-monad
   (reify
     proto/Functor
@@ -98,6 +102,7 @@
 
 (defn reader-transformer
   "The Reader transformer constructor."
+  {:deprecated true}
   [inner-monad]
   (reify
     proto/Functor
@@ -143,17 +148,18 @@
 (defn run-reader
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
+  {:deprecated true}
   [reader seed]
   (with-monad (m/get-current-context reader-monad)
     (reader seed)))
 
-(def ask
+(def ^:deprecated ask
   (reader
    (fn [env]
      (let [ctx (m/get-current-context reader-monad)]
        ((proto/ask ctx) env)))))
 
-(def local
+(def ^:deprecated local
   (fn [f mr]
     (reader
      (fn [env]

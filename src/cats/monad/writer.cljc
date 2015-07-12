@@ -25,6 +25,7 @@
 
 (ns cats.monad.writer
   "The Writer Monad."
+  {:no-doc true}
   #?(:clj
      (:require [cats.core :refer [with-monad]]))
   #?(:cljs
@@ -55,12 +56,14 @@
 
   It exists just for avoid extend the clojure
   function type because is very generic type."
+  {:deprecated true}
   [f]
   (Writer. f))
 
 (defn writer?
   "Return true if `s` is instance
   of Writer type."
+  {:deprecated true}
   [s]
   (instance? Writer s))
 
@@ -68,7 +71,8 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^{:no-doc true}
+(def ^{:no-doc true
+       :deprecated true}
   writer-monad
   (reify
     proto/Monad
@@ -97,6 +101,7 @@
 
 (defn writer-transformer
   "The Writer transformer constructor."
+  {:deprecated true}
   [inner-monad]
   (reify
     proto/Monad
@@ -154,18 +159,21 @@
 
 (defn tell
   "Add the value to the log."
+  {:deprecated true}
   [v]
   (proto/tell (m/get-current-context writer-monad) v))
 
 (defn listen
   "Get the value from the log."
+  {:deprecated true}
   [mv]
   (proto/listen (m/get-current-context writer-monad) mv))
 
 (defn pass
-  [mv]
   "Apply a function to the log."
+  {:deprecated true}
+  [mv]
   (proto/pass (m/get-current-context writer-monad) mv))
 
-(def value first)
-(def log second)
+(def ^:deprecated value first)
+(def ^:deprecated log second)
