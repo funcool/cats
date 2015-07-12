@@ -11,8 +11,10 @@ Date: unreleased
 - Add semigroup and monoid abstractions.
 - Add validation applicative (similar to either).
 - Minor performance improvements.
-- Minor improvements to the `<*>` function.
+- Fix inconsistences between fmap / fapply public functions
+  and its haskell-style aliases.
 - Add more tests.
+
 
 
 ## Version 0.4.0 ##
