@@ -164,9 +164,12 @@
 (defn fmap
   "Apply a function f to the value inside functor's fv
   preserving the context type."
-  [f fv]
-  (-> (get-current-context fv)
-      (p/fmap f fv)))
+  ([f]
+   (fn [fv]
+     (fmap f fv)))
+  ([f fv]
+   (-> (get-current-context fv)
+       (p/fmap f fv))))
 
 (defn fapply
   "Given function inside af's context and value inside
