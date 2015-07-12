@@ -174,9 +174,14 @@
 (defn fapply
   "Given function inside af's context and value inside
   av's context, applies the function to value and return
-  a result wrapped in context of same type of av context."
-  [af av]
-  (p/fapply (get-current-context af) af av))
+  a result wrapped in context of same type of av context.
+
+  This function is variadic, so it can be used like
+  a haskell style left-associative fapply."
+  [af & avs]
+  {:pre [(not (empty? avs))]}
+  (let [ctx (get-current-context af)]
+    (reduce (partial p/fapply ctx) af avs)))
 
 (defn when
   "If the expression is true, returns the monadic value.
