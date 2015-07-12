@@ -361,20 +361,13 @@
 ;; Haskell-style aliases and util functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn <$>
-  "Alias of fmap."
-  ([f]
-   (fn [fv]
-     (fmap f fv)))
-  ([f fv]
-   (fmap f fv)))
+(def <$>
+  "A haskell-style fmap alias."
+  fmap)
 
-(defn <*>
-  "Performs a Haskell-style left-associative fapply."
-  [& avs]
-  {:pre [(not (empty? avs))]}
-  (let [ctx (get-current-context (first avs))]
-    (reduce (partial p/fapply ctx) avs)))
+(def <*>
+  "A haskell-style fapply alias."
+  fapply)
 
 (defn >>=
   "Performs a Haskell-style left-associative
