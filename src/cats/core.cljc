@@ -164,16 +164,24 @@
 (defn fmap
   "Apply a function f to the value inside functor's fv
   preserving the context type."
-  [f fv]
-  (-> (get-current-context fv)
-      (p/fmap f fv)))
+  ([f]
+   (fn [fv]
+     (fmap f fv)))
+  ([f fv]
+   (-> (get-current-context fv)
+       (p/fmap f fv))))
 
 (defn fapply
   "Given function inside af's context and value inside
   av's context, applies the function to value and return
-  a result wrapped in context of same type of av context."
-  [af av]
-  (p/fapply (get-current-context af) af av))
+  a result wrapped in context of same type of av context.
+
+  This function is variadic, so it can be used like
+  a haskell style left-associative fapply."
+  [af & avs]
+  {:pre [(not (empty? avs))]}
+  (let [ctx (get-current-context af)]
+    (reduce (partial p/fapply ctx) af avs)))
 
 (defn when
   "If the expression is true, returns the monadic value.
@@ -210,18 +218,18 @@
     a code using bind for compose few number of operations:
 
         (bind (just 1)
-        (fn [a]
-        (bind (just (inc a))
-        (fn [b]
-        (return (* b 2))))))
+              (fn [a]
+                (bind (just (inc a))
+                        (fn [b]
+                          (return (* b 2))))))
         ;=> #<Just [4]>
 
     Now see how this code can be more clear if you
     are using mlet macro for do it:
 
         (mlet [a (just 1)
-        b (just (inc a))]
-        (return (* b 2)))
+               b (just (inc a))]
+          (return (* b 2)))
         ;=> #<Just [4]>
     "
     [bindings & body]
@@ -353,20 +361,13 @@
 ;; Haskell-style aliases and util functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn <$>
-  "Alias of fmap."
-  ([f]
-   (fn [fv]
-     (fmap f fv)))
-  ([f fv]
-   (fmap f fv)))
+(def <$>
+  "A haskell-style fmap alias."
+  fmap)
 
-(defn <*>
-  "Performs a Haskell-style left-associative fapply."
-  [& avs]
-  {:pre [(not (empty? avs))]}
-  (let [ctx (get-current-context (first avs))]
-    (reduce (partial p/fapply ctx) avs)))
+(def <*>
+  "A haskell-style fapply alias."
+  fapply)
 
 (defn >>=
   "Performs a Haskell-style left-associative
