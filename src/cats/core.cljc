@@ -218,18 +218,18 @@
     a code using bind for compose few number of operations:
 
         (bind (just 1)
-        (fn [a]
-        (bind (just (inc a))
-        (fn [b]
-        (return (* b 2))))))
+              (fn [a]
+                (bind (just (inc a))
+                        (fn [b]
+                          (return (* b 2))))))
         ;=> #<Just [4]>
 
     Now see how this code can be more clear if you
     are using mlet macro for do it:
 
         (mlet [a (just 1)
-        b (just (inc a))]
-        (return (* b 2)))
+               b (just (inc a))]
+          (return (* b 2)))
         ;=> #<Just [4]>
     "
     [bindings & body]
