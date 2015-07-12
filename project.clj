@@ -29,7 +29,9 @@
                                   [org.clojure/clojure "1.7.0"]
                                   [org.clojure/clojurescript "0.0-3297"]]
                    :codeina {:sources ["src"]
-                             :output-dir "doc/codeina"}
-                   :plugins [[funcool/codeina "0.1.0-SNAPSHOT"
-                              :exclusions [org.clojure/clojure]]
+                             :reader :clojure
+                             :target "doc/dist/latest/api"
+                             :src-uri "http://github.com/funcool/cats/blob/master/"
+                             :src-uri-prefix "#L"}
+                   :plugins [[funcool/codeina "0.2.0"]
                              [lein-cljsbuild "1.0.6"]]}})

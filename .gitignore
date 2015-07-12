@@ -8,8 +8,11 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /*-init.clj
-doc/index.html
-doc/codox
+/doc/dist/
 /output
 /repl
 /node_modules
+\#*\#
+*~
+.\#*
+/.nrepl-history
