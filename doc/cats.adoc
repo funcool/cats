@@ -910,7 +910,12 @@ they should not extend any of the previously explained protocols.
 |================================================================================
 
 
-== How to Contribute?
+=== Where are the State, Reader, Writer and Continuation monads?
+
+TBD
+
+
+== Developers Guide
 
 === Philosophy
 
@@ -925,28 +930,38 @@ Five most important rules:
 All contributions to _cats_ should keep these important rules in mind.
 
 
-=== Procedure
+=== Contributing
 
-_cats_ does not have many restrictions for contributions. Just follow these
-steps depending on the situation:
+Unlike Clojure and other Clojure contributed libraries, _cats_ does not have many
+restrictions for contributions. Just open an issue or pull request.
 
-*Bugfix*:
 
-- Fork the GitHub repo.
-- Fix a bug/typo on a new branch.
-- Make a pull-request to master.
+=== Source Code
 
-*New feature*:
+_cats_ is open source and can be found on link:https://github.com/funcool/cats[github].
 
-- Open new issue with the new feature proposal.
-- If it is accepted, follow the same steps as "bugfix".
+You can clone the public repository with this command:
+
+[source,text]
+----
+git clone https://github.com/funcool/cats
+----
+
+=== Run tests
+
+For running tests just execute this:
+
+[source, text]
+----
+lein test
+----
 
 
 === License
 
 [source,text]
 ----
-Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.be>
+Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
 Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
 
 All rights reserved.
