@@ -420,6 +420,18 @@
            :when (p v)]
           (return v))))
 
+(defn foldseq
+  [f val mvs]
+  {:pre [(not-empty mvs)]}
+  (let [ctx (get-current-context (first mvs))]
+    (with-monad ctx
+      (reduce (fn [mz mv]
+                (mlet [z mz
+                       v mv]
+                  (f z v)))
+              (return val)
+              mvs))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
