@@ -11,7 +11,7 @@ And there are my cats, engaged in a ritual that goes back thousands of years, tr
 -- <cite>William S. Burroughs, The Cat Inside</cite>
 </blockquote>
 
-[![Clojars Project](http://clojars.org/cats/latest-version.svg)](http://clojars.org/cats)
+[![Clojars Project](http://clojars.org/funcool/cats/latest-version.svg)](http://clojars.org/funcool/cats)
 
 Category Theory abstractions for Clojure.
 
