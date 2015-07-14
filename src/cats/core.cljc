@@ -322,7 +322,6 @@
            body `(~f ~@args)]
        `(curry* ~args ~body)))))
 
-;; TODO: infer arity when possible
 #?(:clj
    (defmacro lift-m
     "Lifts a function with the given fixed number of arguments to a
