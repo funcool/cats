@@ -138,8 +138,6 @@
     (t/is (= [nil]
              (m/when false [])))))
 
-
-
 (t/deftest curry-tests
   (t/testing "It can curry single and fixed arity functions automatically"
     (let [cadd2 (m/curry add2)]
