@@ -339,13 +339,22 @@
         (monad+ [0 2 4] [1 2])
         ;; => [1 2 3 4 5 6]
     "
-    [n f]
-    (let [val-syms (repeatedly n gensym)
-          mval-syms (repeatedly n gensym)
-          mlet-bindings (interleave val-syms mval-syms)]
-      `(fn [~@mval-syms]
-         (mlet [~@mlet-bindings]
-           (return (~f ~@val-syms)))))))
+    ([f]
+     (if (not (symbol? f))
+       (throw (IllegalArgumentException. "You must provide an arity for lifting anonymous functions"))
+       (let [fvar (resolve f)]
+         (if-let [args (arglists fvar)]
+           (if (single-arity? fvar)
+             `(lift-m ~(arity fvar) ~f)
+             (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for lifting.")))
+           (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for lifting."))))))
+    ([n f]
+     (let [val-syms (repeatedly n gensym)
+           mval-syms (repeatedly n gensym)
+           mlet-bindings (interleave val-syms mval-syms)]
+       `(fn [~@mval-syms]
+          (mlet [~@mlet-bindings]
+            (return (~f ~@val-syms))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sequences.

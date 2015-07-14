@@ -10,6 +10,9 @@
                [cats.monad.maybe :as maybe]
                [cats.core :as m])))
 
+(defn add2 [x y]
+  (+ x y))
+
 (t/deftest fapply-test
   (t/testing "Simple fapply run."
     (t/is (= 2 @(m/fapply (maybe/just inc) (maybe/just 1)))))
@@ -73,9 +76,29 @@
                            (maybe/just v)
                            (maybe/nothing)))
                        [1 2 3 4 5])))))
-
 (t/deftest lift-m-tests
   (let [monad+ (m/lift-m 2 +)]
+    (t/testing "It can lift a function to the vector monad"
+      (t/is (= [1 2 3 4 5 6]
+               (monad+ [0 2 4] [1 2]))))
+
+    (t/testing "It can lift a function to the Maybe monad"
+      (t/is (= (maybe/just 6)
+               (monad+ (maybe/just 2) (maybe/just 4))))
+      (t/is (= (maybe/nothing)
+               (monad+ (maybe/just 1) (maybe/nothing)))))
+
+    (t/testing "It can lift a function to a Monad Transformer"
+      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)]
+        (t/is (= [(maybe/just 1) (maybe/just 2)
+                  (maybe/just 3) (maybe/just 4)
+                  (maybe/just 5) (maybe/just 6)]
+                 (m/with-monad maybe-sequence-monad
+                   (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
+                           [(maybe/just 1) (maybe/just 2)]))))))))
+
+(t/deftest fixed-arity-lift-m-tests
+  (let [monad+ (m/lift-m add2)]
     (t/testing "It can lift a function to the vector monad"
       (t/is (= [1 2 3 4 5 6]
                (monad+ [0 2 4] [1 2]))))
@@ -115,8 +138,7 @@
     (t/is (= [nil]
              (m/when false [])))))
 
-(defn add2 [x y]
-  (+ x y))
+
 
 (t/deftest curry-tests
   (t/testing "It can curry single and fixed arity functions automatically"
@@ -137,8 +159,7 @@
       (t/is (= (((csum) 1 2) 3)
                6))
       (t/is (= (csum 1 2 3)
-               6))
-      ))
+               6))))
 
   (t/testing "It can curry variadic functions when providing an arity"
     (let [csum (m/curry 3 +)]
