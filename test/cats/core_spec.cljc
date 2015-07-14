@@ -114,3 +114,39 @@
   (t/testing "It returns nil in the monadic context when the condition is false"
     (t/is (= [nil]
              (m/when false [])))))
+
+(defn add2 [x y]
+  (+ x y))
+
+(t/deftest curry-tests
+  (t/testing "It can curry single and fixed arity functions automatically"
+    (let [cadd2 (m/curry add2)]
+      (t/is (= ((cadd2 1) 2)
+               3))
+      (t/is (= (cadd2)
+               cadd2))
+      (t/is (= (cadd2 1 2)
+               3))))
+
+  (t/testing "It can curry anonymous functions when providing an arity"
+    (let [csum (m/curry 3 (fn [x y z] (+ x y z)))]
+      (t/is (= (((csum 1) 2) 3)
+               6))
+      (t/is (= ((csum 1 2) 3)
+               6))
+      (t/is (= (((csum) 1 2) 3)
+               6))
+      (t/is (= (csum 1 2 3)
+               6))
+      ))
+
+  (t/testing "It can curry variadic functions when providing an arity"
+    (let [csum (m/curry 3 +)]
+      (t/is (= (((csum 1) 2) 3)
+               6))
+      (t/is (= ((csum 1 2) 3)
+               6))
+      (t/is (= (((csum) 1 2) 3)
+               6))
+      (t/is (= (csum 1 2 3)
+               6)))))

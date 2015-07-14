@@ -248,6 +248,80 @@
                      `(bind ~r (fn [~l] ~acc))))
                  `(do ~@body)))))
 
+(defn- arglists
+  [var]
+  (get (meta var) :arglists))
+
+(defn- single-arity?
+  [var]
+  (let [args (arglists var)]
+    (and (= (count args) 1)
+         (not (some #{'&} (first args))))))
+
+(defn- arity
+  [var]
+  {:pre [(single-arity? var)]}
+  (count (first (arglists var))))
+
+#?(:clj
+   (defmacro curry*
+     [args body]
+     (let [argcount (count args)]
+       (cond
+         (= argcount 0) `(fn f# [] ~body)
+         (= argcount 1) `(fn f#
+                           ([] f#)
+                           ([~@args] ~body))
+         :else
+         (let [arities (for [n (range 1 (count args))]
+                         `([~@(take n args)] (curry* ~(drop n args) ~body)))]
+           `(fn f#
+              ([] f#)
+              ~@arities
+              ([~@args] ~body)))
+         ))))
+
+#?(:clj
+   (defmacro curry
+    "Given either a fixed arity function or an arity and a function
+    yields another which is curried.
+
+    ;; Inferred arity (function must have one fixed arity)
+
+    (defn add2 [x y] (+ x y))
+    (def cadd2 (curry add2))
+
+    ((cadd2 1) 3)
+    ;; => 4
+
+    (cadd2 1 3)
+    ;; => 4
+
+    ;; Fixed arity
+
+    (def c+ (curry 3 +))
+
+    ((c+ 1 2) 3)
+    ;; => 6
+
+    ((((c+) 1) 2) 3)
+    ;; => 6
+    "
+    ([f]
+     (if (not (symbol? f))
+       (throw (IllegalArgumentException. "You must provide an arity for currying anonymous functions"))
+       (let [fvar (resolve f)]
+         (if-let [args (arglists fvar)]
+           (if (single-arity? fvar)
+             `(curry ~(arity fvar) ~f)
+             (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for currying.")))
+           (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for currying."))))))
+    ([n f]
+     (let [args (repeatedly n gensym)
+           body `(~f ~@args)]
+       `(curry* ~args ~body)))))
+
+;; TODO: infer arity when possible
 #?(:clj
    (defmacro lift-m
     "Lifts a function with the given fixed number of arguments to a
