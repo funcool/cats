@@ -109,6 +109,11 @@
       (t/is (= (maybe/nothing)
                (monad+ (maybe/just 1) (maybe/nothing)))))
 
+    (t/testing "The original forms metadata is preserved"
+      (let [curry-monad+ (m/curry monad+)]
+        (t/is (= (maybe/just 6)
+                 ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
+
     (t/testing "It can lift a function to a Monad Transformer"
       (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
