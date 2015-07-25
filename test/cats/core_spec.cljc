@@ -109,8 +109,8 @@
       (t/is (= (maybe/nothing)
                (monad+ (maybe/just 1) (maybe/nothing)))))
 
-    (t/testing "The original forms metadata is preserved"
-      (let [curry-monad+ (m/curry monad+)]
+    (t/testing "Currying and lifting can be combined"
+      (let [curry-monad+ (m/curry-lift-m 2 add2)]
         (t/is (= (maybe/just 6)
                  ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
 

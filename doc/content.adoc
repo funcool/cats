@@ -1006,14 +1006,15 @@ variadic:
 ;; => nil
 ----
 
-Note that you can combine both `curry` and `lift-m` to get curried functions that work on monadic types:
+Note that you can combine both `curry` and `lift-m` to get curried functions that work on monadic types using
+the `curry-lift-m` macro. The arity is mandatory when using this macro:
 
 [source, clojure]
 ----
 (require '[cats.core :as m])
 (require '[cats.monad.maybe :refer [just nothing]])
 
-(def curried-add-m (m/curry 3 (m/lift-m 3 +)))
+(def curried-add-m (m/curry-lift-m 3 +))
 
 (curried-add-m (just 1) (just 2) (just 3))
 ;; => #<Just 6>
@@ -1024,6 +1025,8 @@ Note that you can combine both `curry` and `lift-m` to get curried functions tha
 ((curried-add-m (just 1) (just 2)) (just 3))
 ;; => #<Just 6>
 ----
+
+
 
 == FAQ
 
