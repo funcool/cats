@@ -45,6 +45,26 @@
                (assert (= x 3))
                (m/return x))))))
 
+(t/deftest alet-tests
+  (t/testing "It works with just one applicative binding"
+    (t/is (= (maybe/just 3)
+             (m/alet [x (maybe/just 2)]
+                     (inc x)))))
+
+  (t/testing "It works with no dependencies between applicative values"
+    (t/is (= (maybe/just 3)
+             (m/alet [x (maybe/just 1)
+                      y (maybe/just 2)]
+                     (add2 x y)))))
+
+  #_(t/testing "It works with one level of dependencies between applicative values"
+    (t/is (= (maybe/just [42])
+             (m/alet [x (maybe/just 21)
+                      y (maybe/just 2)
+                      z (maybe/just (* x y))]
+                     (vector z)))))
+)
+
 (t/deftest sequence-tests
   (t/testing "It works with vectors"
     (t/is (= (m/sequence [[1 2] [3 4]])
