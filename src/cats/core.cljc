@@ -360,6 +360,7 @@
 
 #?(:clj
    (defmacro curry-lift-m
+     "Is a composition of curry and lift-m macros."
      [n f]
      `(curry ~n (lift-m ~n ~f))))
 
