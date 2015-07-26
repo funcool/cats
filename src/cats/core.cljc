@@ -40,19 +40,19 @@
 
 #?(:clj
    (defmacro with-monad
-    "Set current context to specific monad."
-    [ctx & body]
-    `(cond
-       (satisfies? p/MonadTrans ~ctx)
-       (binding [*context* ~ctx]
-         ~@body)
+     "Set current context to specific monad."
+     [ctx & body]
+     `(cond
+        (satisfies? p/MonadTrans ~ctx)
+        (binding [*context* ~ctx]
+          ~@body)
 
-       (satisfies? p/MonadTrans *context*)
-       (do ~@body)
+        (satisfies? p/MonadTrans *context*)
+        (do ~@body)
 
-       :else
-       (binding [*context* ~ctx]
-         ~@body))))
+        :else
+        (binding [*context* ~ctx]
+          ~@body))))
 
 (defn ^{:no-doc true}
   get-current-context
