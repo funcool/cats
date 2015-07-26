@@ -212,41 +212,41 @@
 
 #?(:clj
    (defmacro mlet
-    "Monad composition macro that works like clojure
-    let. This allows much easy composition of monadic
-    computations.
+     "Monad composition macro that works like clojure
+     let. This allows much easy composition of monadic
+     computations.
 
-    Let see one example for understand how it works, this is
-    a code using bind for compose few number of operations:
+     Let see one example for understand how it works, this is
+     a code using bind for compose few number of operations:
 
-        (bind (just 1)
-              (fn [a]
-                (bind (just (inc a))
-                        (fn [b]
-                          (return (* b 2))))))
-        ;=> #<Just [4]>
+         (bind (just 1)
+               (fn [a]
+                 (bind (just (inc a))
+                         (fn [b]
+                           (return (* b 2))))))
+         ;=> #<Just [4]>
 
-    Now see how this code can be more clear if you
-    are using mlet macro for do it:
+     Now see how this code can be more clear if you
+     are using mlet macro for do it:
 
-        (mlet [a (just 1)
-               b (just (inc a))]
-          (return (* b 2)))
-        ;=> #<Just [4]>
-    "
-    [bindings & body]
-    (when-not (and (vector? bindings)
-                   (not-empty bindings)
-                   (even? (count bindings)))
-      (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-    (->> (reverse (partition 2 bindings))
-         (reduce (fn [acc [l r]]
-                   (case l
-                     :let  `(let ~r ~acc)
-                     :when `(bind (guard ~r)
-                                  (fn [~(gensym)] ~acc))
-                     `(bind ~r (fn [~l] ~acc))))
-                 `(do ~@body)))))
+         (mlet [a (just 1)
+                b (just (inc a))]
+           (return (* b 2)))
+         ;=> #<Just [4]>
+     "
+     [bindings & body]
+     (when-not (and (vector? bindings)
+                    (not-empty bindings)
+                    (even? (count bindings)))
+       (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
+     (->> (reverse (partition 2 bindings))
+          (reduce (fn [acc [l r]]
+                    (case l
+                      :let  `(let ~r ~acc)
+                      :when `(bind (guard ~r)
+                                   (fn [~(gensym)] ~acc))
+                      `(bind ~r (fn [~l] ~acc))))
+                  `(do ~@body)))))
 
 (defn- arglists
   [var]
