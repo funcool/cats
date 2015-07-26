@@ -878,6 +878,156 @@ that build higher-level abstractions on top of what cats offers.
 * Concurrent data fetching: https://github.com/kachayev/muse
 
 
+== Higher-order functions
+
+=== curry
+
+The first combinator that _cats_ provides is a `curry` macro. Given a function, it can convert it to a curried
+versions of itself. The generated function will accept parameters until all the expected parameters are given.
+Let's see some examples of a curried function in action:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+
+(defn add [a b c]
+  (+ a b c))
+
+(def curried-add (m/curry add))
+
+(= curried-add (curried-add))
+;; => true
+
+(= (curried-add 1 2 3) 6)
+;; => true
+
+(= ((curried-add 1) 2 3) 6)
+;; => true
+
+(= ((curried-add 1 2) 3) 6)
+;; => true
+----
+
+As you can see above, since the original `add` has a single arity (3) and is fixed (i.e. it doesn't accept a variable
+number of arguments), the `curry` macro was able to generate a curried function with the correct number of parameters.
+
+This doesn't mean that functions with multiple arities or variadic arguments can't be curried but an arity for the
+curried function must be given:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+
+(def curried+ (m/curry 3 +))
+
+(= curried+ (curried+))
+;; => true
+
+(= (curried+ 1 2 3) 6)
+;; => true
+
+(= ((curried+ 1) 2 3) 6)
+;; => true
+
+(= ((curried+ 1 2) 3) 6)
+;; => true
+----
+
+Curried functions are very useful in combination with the applicative's `fapply` operation, since we can curry
+a function and use applicatives for building up results with context-specific effects.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :refer [just nothing]])
+
+(def curried+ (m/curry 3 +))
+
+(m/fapply (just curried+) (just 1) (just 2) (just 3))
+;; => #<Just 6>
+
+(m/fapply (just curried+) (just 1) (just 2) (nothing))
+;; => #<Nothing >
+
+(m/fapply (just curried+) (just 1) nil (just 3))
+;; => nil
+
+(m/fapply (m/fmap curried+ (just 1)) (just 2) (just 3))
+;; => #<Just 6>
+
+(m/<*> (m/<$> curried+ (just 1)) (just 2) (just 3))
+;; => #<Just 6>
+----
+
+
+=== lift-m
+
+The `lift-m` macro is a combinator for promoting functions that work on regular values to work on monadic values
+instead. It uses the monad's bind operation under the hood and, like `curry`, can be used without specifying arity
+if the function we are lifting has a fixed and a single arity:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :refer [just nothing]])
+
+(defn add [a b c]
+  (+ a b c))
+
+(def add-m (m/lift-m add))
+
+(add-m (just 1) (just 2) (just 3))
+;; => #<Just 6>
+
+(add-m (just 1) (nothing) (just 3))
+; => #<Nothing >
+
+(add-m (just 1) nil (just 3))
+;; => nil
+----
+
+Like with `curry`, we must provide an arity in case we are lifting a function that has multiple arities or is
+variadic:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :refer [just nothing]])
+
+(def add-m (m/lift-m 3 +))
+
+(add-m (just 1) (just 2) (just 3))
+;; => #<Just 6>
+
+(add-m (just 1) (nothing) (just 3))
+; => #<Nothing >
+
+(add-m (just 1) nil (just 3))
+;; => nil
+----
+
+Note that you can combine both `curry` and `lift-m` to get curried functions that work on monadic types using
+the `curry-lift-m` macro. The arity is mandatory when using this macro:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.monad.maybe :refer [just nothing]])
+
+(def curried-add-m (m/curry-lift-m 3 +))
+
+(curried-add-m (just 1) (just 2) (just 3))
+;; => #<Just 6>
+
+((curried-add-m (just 1)) (just 2) (just 3))
+;; => #<Just 6>
+
+((curried-add-m (just 1) (just 2)) (just 3))
+;; => #<Just 6>
+----
+
+
+
 == FAQ
 
 === What Clojure types implement some of the Category Theory abstractions?

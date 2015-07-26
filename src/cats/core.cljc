@@ -40,19 +40,19 @@
 
 #?(:clj
    (defmacro with-monad
-    "Set current context to specific monad."
-    [ctx & body]
-    `(cond
-       (satisfies? p/MonadTrans ~ctx)
-       (binding [*context* ~ctx]
-         ~@body)
+     "Set current context to specific monad."
+     [ctx & body]
+     `(cond
+        (satisfies? p/MonadTrans ~ctx)
+        (binding [*context* ~ctx]
+          ~@body)
 
-       (satisfies? p/MonadTrans *context*)
-       (do ~@body)
+        (satisfies? p/MonadTrans *context*)
+        (do ~@body)
 
-       :else
-       (binding [*context* ~ctx]
-         ~@body))))
+        :else
+        (binding [*context* ~ctx]
+          ~@body))))
 
 (defn ^{:no-doc true}
   get-current-context
@@ -212,65 +212,157 @@
 
 #?(:clj
    (defmacro mlet
-    "Monad composition macro that works like clojure
-    let. This allows much easy composition of monadic
-    computations.
+     "Monad composition macro that works like clojure
+     let. This allows much easy composition of monadic
+     computations.
 
-    Let see one example for understand how it works, this is
-    a code using bind for compose few number of operations:
+     Let see one example for understand how it works, this is
+     a code using bind for compose few number of operations:
 
-        (bind (just 1)
-              (fn [a]
-                (bind (just (inc a))
-                        (fn [b]
-                          (return (* b 2))))))
-        ;=> #<Just [4]>
+         (bind (just 1)
+               (fn [a]
+                 (bind (just (inc a))
+                         (fn [b]
+                           (return (* b 2))))))
+         ;=> #<Just [4]>
 
-    Now see how this code can be more clear if you
-    are using mlet macro for do it:
+     Now see how this code can be more clear if you
+     are using mlet macro for do it:
 
-        (mlet [a (just 1)
-               b (just (inc a))]
-          (return (* b 2)))
-        ;=> #<Just [4]>
-    "
-    [bindings & body]
-    (when-not (and (vector? bindings)
-                   (not-empty bindings)
-                   (even? (count bindings)))
-      (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-    (->> (reverse (partition 2 bindings))
-         (reduce (fn [acc [l r]]
-                   (case l
-                     :let  `(let ~r ~acc)
-                     :when `(bind (guard ~r)
-                                  (fn [~(gensym)] ~acc))
-                     `(bind ~r (fn [~l] ~acc))))
-                 `(do ~@body)))))
+         (mlet [a (just 1)
+                b (just (inc a))]
+           (return (* b 2)))
+         ;=> #<Just [4]>
+     "
+     [bindings & body]
+     (when-not (and (vector? bindings)
+                    (not-empty bindings)
+                    (even? (count bindings)))
+       (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
+     (->> (reverse (partition 2 bindings))
+          (reduce (fn [acc [l r]]
+                    (case l
+                      :let  `(let ~r ~acc)
+                      :when `(bind (guard ~r)
+                                   (fn [~(gensym)] ~acc))
+                      `(bind ~r (fn [~l] ~acc))))
+                  `(do ~@body)))))
+
+(defn- arglists
+  [var]
+  (get (meta var) :arglists))
+
+(defn- single-arity?
+  [var]
+  (let [args (arglists var)]
+    (and (= (count args) 1)
+         (not (some #{'&} (first args))))))
+
+(defn- arity
+  [var]
+  {:pre [(single-arity? var)]}
+  (count (first (arglists var))))
+
+#?(:clj
+   (defmacro curry*
+     [args body]
+     (let [argcount (count args)]
+       (cond
+         (= argcount 0) `(fn f# [] ~body)
+         (= argcount 1) `(fn f#
+                           ([] f#)
+                           ([~@args] ~body))
+         :else
+         (let [arities (for [n (range 1 (count args))]
+                         `([~@(take n args)] (curry* ~(drop n args) ~body)))]
+           `(fn f#
+              ([] f#)
+              ~@arities
+              ([~@args] ~body)))))))
+
+#?(:clj
+   (defmacro curry
+     "Given either a fixed arity function or an arity and a function
+     yields another which is curried.
+
+     With inferred arity (function must have one fixed arity)
+
+         (defn add2 [x y] (+ x y))
+         (def cadd2 (curry add2))
+
+         ((cadd2 1) 3)
+         ;; => 4
+
+         (cadd2 1 3)
+         ;; => 4
+
+     With fixed arity:
+
+         (def c+ (curry 3 +))
+
+         ((c+ 1 2) 3)
+         ;; => 6
+
+         ((((c+) 1) 2) 3)
+         ;; => 6
+     "
+    ([f]
+     (if (not (symbol? f))
+       (throw (IllegalArgumentException. "You must provide an arity for currying anonymous functions"))
+       (let [fvar (resolve f)]
+         (if-let [args (arglists fvar)]
+           (if (single-arity? fvar)
+             `(curry ~(arity fvar) ~f)
+             (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for currying.")))
+           (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for currying."))))))
+    ([n f]
+     {:pre [(or (< n 21)
+                (throw (IllegalArgumentException. "Clojure doesn't allow more than 20 positional arguments")))]}
+     (let [args (repeatedly n gensym)
+           body `(~f ~@args)]
+       `(curry* ~args ~body)))))
 
 #?(:clj
    (defmacro lift-m
-    "Lifts a function with the given fixed number of arguments to a
-    monadic context.
+     "Lifts a function with the given fixed number of arguments to a
+     monadic context.
 
-        (def monad+ (lift-m 2 +))
+         (def monad+ (lift-m 2 +))
 
-        (monad+ (maybe/just 1) (maybe/just 2))
-        ;; => <Just [3]>
+         (monad+ (maybe/just 1) (maybe/just 2))
+         ;; => <Just [3]>
 
-        (monad+ (maybe/just 1) (maybe/nothing))
-        ;; => <Nothing>
+         (monad+ (maybe/just 1) (maybe/nothing))
+         ;; => <Nothing>
 
-        (monad+ [0 2 4] [1 2])
-        ;; => [1 2 3 4 5 6]
-    "
-    [n f]
-    (let [val-syms (repeatedly n gensym)
-          mval-syms (repeatedly n gensym)
-          mlet-bindings (interleave val-syms mval-syms)]
-      `(fn [~@mval-syms]
-         (mlet [~@mlet-bindings]
-           (return (~f ~@val-syms)))))))
+         (monad+ [0 2 4] [1 2])
+         ;; => [1 2 3 4 5 6]
+     "
+     ([f]
+     (if (not (symbol? f))
+       (throw (IllegalArgumentException.
+               "You must provide an arity for lifting anonymous functions"))
+       (let [fvar (resolve f)]
+         (if-let [args (arglists fvar)]
+           (if (single-arity? fvar)
+             `(lift-m ~(arity fvar) ~f)
+             (throw (IllegalArgumentException.
+                     "The given function is either variadic or has multiple arities, provide an arity for lifting.")))
+           (throw (IllegalArgumentException.
+                   "The given function doesn't have arity metadata, provide an arity for lifting."))))))
+    ([n f]
+     (let [val-syms (repeatedly n gensym)
+           mval-syms (repeatedly n gensym)
+           mlet-bindings (interleave val-syms mval-syms)]
+       `(fn [~@mval-syms]
+          (mlet [~@mlet-bindings]
+            (return (~f ~@val-syms))))))))
+
+#?(:clj
+   (defmacro curry-lift-m
+     "Is a composition of curry and lift-m macros."
+     [n f]
+     `(curry ~n (lift-m ~n ~f))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sequences.
