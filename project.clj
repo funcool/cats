@@ -7,24 +7,8 @@
                  [org.clojure/clojurescript "0.0-3308" :scope "provided"]]
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
-
   :source-paths ["src"]
   :test-paths ["test"]
-
-  :cljsbuild {:test-commands {"test" ["node" "output/tests.js"]}
-              :builds [{:id "test"
-                        :source-paths ["src" "test"]
-                        :notify-command ["node" "output/tests.js"]
-                        :compiler {:output-to "output/tests.js"
-                                   :output-dir "output"
-                                   :source-map true
-                                   :static-fns true
-                                   :cache-analysis false
-                                   :main cats.runner
-                                   :optimizations :none
-                                   :target :nodejs
-                                   :pretty-print true}}]}
-
   :jar-exclusions [#"\.swp|\.swo"]
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]]
                    :codeina {:sources ["src"]
@@ -32,8 +16,7 @@
                              :target "doc/dist/latest/api"
                              :src-uri "http://github.com/funcool/cats/blob/master/"
                              :src-uri-prefix "#L"}
-                   :plugins [[funcool/codeina "0.2.0"]
-                             [lein-cljsbuild "1.0.6"]]}
+                   :plugins [[funcool/codeina "0.2.0"]]}
              :bench [:dev {:dependencies [[criterium "0.4.3"]]
                            :main ^:skip-aot benchmarks
                            :jvm-opts ^:replace []
