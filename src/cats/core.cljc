@@ -324,29 +324,32 @@
 
 #?(:clj
    (defmacro lift-m
-    "Lifts a function with the given fixed number of arguments to a
-    monadic context.
+     "Lifts a function with the given fixed number of arguments to a
+     monadic context.
 
-        (def monad+ (lift-m 2 +))
+         (def monad+ (lift-m 2 +))
 
-        (monad+ (maybe/just 1) (maybe/just 2))
-        ;; => <Just [3]>
+         (monad+ (maybe/just 1) (maybe/just 2))
+         ;; => <Just [3]>
 
-        (monad+ (maybe/just 1) (maybe/nothing))
-        ;; => <Nothing>
+         (monad+ (maybe/just 1) (maybe/nothing))
+         ;; => <Nothing>
 
-        (monad+ [0 2 4] [1 2])
-        ;; => [1 2 3 4 5 6]
-    "
-    ([f]
+         (monad+ [0 2 4] [1 2])
+         ;; => [1 2 3 4 5 6]
+     "
+     ([f]
      (if (not (symbol? f))
-       (throw (IllegalArgumentException. "You must provide an arity for lifting anonymous functions"))
+       (throw (IllegalArgumentException.
+               "You must provide an arity for lifting anonymous functions"))
        (let [fvar (resolve f)]
          (if-let [args (arglists fvar)]
            (if (single-arity? fvar)
              `(lift-m ~(arity fvar) ~f)
-             (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for lifting.")))
-           (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for lifting."))))))
+             (throw (IllegalArgumentException.
+                     "The given function is either variadic or has multiple arities, provide an arity for lifting.")))
+           (throw (IllegalArgumentException.
+                   "The given function doesn't have arity metadata, provide an arity for lifting."))))))
     ([n f]
      (let [val-syms (repeatedly n gensym)
            mval-syms (repeatedly n gensym)
