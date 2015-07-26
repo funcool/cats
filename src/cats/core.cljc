@@ -282,30 +282,30 @@
 
 #?(:clj
    (defmacro curry
-    "Given either a fixed arity function or an arity and a function
-    yields another which is curried.
+     "Given either a fixed arity function or an arity and a function
+     yields another which is curried.
 
-    ;; Inferred arity (function must have one fixed arity)
+     With inferred arity (function must have one fixed arity)
 
-    (defn add2 [x y] (+ x y))
-    (def cadd2 (curry add2))
+         (defn add2 [x y] (+ x y))
+         (def cadd2 (curry add2))
 
-    ((cadd2 1) 3)
-    ;; => 4
+         ((cadd2 1) 3)
+         ;; => 4
 
-    (cadd2 1 3)
-    ;; => 4
+         (cadd2 1 3)
+         ;; => 4
 
-    ;; Fixed arity
+     With fixed arity:
 
-    (def c+ (curry 3 +))
+         (def c+ (curry 3 +))
 
-    ((c+ 1 2) 3)
-    ;; => 6
+         ((c+ 1 2) 3)
+         ;; => 6
 
-    ((((c+) 1) 2) 3)
-    ;; => 6
-    "
+         ((((c+) 1) 2) 3)
+         ;; => 6
+     "
     ([f]
      (if (not (symbol? f))
        (throw (IllegalArgumentException. "You must provide an arity for currying anonymous functions"))
