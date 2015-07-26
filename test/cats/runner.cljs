@@ -11,7 +11,6 @@
             [cats.monad.reader-spec]
             [cats.monad.writer-spec]))
 
-
 (enable-console-print!)
 
 (defn main
@@ -26,5 +25,11 @@
                   'cats.monad.identity-spec
                   'cats.monad.reader-spec
                   'cats.monad.writer-spec))
+
+(defmethod test/report [:cljs.test/default :end-run-tests]
+  [m]
+  (if (test/successful? m)
+    (set! (.-exitCode js/process) 0)
+    (set! (.-exitCode js/process) 1)))
 
 (set! *main-cli-fn* main)

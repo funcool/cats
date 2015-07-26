@@ -9,10 +9,12 @@ pom.xml.asc
 /.nrepl-port
 /*-init.clj
 /doc/dist/
-/output
+/out
 /repl
+/tests.js
 /node_modules
 \#*\#
 *~
 .\#*
 /.nrepl-history
+/nashorn_code_cache
