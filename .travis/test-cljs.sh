@@ -1,3 +1,3 @@
 #!/bin/sh
-
-lein2 cljsbuild test
+./scripts/build
+node tests.js
