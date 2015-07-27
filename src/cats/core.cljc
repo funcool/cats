@@ -515,3 +515,15 @@
   (p/extract v))
 
 (def <> mappend)
+
+(defn foldr
+  "Perform a right-associative fold on the data structure."
+  [f z xs]
+  (let [ctx (get-current-context xs)]
+    (p/foldr ctx f z xs)))
+
+(defn foldl
+  "Perform a right-associative fold on the data structure."
+  [f z xs]
+  (let [ctx (get-current-context xs)]
+    (p/foldl ctx f z xs)))
