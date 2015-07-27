@@ -98,30 +98,33 @@
                            [(maybe/just 1) (maybe/just 2)]))))))))
 
 (t/deftest fixed-arity-lift-m-tests
-  (let [monad+ (m/lift-m add2)]
-    (t/testing "It can lift a function to the vector monad"
-      (t/is (= [1 2 3 4 5 6]
-               (monad+ [0 2 4] [1 2]))))
+  #?(:clj
+     (let [monad+ (m/lift-m add2)]
+       (t/testing "It can lift a function to the vector monad"
+         (t/is (= [1 2 3 4 5 6]
+                  (monad+ [0 2 4] [1 2]))))))
 
-    (t/testing "It can lift a function to the Maybe monad"
+  (t/testing "It can lift a function to the Maybe monad"
+    (let [monad+ (m/lift-m 2 add2)]
       (t/is (= (maybe/just 6)
                (monad+ (maybe/just 2) (maybe/just 4))))
       (t/is (= (maybe/nothing)
-               (monad+ (maybe/just 1) (maybe/nothing)))))
+               (monad+ (maybe/just 1) (maybe/nothing))))))
 
-    (t/testing "Currying and lifting can be combined"
-      (let [curry-monad+ (m/curry-lift-m 2 add2)]
-        (t/is (= (maybe/just 6)
-                 ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
+  (t/testing "Currying and lifting can be combined"
+    (let [curry-monad+ (m/curry-lift-m 2 add2)]
+      (t/is (= (maybe/just 6)
+               ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
 
     (t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)]
+      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)
+            monad+ (m/lift-m 2 add2)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
                   (maybe/just 3) (maybe/just 4)
                   (maybe/just 5) (maybe/just 6)]
                  (m/with-monad maybe-sequence-monad
                    (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
-                           [(maybe/just 1) (maybe/just 2)]))))))))
+                           [(maybe/just 1) (maybe/just 2)])))))))
 
 (t/deftest filter-tests
   (t/testing "It can filter Maybe monadic values"
@@ -144,14 +147,15 @@
              (m/when false [])))))
 
 (t/deftest curry-tests
-  (t/testing "It can curry single and fixed arity functions automatically"
-    (let [cadd2 (m/curry add2)]
-      (t/is (= ((cadd2 1) 2)
-               3))
-      (t/is (= (cadd2)
-               cadd2))
-      (t/is (= (cadd2 1 2)
-               3))))
+  #?(:clj
+     (t/testing "It can curry single and fixed arity functions automatically"
+       (let [cadd2 (m/curry add2)]
+         (t/is (= ((cadd2 1) 2)
+                  3))
+         (t/is (= (cadd2)
+                  cadd2))
+         (t/is (= (cadd2 1 2)
+                  3)))))
 
   (t/testing "It can curry anonymous functions when providing an arity"
     (let [csum (m/curry 3 (fn [x y z] (+ x y z)))]
