@@ -1,3 +1,3 @@
 #!/bin/sh
 ./scripts/build
-node tests.js
+node out/tests.js
