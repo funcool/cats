@@ -1,18 +1,10 @@
 (ns cats.builtin-spec
-  #?(:cljs
-     (:require [cljs.test :as t]
-               [cats.builtin :as b]
-               [cats.protocols :as p]
-               [cats.monad.maybe :as maybe]
-               [cats.core :as m :include-macros true])
-
-     :clj
-
-     (:require [clojure.test :as t]
-               [cats.builtin :as b]
-               [cats.protocols :as p]
-               [cats.monad.maybe :as maybe]
-               [cats.core :as m])))
+  (:require [cljs.test :as t]
+            [cats.builtin :as b]
+            [cats.protocols :as p]
+            [cats.monad.maybe :as maybe]
+            #?(:cljs [cats.core :as m :include-macros true]
+               :clj [cats.core :as m])))
 
 (t/deftest test-nil-as-maybe
   (t/testing "Nil works like nothing (for avoid unnecesary null pointers)."
@@ -117,3 +109,34 @@
                     (fn [x]
                       (m/>>= #{(inc x)}
                              (fn [y] #{(inc y)}))))))))
+
+
+(t/deftest vector-foldable
+  (t/testing "Foldl"
+    (t/is (= [2 3 4] (m/foldl #(conj %1 (inc %2)) [] [1 2 3])))
+    (t/is (= 6 (m/foldl + 0 [1 2 3]))))
+
+  (t/testing "Foldr"
+    (t/is (= [2 3 4] (m/foldr #(cons (inc %1) %2) [] [1 2 3])))
+    (t/is (= 6 (m/foldr + 0 [1 2 3])))))
+
+(t/deftest lazyseq-foldable
+  (letfn [(foldl-fn [state acc x]
+            (swap! state inc)
+            (conj acc (inc x)))
+          (foldr-fn [state x acc]
+            (swap! state inc)
+            (cons (inc x) acc))]
+    (t/testing "Foldl"
+      (let [state (atom 0)
+            result (m/foldl (partial foldl-fn state) [] (map identity [1 2 3 4]))]
+        (t/is (= @state 0))
+        (t/is (= 2 (first result)))
+        (t/is (= @state 4))))
+    (t/testing "Foldr"
+      (let [state (atom 0)
+            result (m/foldr (partial foldr-fn state) '() (map identity [1 2 3 4]))]
+        (t/is (= @state 0))
+        (t/is (= 2 (first result)))
+        (t/is (= @state 1))))
+))
