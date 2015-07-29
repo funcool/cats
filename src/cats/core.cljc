@@ -126,16 +126,8 @@
   that add a beautiful, let like syntax for
   compose operations with `bind` function."
   [mv f]
-  (cond
-    (satisfies? p/MonadTrans *context*)
-    (p/mbind *context* mv f)
-
-    (nil? *context*)
-    (with-monad (p/get-context mv)
-      (p/mbind *context* mv f))
-
-    :else
-    (let [ctx (get-current-context mv)]
+  (let [ctx (get-current-context mv)]
+    (with-monad ctx
       (p/mbind ctx mv f))))
 
 (defn mzero
