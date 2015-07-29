@@ -1,8 +1,11 @@
 (ns cats.builtin-spec
-  (:require [cljs.test :as t]
-            [cats.builtin :as b]
+  (:require [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
+
+            #?(:cljs [cljs.test :as t]
+               :clj [clojure.test :as t])
+
             #?(:cljs [cats.core :as m :include-macros true]
                :clj [cats.core :as m])))
 
