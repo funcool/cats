@@ -132,8 +132,7 @@
 
 (defn mzero
   ([]
-   (let [ctx (get-current-context)]
-     (p/mzero ctx)))
+   (p/mzero (get-current-context)))
   ([ctx]
    (p/mzero ctx)))
 
