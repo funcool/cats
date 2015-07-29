@@ -5,6 +5,7 @@
 TEST_NAMESPACES=(
     cats.core-spec
     cats.builtin-spec
+    cats.applicative.validation-spec
     cats.monad.exception-spec
     cats.monad.either-spec
     cats.monad.maybe-spec

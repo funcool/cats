@@ -3,6 +3,7 @@
             [cljs.test :as test]
             [cats.core-spec]
             [cats.builtin-spec]
+            [cats.applicative.validation]
             [cats.monad.exception-spec]
             [cats.monad.either-spec]
             [cats.monad.maybe-spec]
@@ -15,6 +16,7 @@
   (test/run-tests (test/empty-env)
                   'cats.core-spec
                   'cats.builtin-spec
+                  'cats.applicative.validation
                   'cats.monad.exception-spec
                   'cats.monad.either-spec
                   'cats.monad.maybe-spec
