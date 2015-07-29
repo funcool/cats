@@ -510,11 +510,11 @@
 (defn foldr
   "Perform a right-associative fold on the data structure."
   [f z xs]
-  (let [ctx (get-current-context xs)]
-    (p/foldr ctx f z xs)))
+  (-> (p/get-context xs)
+      (p/foldr f z xs)))
 
 (defn foldl
   "Perform a right-associative fold on the data structure."
   [f z xs]
-  (let [ctx (get-current-context xs)]
-    (p/foldl ctx f z xs)))
+  (-> (p/get-context xs)
+      (p/foldl f z xs)))
