@@ -73,3 +73,16 @@
 
     (t/is (= (validation/ok 42) (validation/either->validation right1)))
     (t/is (= (validation/fail 42) (validation/either->validation left1)))))
+
+(t/deftest foldable-test
+  (t/testing "Foldl"
+    (t/is (= (validation/ok 2)
+             (m/foldl #(m/pure (+ %1 %2)) 1 (validation/ok 1))))
+    (t/is (= 1
+             (m/foldl #(m/pure (+ %1 %2)) 1 (validation/fail)))))
+
+  (t/testing "Foldr"
+    (t/is (= (validation/ok 2)
+             (m/foldr #(m/pure (+ %1 %2)) 1 (validation/ok 1))))
+    (t/is (= 1
+             (m/foldr #(m/pure (+ %1 %2)) 1 (validation/fail))))))
