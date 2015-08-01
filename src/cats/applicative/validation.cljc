@@ -25,9 +25,8 @@
 
 (ns cats.applicative.validation
   "The Validation applicative implementation and helper functions
-  for validating values. Isomorphic to Either.
-  "
-  (:require [cats.protocols :as proto]
+  for validating values. Isomorphic to Either."
+  (:require [cats.protocols :as p]
             [cats.core :as m]
             [cats.monad.either :as either]))
 
@@ -38,10 +37,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Ok [v]
-  proto/Context
+  p/Context
   (get-context [_] validation-applicative)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -59,17 +58,17 @@
          (with-out-str (print [v])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Ok other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Ok other)
+           (= v (.-v other))
+           false))]))
 
 (deftype Fail [v]
-  proto/Context
+  p/Context
   (get-context [_] validation-applicative)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -87,11 +86,11 @@
          (with-out-str (print [v])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Fail other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Fail other)
+           (= v (.-v other))
+           false))]))
 
 (alter-meta! #'->Ok assoc :private true)
 (alter-meta! #'->Fail assoc :private true)
@@ -100,7 +99,6 @@
   "An Ok type constructor."
   [v]
   (Ok. v))
-
 
 (defn fail
   "A Fail type constructor."
@@ -125,8 +123,8 @@
   "Return true in case of `v` is instance
   of the Validation applicative."
   [v]
-  (if (satisfies? proto/Context v)
-    (identical? (proto/get-context v) validation-applicative)
+  (if (satisfies? p/Context v)
+    (identical? (p/get-context v) validation-applicative)
     false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -136,7 +134,7 @@
 (def ^{:no-doc true}
   validation-applicative
   (reify
-    proto/Semigroup
+    p/Semigroup
     (mappend [_ sv sv']
       (cond
         (and (fail? sv) (fail? sv')) (fail (m/mappend (m/extract sv)
@@ -144,28 +142,28 @@
         (ok? sv) sv
         :else sv'))
 
-    proto/Monoid
+    p/Monoid
     (mempty [_]
       (fail))
 
-    proto/Functor
+    p/Functor
     (fmap [_ f s]
       (if (ok? s)
         (ok (f (.-v s)))
         s))
 
-    proto/Foldable
+    p/Foldable
     (foldl [_ f z mv]
       (if (ok? mv)
-        (f z (proto/extract mv))
+        (f z (p/extract mv))
         z))
 
     (foldr [_ f z mv]
       (if (ok? mv)
-        (f (proto/extract mv) z)
+        (f (p/extract mv) z)
         z))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       (ok v))
 
