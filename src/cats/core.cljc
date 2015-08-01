@@ -108,7 +108,7 @@
 
   Example:
 
-      (with-monad either/either-monad
+      (with-context either/either-monad
         (pure 1)
       ;; => #<Right [1]>
   "
@@ -134,7 +134,7 @@
   compose operations with `bind` function."
   [mv f]
   (let [ctx (get-current-context mv)]
-    (with-monad ctx
+    (with-context ctx
       (p/mbind ctx mv f))))
 
 (defn mzero
@@ -379,7 +379,7 @@
   [mvs]
   {:pre [(not-empty mvs)]}
   (let [ctx (get-current-context (first mvs))]
-    (with-monad ctx
+    (with-context ctx
       (reduce (fn [mvs mv]
                 (mlet [v mv
                        vs mvs]
@@ -444,7 +444,7 @@
       ;=> <Nothing>
   "
   [p mv]
-  (with-monad (get-current-context mv)
+  (with-context (get-current-context mv)
     (mlet [v mv
            :when (p v)]
           (return v))))
@@ -492,7 +492,7 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (with-monad (get-current-context mf)
+  (with-context (get-current-context mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
@@ -501,7 +501,7 @@
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (with-monad (get-current-context mf)
+  (with-context (get-current-context mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
