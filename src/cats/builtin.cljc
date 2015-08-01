@@ -80,7 +80,24 @@
 
     proto/MonadPlus
     (mplus [_ mv mv']
-      (concat mv mv'))))
+      (concat mv mv'))
+
+    proto/Foldable
+    (foldr [ctx f z xs]
+      (lazy-seq
+       (let [x (first xs)
+             xs (rest xs)]
+         (if (nil? x)
+           z
+           (f x (proto/foldr ctx f z xs))))))
+
+    (foldl [ctx f z xs]
+      (lazy-seq
+       (let [x (first xs)
+             xs (rest xs)]
+         (if (nil? x)
+           z
+           (proto/foldl ctx f (f z x) xs)))))))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
@@ -127,7 +144,22 @@
 
     proto/MonadPlus
     (mplus [_ mv mv']
-      (into mv mv'))))
+      (into mv mv'))
+
+    proto/Foldable
+    (foldr [ctx f z xs]
+      (let [x (first xs)
+            xs (rest xs)]
+        (if (nil? x)
+          z
+          (f x (proto/foldr ctx f z xs)))))
+
+    (foldl [ctx f z xs]
+      (let [x (first xs)
+            xs (rest xs)]
+        (if (nil? x)
+          z
+          (proto/foldl ctx f (f z x) xs))))))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)

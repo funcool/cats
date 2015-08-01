@@ -124,3 +124,16 @@
         r (either/right "oh no")]
     (t/is (= r (either/invert l)))
     (t/is (= l (either/invert r)))))
+
+(t/deftest foldable-test
+  (t/testing "Foldl"
+    (t/is (= (either/right 2)
+             (m/foldl #(m/return (+ %1 %2)) 1 (either/right 1))))
+    (t/is (= 1
+             (m/foldl #(m/return (+ %1 %2)) 1 (either/left 5)))))
+
+  (t/testing "Foldr"
+    (t/is (= (either/right 2)
+             (m/foldr #(m/return (+ %1 %2)) 1 (either/right 1))))
+    (t/is (= 1
+             (m/foldr #(m/return (+ %1 %2)) 1 (either/left 5))))))

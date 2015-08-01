@@ -285,6 +285,92 @@ If you do not understand the purpose of the *pure* function, the next section
 should clarify its purpose.
 
 
+=== Foldable
+
+The *Foldable* is a generic abstraction for data structures that can be folded. It consists
+mainly on two functions: `foldl` and `foldr`. `foldl` is also known as `reduce` or `inject`
+in other mainstream programming languages.
+
+
+Both function have an identical signature and differ in how they traverse the data structure.
+Let's look at a little example using `foldl`:
+
+[source, clojure]
+----
+(foldl (fn [acc v] (+ acc v)) 0 [1 2 3 4 5])
+;; => 15
+----
+
+You can observe that `foldl` is identical to the clojure `reduce` function:
+
+[source, clojure]
+----
+(reduce (fn [acc v] (+ acc v)) 0 [1 2 3 4 5])
+;; => 15
+----
+
+And the same operation can be done using `foldr`:
+
+[source, clojure]
+----
+(foldr (fn [v wc] (+ v wc)) 0 [1 2 3 4 5])
+;; => 15
+----
+
+The main difference between `foldl` and `reduce` is that `foldl` has a fixed arity so all
+parameters are mandatory and `foldl` is a generic abstraction that can work with other
+types apart from collections.
+
+As we said previously, the `foldl` and `foldr` differ mainly on how they traverse the
+data structure. Then, for understanding better how they work internally, let's see a
+graphical representation of the `foldl` execution model:
+
+[source, text]
+----
+((((acc⊕1)⊕2)⊕3)⊕4)⊕5
+----
+
+In contrast to the `foldr` internal execution model:
+
+[source, text]
+----
+1⊕(2⊕(3⊕(4⊕(5⊕(wc)))))
+----
+
+In languages with strict argument evaluation, `foldr` does not have many
+applications because when the data structure to fold grows it tends to consume all the
+stack (causing the well known stack overflow). In case of Clojure, the unique obvious
+case of using foldr is for small datastructures or lazy sequences.
+
+[source, clojure]
+----
+(m/foldr #(cons (inc %1) %2) '() (into [] (range 100000)))
+;; => StackOverflowError
+
+;; The same operation but using lazyseqs works as expected
+(m/foldr #(cons (inc %1) %2) '() (map identity (range 100000)))
+;; => (1 2 3 4 ...)
+----
+
+////
+NOTE: commented until correctly implemented
+
+It there also other *fold* functions that are implemented in terms of the basic `foldl`
+or `foldr` such as: `foldm` that is a `foldl` version that works with monads:
+
+[source, clojure]
+----
+(m/foldm #(m/return (conj %1 (inc %2))) []
+         [(either/right 1) (either/right 2) (either/right 3)])
+;; => #<Right [2 3 4]>
+
+(m/foldm #(m/return (conj %1 (inc %2))) []
+         [(either/right 1) (either/right 2) (either/left 5)])
+;; => #<Left 5>
+----
+////
+
+
 === Monad
 
 Monads are the most discussed programming concept to come from category theory. Like functors and
@@ -1039,13 +1125,13 @@ they should not extend any of the previously explained protocols.
 
 .Summary of Clojure types and implemented protocols
 [options="header"]
-|================================================================================
+|==========================================================================================
 | Name     | Implemented protocols
-| sequence | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
-| vector   | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
+| sequence | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable
+| vector   | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable
 | hash-set | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
 | hash-map | Semigroup, Monoid
-|================================================================================
+|==========================================================================================
 
 
 === Where are the State, Reader, Writer and Continuation monads?

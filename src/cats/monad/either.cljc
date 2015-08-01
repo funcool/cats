@@ -37,7 +37,8 @@
       (either/left 1)
       ;; => #<Left [1]>
   "
-  (:require [cats.protocols :as proto]))
+  (:require [cats.protocols :as proto]
+            [cats.core :as m]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -163,7 +164,21 @@
     (mbind [_ s f]
       (if (right? s)
         (f (.-v s))
-        s))))
+        s))
+
+    proto/Foldable
+    (foldl [_ f z mv]
+      (if (right? mv)
+        (m/with-monad (proto/get-context mv)
+          (f z (proto/extract mv)))
+        z))
+
+    (foldr [_ f z mv]
+      (if (right? mv)
+        (m/with-monad (proto/get-context mv)
+          (f (proto/extract mv) z))
+        z))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad transformer definition

@@ -69,6 +69,11 @@
     "Takes any context monadic value ctx and any value v, and puts
      the value v in the most minimal context of same type of ctx"))
 
+(defprotocol Foldable
+  "Abstraction of data structures that can be folded to a summary value."
+  (foldl [fctx f z xs] "Left-associative fold of a structure.")
+  (foldr [fctx f z xs] "Right-associative fold of a structure."))
+
 (defprotocol Monad
   "The Monad abstraction."
   (mreturn [m v])

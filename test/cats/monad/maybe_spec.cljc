@@ -124,3 +124,16 @@
 (t/deftest map-maybe-test
   (let [just-evens #(if (even? %) (maybe/just %) (maybe/nothing))]
     (t/is (= [42 100] (maybe/map-maybe just-evens [41 42 99 100])))))
+
+(t/deftest foldable-test
+  (t/testing "Foldl"
+    (t/is (= (maybe/just 2)
+             (m/foldl #(m/return (+ %1 %2)) 1 (maybe/just 1))))
+    (t/is (= 1
+             (m/foldl #(m/return (+ %1 %2)) 1 (maybe/nothing)))))
+
+  (t/testing "Foldr"
+    (t/is (= (maybe/just 2)
+             (m/foldr #(m/return (+ %1 %2)) 1 (maybe/just 1))))
+    (t/is (= 1
+             (m/foldr #(m/return (+ %1 %2)) 1 (maybe/nothing))))))

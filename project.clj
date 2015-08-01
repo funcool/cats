@@ -4,7 +4,7 @@
   :license {:name "BSD (2 Clause)"
             :url "http://opensource.org/licenses/BSD-2-Clause"}
   :dependencies [[org.clojure/clojure "1.7.0" :scope "provided"]
-                 [org.clojure/clojurescript "0.0-3308" :scope "provided"]]
+                 [org.clojure/clojurescript "1.7.28" :scope "provided"]]
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :source-paths ["src"]
