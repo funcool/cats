@@ -26,7 +26,7 @@
 (ns cats.core
   "Category Theory abstractions for Clojure"
   #?(:cljs
-     (:require-macros [cats.core :refer (with-monad mlet)]))
+     (:require-macros [cats.core :refer (with-monad with-context mlet)]))
   (:require [cats.protocols :as p])
   (:refer-clojure :exclude [when unless filter sequence]))
 
@@ -39,7 +39,7 @@
   *context* nil)
 
 #?(:clj
-   (defmacro with-monad
+   (defmacro with-context
      "Set current context to specific monad."
      [ctx & body]
      `(cond
@@ -53,6 +53,13 @@
         :else
         (binding [*context* ~ctx]
           ~@body))))
+
+#?(:clj
+   (defmacro with-monad
+     "Alias to `with-context`."
+     [ctx & body]
+     `(with-context ~ctx
+        ~@body)))
 
 (defn ^{:no-doc true}
   get-current-context
