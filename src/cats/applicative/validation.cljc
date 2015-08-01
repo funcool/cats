@@ -27,7 +27,6 @@
   "The Validation applicative implementation and helper functions
   for validating values. Isomorphic to Either."
   (:require [cats.protocols :as p]
-            [cats.core :as m]
             [cats.monad.either :as either]))
 
 (declare validation-applicative)
@@ -137,8 +136,11 @@
     p/Semigroup
     (mappend [_ sv sv']
       (cond
-        (and (fail? sv) (fail? sv')) (fail (m/mappend (m/extract sv)
-                                                      (m/extract sv')))
+        (and (fail? sv) (fail? sv'))
+        (fail (let [sv (p/extract sv)
+                    sv' (p/extract sv')]
+                (p/mappend (p/get-context sv) sv sv')))
+
         (ok? sv) sv
         :else sv'))
 
@@ -169,8 +171,14 @@
 
     (fapply [_ af av]
       (cond
-        (and (ok? af) (ok? av)) (ok ((m/extract af) (m/extract av)))
-        (and (fail? af) (fail? av)) (fail (m/mappend (m/extract af) (m/extract av)))
+        (and (ok? af) (ok? av))
+        (ok ((p/extract af) (p/extract av)))
+
+        (and (fail? af) (fail? av))
+        (fail (let [af (p/extract af)
+                    av (p/extract av)]
+                (p/mappend (p/get-context af) af av)))
+
         (ok? af) av
         :else af))))
 
