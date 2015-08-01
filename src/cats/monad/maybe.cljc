@@ -32,7 +32,7 @@
       (maybe/just 1)
       ;; => #<Just [1]>
   "
-  (:require [cats.protocols :as proto]
+  (:require [cats.protocols :as p]
             [cats.core :as m]))
 
 (declare maybe-monad)
@@ -42,10 +42,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Just [v]
-  proto/Context
+  p/Context
   (get-context [_] maybe-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -63,17 +63,17 @@
          (with-out-str (print [v])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Just other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Just other)
+           (= v (.-v other))
+           false))]))
 
 (deftype Nothing []
-  proto/Context
+  p/Context
   (get-context [_] maybe-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] nil)
 
   #?(:clj clojure.lang.IDeref
@@ -89,9 +89,9 @@
          (with-out-str (print "")))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (instance? Nothing other))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (instance? Nothing other))]))
 
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)
@@ -100,8 +100,8 @@
   "Return true in case of `v` is instance
   of Maybe monad."
   [v]
-  (if (satisfies? proto/Context v)
-    (identical? (proto/get-context v) maybe-monad)
+  (if (satisfies? p/Context v)
+    (identical? (p/get-context v) maybe-monad)
     false))
 
 (defn just
@@ -152,11 +152,11 @@
   ([mv]
    {:pre [(maybe? mv)]}
    (when (just? mv)
-     (proto/extract mv)))
+     (p/extract mv)))
   ([mv default]
    {:pre [(maybe? mv)]}
    (if (just? mv)
-     (proto/extract mv)
+     (p/extract mv)
      default)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -166,33 +166,33 @@
 (def ^{:no-doc true}
   maybe-monad
   (reify
-    proto/Semigroup
+    p/Semigroup
     (mappend [_ mv mv']
       (cond
         (nothing? mv) mv'
         (nothing? mv') mv
-        :else (just (m/mappend (proto/extract mv)
-                               (proto/extract mv')))))
+        :else (just (m/mappend (p/extract mv)
+                               (p/extract mv')))))
 
-    proto/Monoid
+    p/Monoid
     (mempty [_]
       (nothing))
 
-    proto/Functor
+    p/Functor
     (fmap [_ f mv]
       (if (nothing? mv)
         mv
         (just (f (from-maybe mv)))))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       (just v))
     (fapply [m af av]
       (if (nothing? af)
         af
-        (proto/fmap m (from-maybe af) av)))
+        (p/fmap m (from-maybe af) av)))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       (just v))
     (mbind [_ mv f]
@@ -200,27 +200,27 @@
         mv
         (f (from-maybe mv))))
 
-    proto/MonadZero
+    p/MonadZero
     (mzero [_]
       (nothing))
 
-    proto/MonadPlus
+    p/MonadPlus
     (mplus [_ mv mv']
       (if (just? mv)
         mv
         mv'))
 
-    proto/Foldable
+    p/Foldable
     (foldl [_ f z mv]
       (if (just? mv)
-        (m/with-monad (proto/get-context mv)
-          (f z (proto/extract mv)))
+        (m/with-monad (p/get-context mv)
+          (f z (p/extract mv)))
         z))
 
     (foldr [_ f z mv]
       (if (just? mv)
-        (m/with-monad (proto/get-context mv)
-          (f (proto/extract mv) z))
+        (m/with-monad (p/get-context mv)
+          (f (p/extract mv) z))
         z))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -231,38 +231,38 @@
   "The maybe transformer constructor."
   [inner-monad]
   (reify
-    proto/Functor
+    p/Functor
     (fmap [_ f fv]
-      (proto/fmap inner-monad
-                  #(proto/fmap maybe-monad f %)
-                  fv))
+      (p/fmap inner-monad
+              #(p/fmap maybe-monad f %)
+              fv))
 
-    proto/Monad
+    p/Monad
     (mreturn [m v]
-      (proto/mreturn inner-monad (just v)))
+      (p/mreturn inner-monad (just v)))
 
     (mbind [_ mv f]
-      (proto/mbind inner-monad
-                   mv
-                   (fn [maybe-v]
-                     (if (just? maybe-v)
-                       (f (from-maybe maybe-v))
-                       (proto/mreturn inner-monad (nothing))))))
+      (p/mbind inner-monad
+               mv
+               (fn [maybe-v]
+                 (if (just? maybe-v)
+                   (f (from-maybe maybe-v))
+                   (p/mreturn inner-monad (nothing))))))
 
-    proto/MonadZero
+    p/MonadZero
     (mzero [_]
-      (proto/mreturn inner-monad (nothing)))
+      (p/mreturn inner-monad (nothing)))
 
-    proto/MonadPlus
+    p/MonadPlus
     (mplus [_ mv mv']
-      (proto/mbind inner-monad
-                   mv
-                   (fn [maybe-v]
-                     (if (just? maybe-v)
-                       (proto/mreturn inner-monad maybe-v)
-                       mv'))))
+      (p/mbind inner-monad
+               mv
+               (fn [maybe-v]
+                 (if (just? maybe-v)
+                   (p/mreturn inner-monad maybe-v)
+                   mv'))))
 
-    proto/MonadTrans
+    p/MonadTrans
     (base [_]
       maybe-monad)
 
@@ -270,10 +270,10 @@
       inner-monad)
 
     (lift [_ mv]
-      (proto/mbind inner-monad
-                   mv
-                   (fn [v]
-                     (proto/mreturn inner-monad (just v)))))))
+      (p/mbind inner-monad
+               mv
+               (fn [v]
+                 (p/mreturn inner-monad (just v)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
