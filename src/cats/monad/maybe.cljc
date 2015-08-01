@@ -286,7 +286,7 @@
   {:pre [(maybe? m)]}
   (if (nothing? m)
     default
-    (f (m/extract m))))
+    (f (p/extract m))))
 
 (defn seq->maybe
   "Given a collection, return a nothing if its empty or a just with its
@@ -303,14 +303,14 @@
   {:pre [(maybe? m)]}
   (if (nothing? m)
     (lazy-seq [])
-    (lazy-seq [(m/extract m)])))
+    (lazy-seq [(p/extract m)])))
 
 ;; TODO: use a transducer when we support 1.7.0+
 (defn cat-maybes
   "Given a collection of maybes, return a sequence of the values that the
    just's contain."
   [coll]
-  (map m/extract (filter just? coll)))
+  (map p/extract (filter just? coll)))
 
 (defn map-maybe
   "Given a maybe-returning function and a collection, map the function over
