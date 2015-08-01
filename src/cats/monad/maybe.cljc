@@ -171,9 +171,9 @@
       (cond
         (nothing? mv) mv'
         (nothing? mv') mv
-        :else (just (p/mappend ctx
-                               (p/extract mv)
-                               (p/extract mv')))))
+        :else (just (let [mv (p/extract mv)
+                          mv' (p/extract mv')]
+                      (p/mappend (p/get-context mv) mv mv')))))
 
     p/Monoid
     (mempty [_]
