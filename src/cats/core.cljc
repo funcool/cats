@@ -36,12 +36,13 @@
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Context Management
+;; Backward compatiblity aliases.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #?(:clj
    (defmacro with-monad
      "Alias to `with-context` for backward compatibility."
+     {:deprecated true}
      [ctx & body]
      `(ctx/with-context ~ctx
         ~@body)))
