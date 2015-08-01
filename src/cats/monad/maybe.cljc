@@ -304,14 +304,17 @@
     (lazy-seq [])
     (lazy-seq [(p/extract m)])))
 
+(def ^{:private true :no-doc true}
+  +extract-just-xform+
+  (comp
+   (filter just?)
+   (map p/extract)))
+
 (defn cat-maybes
   "Given a collection of maybes, return a sequence of the values
   that the just's contain."
   [coll]
-  (let [xform (comp
-               (filter just?)
-               (map p/extract))]
-    (sequence xform coll)))
+  (sequence +extract-just-xform+ coll))
 
 (defn map-maybe
   "Given a maybe-returning function and a collection, map the function over
