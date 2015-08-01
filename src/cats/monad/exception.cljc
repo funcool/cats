@@ -53,15 +53,12 @@
   That is because when you will dereference the
   failure instance, it will reraise the containing
   exception."
-  #?(:clj
-     (:require [cats.protocols :as p]
-               [cats.core :refer [with-monad]]))
 
-  #?@(:cljs
-      [(:require [cats.protocols :as p])
-
-       (:require-macros [cats.monad.exception :refer [try-on]]
-                        [cats.core :refer [with-monad]])]))
+  (:require [cats.protocols :as p]
+            #?(:clj [cats.context :as ctx]
+               :cljs [cats.context :as ctx :include-macros true]))
+  #?(:cljs
+     (:require-macros [cats.monad.exception :refer (try-on)])))
 
 (defn throw-exception
   [message]
@@ -231,7 +228,7 @@
   exec-try-or-recover
   [func recoverfn]
   (let [result (exec-try-on func)]
-    (with-monad exception-monad
+    (ctx/with-context exception-monad
       (if (failure? result)
         (recoverfn (.-e result))
         result))))
