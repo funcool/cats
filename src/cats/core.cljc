@@ -26,61 +26,25 @@
 (ns cats.core
   "Category Theory abstractions for Clojure"
   #?(:cljs
-     (:require-macros [cats.core :refer (with-monad with-context mlet)]))
-  (:require [cats.protocols :as p])
+     (:require-macros [cats.core :refer (mlet)]))
+  #?(:cljs
+     (:require [cats.protocols :as p]
+               [cats.context :as ctx :include-macros true])
+     :clj
+     (:require [cats.protocols :as p]
+               [cats.context :as ctx]))
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^{:dynamic true
-       :no-doc true}
-  *context* nil)
-
-#?(:clj
-   (defmacro with-context
-     "Set current context to specific monad."
-     [ctx & body]
-     `(cond
-        (satisfies? p/MonadTrans ~ctx)
-        (binding [*context* ~ctx]
-          ~@body)
-
-        (satisfies? p/MonadTrans *context*)
-        (do ~@body)
-
-        :else
-        (binding [*context* ~ctx]
-          ~@body))))
-
 #?(:clj
    (defmacro with-monad
-     "Alias to `with-context`."
+     "Alias to `with-context` for backward compatibility."
      [ctx & body]
-     `(with-context ~ctx
+     `(ctx/with-context ~ctx
         ~@body)))
-
-(defn ^{:no-doc true}
-  get-current-context
-  "Get current context or obtain it from
-  the provided instance."
-  ([] (get-current-context nil))
-  ([default]
-   (cond
-     (not (nil? *context*))
-     *context*
-
-     (satisfies? p/Context default)
-     (p/get-context default)
-
-     (satisfies? p/Monad default)
-     default
-
-     :else
-     (throw (#?(:clj IllegalArgumentException.
-                :cljs js/Error.)
-             "You are using return/pure/mzero function without context.")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
@@ -88,13 +52,13 @@
 
 (defn mempty
   []
-  (let [ctx (get-current-context)]
+  (let [ctx (ctx/get-current)]
     (p/mempty ctx)))
 
 (defn mappend
   [& svs]
   {:pre [(not (empty? svs))]}
-  (let [ctx (get-current-context (first svs))]
+  (let [ctx (ctx/get-current (first svs))]
     (reduce (partial p/mappend ctx) svs)))
 
 (defn pure
@@ -112,13 +76,13 @@
         (pure 1)
       ;; => #<Right [1]>
   "
-  ([v] (pure (get-current-context) v))
+  ([v] (pure (ctx/get-current) v))
   ([ctx v] (p/pure ctx v)))
 
 (defn return
   "This is a monad version of pure and it works
   identically to it."
-  ([v] (return (get-current-context) v))
+  ([v] (return (ctx/get-current) v))
   ([ctx v] (p/mreturn ctx v)))
 
 (defn bind
@@ -133,20 +97,20 @@
   that add a beautiful, let like syntax for
   compose operations with `bind` function."
   [mv f]
-  (let [ctx (get-current-context mv)]
-    (with-context ctx
+  (let [ctx (ctx/get-current mv)]
+    (ctx/with-context ctx
       (p/mbind ctx mv f))))
 
 (defn mzero
   ([]
-   (p/mzero (get-current-context)))
+   (p/mzero (ctx/get-current)))
   ([ctx]
    (p/mzero ctx)))
 
 (defn mplus
   [& mvs]
   {:pre [(not (empty? mvs))]}
-  (let [ctx (get-current-context (first mvs))]
+  (let [ctx (ctx/get-current (first mvs))]
     (reduce (partial p/mplus ctx) mvs)))
 
 (defn guard
@@ -168,7 +132,7 @@
    (fn [fv]
      (fmap f fv)))
   ([f fv]
-   (-> (get-current-context fv)
+   (-> (ctx/get-current fv)
        (p/fmap f fv))))
 
 (defn fapply
@@ -180,14 +144,14 @@
   a haskell style left-associative fapply."
   [af & avs]
   {:pre [(not (empty? avs))]}
-  (let [ctx (get-current-context af)]
+  (let [ctx (ctx/get-current af)]
     (reduce (partial p/fapply ctx) af avs)))
 
 (defn when
   "If the expression is true, returns the monadic value.
   Otherwise, yields nil in a monadic context."
   ([b mv]
-   (when (get-current-context mv) b mv))
+   (when (ctx/get-current mv) b mv))
   ([ctx b mv]
    (if b mv (return ctx nil))))
 
@@ -201,7 +165,7 @@
 (defn lift
   "Lift a value from the inner monad of a monad transformer
   into a value of the monad transformer."
-  ([mv] (p/lift *context* mv))
+  ([mv] (p/lift ctx/*context* mv))
   ([m mv] (p/lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -378,8 +342,8 @@
   "
   [mvs]
   {:pre [(not-empty mvs)]}
-  (let [ctx (get-current-context (first mvs))]
-    (with-context ctx
+  (let [ctx (ctx/get-current (first mvs))]
+    (ctx/with-context ctx
       (reduce (fn [mvs mv]
                 (mlet [v mv
                        vs mvs]
@@ -444,7 +408,7 @@
       ;=> <Nothing>
   "
   [p mv]
-  (with-context (get-current-context mv)
+  (ctx/with-context (ctx/get-current mv)
     (mlet [v mv
            :when (p v)]
           (return v))))
@@ -492,7 +456,7 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (with-context (get-current-context mf)
+  (ctx/with-context (ctx/get-current mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
@@ -501,7 +465,7 @@
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (with-context (get-current-context mf)
+  (ctx/with-context (ctx/get-current mf)
     (mlet [a (mf x)
            b (mg a)]
           (return b))))
@@ -518,12 +482,12 @@
   "Perform a right-associative fold on the data structure."
   [f z xs]
   (let [ctx (p/get-context xs)]
-    (with-context ctx
+    (ctx/with-context ctx
       (p/foldr ctx f z xs))))
 
 (defn foldl
   "Perform a right-associative fold on the data structure."
   [f z xs]
   (let [ctx (p/get-context xs)]
-    (with-context ctx
+    (ctx/with-context ctx
       (p/foldl ctx f z xs))))
