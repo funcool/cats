@@ -25,7 +25,7 @@
 
 (ns cats.monad.identity
   "The Identity Monad."
-  (:require [cats.protocols :as proto])
+  (:require [cats.protocols :as p])
   (:refer-clojure :exclude [identity]))
 
 (declare identity-monad)
@@ -35,10 +35,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Identity [v]
-  proto/Context
+  p/Context
   (get-context [_] identity-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -56,11 +56,11 @@
          (str v))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Identity other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Identity other)
+           (= v (.-v other))
+           false))]))
 
 (alter-meta! #'->Identity assoc :private true)
 
@@ -76,18 +76,18 @@
 (def ^{:no-doc true}
   identity-monad
   (reify
-    proto/Functor
+    p/Functor
     (fmap [_ f iv]
       (Identity. (f (.-v iv))))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       (Identity. v))
 
     (fapply [_ af av]
       (Identity. ((.-v af) (.-v av))))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       (Identity. v))
 
@@ -102,9 +102,9 @@
   "The Identity transformer constructor."
   [inner-monad]
   (reify
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
-      (identity (proto/mreturn inner-monad v)))
+      (identity (p/mreturn inner-monad v)))
 
     (mbind [_ mv f]
       nil)))
