@@ -183,7 +183,7 @@
     (fmap [_ f mv]
       (if (nothing? mv)
         mv
-        (just (f (from-maybe mv)))))
+        (just (f (p/extract mv)))))
 
     p/Applicative
     (pure [_ v]
@@ -191,7 +191,7 @@
     (fapply [m af av]
       (if (nothing? af)
         af
-        (p/fmap m (from-maybe af) av)))
+        (p/fmap m (p/extract af) av)))
 
     p/Monad
     (mreturn [_ v]
@@ -199,7 +199,7 @@
     (mbind [_ mv f]
       (if (nothing? mv)
         mv
-        (f (from-maybe mv))))
+        (f (p/extract mv))))
 
     p/MonadZero
     (mzero [_]
@@ -247,7 +247,7 @@
                mv
                (fn [maybe-v]
                  (if (just? maybe-v)
-                   (f (from-maybe maybe-v))
+                   (f (p/extract maybe-v))
                    (p/mreturn inner-monad (nothing))))))
 
     p/MonadZero
