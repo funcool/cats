@@ -167,11 +167,12 @@
   maybe-monad
   (reify
     p/Semigroup
-    (mappend [_ mv mv']
+    (mappend [ctx mv mv']
       (cond
         (nothing? mv) mv'
         (nothing? mv') mv
-        :else (just (m/mappend (p/extract mv)
+        :else (just (p/mappend ctx
+                               (p/extract mv)
                                (p/extract mv')))))
 
     p/Monoid
