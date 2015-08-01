@@ -214,14 +214,12 @@
     p/Foldable
     (foldl [_ f z mv]
       (if (just? mv)
-        (m/with-monad (p/get-context mv)
-          (f z (p/extract mv)))
+        (f z (p/extract mv))
         z))
 
     (foldr [_ f z mv]
       (if (just? mv)
-        (m/with-monad (p/get-context mv)
-          (f (p/extract mv) z))
+        (f (p/extract mv) z)
         z))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -169,14 +169,12 @@
     proto/Foldable
     (foldl [_ f z mv]
       (if (right? mv)
-        (m/with-monad (proto/get-context mv)
-          (f z (proto/extract mv)))
+        (f z (proto/extract mv))
         z))
 
     (foldr [_ f z mv]
       (if (right? mv)
-        (m/with-monad (proto/get-context mv)
-          (f (proto/extract mv) z))
+        (f (proto/extract mv) z)
         z))))
 
 
