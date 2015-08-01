@@ -32,8 +32,7 @@
       (maybe/just 1)
       ;; => #<Just [1]>
   "
-  (:require [cats.protocols :as p]
-            [cats.core :as m]))
+  (:require [cats.protocols :as p]))
 
 (declare maybe-monad)
 
