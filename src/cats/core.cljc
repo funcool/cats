@@ -46,6 +46,12 @@
      `(ctx/with-context ~ctx
         ~@body)))
 
+(defn get-current-context
+  "Alias to cats.context/get-current for backward compatibility."
+  {:deprecated true}
+  ([] (ctx/get-current nil))
+  ([default] (ctx/get-current default)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware funcionts
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
