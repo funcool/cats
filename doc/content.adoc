@@ -287,13 +287,13 @@ should clarify its purpose.
 
 === Foldable
 
-The *Foldable* is generic abstraction of fold operations on a data structure. It consists
-mainly on two functions: `foldl` and `foldr`. The `foldl` is also known as `reduce`
-or `inject` in other mainstream programming languages.
+The *Foldable* is a generic abstraction for data structures that can be folded. It consists
+mainly on two functions: `foldl` and `foldr`. `foldl` is also known as `reduce` or `inject`
+in other mainstream programming languages.
 
 
-The both function consists in a identical signature and differes on how them traverse
-the data structure. Let's take a `foldl` for a little example:
+Both function have an identical signature and differ in how they traverse the data structure.
+Let's look at a little example using `foldl`:
 
 [source, clojure]
 ----
@@ -301,7 +301,7 @@ the data structure. Let's take a `foldl` for a little example:
 ;; => 15
 ----
 
-You can observe that in case of `foldl` is identical to the clojure `reduce` function:
+You can observe that `foldl` is identical to the clojure `reduce` function:
 
 [source, clojure]
 ----
@@ -309,7 +309,7 @@ You can observe that in case of `foldl` is identical to the clojure `reduce` fun
 ;; => 15
 ----
 
-And the same operation can be done using the `foldr`:
+And the same operation can be done using `foldr`:
 
 [source, clojure]
 ----
@@ -317,12 +317,12 @@ And the same operation can be done using the `foldr`:
 ;; => 15
 ----
 
-The main difference between `foldl` and `reduce` is that `foldl` has fixed arity so all
-parameters are mandatory and `foldl` is a generic abstraction that can work
-with other types apart from collections.
+The main difference between `foldl` and `reduce` is that `foldl` has a fixed arity so all
+parameters are mandatory and `foldl` is a generic abstraction that can work with other
+types apart from collections.
 
-As we said previously, the `foldl` and `foldr` differs mainly on how they traverse the
-data structure. Then, for better understanding how they works internally, let see a
+As we said previously, the `foldl` and `foldr` differ mainly on how they traverse the
+data structure. Then, for understanding better how they work internally, let's see a
 graphical representation of the `foldl` execution model:
 
 [source, text]
@@ -337,7 +337,7 @@ In contrast to the `foldr` internal execution model:
 1⊕(2⊕(3⊕(4⊕(5⊕(wc)))))
 ----
 
-In languages with strict argument evaluation, the `foldr` does not has much of
+In languages with strict argument evaluation, `foldr` does not have many
 applications because when the data structure to fold grows it tends to consume all the
 stack (causing the well known stack overflow). In case of Clojure, the unique obvious
 case of using foldr is for small datastructures or lazy sequences.
@@ -1125,13 +1125,13 @@ they should not extend any of the previously explained protocols.
 
 .Summary of Clojure types and implemented protocols
 [options="header"]
-|================================================================================
+|==========================================================================================
 | Name     | Implemented protocols
-| sequence | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
-| vector   | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
+| sequence | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable
+| vector   | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable
 | hash-set | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
 | hash-map | Semigroup, Monoid
-|================================================================================
+|==========================================================================================
 
 
 === Where are the State, Reader, Writer and Continuation monads?
