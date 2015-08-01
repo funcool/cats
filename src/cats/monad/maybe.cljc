@@ -305,12 +305,14 @@
     (lazy-seq [])
     (lazy-seq [(p/extract m)])))
 
-;; TODO: use a transducer when we support 1.7.0+
 (defn cat-maybes
-  "Given a collection of maybes, return a sequence of the values that the
-   just's contain."
+  "Given a collection of maybes, return a sequence of the values
+  that the just's contain."
   [coll]
-  (map p/extract (filter just? coll)))
+  (let [xform (comp
+               (filter just?)
+               (map p/extract))]
+    (sequence xform coll)))
 
 (defn map-maybe
   "Given a maybe-returning function and a collection, map the function over
