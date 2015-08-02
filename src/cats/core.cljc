@@ -418,7 +418,7 @@
   (ctx/with-context (ctx/get-current mv)
     (mlet [v mv
            :when (p v)]
-          (return v))))
+      (return v))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
@@ -466,7 +466,7 @@
   (ctx/with-context (ctx/get-current mf)
     (mlet [a (mf x)
            b (mg a)]
-          (return b))))
+      (return b))))
 
 (defn <=<
   "Right-to-left composition of monads.
@@ -475,7 +475,7 @@
   (ctx/with-context (ctx/get-current mf)
     (mlet [a (mf x)
            b (mg a)]
-          (return b))))
+      (return b))))
 
 (defn extract
   "Generic function for unwrap/extract
