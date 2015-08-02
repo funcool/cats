@@ -504,13 +504,9 @@
   returns a value inside the given monadic context, an initial value, and a
   collection of values, perform a left-associative fold."
   [ctx f z xs]
-  (letfn [(foldm'
-            ([xs']
-             (fn [z'']
-               (foldm' z'' xs')))
-            ([z' xs']
-             (if (empty? xs')
-               (return ctx z')
-               (let [[h & t] xs']
-                 (>>= (f z' h) (foldm' t))))))]
+  (letfn [(foldm' [z' xs']
+            (if (empty? xs')
+              (return ctx z')
+              (let [[h & t] xs']
+                (>>= (f z' h) (fn [z''] (foldm' z'' t))))))]
     (foldm' z xs)))
