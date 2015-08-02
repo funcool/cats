@@ -53,15 +53,12 @@
   That is because when you will dereference the
   failure instance, it will reraise the containing
   exception."
-  #?(:clj
-     (:require [cats.protocols :as proto]
-               [cats.core :refer [with-monad]]))
 
-  #?@(:cljs
-      [(:require [cats.protocols :as proto])
-
-       (:require-macros [cats.monad.exception :refer [try-on]]
-                        [cats.core :refer [with-monad]])]))
+  (:require [cats.protocols :as p]
+            #?(:clj [cats.context :as ctx]
+               :cljs [cats.context :as ctx :include-macros true]))
+  #?(:cljs
+     (:require-macros [cats.monad.exception :refer (try-on)])))
 
 (defn throw-exception
   [message]
@@ -82,10 +79,10 @@
 (declare exception-monad)
 
 (deftype Success [v]
-  proto/Context
+  p/Context
   (get-context [_] exception-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -103,17 +100,17 @@
          (with-out-str (print [v])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Success other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Success other)
+           (= v (.-v other))
+           false))]))
 
 (deftype Failure [e]
-  proto/Context
+  p/Context
   (get-context [_] exception-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] e)
 
   #?(:clj clojure.lang.IDeref
@@ -131,11 +128,11 @@
          (with-out-str (print [e])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Failure other)
-                  (= e (.-e other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Failure other)
+           (= e (.-e other))
+           false))]))
 
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
@@ -181,8 +178,8 @@
   "Return true in case of `v` is instance
   of Exception monad."
   [v]
-  (if (satisfies? proto/Context v)
-    (identical? (proto/get-context v) exception-monad)
+  (if (satisfies? p/Context v)
+    (identical? (p/get-context v) exception-monad)
     false))
 
 (defn extract
@@ -199,12 +196,12 @@
   ([mv]
    {:pre [(exception? mv)]}
    (if (success? mv)
-     (proto/extract mv)
-     (throw (proto/extract mv))))
+     (p/extract mv)
+     (throw (p/extract mv))))
   ([mv default]
    {:pre [(exception? mv)]}
    (if (success? mv)
-     (proto/extract mv)
+     (p/extract mv)
      default)))
 
 (defn ^{:no-doc true}
@@ -231,7 +228,7 @@
   exec-try-or-recover
   [func recoverfn]
   (let [result (exec-try-on func)]
-    (with-monad exception-monad
+    (ctx/with-context exception-monad
       (if (failure? result)
         (recoverfn (.-e result))
         result))))
@@ -274,26 +271,26 @@
 (def ^{:no-doc true}
   exception-monad
   (reify
-    proto/Functor
+    p/Functor
     (fmap [_ f s]
       (if (success? s)
-        (try-on (f (proto/extract s)))
+        (try-on (f (p/extract s)))
         s))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       (success v))
 
     (fapply [m af av]
       (if (success? af)
-        (proto/fmap m (proto/extract af) av)
+        (p/fmap m (p/extract af) av)
         af))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       (success v))
 
     (mbind [_ s f]
       (if (success? s)
-        (f (proto/extract s))
+        (f (p/extract s))
         s))))

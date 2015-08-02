@@ -37,8 +37,7 @@
       (either/left 1)
       ;; => #<Left [1]>
   "
-  (:require [cats.protocols :as proto]
-            [cats.core :as m]))
+  (:require [cats.protocols :as p]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -47,10 +46,10 @@
 (declare either-monad)
 
 (deftype Right [v]
-  proto/Context
+  p/Context
   (get-context [_] either-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -68,17 +67,17 @@
          (with-out-str (print [v])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Right other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Right other)
+           (= v (.-v other))
+           false))]))
 
 (deftype Left [v]
-  proto/Context
+  p/Context
   (get-context [_] either-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] v)
 
   #?(:clj clojure.lang.IDeref
@@ -96,11 +95,11 @@
          (with-out-str (print [v])))])
 
   #?@(:cljs
-       [cljs.core/IEquiv
-        (-equiv [_ other]
-                (if (instance? Left other)
-                  (= v (.-v other))
-                  false))]))
+      [cljs.core/IEquiv
+       (-equiv [_ other]
+         (if (instance? Left other)
+           (= v (.-v other))
+           false))]))
 
 (alter-meta! #'->Right assoc :private true)
 (alter-meta! #'->Left assoc :private true)
@@ -131,8 +130,8 @@
   "Return true in case of `v` is instance
   of Either monad."
   [v]
-  (if (satisfies? proto/Context v)
-    (identical? (proto/get-context v) either-monad)
+  (if (satisfies? p/Context v)
+    (identical? (p/get-context v) either-monad)
     false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -142,22 +141,22 @@
 (def ^{:no-doc true}
   either-monad
   (reify
-    proto/Functor
+    p/Functor
     (fmap [_ f s]
       (if (right? s)
         (right (f (.-v s)))
         s))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       (right v))
 
     (fapply [m af av]
       (if (right? af)
-        (proto/fmap m (.-v af) av)
+        (p/fmap m (.-v af) av)
         af))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       (right v))
 
@@ -166,17 +165,15 @@
         (f (.-v s))
         s))
 
-    proto/Foldable
+    p/Foldable
     (foldl [_ f z mv]
       (if (right? mv)
-        (m/with-monad (proto/get-context mv)
-          (f z (proto/extract mv)))
+        (f z (p/extract mv))
         z))
 
     (foldr [_ f z mv]
       (if (right? mv)
-        (m/with-monad (proto/get-context mv)
-          (f (proto/extract mv) z))
+        (f (p/extract mv) z)
         z))))
 
 
@@ -188,19 +185,19 @@
   "The Either transformer constructor."
   [inner-monad]
   (reify
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
-      (proto/mreturn inner-monad (right v)))
+      (p/mreturn inner-monad (right v)))
 
     (mbind [_ mv f]
-      (proto/mbind inner-monad
-                   mv
-                   (fn [either-v]
-                     (if (left? either-v)
-                       (proto/mreturn inner-monad either-v)
-                       (f (proto/extract either-v))))))
+      (p/mbind inner-monad
+               mv
+               (fn [either-v]
+                 (if (left? either-v)
+                   (p/mreturn inner-monad either-v)
+                   (f (p/extract either-v))))))
 
-    proto/MonadTrans
+    p/MonadTrans
     (base [_]
       either-monad)
 
@@ -208,10 +205,10 @@
       inner-monad)
 
     (lift [m mv]
-      (proto/mbind inner-monad
-                   mv
-                   (fn [v]
-                     (proto/mreturn inner-monad (right v)))))))
+      (p/mbind inner-monad
+               mv
+               (fn [v]
+                 (p/mreturn inner-monad (right v)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
@@ -224,8 +221,8 @@
   [e lf rf]
   {:pre [(either? e)]}
   (if (left? e)
-    (lf (proto/extract e))
-    (rf (proto/extract e))))
+    (lf (p/extract e))
+    (rf (p/extract e))))
 
 (defn branch-left
   "Given an either value and a function, if the either is a
@@ -244,7 +241,7 @@
   [e rf]
   {:pre [(either? e)]}
   (let [context either-monad]
-    (proto/mbind context e rf)))
+    (p/mbind context e rf)))
 
 (def lefts
   "Given a collection of eithers, return only the values that are left."
@@ -267,5 +264,5 @@
   [e]
   {:pre [(either? e)]}
   (if (left? e)
-    (right (proto/extract e))
-    (left (proto/extract e))))
+    (right (p/extract e))
+    (left (p/extract e))))

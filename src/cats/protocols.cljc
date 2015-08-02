@@ -89,32 +89,6 @@
   supports the notion of addition."
   (mplus [m mv mv'] "An associative addition operation."))
 
-(defprotocol MonadState
-  "A specific case of Monad abstraction for
-  work with state in pure functional way."
-  (get-state [m] "Return the current state.")
-  (put-state [m newstate] "Update the state.")
-  (swap-state [m f] "Apply a function to the current state and update it."))
-
-(defprotocol MonadReader
-  "A specific case of Monad abstraction that
-  allows a read only access to an environment."
-  (ask [m] "Return the current environment.")
-  (local [m f reader] "Create a reader in a modified version of the environment."))
-
-(defprotocol MonadWriter
-  "A specific case of Monad abstraction that
-  allows emulate write operations in pure functional
-  way.
-
-  A great example is writing a log message."
-  (listen [m mv] "Given a writer, yield a (value, log) pair as a value.")
-  (tell [m v] "Add the given value to the log.")
-  (pass [m mv]
-    "Given a writer whose value is a pair with a function as its second element,
-     yield a writer which has the first element of the pair as the value and
-     the result of applying the aforementioned function to the log as the new log."))
-
 (defprotocol MonadTrans
   "A common abstraction for all monad transformers."
   (base [mt] "Return the base monad of this transformer.")

@@ -27,17 +27,17 @@
   "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.monad.maybe :as maybe]
-            [cats.protocols :as proto]))
+            [cats.protocols :as p]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (extend-type nil
-  proto/Context
+  p/Context
   (get-context [_] maybe/maybe-monad)
 
-  proto/Extract
+  p/Extract
   (extract [_] nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -46,19 +46,19 @@
 
 (def sequence-monad
   (reify
-    proto/Semigroup
+    p/Semigroup
     (mappend [_ sv sv']
       (concat sv sv'))
 
-    proto/Monoid
+    p/Monoid
     (mempty [_]
       (lazy-seq []))
 
-    proto/Functor
+    p/Functor
     (fmap [_ f v]
       (map f v))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       (lazy-seq [v]))
 
@@ -67,29 +67,29 @@
             v av]
            (f v)))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       (lazy-seq [v]))
 
     (mbind [_ self f]
       (apply concat (map f self)))
 
-    proto/MonadZero
+    p/MonadZero
     (mzero [_]
       (lazy-seq []))
 
-    proto/MonadPlus
+    p/MonadPlus
     (mplus [_ mv mv']
       (concat mv mv'))
 
-    proto/Foldable
+    p/Foldable
     (foldr [ctx f z xs]
       (lazy-seq
        (let [x (first xs)
              xs (rest xs)]
          (if (nil? x)
            z
-           (f x (proto/foldr ctx f z xs))))))
+           (f x (p/foldr ctx f z xs))))))
 
     (foldl [ctx f z xs]
       (lazy-seq
@@ -97,11 +97,11 @@
              xs (rest xs)]
          (if (nil? x)
            z
-           (proto/foldl ctx f (f z x) xs)))))))
+           (p/foldl ctx f (f z x) xs)))))))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
-  proto/Context
+  p/Context
   (get-context [_] sequence-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -110,19 +110,19 @@
 
 (def vector-monad
   (reify
-    proto/Semigroup
+    p/Semigroup
     (mappend [_ sv sv']
       (into sv sv'))
 
-    proto/Monoid
+    p/Monoid
     (mempty [_]
       [])
 
-    proto/Functor
+    p/Functor
     (fmap [_ f v]
       (vec (map f v)))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       [v])
 
@@ -131,39 +131,39 @@
                  v av]
              (f v))))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       [v])
 
     (mbind [_ self f]
       (vec (mapcat f self)))
 
-    proto/MonadZero
+    p/MonadZero
     (mzero [_]
       [])
 
-    proto/MonadPlus
+    p/MonadPlus
     (mplus [_ mv mv']
       (into mv mv'))
 
-    proto/Foldable
+    p/Foldable
     (foldr [ctx f z xs]
       (let [x (first xs)
             xs (rest xs)]
         (if (nil? x)
           z
-          (f x (proto/foldr ctx f z xs)))))
+          (f x (p/foldr ctx f z xs)))))
 
     (foldl [ctx f z xs]
       (let [x (first xs)
             xs (rest xs)]
         (if (nil? x)
           z
-          (proto/foldl ctx f (f z x) xs))))))
+          (p/foldl ctx f (f z x) xs))))))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
-  proto/Context
+  p/Context
   (get-context [_] vector-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -172,19 +172,19 @@
 
 (def set-monad
   (reify
-    proto/Semigroup
+    p/Semigroup
     (mappend [_ sv sv']
       (s/union sv (set sv')))
 
-    proto/Monoid
+    p/Monoid
     (mempty [_]
       #{})
 
-    proto/Functor
+    p/Functor
     (fmap [_ f self]
       (set (map f self)))
 
-    proto/Applicative
+    p/Applicative
     (pure [_ v]
       #{v})
 
@@ -193,24 +193,24 @@
                  v av]
              (f v))))
 
-    proto/Monad
+    p/Monad
     (mreturn [_ v]
       #{v})
 
     (mbind [_ self f]
       (apply s/union (map f self)))
 
-    proto/MonadZero
+    p/MonadZero
     (mzero [_]
       #{})
 
-    proto/MonadPlus
+    p/MonadPlus
     (mplus [_ mv mv']
       (s/union mv mv'))))
 
 (extend-type #?(:clj clojure.lang.PersistentHashSet
                 :cljs cljs.core.PersistentHashSet)
-  proto/Context
+  p/Context
   (get-context [_] set-monad))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -219,20 +219,20 @@
 
 (def map-monoid
   (reify
-    proto/Semigroup
+    p/Semigroup
     (mappend [_ sv sv']
       (merge sv sv'))
 
-    proto/Monoid
+    p/Monoid
     (mempty [_]
       {})))
 
 (extend-type #?(:clj clojure.lang.PersistentHashMap
                 :cljs cljs.core.PersistentHashMap)
-  proto/Context
+  p/Context
   (get-context [_] map-monoid))
 
 #?(:clj
    (extend-type clojure.lang.PersistentArrayMap
-     proto/Context
+     p/Context
      (get-context [_] map-monoid)))
