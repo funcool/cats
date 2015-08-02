@@ -1,5 +1,12 @@
 # Changelog #
 
+## Version 0.6.1 ##
+
+Date: 2015-08-02
+
+- Remove src/user.clj that causes some problems.
+
+
 ## Version 0.6.0 ##
 
 Date: 2015-08-02
