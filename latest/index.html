@@ -80,7 +80,7 @@
 <h1>Cats Documentation</h1>
 <div class="details">
 <span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">0.5.0</span>
+<span id="revdate">0.6.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -99,10 +99,11 @@
 <li><a href="#_monoid">5.2. Monoid</a></li>
 <li><a href="#_functor">5.3. Functor</a></li>
 <li><a href="#_applicative">5.4. Applicative</a></li>
-<li><a href="#_monad">5.5. Monad</a></li>
-<li><a href="#_monadzero">5.6. MonadZero</a></li>
-<li><a href="#_monadplus">5.7. MonadPlus</a></li>
-<li><a href="#_monad_transformers">5.8. Monad Transformers</a></li>
+<li><a href="#_foldable">5.5. Foldable</a></li>
+<li><a href="#_monad">5.6. Monad</a></li>
+<li><a href="#_monadzero">5.7. MonadZero</a></li>
+<li><a href="#_monadplus">5.8. MonadPlus</a></li>
+<li><a href="#_monad_transformers">5.9. Monad Transformers</a></li>
 </ul>
 </li>
 <li><a href="#_types">6. Types</a>
@@ -115,19 +116,25 @@
 <li><a href="#_complementary_libraries">6.6. Complementary libraries</a></li>
 </ul>
 </li>
-<li><a href="#_faq">7. FAQ</a>
+<li><a href="#_higher_order_functions">7. Higher-order functions</a>
 <ul class="sectlevel2">
-<li><a href="#_what_clojure_types_implement_some_of_the_category_theory_abstractions">7.1. What Clojure types implement some of the Category Theory abstractions?</a></li>
-<li><a href="#_where_are_the_state_reader_writer_and_continuation_monads">7.2. Where are the State, Reader, Writer and Continuation monads?</a></li>
+<li><a href="#_curry">7.1. curry</a></li>
+<li><a href="#_lift_m">7.2. lift-m</a></li>
 </ul>
 </li>
-<li><a href="#_developers_guide">8. Developers Guide</a>
+<li><a href="#_faq">8. FAQ</a>
 <ul class="sectlevel2">
-<li><a href="#_philosophy">8.1. Philosophy</a></li>
-<li><a href="#_contributing">8.2. Contributing</a></li>
-<li><a href="#_source_code">8.3. Source Code</a></li>
-<li><a href="#_run_tests">8.4. Run tests</a></li>
-<li><a href="#_license">8.5. License</a></li>
+<li><a href="#_what_clojure_types_implement_some_of_the_category_theory_abstractions">8.1. What Clojure types implement some of the Category Theory abstractions?</a></li>
+<li><a href="#_where_are_the_state_reader_writer_and_continuation_monads">8.2. Where are the State, Reader, Writer and Continuation monads?</a></li>
+</ul>
+</li>
+<li><a href="#_developers_guide">9. Developers Guide</a>
+<ul class="sectlevel2">
+<li><a href="#_philosophy">9.1. Philosophy</a></li>
+<li><a href="#_contributing">9.2. Contributing</a></li>
+<li><a href="#_source_code">9.3. Source Code</a></li>
+<li><a href="#_run_tests">9.4. Run tests</a></li>
+<li><a href="#_license">9.5. License</a></li>
 </ul>
 </li>
 </ul>
@@ -223,7 +230,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;0.5.0&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;0.6.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 </div>
@@ -491,7 +498,82 @@ should clarify its purpose.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monad">5.5. Monad</h3>
+<h3 id="_foldable">5.5. Foldable</h3>
+<div class="paragraph">
+<p>The <strong>Foldable</strong> is a generic abstraction for data structures that can be folded. It consists
+mainly on two functions: <code>foldl</code> and <code>foldr</code>. <code>foldl</code> is also known as <code>reduce</code> or <code>inject</code>
+in other mainstream programming languages.</p>
+</div>
+<div class="paragraph">
+<p>Both function have an identical signature and differ in how they traverse the data structure.
+Let&#8217;s look at a little example using <code>foldl</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">foldl</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 15</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can observe that <code>foldl</code> is identical to the clojure <code>reduce</code> function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nb">reduce </span><span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 15</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the same operation can be done using <code>foldr</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">foldr</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span> <span class="tok-nv">wc</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">v</span> <span class="tok-nv">wc</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 15</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The main difference between <code>foldl</code> and <code>reduce</code> is that <code>foldl</code> has a fixed arity so all
+parameters are mandatory and <code>foldl</code> is a generic abstraction that can work with other
+types apart from collections.</p>
+</div>
+<div class="paragraph">
+<p>As we said previously, the <code>foldl</code> and <code>foldr</code> differ mainly on how they traverse the
+data structure. Then, for understanding better how they work internally, let&#8217;s see a
+graphical representation of the <code>foldl</code> execution model:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="text">((((acc⊕1)⊕2)⊕3)⊕4)⊕5</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In contrast to the <code>foldr</code> internal execution model:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="text">1⊕(2⊕(3⊕(4⊕(5⊕(wc)))))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In languages with strict argument evaluation, <code>foldr</code> does not have many
+applications because when the data structure to fold grows it tends to consume all the
+stack (causing the well known stack overflow). In case of Clojure, the unique obvious
+case of using foldr is for small datastructures or lazy sequences.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/foldr</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nb">cons </span><span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">%1</span><span class="tok-p">)</span> <span class="tok-nv">%2</span><span class="tok-p">)</span> <span class="tok-o">&#39;</span><span class="tok-p">()</span> <span class="tok-p">(</span><span class="tok-nb">into </span><span class="tok-p">[]</span> <span class="tok-p">(</span><span class="tok-nb">range </span><span class="tok-mi">100000</span><span class="tok-p">)))</span>
+<span class="tok-c1">;; =&gt; StackOverflowError</span>
+
+<span class="tok-c1">;; The same operation but using lazyseqs works as expected</span>
+<span class="tok-p">(</span><span class="tok-nf">m/foldr</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nb">cons </span><span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">%1</span><span class="tok-p">)</span> <span class="tok-nv">%2</span><span class="tok-p">)</span> <span class="tok-o">&#39;</span><span class="tok-p">()</span> <span class="tok-p">(</span><span class="tok-nb">map identity </span><span class="tok-p">(</span><span class="tok-nb">range </span><span class="tok-mi">100000</span><span class="tok-p">)))</span>
+<span class="tok-c1">;; =&gt; (1 2 3 4 ...)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_monad">5.6. Monad</h3>
 <div class="paragraph">
 <p>Monads are the most discussed programming concept to come from category theory. Like functors and
 applicatives, monads deal with data in contexts.</p>
@@ -592,7 +674,7 @@ If you are coming from Haskell, mlet represents the <strong>do-syntax</strong>.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monadzero">5.6. MonadZero</h3>
+<h3 id="_monadzero">5.7. MonadZero</h3>
 <div class="paragraph">
 <p>Some monads also have the notion of an identity element analogous to that of Monoid. When calling <code>bind</code> on a identity element
 for a monad, the same value is returned. This means that whenever we encounter the identity element in a monadic composition it will
@@ -677,7 +759,7 @@ using <code>bind</code> with <code>mlet</code> and <code>:when</code>:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monadplus">5.7. MonadPlus</h3>
+<h3 id="_monadplus">5.8. MonadPlus</h3>
 <div class="paragraph">
 <p>MonadPlus is a complementary abstraction for Monads that support an associative binary operation, analogous to that of a
 Semigroup. If the monad implements the MonadZero and MonadPlus protocols it forms a monoid.</p>
@@ -702,9 +784,9 @@ Semigroup. If the monad implements the MonadZero and MonadPlus protocols it form
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monad_transformers">5.8. Monad Transformers</h3>
+<h3 id="_monad_transformers">5.9. Monad Transformers</h3>
 <div class="sect3">
-<h4 id="_motivation">5.8.1. Motivation</h4>
+<h4 id="_motivation">5.9.1. Motivation</h4>
 <div class="paragraph">
 <p>We can combine two functors and get a new one automatically. Given any two functors <em>a</em> and <em>b</em>,
 we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we&#8217;ll call it fmap2:</p>
@@ -738,7 +820,7 @@ monad transformer is itself a monad.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_monad_transformers">5.8.2. Using monad transformers</h4>
+<h4 id="_using_monad_transformers">5.9.2. Using monad transformers</h4>
 <div class="paragraph">
 <p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the transformer
 using State as the base monad since we want the resulting type to be a stateful computation
@@ -1194,10 +1276,169 @@ that build higher-level abstractions on top of what cats offers.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_faq">7. FAQ</h2>
+<h2 id="_higher_order_functions">7. Higher-order functions</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_what_clojure_types_implement_some_of_the_category_theory_abstractions">7.1. What Clojure types implement some of the Category Theory abstractions?</h3>
+<h3 id="_curry">7.1. curry</h3>
+<div class="paragraph">
+<p>The first combinator that <em>cats</em> provides is a <code>curry</code> macro. Given a function, it can convert it to a curried
+versions of itself. The generated function will accept parameters until all the expected parameters are given.
+Let&#8217;s see some examples of a curried function in action:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+
+<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">add</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">]</span>
+  <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried-add</span> <span class="tok-p">(</span><span class="tok-nf">m/curry</span> <span class="tok-nv">add</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-nv">curried-add</span> <span class="tok-p">(</span><span class="tok-nf">curried-add</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; true</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-p">(</span><span class="tok-nf">curried-add</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">)</span> <span class="tok-mi">6</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; true</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-p">((</span><span class="tok-nf">curried-add</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">)</span> <span class="tok-mi">6</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; true</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-p">((</span><span class="tok-nf">curried-add</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-mi">3</span><span class="tok-p">)</span> <span class="tok-mi">6</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see above, since the original <code>add</code> has a single arity (3) and is fixed (i.e. it doesn&#8217;t accept a variable
+number of arguments), the <code>curry</code> macro was able to generate a curried function with the correct number of parameters.</p>
+</div>
+<div class="paragraph">
+<p>This doesn&#8217;t mean that functions with multiple arities or variadic arguments can&#8217;t be curried but an arity for the
+curried function must be given:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">m/curry</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">curried+</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; true</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-p">(</span><span class="tok-nf">curried+</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">)</span> <span class="tok-mi">6</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; true</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-p">((</span><span class="tok-nf">curried+</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">)</span> <span class="tok-mi">6</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; true</span>
+
+<span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-p">((</span><span class="tok-nf">curried+</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-mi">3</span><span class="tok-p">)</span> <span class="tok-mi">6</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; true</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Curried functions are very useful in combination with the applicative&#8217;s <code>fapply</code> operation, since we can curry
+a function and use applicatives for building up results with context-specific effects.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">m/curry</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-nv">curried+</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-nv">curried+</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-nv">curried+</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-nv">nil</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; nil</span>
+
+<span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">m/&lt;*&gt;</span> <span class="tok-p">(</span><span class="tok-nf">m/&lt;$&gt;</span> <span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_lift_m">7.2. lift-m</h3>
+<div class="paragraph">
+<p>The <code>lift-m</code> macro is a combinator for promoting functions that work on regular values to work on monadic values
+instead. It uses the monad&#8217;s bind operation under the hood and, like <code>curry</code>, can be used without specifying arity
+if the function we are lifting has a fixed and a single arity:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
+
+<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">add</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">]</span>
+  <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">add-m</span> <span class="tok-p">(</span><span class="tok-nf">m/lift-m</span> <span class="tok-nv">add</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">; =&gt; #&lt;Nothing &gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-nv">nil</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; nil</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Like with <code>curry</code>, we must provide an arity in case we are lifting a function that has multiple arities or is
+variadic:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">add-m</span> <span class="tok-p">(</span><span class="tok-nf">m/lift-m</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">; =&gt; #&lt;Nothing &gt;</span>
+
+<span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-nv">nil</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; nil</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that you can combine both <code>curry</code> and <code>lift-m</code> to get curried functions that work on monadic types using
+the <code>curry-lift-m</code> macro. The arity is mandatory when using this macro:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried-add-m</span> <span class="tok-p">(</span><span class="tok-nf">m/curry-lift-m</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">curried-add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
+
+<span class="tok-p">((</span><span class="tok-nf">curried-add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">))</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
+
+<span class="tok-p">((</span><span class="tok-nf">curried-add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">))</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_faq">8. FAQ</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_what_clojure_types_implement_some_of_the_category_theory_abstractions">8.1. What Clojure types implement some of the Category Theory abstractions?</h3>
 <div class="paragraph">
 <p>In contrast to other similar libraries in Clojure, <em>cats</em> doesn&#8217;t intend to extend Clojure types
 that don&#8217;t act like containers. For example, Clojure keywords are values but can not be containers so
@@ -1218,11 +1459,11 @@ they should not extend any of the previously explained protocols.</p>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">sequence</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">vector</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash-set</p></td>
@@ -1236,7 +1477,7 @@ they should not extend any of the previously explained protocols.</p>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_where_are_the_state_reader_writer_and_continuation_monads">7.2. Where are the State, Reader, Writer and Continuation monads?</h3>
+<h3 id="_where_are_the_state_reader_writer_and_continuation_monads">8.2. Where are the State, Reader, Writer and Continuation monads?</h3>
 <div class="paragraph">
 <p>TBD</p>
 </div>
@@ -1244,10 +1485,10 @@ they should not extend any of the previously explained protocols.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_developers_guide">8. Developers Guide</h2>
+<h2 id="_developers_guide">9. Developers Guide</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_philosophy">8.1. Philosophy</h3>
+<h3 id="_philosophy">9.1. Philosophy</h3>
 <div class="paragraph">
 <p>Five most important rules:</p>
 </div>
@@ -1275,14 +1516,14 @@ they should not extend any of the previously explained protocols.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_contributing">8.2. Contributing</h3>
+<h3 id="_contributing">9.2. Contributing</h3>
 <div class="paragraph">
 <p>Unlike Clojure and other Clojure contributed libraries, <em>cats</em> does not have many
 restrictions for contributions. Just open an issue or pull request.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_source_code">8.3. Source Code</h3>
+<h3 id="_source_code">9.3. Source Code</h3>
 <div class="paragraph">
 <p><em>cats</em> is open source and can be found on <a href="https://github.com/funcool/cats">github</a>.</p>
 </div>
@@ -1296,7 +1537,7 @@ restrictions for contributions. Just open an issue or pull request.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_run_tests">8.4. Run tests</h3>
+<h3 id="_run_tests">9.4. Run tests</h3>
 <div class="paragraph">
 <p>For running tests just execute this:</p>
 </div>
@@ -1307,7 +1548,7 @@ restrictions for contributions. Just open an issue or pull request.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_license">8.5. License</h3>
+<h3 id="_license">9.5. License</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="text">Copyright (c) 2014-2015 Andrey Antukh &lt;niwi@niwi.nz&gt;
@@ -1343,7 +1584,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-13 01:32:36 EEST
+Last updated 2015-08-02 12:49:38 EEST
 </div>
 </div>
 </body>
