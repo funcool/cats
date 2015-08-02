@@ -64,7 +64,7 @@
 
 (defn mappend
   [& svs]
-  {:pre [(not (empty? svs))]}
+  {:pre [(seq svs)]}
   (let [ctx (ctx/get-current (first svs))]
     (reduce (partial p/mappend ctx) svs)))
 
@@ -116,7 +116,7 @@
 
 (defn mplus
   [& mvs]
-  {:pre [(not (empty? mvs))]}
+  {:pre [(seq mvs)]}
   (let [ctx (ctx/get-current (first mvs))]
     (reduce (partial p/mplus ctx) mvs)))
 
@@ -148,9 +148,9 @@
   a result wrapped in context of same type of av context.
 
   This function is variadic, so it can be used like
-  a haskell style left-associative fapply."
+  a Haskell-style left-associative fapply."
   [af & avs]
-  {:pre [(not (empty? avs))]}
+  {:pre [(seq avs)]}
   (let [ctx (ctx/get-current af)]
     (reduce (partial p/fapply ctx) af avs)))
 
@@ -425,11 +425,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def <$>
-  "A haskell-style fmap alias."
+  "A Haskell-style fmap alias."
   fmap)
 
 (def <*>
-  "A haskell-style fapply alias."
+  "A Haskell-style fapply alias."
   fapply)
 
 (defn >>=
