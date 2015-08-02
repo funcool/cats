@@ -500,13 +500,17 @@
       (p/foldl ctx f z xs))))
 
 (defn foldm
-  "Given a monadic context, a function that takes two non-monadic arguments and
-  returns a value inside the given monadic context, an initial value, and a
-  collection of values, perform a left-associative fold."
-  [ctx f z xs]
-  (letfn [(foldm' [z' xs']
-            (if (empty? xs')
-              (return ctx z')
-              (let [[h & t] xs']
-                (>>= (f z' h) (fn [z''] (foldm' z'' t))))))]
-    (foldm' z xs)))
+  "Given an optional monadic context, a function that takes two non-monadic
+  arguments and returns a value inside the given monadic context, an initial
+  value, and a collection of values, perform a left-associative fold."
+  ([f z xs]
+   {:pre [(seq xs)]}
+   (let [[h & t] xs]
+     (mlet [z' (f z h)]
+       (if (empty? t)
+         (return z')
+         (foldm f z' t)))))
+  ([ctx f z xs]
+   (if (empty? xs)
+     (return ctx z)
+     (foldm f z xs))))
