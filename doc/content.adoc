@@ -550,7 +550,7 @@ For the Maybe type, `mplus` acts similarly to a logical OR that treats `Nothing`
 ;; => #<Just 1>
 
 (m/mplus (maybe/just 1) (maybe/just 2))
-;; => #<Just 1>
+;; => #<Just 3>
 ----
 
 
