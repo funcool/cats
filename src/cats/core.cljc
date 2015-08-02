@@ -359,23 +359,22 @@
               (reverse mvs)))))
 
 (defn mapseq
-   "Given a function that takes a value and puts it into a
-   monadic context, map it into the given collection
-   calling sequence on the results.
+  "Given a function that takes a value and puts it into a
+  monadic context, map it into the given collection
+  calling sequence on the results.
 
-       (require '[cats.monad.maybe :as maybe])
-       (require '[cats.core :as m])
+      (require '[cats.monad.maybe :as maybe])
+      (require '[cats.core :as m])
 
-       (m/mapseq maybe/just [2 3])
-       ;=> <Just [[2 3]]>
+      (m/mapseq maybe/just [2 3])
+      ;=> <Just [[2 3]]>
 
-       (m/mapseq (fn [v]
-                    (if (odd? v)
-                      (maybe/just v)
-                      (maybe/nothing)))
-                   [1 2])
-       ;=> <Nothing>
-  "
+      (m/mapseq (fn [v]
+                  (if (odd? v)
+                    (maybe/just v)
+                    (maybe/nothing)))
+                [1 2])
+      ;=> <Nothing>"
   [mf coll]
   (sequence (map mf coll)))
 
