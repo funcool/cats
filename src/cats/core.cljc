@@ -64,7 +64,7 @@
 
 (defn mappend
   [& svs]
-  {:pre [(not (empty? svs))]}
+  {:pre [(seq svs)]}
   (let [ctx (ctx/get-current (first svs))]
     (reduce (partial p/mappend ctx) svs)))
 
@@ -116,7 +116,7 @@
 
 (defn mplus
   [& mvs]
-  {:pre [(not (empty? mvs))]}
+  {:pre [(seq mvs)]}
   (let [ctx (ctx/get-current (first mvs))]
     (reduce (partial p/mplus ctx) mvs)))
 
@@ -150,7 +150,7 @@
   This function is variadic, so it can be used like
   a Haskell-style left-associative fapply."
   [af & avs]
-  {:pre [(not (empty? avs))]}
+  {:pre [(seq avs)]}
   (let [ctx (ctx/get-current af)]
     (reduce (partial p/fapply ctx) af avs)))
 
