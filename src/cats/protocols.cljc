@@ -63,7 +63,7 @@
 (defprotocol Applicative
   "The Applicative abstraction."
   (fapply [app af av]
-    "Applies the function(s) inside ag's context to the value(s)
+    "Applies the function(s) inside af's context to the value(s)
      inside av's context while preserving the context.")
   (pure [app v]
     "Takes any context monadic value ctx and any value v, and puts

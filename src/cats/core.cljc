@@ -275,21 +275,21 @@
          ((((c+) 1) 2) 3)
          ;; => 6
      "
-    ([f]
-     (if (not (symbol? f))
-       (throw (IllegalArgumentException. "You must provide an arity for currying anonymous functions"))
-       (let [fvar (resolve f)]
-         (if-let [args (arglists fvar)]
-           (if (single-arity? fvar)
-             `(curry ~(arity fvar) ~f)
-             (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for currying.")))
-           (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for currying."))))))
-    ([n f]
-     {:pre [(or (< n 21)
-                (throw (IllegalArgumentException. "Clojure doesn't allow more than 20 positional arguments")))]}
-     (let [args (repeatedly n gensym)
-           body `(~f ~@args)]
-       `(curry* ~args ~body)))))
+     ([f]
+      (if (not (symbol? f))
+        (throw (IllegalArgumentException. "You must provide an arity for currying anonymous functions"))
+        (let [fvar (resolve f)]
+          (if-let [args (arglists fvar)]
+            (if (single-arity? fvar)
+              `(curry ~(arity fvar) ~f)
+              (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for currying.")))
+            (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for currying."))))))
+     ([n f]
+      {:pre [(or (< n 21)
+                 (throw (IllegalArgumentException. "Clojure doesn't allow more than 20 positional arguments")))]}
+      (let [args (repeatedly n gensym)
+            body `(~f ~@args)]
+        `(curry* ~args ~body)))))
 
 #?(:clj
    (defmacro lift-m
@@ -308,24 +308,24 @@
          ;; => [1 2 3 4 5 6]
      "
      ([f]
-     (if (not (symbol? f))
-       (throw (IllegalArgumentException.
-               "You must provide an arity for lifting anonymous functions"))
-       (let [fvar (resolve f)]
-         (if-let [args (arglists fvar)]
-           (if (single-arity? fvar)
-             `(lift-m ~(arity fvar) ~f)
-             (throw (IllegalArgumentException.
-                     "The given function is either variadic or has multiple arities, provide an arity for lifting.")))
-           (throw (IllegalArgumentException.
-                   "The given function doesn't have arity metadata, provide an arity for lifting."))))))
-    ([n f]
-     (let [val-syms (repeatedly n gensym)
-           mval-syms (repeatedly n gensym)
-           mlet-bindings (interleave val-syms mval-syms)]
-       `(fn [~@mval-syms]
-          (mlet [~@mlet-bindings]
-            (return (~f ~@val-syms))))))))
+      (if (not (symbol? f))
+        (throw (IllegalArgumentException.
+                "You must provide an arity for lifting anonymous functions"))
+        (let [fvar (resolve f)]
+          (if-let [args (arglists fvar)]
+            (if (single-arity? fvar)
+              `(lift-m ~(arity fvar) ~f)
+              (throw (IllegalArgumentException.
+                      "The given function is either variadic or has multiple arities, provide an arity for lifting.")))
+            (throw (IllegalArgumentException.
+                    "The given function doesn't have arity metadata, provide an arity for lifting."))))))
+     ([n f]
+      (let [val-syms (repeatedly n gensym)
+            mval-syms (repeatedly n gensym)
+            mlet-bindings (interleave val-syms mval-syms)]
+        `(fn [~@mval-syms]
+           (mlet [~@mlet-bindings]
+             (return (~f ~@val-syms))))))))
 
 #?(:clj
    (defmacro curry-lift-m
@@ -359,22 +359,22 @@
               (reverse mvs)))))
 
 (defn mapseq
-   "Given a function that takes a value and puts it into a
-   monadic context, map it into the given collection
-   calling sequence on the results.
+  "Given a function that takes a value and puts it into a
+  monadic context, map it into the given collection
+  calling sequence on the results.
 
-       (require '[cats.monad.maybe :as maybe])
-       (require '[cats.core :as m])
+      (require '[cats.monad.maybe :as maybe])
+      (require '[cats.core :as m])
 
-       (m/mapseq maybe/just [2 3])
-       ;=> <Just [[2 3]]>
+      (m/mapseq maybe/just [2 3])
+      ;=> <Just [[2 3]]>
 
-       (m/mapseq (fn [v]
-                    (if (odd? v)
-                      (maybe/just v)
-                      (maybe/nothing)))
-                   [1 2])
-       ;=> <Nothing>
+      (m/mapseq (fn [v]
+                  (if (odd? v)
+                    (maybe/just v)
+                    (maybe/nothing)))
+                [1 2])
+      ;=> <Nothing>
   "
   [mf coll]
   (sequence (map mf coll)))
@@ -418,7 +418,7 @@
   (ctx/with-context (ctx/get-current mv)
     (mlet [v mv
            :when (p v)]
-          (return v))))
+      (return v))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
@@ -466,7 +466,7 @@
   (ctx/with-context (ctx/get-current mf)
     (mlet [a (mf x)
            b (mg a)]
-          (return b))))
+      (return b))))
 
 (defn <=<
   "Right-to-left composition of monads.
@@ -475,7 +475,7 @@
   (ctx/with-context (ctx/get-current mf)
     (mlet [a (mf x)
            b (mg a)]
-          (return b))))
+      (return b))))
 
 (defn extract
   "Generic function for unwrap/extract
@@ -493,7 +493,7 @@
       (p/foldr ctx f z xs))))
 
 (defn foldl
-  "Perform a right-associative fold on the data structure."
+  "Perform a left-associative fold on the data structure."
   [f z xs]
   (let [ctx (p/get-context xs)]
     (ctx/with-context ctx
