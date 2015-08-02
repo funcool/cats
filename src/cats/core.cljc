@@ -504,12 +504,15 @@
   arguments and returns a value inside the given monadic context, an initial
   value, and a collection of values, perform a left-associative fold."
   ([f z xs]
-   {:pre [(seq xs)]}
-   (let [[h & t] xs]
+   {:pre [(or (seq xs) (get-current-context))]}
+   (if-let [[h & t] (seq xs)]
      (mlet [z' (f z h)]
        (if (empty? t)
          (return z')
-         (foldm f z' t)))))
+         (foldm f z' t)))
+     (or (some-> (get-current-context) (return z))
+         ;; TODO: write better exception message
+         (throw (Exception. "missing context")))))
   ([ctx f z xs]
    (if (empty? xs)
      (return ctx z)
