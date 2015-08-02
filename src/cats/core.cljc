@@ -374,7 +374,8 @@
                     (maybe/just v)
                     (maybe/nothing)))
                 [1 2])
-      ;=> <Nothing>"
+      ;=> <Nothing>
+  "
   [mf coll]
   (sequence (map mf coll)))
 
