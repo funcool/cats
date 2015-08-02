@@ -420,18 +420,6 @@
            :when (p v)]
           (return v))))
 
-(defn foldseq
-  [f val mvs]
-  {:pre [(not-empty mvs)]}
-  (let [ctx (get-current-context (first mvs))]
-    (with-monad ctx
-      (reduce (fn [mz mv]
-                (mlet [z mz
-                       v mv]
-                  (f z v)))
-              (return val)
-              mvs))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -510,3 +498,19 @@
   (let [ctx (p/get-context xs)]
     (ctx/with-context ctx
       (p/foldl ctx f z xs))))
+
+(defn foldm
+  "Given a monadic context, a function that takes two non-monadic arguments and
+  returns a value inside the given monadic context, an initial value, and a
+  collection of values, perform a left-associative fold."
+  [ctx f z xs]
+  (letfn [(foldm'
+            ([xs']
+             (fn [z'']
+               (foldm' z'' xs')))
+            ([z' xs']
+             (if (empty? xs')
+               (return ctx z')
+               (let [[h & t] xs']
+                 (>>= (f z' h) (foldm' t))))))]
+    (foldm' z xs)))
