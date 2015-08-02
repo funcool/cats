@@ -505,9 +505,7 @@
   value, and a collection of values, perform a left-associative fold."
   ([f z xs]
    (if (empty? xs)
-     (or (some-> (get-current-context) (return z))
-         ;; TODO: write better exception message
-         (throw (Exception. "missing context")))
+     (return (get-current-context) z)
      (let [[h & t] xs]
        (mlet [z' (f z h)]
          (if (empty? t)
