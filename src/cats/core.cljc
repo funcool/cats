@@ -502,7 +502,32 @@
 (defn foldm
   "Given an optional monadic context, a function that takes two non-monadic
   arguments and returns a value inside the given monadic context, an initial
-  value, and a collection of values, perform a left-associative fold."
+  value, and a collection of values, perform a left-associative fold.
+
+      (require '[cats.context :as ctx]
+               '[cats.core :as m]
+               '[cats.monad.maybe :as maybe])
+
+      (defn m-div [x y]
+        (if (zero? y)
+          (maybe/nothing)
+          (maybe/just (/ x y))))
+
+      (m/foldm m-div 1 [1 2 3])
+      (m/foldm maybe/maybe-monad m-div 1 [1 2 3])
+      ;; => #<Just 1/6>
+
+      (m/foldm maybe/maybe-monad m-div 1 [1 0 3])
+      ;; => #<Nothing>
+
+      (foldm m-div 1 [])
+      ;; => Exception
+
+      (m/foldm maybe/maybe-monad m-div 1 [])
+      (ctx/with-context maybe/maybe-monad
+        (foldm m-div 1 []))
+      ;; => #<Just 1>
+  "
   ([f z xs]
    (if (empty? xs)
      (return (get-current-context) z)
