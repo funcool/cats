@@ -159,16 +159,18 @@
     (reduce (partial p/fapply ctx) af avs)))
 
 (defn when
-  "If the expression is true, returns the monadic value.
-  Otherwise, yields nil in a monadic context."
+  "Given an expression and a monadic value,
+  if the expression is logical true, return the monadic value.
+  Otherwise, return nil in a monadic context."
   ([b mv]
    (when (ctx/get-current mv) b mv))
   ([ctx b mv]
    (if b mv (return ctx nil))))
 
 (defn unless
-  "If the expression is false, returns the monadic value.
-  Otherwise, yields nil in a monadic context."
+  "Given an expression and a monadic value,
+  if the expression is not logical true, return the monadic value.
+  Otherwise, return nil in a monadic context."
   [b mv]
   (when-not b
     mv))
