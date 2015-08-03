@@ -96,16 +96,16 @@
   ([ctx v] (p/mreturn ctx v)))
 
 (defn bind
-  "Given a value inside monadic context `mv` and any function,
-  applies a function to value of mv.
+  "Given a monadic value `mv` and a function `f`,
+  apply `f` to the unwrapped value of `mv`.
 
       (bind (either/right 1) (fn [v]
                                (return (inc v))))
       ;; => #<Right [2]>
 
-  For convenience, you may prefer use a `mlet` macro
-  that add a beautiful, let like syntax for
-  compose operations with `bind` function."
+  For convenience, you may prefer to use the `mlet` macro,
+  which provides a beautiful, `let`-like syntax for
+  composing operations with the `bind` function."
   [mv f]
   (let [ctx (ctx/get-current mv)]
     (ctx/with-context ctx
