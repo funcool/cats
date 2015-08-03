@@ -185,8 +185,8 @@
      let. This allows much easy composition of monadic
      computations.
 
-     Let see one example for understand how it works, this is
-     a code using bind for compose few number of operations:
+     Let's see an example to understand how it works.
+     This code uses bind to compose a few operations:
 
          (bind (just 1)
                (fn [a]
@@ -195,8 +195,8 @@
                            (return (* b 2))))))
          ;=> #<Just [4]>
 
-     Now see how this code can be more clear if you
-     are using mlet macro for do it:
+     Now see how this code can be made clearer
+     by using the mlet macro:
 
          (mlet [a (just 1)
                 b (just (inc a))]
