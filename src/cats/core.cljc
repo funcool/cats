@@ -69,18 +69,21 @@
     (reduce (partial p/mappend ctx) svs)))
 
 (defn pure
-  "Given any value v, return it wrapped in
-  default/effect free context.
+  "Given any value `v`, return it wrapped in
+  the default/effect-free context.
 
-  This is multiarity function that with arity pure/1
-  it uses the dynamic scope to resolve the current
+  This is a multi-arity function that with arity `pure/1`
+  uses the dynamic scope to resolve the current
   context. With `pure/2`, you can force a specific context
   value.
 
   Example:
 
       (with-context either/either-monad
-        (pure 1)
+        (pure 1))
+      ;; => #<Right [1]>
+
+      (pure either/either-monad 1)
       ;; => #<Right [1]>
   "
   ([v] (pure (ctx/get-current) v))
