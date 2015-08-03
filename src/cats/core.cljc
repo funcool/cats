@@ -382,7 +382,7 @@
 (defn forseq
   "Same as mapseq but with the arguments in reverse order.
 
-  Let se a little example:
+  Let's see a little example:
 
       (m/forseq [2 3] maybe/just)
       ;; => <Just [[2 3]]>
@@ -436,7 +436,7 @@
   "Performs a Haskell-style left-associative
   bind.
 
-  Let see it in action:
+  Let's see it in action:
 
       (>>= (just 1) (comp just inc) (comp just inc))
       ;; => #<Just [3]>
