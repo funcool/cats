@@ -48,7 +48,7 @@
         ~@body)))
 
 (defn get-current-context
-  "Alias to cats.context/get-current for backward compatibility."
+  "Alias to `cats.context/get-current` for backward compatibility."
   {:deprecated true}
   ([] (ctx/get-current nil))
   ([default] (ctx/get-current default)))
@@ -87,7 +87,7 @@
   ([ctx v] (p/pure ctx v)))
 
 (defn return
-  "This is a monad version of pure and it works
+  "This is a monad version of `pure` and works
   identically to it."
   ([v] (return (ctx/get-current) v))
   ([ctx v] (p/mreturn ctx v)))
@@ -133,7 +133,7 @@
   (bind mv identity))
 
 (defn fmap
-  "Apply a function f to the value inside functor's fv
+  "Apply a function `f` to the value inside functor `fv`,
   preserving the context type."
   ([f]
    (fn [fv]
@@ -425,11 +425,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def <$>
-  "A Haskell-style fmap alias."
+  "A Haskell-style `fmap` alias."
   fmap)
 
 (def <*>
-  "A Haskell-style fapply alias."
+  "A Haskell-style `fapply` alias."
   fapply)
 
 (defn >>=
