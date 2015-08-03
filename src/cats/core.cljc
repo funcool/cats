@@ -380,7 +380,7 @@
   (sequence (map mf coll)))
 
 (defn forseq
-  "Same as mapseq but with the arguments in reverse order.
+  "Same as `mapseq` but with the arguments flipped.
 
   Let's see a little example:
 
@@ -456,7 +456,7 @@
 
 (defn =<<
   "Same as the two argument version of `>>=` but with the
-  arguments interchanged."
+  arguments flipped."
   [f mv]
   (>>= mv f))
 
