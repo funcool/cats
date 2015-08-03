@@ -146,9 +146,10 @@
        (p/fmap f fv))))
 
 (defn fapply
-  "Given function inside af's context and value inside
-  av's context, applies the function to value and return
-  a result wrapped in context of same type of av context.
+  "Given a function wrapped in a monadic context `af`,
+  and a value wrapped in a monadic context `av`,
+  apply the unwrapped function to the unwrapped value
+  and return the result, wrapped in the same context as `av`.
 
   This function is variadic, so it can be used like
   a Haskell-style left-associative fapply."
