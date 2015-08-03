@@ -438,8 +438,7 @@
   fapply)
 
 (defn >>=
-  "Performs a Haskell-style left-associative
-  bind.
+  "Perform a Haskell-style left-associative bind.
 
   Let's see it in action:
 
@@ -452,8 +451,8 @@
    (reduce bind mv (cons f fs))))
 
 (defn >>
-  "Performs a Haskell-style left-associative bind,
-  ignoring the values produced by the monad computations."
+  "Perform a Haskell-style left-associative bind,
+  ignoring the values produced by the monadic computations."
   ([mv mv']
    (bind mv (fn [_] mv')))
   ([mv mv' & mvs]
@@ -483,7 +482,7 @@
       (return b))))
 
 (defn extract
-  "Generic function for unwrap/extract
+  "Generic function to unwrap/extract
   the inner value of a container."
   [v]
   (p/extract v))
