@@ -364,9 +364,9 @@
               (reverse mvs)))))
 
 (defn mapseq
-  "Given a function that takes a value and puts it into a
-  monadic context, map it into the given collection
-  calling sequence on the results.
+  "Given a function `mf` that takes a value and puts it into a
+  monadic context, and a collection, map `mf` over the collection,
+  calling `sequence` on the results.
 
       (require '[cats.monad.maybe :as maybe])
       (require '[cats.core :as m])
@@ -405,12 +405,12 @@
   (mapseq mf vs))
 
 (defn filter
-  "Applies a predicate to a value in a `MonadZero` instance,
-  returning the identity element when the predicate yields false.
+  "Apply a predicate to a value in a `MonadZero` instance,
+  returning the identity element when the predicate does not hold.
 
-  Otherwise, returns the instance unchanged.
+  Otherwise, return the instance unchanged.
 
-      (require '[cats.monad.moaybe :as maybe])
+      (require '[cats.monad.maybe :as maybe])
       (require '[cats.core :as m])
 
       (m/filter (partial < 2) (maybe/just 3))
