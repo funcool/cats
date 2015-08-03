@@ -187,9 +187,9 @@
 
 #?(:clj
    (defmacro mlet
-     "Monad composition macro that works like clojure
-     let. This allows much easy composition of monadic
-     computations.
+     "Monad composition macro that works like Clojure's
+     `let`. This facilitates much easier composition of
+     monadic computations.
 
      Let's see an example to understand how it works.
      This code uses bind to compose a few operations:
