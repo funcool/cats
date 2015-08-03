@@ -131,12 +131,12 @@
 
 (defn join
   "Remove one level of monadic structure.
-  This is same as that `(bind mv identity)`"
+  This is the same as `(bind mv identity)`."
   [mv]
   (bind mv identity))
 
 (defn fmap
-  "Apply a function `f` to the value inside functor `fv`,
+  "Apply a function `f` to the value wrapped in functor `fv`,
   preserving the context type."
   ([f]
    (fn [fv]
