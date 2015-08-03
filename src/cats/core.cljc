@@ -257,10 +257,10 @@
 
 #?(:clj
    (defmacro curry
-     "Given either a fixed arity function or an arity and a function
-     yields another which is curried.
+     "Given either a fixed arity function or an arity and a function,
+     return another which is curried.
 
-     With inferred arity (function must have one fixed arity)
+     With inferred arity (function must have one fixed arity):
 
          (defn add2 [x y] (+ x y))
          (def cadd2 (curry add2))
@@ -271,7 +271,7 @@
          (cadd2 1 3)
          ;; => 4
 
-     With fixed arity:
+     With given arity:
 
          (def c+ (curry 3 +))
 
@@ -299,8 +299,7 @@
 
 #?(:clj
    (defmacro lift-m
-     "Lifts a function with the given fixed number of arguments to a
-     monadic context.
+     "Lift a function with a given fixed arity to a monadic context.
 
          (def monad+ (lift-m 2 +))
 
@@ -335,7 +334,7 @@
 
 #?(:clj
    (defmacro curry-lift-m
-     "Is a composition of curry and lift-m macros."
+     "Composition of `curry` and `lift-m`"
      [n f]
      `(curry ~n (lift-m ~n ~f))))
 
