@@ -223,35 +223,147 @@
                       `(bind ~r (fn [~l] ~acc))))
                   `(do ~@body)))))
 
+(defn deps [expr syms]
+  (cond
+    (and (symbol? expr)
+         (contains? syms expr))
+    (list expr)
+
+    (seq? expr)
+    (mapcat #(deps % syms) expr)
+
+    :else
+    '()))
+
+(defn rename-sym [expr renames]
+  (get renames expr expr))
+
+(defn rename [expr renames]
+  (cond
+    (symbol? expr)
+    (rename-sym expr renames)
+    (list? expr)
+    (map #(rename % renames) expr)
+    :else
+    expr))
+
+(defn dedupe-symbols*
+  [sym->ap body]
+  (letfn [(renamer [{:keys [body syms aps seen renames] :as summ} [s ap]]
+           (let [ap' (rename ap renames)]
+             (if (seen s)
+               (let [s' (gensym)]
+                 {:syms (conj syms s')
+                  :aps (conj aps ap')
+                  :seen (conj seen s')
+                  :renames (assoc renames s s')
+                  :body (rename body (assoc renames s s'))})
+               {:syms (conj syms s)
+                :aps (conj aps ap')
+                :seen (conj seen s)
+                :renames renames
+                :body body})))]
+    (let [summ
+          (reduce renamer
+                  {:syms []
+                   :aps []
+                   :seen #{}
+                   :renames {}
+                   :body body}
+                  sym->ap)]
+      [(mapv vector (:syms summ) (:aps summ)) (:body summ)])))
+
+(defn dedupe-symbols
+  [bindings body]
+  (let [syms (map first bindings)
+        aps (map second bindings)
+        sym->ap (mapv vector syms aps)]
+    (dedupe-symbols* sym->ap body)))
+
+(defn dependency-map
+  [sym->ap]
+  (let [syms (map first sym->ap)
+        symset (set syms)]
+    (into []
+          (for [[s ap] sym->ap
+                :let [ds (set (deps ap symset))]]
+            [s ds]))))
+
+(defn remove-deps
+  [deps symset]
+  (let [removed (for [[s depset] deps]
+                  [s (clojure.set/difference depset symset)])]
+    (into (empty deps) removed)))
+
+(defn topo-sort*
+  [deps seen batches current]
+  (if (empty? deps)
+    (conj batches current)
+    (let [dep (first deps)
+          [s dependencies] dep
+          dependant? (some dependencies seen)]
+      (if (nil? dependant?)
+        (recur (subvec deps 1)
+               (conj seen s)
+               batches
+               (conj current s))
+        (recur (remove-deps (subvec deps 1) (set current))
+               (conj seen s)
+               (conj batches current)
+               [s])))))
+
+(defn topo-sort
+  [deps]
+  (let [syms (into #{} (map first deps))]
+    (topo-sort* deps #{} [] [])))
+
+(defn bindings->batches
+  [bindings]
+  (let [syms (map first bindings)
+        aps (map second bindings)
+        sym->ap (mapv vector syms aps)
+        sorted-deps (topo-sort (dependency-map sym->ap))]
+    sorted-deps))
+
+(defn alet*
+    [batches env body]
+    (let [fb (first batches)
+        rb (rest batches)
+        fs (first fb)
+        fa (get env fs)]
+      (reduce (fn [acc syms]
+                (let [fs (first syms)
+                      fa (get env fs)
+                      faps (map #(get env %) (rest syms))]
+                  (if (= (count syms) 1)
+                    `(join (fmap (fn [~fs] ~acc) ~fa))
+                    `(fapply (fmap (fn [~(first syms)]
+                                     (fn [~@(rest syms)] ~acc))
+                                    ~fa)
+                            ~@faps))))
+            `(do ~body)
+            (reverse batches))))
+
 #?(:clj
    (defmacro alet
-    "TODO:
-     "
+    "TODO"
     [bindings body]
     (when-not (and (vector? bindings)
                    (not-empty bindings)
                    (even? (count bindings)))
       (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-    (when-not (and (list? body)
-                   (symbol? (first body)))
-      (throw (IllegalArgumentException. "the body must be a function call.")))
-    (let [bs (partition 2 bindings)
-          syms (map first bs)
-          sym-count (count syms)
-          aps (map second bs)
-          ;; TODO:
-          ;; - binding renaming, implies changing the symbols in `body` too!
-          ;;  -dependency graph
-          ;; - topological sort
-          ;; - maximize parallelism. when confronted with various oportunities for desugaring, choose maximum parallelism
-          ;; - careful about ordering
-          ;; - applicative expression generation and combination with `(fapply (fmap curried-fn a1) a2 a3 ...)`
-          f (first body)
-          cf `(curry ~sym-count (fn [~@syms] ~body))
-          fa (first aps)]
-      (if (= sym-count 1)
-        `(fmap ~cf ~fa)
-        `(fapply (fmap ~cf ~fa) ~@(rest aps))))))
+    (let [bindings (partition 2 bindings)
+          [bindings body] (dedupe-symbols bindings body)
+          batches (bindings->batches bindings)
+          env (into {} bindings)]
+      (if (and (= (count batches) 1)
+               (= (count (map first bindings)) 1))
+        `(fmap (fn [~@(map first bindings)]
+                 (do ~body))
+               ~@(map second bindings))
+        (alet* batches env body))))
+
+)
 
 (defn- arglists
   [var]

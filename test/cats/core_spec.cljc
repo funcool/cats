@@ -57,11 +57,19 @@
                       y (maybe/just 2)]
                      (add2 x y)))))
 
-  #_(t/testing "It works with one level of dependencies between applicative values"
+  (t/testing "It works with one level of dependencies between applicative values"
     (t/is (= (maybe/just [42])
              (m/alet [x (maybe/just 21)
                       y (maybe/just 2)
                       z (maybe/just (* x y))]
+                     (vector z)))))
+
+  (t/testing "It works with more than one level of dependencies between applicative values"
+    (t/is (= (maybe/just [45])
+             (m/alet [x (maybe/just 21)
+                      y (maybe/just 2)
+                      z (maybe/just (* x y))
+                      z (maybe/just (+ 3 z))]
                      (vector z)))))
 )
 
