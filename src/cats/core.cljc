@@ -326,23 +326,23 @@
     sorted-deps))
 
 (defn alet*
-    [batches env body]
-    (let [fb (first batches)
+  [batches env body]
+  (let [fb (first batches)
         rb (rest batches)
         fs (first fb)
         fa (get env fs)]
-      (reduce (fn [acc syms]
-                (let [fs (first syms)
-                      fa (get env fs)
-                      faps (map #(get env %) (rest syms))]
-                  (if (= (count syms) 1)
-                    `(join (fmap (fn [~fs] ~acc) ~fa))
-                    `(fapply (fmap (fn [~(first syms)]
-                                     (fn [~@(rest syms)] ~acc))
-                                    ~fa)
-                            ~@faps))))
-            `(do ~body)
-            (reverse batches))))
+    (reduce (fn [acc syms]
+              (let [fs (first syms)
+                    fa (get env fs)
+                    faps (map #(get env %) (rest syms))]
+                (if (= (count syms) 1)
+                  `(join (fmap (fn [~fs] ~acc) ~fa))
+                  `(fapply (fmap (fn [~(first syms)]
+                                   (fn [~@(rest syms)] ~acc))
+                                  ~fa)
+                          ~@faps))))
+          `(do ~body)
+          (reverse batches))))
 
 #?(:clj
    (defmacro alet
