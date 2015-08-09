@@ -52,14 +52,14 @@
   (let [val->lazyseq (fn [x] (lazy-seq [x]))
         s (val->lazyseq 2)]
 
-  (t/testing "Forms a semigroup"
-    (t/is (= [1 2 3 4 5]
-             (m/mappend (lazy-seq [1 2 3]) (lazy-seq [4 5])))))
+    (t/testing "Forms a semigroup"
+      (t/is (= [1 2 3 4 5]
+               (m/mappend (lazy-seq [1 2 3]) (lazy-seq [4 5])))))
 
-  (t/testing "Forms a monoid"
-    (t/is (= [1 2 3]
-             (m/with-monad b/sequence-monad
-               (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
+    (t/testing "Forms a monoid"
+      (t/is (= [1 2 3]
+               (m/with-monad b/sequence-monad
+                 (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
 
     (t/testing "The first monad law: left identity"
       (t/is (= s (m/with-monad b/sequence-monad
