@@ -67,7 +67,7 @@
 
 
 (t/deftest mapseq-tests
-  (t/testing "It works with maybe values"
+  (t/testing "It works with Maybe values"
     (t/is (= (m/mapseq maybe/just [1 2 3 4 5])
              (maybe/just [1 2 3 4 5])))
     (t/is (= (maybe/nothing)
