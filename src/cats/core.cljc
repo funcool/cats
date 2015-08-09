@@ -530,7 +530,7 @@
   "
   ([f z xs]
    (if (empty? xs)
-     (return (get-current-context) z)
+     (return (ctx/get-current) z)
      (let [[h & t] xs]
        (mlet [z' (f z h)]
          (if (empty? t)
