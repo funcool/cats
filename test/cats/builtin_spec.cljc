@@ -141,5 +141,4 @@
             result (m/foldr (partial foldr-fn state) '() (map identity [1 2 3 4]))]
         (t/is (= @state 0))
         (t/is (= 2 (first result)))
-        (t/is (= @state 1))))
-))
+        (t/is (= @state 1))))))
