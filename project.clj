@@ -1,4 +1,4 @@
-(defproject funcool/cats "0.5.0"
+(defproject funcool/cats "0.6.1"
   :description "Category Theory abstractions for Clojure"
   :url "https://github.com/funcool/cats"
   :license {:name "BSD (2 Clause)"
@@ -16,7 +16,7 @@
                              :target "doc/dist/latest/api"
                              :src-uri "http://github.com/funcool/cats/blob/master/"
                              :src-uri-prefix "#L"}
-                   :plugins [[funcool/codeina "0.2.0"]]}
+                   :plugins [[funcool/codeina "0.3.0-SNAPSHOT"]]}
              :bench [:dev {:dependencies [[criterium "0.4.3"]]
                            :main ^:skip-aot benchmarks
                            :jvm-opts ^:replace []

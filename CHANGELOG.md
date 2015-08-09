@@ -1,5 +1,25 @@
 # Changelog #
 
+## Version 0.6.1 ##
+
+Date: 2015-08-02
+
+- Remove src/user.clj that causes some problems.
+
+
+## Version 0.6.0 ##
+
+Date: 2015-08-02
+
+- Foldable abstraction.
+- Curry facilities.
+- Major code cleaning.
+- Context management moved into its own namespace.
+- A lot of performance improvements (removing unnecessary
+  function call forwarding).
+- Start using the clojurescript 1.7.28.
+
+
 ## Version 0.5.0 ##
 
 Date: 2015-07-13
