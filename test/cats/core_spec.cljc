@@ -116,15 +116,15 @@
       (t/is (= (maybe/just 6)
                ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
 
-    (t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)
-            monad+ (m/lift-m 2 add2)]
-        (t/is (= [(maybe/just 1) (maybe/just 2)
-                  (maybe/just 3) (maybe/just 4)
-                  (maybe/just 5) (maybe/just 6)]
-                 (m/with-monad maybe-sequence-monad
-                   (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
-                           [(maybe/just 1) (maybe/just 2)])))))))
+  (t/testing "It can lift a function to a Monad Transformer"
+    (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)
+          monad+ (m/lift-m 2 add2)]
+      (t/is (= [(maybe/just 1) (maybe/just 2)
+                (maybe/just 3) (maybe/just 4)
+                (maybe/just 5) (maybe/just 6)]
+               (m/with-monad maybe-sequence-monad
+                 (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
+                         [(maybe/just 1) (maybe/just 2)])))))))
 
 (t/deftest filter-tests
   (t/testing "It can filter Maybe monadic values"
