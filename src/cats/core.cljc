@@ -36,7 +36,7 @@
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Backward compatiblity aliases.
+;; Backward compatiblity aliases
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 #?(:clj
@@ -48,13 +48,13 @@
         ~@body)))
 
 (defn get-current-context
-  "Alias to cats.context/get-current for backward compatibility."
+  "Alias to `cats.context/get-current` for backward compatibility."
   {:deprecated true}
   ([] (ctx/get-current nil))
   ([default] (ctx/get-current default)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Context-aware funcionts
+;; Context-aware functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn mempty
@@ -69,40 +69,43 @@
     (reduce (partial p/mappend ctx) svs)))
 
 (defn pure
-  "Given any value v, return it wrapped in
-  default/effect free context.
+  "Given any value `v`, return it wrapped in
+  the default/effect-free context.
 
-  This is multiarity function that with arity pure/1
-  it uses the dynamic scope to resolve the current
+  This is a multi-arity function that with arity `pure/1`
+  uses the dynamic scope to resolve the current
   context. With `pure/2`, you can force a specific context
   value.
 
   Example:
 
       (with-context either/either-monad
-        (pure 1)
+        (pure 1))
+      ;; => #<Right [1]>
+
+      (pure either/either-monad 1)
       ;; => #<Right [1]>
   "
   ([v] (pure (ctx/get-current) v))
   ([ctx v] (p/pure ctx v)))
 
 (defn return
-  "This is a monad version of pure and it works
+  "This is a monad version of `pure` and works
   identically to it."
   ([v] (return (ctx/get-current) v))
   ([ctx v] (p/mreturn ctx v)))
 
 (defn bind
-  "Given a value inside monadic context `mv` and any function,
-  applies a function to value of mv.
+  "Given a monadic value `mv` and a function `f`,
+  apply `f` to the unwrapped value of `mv`.
 
       (bind (either/right 1) (fn [v]
                                (return (inc v))))
       ;; => #<Right [2]>
 
-  For convenience, you may prefer use a `mlet` macro
-  that add a beautiful, let like syntax for
-  compose operations with `bind` function."
+  For convenience, you may prefer to use the `mlet` macro,
+  which provides a beautiful, `let`-like syntax for
+  composing operations with the `bind` function."
   [mv f]
   (let [ctx (ctx/get-current mv)]
     (ctx/with-context ctx
@@ -128,12 +131,12 @@
 
 (defn join
   "Remove one level of monadic structure.
-  This is same as that `(bind mv identity)`"
+  This is the same as `(bind mv identity)`."
   [mv]
   (bind mv identity))
 
 (defn fmap
-  "Apply a function f to the value inside functor's fv
+  "Apply a function `f` to the value wrapped in functor `fv`,
   preserving the context type."
   ([f]
    (fn [fv]
@@ -143,9 +146,10 @@
        (p/fmap f fv))))
 
 (defn fapply
-  "Given function inside af's context and value inside
-  av's context, applies the function to value and return
-  a result wrapped in context of same type of av context.
+  "Given a function wrapped in a monadic context `af`,
+  and a value wrapped in a monadic context `av`,
+  apply the unwrapped function to the unwrapped value
+  and return the result, wrapped in the same context as `av`.
 
   This function is variadic, so it can be used like
   a Haskell-style left-associative fapply."
@@ -155,16 +159,18 @@
     (reduce (partial p/fapply ctx) af avs)))
 
 (defn when
-  "If the expression is true, returns the monadic value.
-  Otherwise, yields nil in a monadic context."
+  "Given an expression and a monadic value,
+  if the expression is logical true, return the monadic value.
+  Otherwise, return nil in a monadic context."
   ([b mv]
    (when (ctx/get-current mv) b mv))
   ([ctx b mv]
    (if b mv (return ctx nil))))
 
 (defn unless
-  "If the expression is false, returns the monadic value.
-  Otherwise, yields nil in a monadic context."
+  "Given an expression and a monadic value,
+  if the expression is not logical true, return the monadic value.
+  Otherwise, return nil in a monadic context."
   [b mv]
   (when-not b
     mv))
@@ -181,12 +187,12 @@
 
 #?(:clj
    (defmacro mlet
-     "Monad composition macro that works like clojure
-     let. This allows much easy composition of monadic
-     computations.
+     "Monad composition macro that works like Clojure's
+     `let`. This facilitates much easier composition of
+     monadic computations.
 
-     Let see one example for understand how it works, this is
-     a code using bind for compose few number of operations:
+     Let's see an example to understand how it works.
+     This code uses bind to compose a few operations:
 
          (bind (just 1)
                (fn [a]
@@ -195,8 +201,8 @@
                            (return (* b 2))))))
          ;=> #<Just [4]>
 
-     Now see how this code can be more clear if you
-     are using mlet macro for do it:
+     Now see how this code can be made clearer
+     by using the mlet macro:
 
          (mlet [a (just 1)
                 b (just (inc a))]
@@ -251,10 +257,10 @@
 
 #?(:clj
    (defmacro curry
-     "Given either a fixed arity function or an arity and a function
-     yields another which is curried.
+     "Given either a fixed arity function or an arity and a function,
+     return another which is curried.
 
-     With inferred arity (function must have one fixed arity)
+     With inferred arity (function must have one fixed arity):
 
          (defn add2 [x y] (+ x y))
          (def cadd2 (curry add2))
@@ -265,7 +271,7 @@
          (cadd2 1 3)
          ;; => 4
 
-     With fixed arity:
+     With given arity:
 
          (def c+ (curry 3 +))
 
@@ -293,8 +299,7 @@
 
 #?(:clj
    (defmacro lift-m
-     "Lifts a function with the given fixed number of arguments to a
-     monadic context.
+     "Lift a function with a given fixed arity to a monadic context.
 
          (def monad+ (lift-m 2 +))
 
@@ -329,7 +334,7 @@
 
 #?(:clj
    (defmacro curry-lift-m
-     "Is a composition of curry and lift-m macros."
+     "Composition of `curry` and `lift-m`"
      [n f]
      `(curry ~n (lift-m ~n ~f))))
 
@@ -359,9 +364,9 @@
               (reverse mvs)))))
 
 (defn mapseq
-  "Given a function that takes a value and puts it into a
-  monadic context, map it into the given collection
-  calling sequence on the results.
+  "Given a function `mf` that takes a value and puts it into a
+  monadic context, and a collection, map `mf` over the collection,
+  calling `sequence` on the results.
 
       (require '[cats.monad.maybe :as maybe])
       (require '[cats.core :as m])
@@ -380,9 +385,9 @@
   (sequence (map mf coll)))
 
 (defn forseq
-  "Same as mapseq but with the arguments in reverse order.
+  "Same as `mapseq` but with the arguments flipped.
 
-  Let se a little example:
+  Let's see a little example:
 
       (m/forseq [2 3] maybe/just)
       ;; => <Just [[2 3]]>
@@ -400,12 +405,12 @@
   (mapseq mf vs))
 
 (defn filter
-  "Applies a predicate to a value in a `MonadZero` instance,
-  returning the identity element when the predicate yields false.
+  "Apply a predicate to a value in a `MonadZero` instance,
+  returning the identity element when the predicate does not hold.
 
-  Otherwise, returns the instance unchanged.
+  Otherwise, return the instance unchanged.
 
-      (require '[cats.monad.moaybe :as maybe])
+      (require '[cats.monad.maybe :as maybe])
       (require '[cats.core :as m])
 
       (m/filter (partial < 2) (maybe/just 3))
@@ -425,18 +430,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def <$>
-  "A Haskell-style fmap alias."
+  "A Haskell-style `fmap` alias."
   fmap)
 
 (def <*>
-  "A Haskell-style fapply alias."
+  "A Haskell-style `fapply` alias."
   fapply)
 
 (defn >>=
-  "Performs a Haskell-style left-associative
-  bind.
+  "Perform a Haskell-style left-associative bind.
 
-  Let see it in action:
+  Let's see it in action:
 
       (>>= (just 1) (comp just inc) (comp just inc))
       ;; => #<Just [3]>
@@ -447,8 +451,8 @@
    (reduce bind mv (cons f fs))))
 
 (defn >>
-  "Performs a Haskell-style left-associative bind,
-  ignoring the values produced by the monad computations."
+  "Perform a Haskell-style left-associative bind,
+  ignoring the values produced by the monadic computations."
   ([mv mv']
    (bind mv (fn [_] mv')))
   ([mv mv' & mvs]
@@ -456,7 +460,7 @@
 
 (defn =<<
   "Same as the two argument version of `>>=` but with the
-  arguments interchanged."
+  arguments flipped."
   [f mv]
   (>>= mv f))
 
@@ -478,7 +482,7 @@
       (return b))))
 
 (defn extract
-  "Generic function for unwrap/extract
+  "Generic function to unwrap/extract
   the inner value of a container."
   [v]
   (p/extract v))

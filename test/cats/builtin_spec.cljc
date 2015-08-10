@@ -52,14 +52,14 @@
   (let [val->lazyseq (fn [x] (lazy-seq [x]))
         s (val->lazyseq 2)]
 
-  (t/testing "Forms a semigroup"
-    (t/is (= [1 2 3 4 5]
-             (m/mappend (lazy-seq [1 2 3]) (lazy-seq [4 5])))))
+    (t/testing "Forms a semigroup"
+      (t/is (= [1 2 3 4 5]
+               (m/mappend (lazy-seq [1 2 3]) (lazy-seq [4 5])))))
 
-  (t/testing "Forms a monoid"
-    (t/is (= [1 2 3]
-             (m/with-monad b/sequence-monad
-               (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
+    (t/testing "Forms a monoid"
+      (t/is (= [1 2 3]
+               (m/with-monad b/sequence-monad
+                 (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
 
     (t/testing "The first monad law: left identity"
       (t/is (= s (m/with-monad b/sequence-monad
@@ -141,5 +141,4 @@
             result (m/foldr (partial foldr-fn state) '() (map identity [1 2 3 4]))]
         (t/is (= @state 0))
         (t/is (= 2 (first result)))
-        (t/is (= @state 1))))
-))
+        (t/is (= @state 1))))))
