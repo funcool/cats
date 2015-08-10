@@ -178,3 +178,29 @@
                6))
       (t/is (= (csum 1 2 3)
                6)))))
+
+(t/deftest foldm-tests
+  (letfn [(m-div [x y]
+            (if (zero? y)
+              (maybe/nothing)
+              (maybe/just (/ x y))))]
+    (t/testing "It can fold a non-empty collection without an explicit context"
+      (t/is (= (maybe/just #?(:clj 1/6 :cljs (/ 1 6)))
+               (m/foldm m-div 1 [1 2 3])))
+      (t/is (= (maybe/nothing)
+               (m/foldm m-div 1 [1 0 3]))))
+    (t/testing "It cannot fold an empty collection without an explicit context"
+      (t/is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
+                     (with-redefs [cats.context/get-current (constantly nil)]
+                       (m/foldm m-div 1 [])))))
+    (t/testing "It can fold a non-empty collection, given an explicit context"
+      (t/is (= (maybe/just #?(:clj 1/6, :cljs (/ 1 6)))
+               (m/foldm maybe/maybe-monad m-div 1 [1 2 3])))
+      (t/is (= (maybe/nothing)
+               (m/foldm maybe/maybe-monad m-div 1 [1 0 3]))))
+    (t/testing "It can fold an empty collection, given an explicit context"
+      (t/is (= (maybe/just 1)
+               (m/foldm maybe/maybe-monad m-div 1 [])))
+      (t/is (= (maybe/just 1)
+               (m/with-monad maybe/maybe-monad
+                 (m/foldm m-div 1 [])))))))
