@@ -339,10 +339,10 @@
                         faps (map #(get env %) rs)]
                     (if (= (count syms) 1)
                       `(fmap (fn [~fs] ~acc) ~fa)
-                       `(fapply (fmap (fn [~fs]
-                                        (curry ~(count (rest syms)) (fn [~@(rest syms)] ~acc))) ;; TODO: only need 1 arity, don't invoke `curry`
-                                      ~fa)
-                                ~@faps))))
+                      (let [cf (reduce (fn [f sym] `(fn [~sym] ~f))
+                                       acc
+                                       (reverse syms))]
+                        `(fapply (fmap ~cf ~fa) ~@faps)))))
                 `(do ~body)
                 (reverse batches))
         join-count (dec (count batches))]
