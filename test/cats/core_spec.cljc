@@ -59,19 +59,29 @@
 
   (t/testing "It works with one level of dependencies between applicative values"
     (t/is (= (maybe/just [42])
-             (m/alet [x (maybe/just 21)
+             (m/alet [x (maybe/just 21)       ;; split 1
                       y (maybe/just 2)
-                      z (maybe/just (* x y))]
+                      z (maybe/just (* x y))] ;; split 2
                      (vector z)))))
 
   (t/testing "It works with more than one level of dependencies between applicative values"
     (t/is (= (maybe/just [45])
-             (m/alet [x (maybe/just 21)
+             (m/alet [x (maybe/just 21)       ;; split 1
                       y (maybe/just 2)
-                      z (maybe/just (* x y))
-                      z (maybe/just (+ 3 z))]
+                      z (maybe/just (* x y))  ;; split 2
+                      z (maybe/just (+ 3 z))] ;; split 3
                      (vector z)))))
-)
+
+  (t/testing "It works with more than one level of dependencies, with distinct split sizes"
+    (t/is (= (maybe/just 66)
+             (m/alet [x (maybe/just 21)         ;; split 1
+                      y (maybe/just 2)
+                      z (maybe/just (* x y))    ;; split 2
+                      a (maybe/just (* 3 x))
+                      b (maybe/just 1)          ;; split 3
+                      c (maybe/just 2)
+                      d (maybe/just (+ a b c))] ;; split 4
+               d)))))
 
 (t/deftest sequence-tests
   (t/testing "It works with vectors"

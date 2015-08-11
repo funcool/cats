@@ -330,19 +330,26 @@
   (let [fb (first batches)
         rb (rest batches)
         fs (first fb)
-        fa (get env fs)]
-    (reduce (fn [acc syms]
-              (let [fs (first syms)
-                    fa (get env fs)
-                    faps (map #(get env %) (rest syms))]
-                (if (= (count syms) 1)
-                  `(join (fmap (fn [~fs] ~acc) ~fa))
-                  `(fapply (fmap (fn [~(first syms)]
-                                   (fn [~@(rest syms)] ~acc))
-                                  ~fa)
-                          ~@faps))))
-          `(do ~body)
-          (reverse batches))))
+        fa (get env fs)
+        code
+        (reduce (fn [acc syms]
+                  (let [fs (first syms)
+                        fa (get env fs)
+                        rs (rest syms)
+                        faps (map #(get env %) rs)]
+                    (if (= (count syms) 1)
+                      `(fmap (fn [~fs] ~acc) ~fa)
+                       `(fapply (fmap (fn [~fs]
+                                        (curry ~(count (rest syms)) (fn [~@(rest syms)] ~acc))) ;; TODO: only need 1 arity, don't invoke `curry`
+                                      ~fa)
+                                ~@faps))))
+                `(do ~body)
+                (reverse batches))
+        join-count (dec (count batches))]
+    (reduce (fn [acc _]
+            `(join ~acc))
+        code
+        (range join-count))))
 
 #?(:clj
    (defmacro alet
