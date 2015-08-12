@@ -1,5 +1,7 @@
 (ns user
   (:require [clojure.tools.namespace.repl :as repl]
+            [clojure.walk :refer [macroexpand-all]]
+            [clojure.pprint :refer [pprint]]
             [clojure.test :as test]))
 
 (defonce ^:dynamic
