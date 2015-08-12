@@ -29,9 +29,11 @@
      (:require-macros [cats.core :refer (mlet)]))
   #?(:cljs
      (:require [cats.protocols :as p]
+               [clojure.set]
                [cats.context :as ctx :include-macros true])
      :clj
      (:require [cats.protocols :as p]
+               [clojure.set]
                [cats.context :as ctx]))
   (:refer-clojure :exclude [when unless filter sequence]))
 
