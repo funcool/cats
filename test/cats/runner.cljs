@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [cljs.test :as test]
             [cats.core-spec]
+            [cats.labs.channel-spec]
             [cats.builtin-spec]
             [cats.applicative.validation]
             [cats.monad.exception-spec]
@@ -20,7 +21,8 @@
                   'cats.monad.exception-spec
                   'cats.monad.either-spec
                   'cats.monad.maybe-spec
-                  'cats.monad.identity-spec))
+                  'cats.monad.identity-spec
+                  'cats.labs.channel-spec))
 
 (defmethod test/report [:cljs.test/default :end-run-tests]
   [m]
