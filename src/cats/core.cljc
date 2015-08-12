@@ -352,7 +352,7 @@
                                        acc
                                        (reverse syms))]
                         `(fapply (fmap ~cf ~fa) ~@faps)))))
-                body
+                `(do ~@body)
                 (reverse batches))
         join-count (dec (count batches))]
     (reduce (fn [acc _]
@@ -413,14 +413,13 @@
                    (even? (count bindings)))
       (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
     (let [bindings (partition 2 bindings)
-          body (cons 'do body)
           [bindings body] (dedupe-symbols bindings body)
           batches (bindings->batches bindings)
           env (into {} bindings)]
       (if (and (= (count batches) 1)
                (= (count (map first bindings)) 1))
         `(fmap (fn [~@(map first bindings)]
-                 ~body)
+                 ~@body)
                ~@(map second bindings))
         (alet* batches env body))))
 
