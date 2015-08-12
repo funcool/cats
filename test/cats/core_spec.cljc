@@ -49,20 +49,27 @@
   (t/testing "It works with just one applicative binding"
     (t/is (= (maybe/just 3)
              (m/alet [x (maybe/just 2)]
-                     (inc x)))))
+               (inc x)))))
+
+  (t/testing "The body runs in an implicit do"
+    (t/is (= (maybe/just 3)
+             (m/alet [x (maybe/just 2)]
+               nil
+               42
+               (inc x)))))
 
   (t/testing "It works with no dependencies between applicative values"
     (t/is (= (maybe/just 3)
              (m/alet [x (maybe/just 1)
                       y (maybe/just 2)]
-                     (add2 x y)))))
+               (add2 x y)))))
 
   (t/testing "It works with one level of dependencies between applicative values"
     (t/is (= (maybe/just [42])
              (m/alet [x (maybe/just 21)       ;; split 1
                       y (maybe/just 2)
                       z (maybe/just (* x y))] ;; split 2
-                     (vector z)))))
+               (vector z)))))
 
   (t/testing "It works with more than one level of dependencies between applicative values"
     (t/is (= (maybe/just [45])
@@ -70,7 +77,7 @@
                       y (maybe/just 2)
                       z (maybe/just (* x y))  ;; split 2
                       z (maybe/just (+ 3 z))] ;; split 3
-                     (vector z)))))
+               (vector z)))))
 
   (t/testing "It works with more than one level of dependencies, with distinct split sizes"
     (t/is (= (maybe/just 66)

@@ -352,7 +352,7 @@
                                        acc
                                        (reverse syms))]
                         `(fapply (fmap ~cf ~fa) ~@faps)))))
-                `(do ~body)
+                body
                 (reverse batches))
         join-count (dec (count batches))]
     (reduce (fn [acc _]
@@ -407,19 +407,20 @@
     at the same time, then proceeds to evaluate `c` when all the values
     it depends on are available. This evaluation strategy is specially
     helpful for asynchronous applicatives."
-    [bindings body]
+    [bindings & body]
     (when-not (and (vector? bindings)
                    (not-empty bindings)
                    (even? (count bindings)))
       (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
     (let [bindings (partition 2 bindings)
+          body (cons 'do body)
           [bindings body] (dedupe-symbols bindings body)
           batches (bindings->batches bindings)
           env (into {} bindings)]
       (if (and (= (count batches) 1)
                (= (count (map first bindings)) 1))
         `(fmap (fn [~@(map first bindings)]
-                 (do ~body))
+                 ~body)
                ~@(map second bindings))
         (alet* batches env body))))
 
