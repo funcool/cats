@@ -242,7 +242,7 @@
   (cond
     (symbol? expr)
     (rename-sym expr renames)
-    (list? expr)
+    (seq? expr)
     (map #(rename % renames) expr)
     :else
     expr))
@@ -250,19 +250,26 @@
 (defn dedupe-symbols*
   [sym->ap body]
   (letfn [(renamer [{:keys [body syms aps seen renames] :as summ} [s ap]]
-           (let [ap' (rename ap renames)]
+           (let [ap' (rename ap renames)
+                 new-aps (conj aps ap')]
              (if (seen s)
-               (let [s' (gensym)]
-                 {:syms (conj syms s')
-                  :aps (conj aps ap')
-                  :seen (conj seen s')
-                  :renames (assoc renames s s')
-                  :body (rename body (assoc renames s s'))})
-               {:syms (conj syms s)
-                :aps (conj aps ap')
-                :seen (conj seen s)
-                :renames renames
-                :body body})))]
+               (let [s' (gensym)
+                     new-syms (conj syms s')
+                     new-seen (conj seen s')
+                     new-renames (assoc renames s s')
+                     new-body (rename body new-renames)]
+                 {:syms new-syms
+                  :aps new-aps
+                  :seen new-seen
+                  :renames new-renames
+                  :body new-body})
+               (let [new-syms (conj syms s)
+                     new-seen (conj seen s)]
+                 {:syms new-syms
+                  :aps new-aps
+                  :seen new-seen
+                  :renames renames
+                  :body body}))))]
     (let [summ
           (reduce renamer
                   {:syms []
