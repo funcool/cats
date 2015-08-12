@@ -225,7 +225,7 @@
                       `(bind ~r (fn [~l] ~acc))))
                   `(do ~@body)))))
 
-(defn deps [expr syms]
+(defn- deps [expr syms]
   (cond
     (and (symbol? expr)
          (contains? syms expr))
@@ -237,10 +237,10 @@
     :else
     '()))
 
-(defn rename-sym [expr renames]
+(defn- rename-sym [expr renames]
   (get renames expr expr))
 
-(defn rename [expr renames]
+(defn- rename [expr renames]
   (cond
     (symbol? expr)
     (rename-sym expr renames)
@@ -249,7 +249,7 @@
     :else
     expr))
 
-(defn dedupe-symbols*
+(defn- dedupe-symbols*
   [sym->ap body]
   (letfn [(renamer [{:keys [body syms aps seen renames] :as summ} [s ap]]
            (let [ap' (rename ap renames)
@@ -282,14 +282,14 @@
                   sym->ap)]
       [(mapv vector (:syms summ) (:aps summ)) (:body summ)])))
 
-(defn dedupe-symbols
+(defn- dedupe-symbols
   [bindings body]
   (let [syms (map first bindings)
         aps (map second bindings)
         sym->ap (mapv vector syms aps)]
     (dedupe-symbols* sym->ap body)))
 
-(defn dependency-map
+(defn- dependency-map
   [sym->ap]
   (let [syms (map first sym->ap)
         symset (set syms)]
@@ -298,13 +298,13 @@
                 :let [ds (set (deps ap symset))]]
             [s ds]))))
 
-(defn remove-deps
+(defn- remove-deps
   [deps symset]
   (let [removed (for [[s depset] deps]
                   [s (clojure.set/difference depset symset)])]
     (into (empty deps) removed)))
 
-(defn topo-sort*
+(defn- topo-sort*
   [deps seen batches current]
   (if (empty? deps)
     (conj batches current)
@@ -321,12 +321,12 @@
                (conj batches current)
                [s])))))
 
-(defn topo-sort
+(defn- topo-sort
   [deps]
   (let [syms (into #{} (map first deps))]
     (topo-sort* deps #{} [] [])))
 
-(defn bindings->batches
+(defn- bindings->batches
   [bindings]
   (let [syms (map first bindings)
         aps (map second bindings)
@@ -334,7 +334,7 @@
         sorted-deps (topo-sort (dependency-map sym->ap))]
     sorted-deps))
 
-(defn alet*
+(defn- alet*
   [batches env body]
   (let [fb (first batches)
         rb (rest batches)
