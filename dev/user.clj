@@ -24,3 +24,14 @@
     (binding [*namespaces* nss]
       (repl/refresh :after 'user/run-tests'))
     (repl/refresh :after 'user/run-tests')))
+
+(defn trace
+  "Asynchronous friendly println variant."
+  [& strings]
+  (locking println
+    (apply println strings)))
+
+;; (require '[cats.core :as m]
+;;          '[cats.context :as mc]
+;;          '[cats.monad.either :as either]
+;;          '[cats.builtin])
