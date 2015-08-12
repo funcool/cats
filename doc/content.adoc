@@ -284,6 +284,127 @@ Examples:
 If you do not understand the purpose of the *pure* function, the next section
 should clarify its purpose.
 
+==== alet
+
+One limitation of monadic bind is that all the steps are strictly sequential and
+happen one at a time. This piece of code illustrates the usage of monadic bind:
+
+[source, clojure]
+----
+(require '[cats.core :refer [bind return]])
+(require '[cats.monad.maybe :refer [just]])
+
+(bind (just 1)
+      (fn [a]
+        (bind (just 41)
+              (fn [b]
+                (return (+ a b))))))
+;; => #<Just 42>
+----
+
+In the first call to `bind`, `(just 1)` and the anonymous function will be evaluated.
+The call of the anonymous function performed by the first `bind` will cause the
+evaluation of the `(just 41)` and the next anonymous function, which will be also
+called to create the final result. Note that `(just 1)` and `(just 41)` are independent
+and thus could be evaluated at the same time.
+
+Here is the `mlet` version for reference and clarity:
+
+[source, clojure]
+----
+(mlet [a (just 1)
+       b (just 41)]
+  (return (+ a b)))
+;; => #<Just 42>
+----
+
+Now let's see the equivalent using `alet`:
+
+[source, clojure]
+----
+(require '[cats.core :refer [alet]])
+
+(alet [a (just 1)
+       b (just 41)]
+  (+ a b))
+;; => #<Just 42>
+----
+
+Note that no `return` is used, this is because the `alet` body runs inside the applicative
+context with `fapply`. This is roughly what `alet` desugars to:
+
+[source, clojure]
+----
+(fapply (fn [a]
+           (fn [b]
+             (do
+               (+ a b))))
+         (just 1)
+         (just 41))
+;; => #<Just 42>
+----
+
+Note that now `(just 1)` and `(just 41)` are evaluated at the same time. This use of
+`fapply` can be called "applicative bind" and in some cases is more efficient than monadic
+bind. Furthermore, the `alet` macro splits the bindings into batches that have
+dependencies only in previous values and evaluates all applicative values in the batch at
+the same time.
+
+This makes no difference at all for Maybe, but applicatives that have latency in their
+calculations (for example promises that do an async computation) get a pretty good evaluation
+strategy, which can minimize overall latency. In the next examples we use the
+link:https://github.com/funcool/promissum[promissum] Clojure library. Similar results can
+be achieved in ClojureScript with the link:https://github.com/funcool/promesa[promesa] library.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[promissum.core :as p])
+
+(defn sleep-promise [wait]
+  (p/promise (fn [deliver]
+               (Thread/sleep wait)
+               (deliver wait))))
+
+;; note: deref-ing for blocking the current thread waiting for the promise being delivered
+(time
+ @(m/mlet [x (sleep-promise 42)
+           y (sleep-promise 41)]
+    (m/return (+ x y))))
+;; "Elapsed time: 84.328182 msecs"
+;; => 83
+
+(time
+ @(m/alet [x (sleep-promise 42)
+           y (sleep-promise 41)]
+    (+ x y)))
+;; "Elapsed time: 44.246427 msecs"
+;; => 83
+----
+
+Another example for illustrating dependencies between batches:
+
+[source, clojure]
+----
+(time
+ @(m/mlet [x (sleep-promise 42)
+           y (sleep-promise 41)
+           z (sleep-promise (inc x))
+           a (sleep-promise (inc y))]
+   (m/return  (+ z a))))
+;; "Elapsed time: 194.253182 msecs"
+;; => 85
+
+(time
+ @(m/alet [x (sleep-promise 42)
+           y (sleep-promise 41)
+           z (sleep-promise (inc x))
+           a (sleep-promise (inc y))]
+    (+ z a)))
+;; "Elapsed time: 86.20699 msecs"
+;; => 85
+----
+
 
 === Foldable
 

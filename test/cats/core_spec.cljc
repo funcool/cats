@@ -89,8 +89,7 @@
                       y (maybe/just 6)
                       x (maybe/just (inc x))
                       y (maybe/just (inc y))]
-               (* x y)))))
-)
+               (* x y))))))
 
 (t/deftest sequence-tests
   (t/testing "It works with vectors"
