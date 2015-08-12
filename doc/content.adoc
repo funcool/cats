@@ -1353,3 +1353,19 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----
+
+== Editor integration
+
+=== Emacs
+
+For making Emacs' clojure-mode treat `alet`, `mlet` et al like a `let` and indent
+them correctly, you can use `define-clojure`indent` like in the following example:
+
+[source, elisp]
+----
+(require 'clojure-mode)
+
+(define-clojure-indent
+  (alet 'defun)
+  (mlet 'defun))
+----
