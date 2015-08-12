@@ -352,23 +352,44 @@ case of using foldr is for small datastructures or lazy sequences.
 ;; => (1 2 3 4 ...)
 ----
 
-////
-NOTE: commented until correctly implemented
-
-It there also other *fold* functions that are implemented in terms of the basic `foldl`
-or `foldr` such as: `foldm` that is a `foldl` version that works with monads:
+The *Foldable* abstraction is already implemented for cloure vectors and lazy seqs plus
+the cats maybe, either and validation types. Let see an example how it behaves with maybe:
 
 [source, clojure]
 ----
-(m/foldm #(m/return (conj %1 (inc %2))) []
-         [(either/right 1) (either/right 2) (either/right 3)])
-;; => #<Right [2 3 4]>
+(m/foldl #(m/return (+ %1 %2)) 1 (maybe/just 1))
+;; => #<Just 1>
 
-(m/foldm #(m/return (conj %1 (inc %2))) []
-         [(either/right 1) (either/right 2) (either/left 5)])
-;; => #<Left 5>
+(m/foldl #(m/return (+ %1 %2)) 1 (maybe/nothing))
+;; => 1
 ----
-////
+
+It there also other fold functions that are implemented in terms of the basic `foldl`
+or `foldr` that can be *foldm* and *foldmap*. At this moment, cats comes only with
+*foldm*.
+
+The *foldm* function in analgous to the `foldl` in terms of how it does the fold operation,
+with the difference that is aware of the monad context. Or in other terms, it works with
+reducing function that return monad types.
+
+Let see an example:
+
+[source, clojure]
+----
+(defn m-div
+  [x y]
+  (if (zero? y)
+    (maybe/nothing)
+    (maybe/just (/ x y))))
+
+
+(m/foldm m-div 1 [1 2 3])
+;; => #<Just 1/6>
+
+
+(m/foldm m-div 1 [1 0 3])
+;; => #<Nothing>
+----
 
 
 === Monad
