@@ -361,8 +361,52 @@
         (range join-count))))
 
 #?(:clj
-   (defmacro alet
-    "TODO"
+  (defmacro alet
+    "Applicative composition macro similar to Clojure's
+    `let`. This macro facilitates composition of applicative
+    computations using `fmap` and `fapply` and evaluating
+    applicative values in parallel.
+
+    Let's see an example to understand how it works.
+    This code uses fmap for executing computations inside
+    an applicative context:
+
+      (fmap (fn [a] (inc a)) (just 1))
+      ;=> #<Just [2]>
+
+    Now see how this code can be made clearer
+    by using the alet macro:
+
+      (alet [a (just 1)]
+        (inc a))
+      ;=> #<Just [2]>
+
+    Let's look at a more complex example, imagine we have
+    dependencies between applicative values:
+
+      (join
+        (fapply
+         (fmap
+           (fn [a]
+             (fn [b]
+               (fmap (fn [c] (inc c))
+                     (just (+ a b)))))
+           (just 1))
+         (just 2)))
+      ;=> #<Just [4]>
+
+    This is greatly simplified using `alet`:
+
+      (alet [a (just 1)
+             b (just 2)
+             c (just (+ a b))]
+        (inc c))
+     ;=> #<Just [4]>
+
+    The intent of the code is much clearer and evaluates `a` and `b`
+    at the same time, then proceeds to evaluate `c` when all the values
+    it depends on are available. This evaluation strategy is specially
+    helpful for asynchronous applicatives."
     [bindings body]
     (when-not (and (vector? bindings)
                    (not-empty bindings)
