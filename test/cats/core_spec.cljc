@@ -81,7 +81,16 @@
                       b (maybe/just 1)          ;; split 3
                       c (maybe/just 2)
                       d (maybe/just (+ a b c))] ;; split 4
-               d)))))
+               d))))
+
+  (t/testing "It renames the body symbols correctly"
+    (t/is (= (maybe/just 42)
+             (m/alet [x (maybe/just 5)
+                      y (maybe/just 6)
+                      x (maybe/just (inc x))
+                      y (maybe/just (inc y))]
+               (* x y)))))
+)
 
 (t/deftest sequence-tests
   (t/testing "It works with vectors"
