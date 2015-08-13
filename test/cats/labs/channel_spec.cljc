@@ -1,12 +1,15 @@
 (ns cats.labs.channel-spec
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
-  (:require #?@(:clj  [[clojure.core.async :as a :refer [go]]
-                       [clojure.test :as t]]
-                :cljs [
-                       [cljs.core.async :as a]
-                       [cljs.test :as t]])
-            [cats.core :as m]
-            [cats.labs.channel :as c]))
+  #?(:cljs (:require [cljs.core.async :as a]
+                     [cljs.test :as t]
+                     [cats.core :as m :include-macros true]
+                     [cats.labs.channel :as c]
+                     [cats.monad.either :as either])
+     :clj  (:require [clojure.core.async :as a :refer [go]]
+                     [clojure.test :as t]
+                     [cats.core :as m]
+                     [cats.labs.channel :as c]
+                     [cats.monad.either :as either])))
 
 (t/deftest channel-as-functor
   #?(:clj
@@ -29,9 +32,11 @@
      :cljs
      (t/async done
        (go
-         (let [ch (m/pure c/channel-monad 3)
-               rs (m/>>= ch (fn [x] (m/return (inc x))))]
-           (t/is (= 4 (a/<! rs)))
+         (let [ch (m/pure c/channel-monad 1)
+               result (m/>>= ch (fn [x] (m/return (inc x))))]
+           ;; (println 2222 @(a/<! result))
+
+           (t/is (= 2 (a/<! result)))
            (done))))))
 
 
@@ -98,7 +103,6 @@
            (t/is (= (a/<! ch1) (a/<! rs)))
            (done))))))
 
-
 (t/deftest third-monad-law-associativity
   #?(:clj
      (let [rs1 (m/>>= (m/mlet [x  (c/with-value 2)
@@ -125,59 +129,68 @@
 
 (defn async-call
   [wait]
-  (a/go
+  (go
     (a/<! (a/timeout wait))
     wait))
 
-#?(:clj
-   (t/deftest applicative-do
+(t/deftest applicative-do
+  #?(:clj
      (let [result (m/alet [x (async-call 100)
                            y (async-call 100)]
                     (+ x y))]
        (t/is (c/channel? result))
-       (t/is (a/<!! result) 200))))
+       (t/is (= (a/<!! result) 200)))
+     :cljs
+     (t/async done
+       (go
+         (let [result (m/alet [x (async-call 100)
+                               y (async-call 100)]
+                        (+ x y))]
+           (t/is (c/channel? result))
+           (t/is (= (a/<! result) 200))
+           (done))))))
 
 
-;; (def chaneither-m (either/either-transformer c/channel-monad))
+(def chaneither-m (either/either-transformer c/channel-monad))
 
-;; #?(:clj
-;;    (t/deftest channel-transformer-tests
-;;      (t/testing "channel combination with either"
-;;        (let [funcright (fn [x] (go (either/right x)))
-;;              funcleft (fn [x] (go (either/left x)))
-;;              r1 (m/with-monad chaneither-m
-;;                   (m/mlet [x (funcright 1)
-;;                            y (funcright 2)]
-;;                     (m/return (+ x y))))
+#?(:clj
+   (t/deftest channel-transformer-tests
+     (t/testing "channel combination with either"
+       (let [funcright (fn [x] (go (either/right x)))
+             funcleft (fn [x] (go (either/left x)))
+             r1 (m/with-monad chaneither-m
+                  (m/mlet [x (funcright 1)
+                           y (funcright 2)]
+                    (m/return (+ x y))))
 
-;;              r2 (m/with-monad chaneither-m
-;;                   (m/mlet [x (funcright 1)
-;;                            y (funcleft :foo)
-;;                            z (funcright 2)]
-;;                     (m/return (+ x y))))]
+             r2 (m/with-monad chaneither-m
+                  (m/mlet [x (funcright 1)
+                           y (funcleft :foo)
+                           z (funcright 2)]
+                    (m/return (+ x y))))]
 
-;;          (t/is (= (either/right 3) (a/<!! r1)))
-;;          (t/is (= (either/left :foo) (a/<!! r2))))))
+         (t/is (= (either/right 3) (a/<!! r1)))
+         (t/is (= (either/left :foo) (a/<!! r2))))))
 
-;;    :cljs
-;;    (t/deftest channel-transformer-tests
-;;      (t/async done
-;;               (let [funcright #(c/with-value (either/right %))
-;;                     funcleft #(c/with-value (either/left %))
-;;                     r1 (m/with-monad chaneither-m
-;;                          (m/mlet [x (funcright 1)
-;;                                   y (funcright 2)]
-;;                            (m/return (+ x y))))
+   :cljs
+   (t/deftest channel-transformer-tests
+     (t/async done
+              (let [funcright #(c/with-value (either/right %))
+                    funcleft #(c/with-value (either/left %))
+                    r1 (m/with-monad chaneither-m
+                         (m/mlet [x (funcright 1)
+                                  y (funcright 2)]
+                           (m/return (+ x y))))
 
-;;                     r2 (m/with-monad chaneither-m
-;;                          (m/mlet [x (funcright 1)
-;;                                   y (funcleft :foo)
-;;                                   z (funcright 2)]
-;;                            (m/return (+ x y))))]
-;;                 (go
-;;                   (t/is (= (either/right 3) (a/<! r1)))
-;;                   (t/is (= (either/left :foo) (a/<! r2)))
-;;                   (done))))))
+                    r2 (m/with-monad chaneither-m
+                         (m/mlet [x (funcright 1)
+                                  y (funcleft :foo)
+                                  z (funcright 2)]
+                           (m/return (+ x y))))]
+                (go
+                  (t/is (= (either/right 3) (a/<! r1)))
+                  (t/is (= (either/left :foo) (a/<! r2)))
+                  (done))))))
 
 ;; #?(:cljs (defn main [] (node/run-tests)))
 
