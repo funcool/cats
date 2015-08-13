@@ -127,28 +127,42 @@
            (t/is (= (a/<! rs1) (a/<! rs2)))
            (done))))))
 
-(defn async-call
-  [wait]
-  (go
-    (a/<! (a/timeout wait))
-    wait))
-
-(t/deftest applicative-do
+(t/deftest semigroup-tests
   #?(:clj
-     (let [result (m/alet [x (async-call 100)
-                           y (async-call 100)]
-                    (+ x y))]
-       (t/is (c/channel? result))
-       (t/is (= (a/<!! result) 200)))
+     (let [c1 (a/to-chan [1 2 3])
+           c2 (a/to-chan [4 5 6])
+           r (m/mappend c1 c2)]
+       (t/is (= [1 2 3 4 5 6] (a/<!! (a/into [] r)))))
      :cljs
      (t/async done
        (go
-         (let [result (m/alet [x (async-call 100)
-                               y (async-call 100)]
-                        (+ x y))]
-           (t/is (c/channel? result))
-           (t/is (= (a/<! result) 200))
+         (let [c1 (a/to-chan [1 2 3])
+               c2 (a/to-chan [4 5 6])
+               r (m/mappend c1 c2)]
+           (t/is (= [1 2 3 4 5 6] (a/<! (a/into [] r))))
            (done))))))
+
+
+(t/deftest applicative-do
+  (letfn [(async-call [wait]
+            (go
+              (a/<! (a/timeout wait))
+              wait))]
+    #?(:clj
+       (let [result (m/alet [x (async-call 100)
+                             y (async-call 100)]
+                            (+ x y))]
+         (t/is (c/channel? result))
+         (t/is (= (a/<!! result) 200)))
+       :cljs
+       (t/async done
+         (go
+           (let [result (m/alet [x (async-call 100)
+                                 y (async-call 100)]
+                                (+ x y))]
+             (t/is (c/channel? result))
+             (t/is (= (a/<! result) 200))
+             (done)))))))
 
 
 (def chaneither-m (either/either-transformer c/channel-monad))

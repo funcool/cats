@@ -54,6 +54,20 @@
   (instance? #?(:clj  clojure.core.async.impl.channels.ManyToManyChannel
                 :cljs cljs.core.async.impl.channels.ManyToManyChannel) c))
 
+(defn- chain-chans
+  [& chans]
+  (let [out (a/chan)]
+    (go-loop [chs chans]
+      (if (pos? (count chs))
+        (let [r (a/<! (first chs))]
+          (if (nil? r)
+            (recur (rest chs))
+            (do
+              (a/>! out r)
+              (recur chs))))
+        (a/close! out)))
+    out))
+
 (def ^{:no-doc true}
   channel-monad
   (reify
@@ -62,6 +76,14 @@
       (let [c (a/chan 1 (map f))]
         (a/pipe mv c)
         c))
+
+    p/Semigroup
+    (mappend [_ sv sv']
+      (chain-chans sv sv'))
+
+    p/Monoid
+    (mempty [_]
+      (a/chan))
 
     p/Applicative
     (pure [_ v]
