@@ -9,6 +9,7 @@
   ['cats.core-spec
    'cats.builtin-spec
    'cats.applicative.validation-spec
+   'cats.labs.channel-spec
    'cats.monad.identity-spec
    'cats.monad.either-spec
    'cats.monad.exception-spec
