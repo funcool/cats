@@ -24,14 +24,17 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.labs.channel
-  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
-  (:require #?(:clj  [clojure.core.async :refer [go] :as a]
-               :cljs [cljs.core.async :as a])
-            [clojure.core.async.impl.dispatch :as dispatch]
-            [clojure.core.async.impl.protocols :as impl]
-            [cats.context :as ctx]
-            [cats.core :as m]
-            [cats.protocols :as p]))
+  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
+  #?(:cljs (:require [cljs.core.async :as a]
+                     [cljs.core.async.impl.protocols :as impl]
+                     [cats.context :as ctx]
+                     [cats.core :as m]
+                     [cats.protocols :as p])
+     :clj  (:require [clojure.core.async :refer [go go-loop] :as a]
+                     [clojure.core.async.impl.protocols :as impl]
+                     [cats.context :as ctx]
+                     [cats.core :as m]
+                     [cats.protocols :as p])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
@@ -56,10 +59,7 @@
   (reify
     p/Functor
     (fmap [_ f mv]
-      (let [ctx ctx/*context*
-            c (a/chan 1 (map (fn [v]
-                               (binding [ctx/*context* ctx]
-                                 (f v)))))]
+      (let [c (a/chan 1 (map f))]
         (a/pipe mv c)
         c))
 
@@ -81,23 +81,26 @@
 
     p/Monad
     (mreturn [_ v]
-      (let [c (a/chan)]
+      (let [c (a/chan 1)]
         (a/put! c v)
+        (a/close! c)
         c))
 
     (mbind [it mv f]
       (let [ctx ctx/*context*
             c (a/chan 1)]
-        (a/go-loop []
+        (go-loop []
           (if-let [v (a/<! mv)]
             (do
               (if (channel? v)
                 (let [result (a/<! v)
-                      result (f result)]
+                      result (binding [ctx/*context* ctx]
+                               (f result))]
                   (if (channel? result)
                     (a/>! c (a/<! result))
                     (a/>! c result)))
-                (let [result (f v)]
+                (let [result (binding [ctx/*context* ctx]
+                               (f v))]
                   (if (channel? result)
                     (a/>! c (a/<! result))
                     (a/>! c result))))
