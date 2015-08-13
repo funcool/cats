@@ -1359,7 +1359,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 === Emacs
 
 For making Emacs' clojure-mode treat `alet`, `mlet` et al like a `let` and indent
-them correctly, you can use `define-clojure`indent` like in the following example:
+them correctly, you can use `define-clojure-indent` like in the following example:
 
 [source, elisp]
 ----
