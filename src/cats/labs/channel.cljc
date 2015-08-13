@@ -83,7 +83,9 @@
 
     p/Monoid
     (mempty [_]
-      (a/chan))
+      (let [c (a/chan)]
+        (a/close! c)
+        c))
 
     p/Applicative
     (pure [_ v]

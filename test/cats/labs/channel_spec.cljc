@@ -143,6 +143,17 @@
            (done))))))
 
 
+(t/deftest semigroup-with-monoid-tests
+  #?(:clj
+     (let [c (m/mappend (m/mempty) (a/to-chan [1]))]
+       (t/is (= [1] (a/<!! (a/into [] c)))))
+     :cljs
+     (t/async done
+       (go
+         (let [c (m/mappend (m/mempty) (a/to-chan [1]))]
+           (t/is (= [1] (a/<! (a/into [] c))))
+           (done))))))
+
 (t/deftest applicative-do
   (letfn [(async-call [wait]
             (go
