@@ -12,6 +12,7 @@ image:logo.png[cats logo]
 
 Category Theory and algebraic abstractions for Clojure.
 
+
 == Rationale
 
 The main motivations for writing this library are:
@@ -1254,6 +1255,130 @@ the `curry-lift-m` macro. The arity is mandatory when using this macro:
 ;; => #<Just 6>
 ----
 
+
+== Labs
+
+This section intends to explain different kind of extra features that can be found under
+*cats.labs* namespace. The fact that they are here because they are experimental, requires external
+dependencies or simply does not have much application in clojure(script).
+
+In any case the state of each module will be notified on the start of the each section.
+
+
+=== Channel
+
+*Status:* Experimental
+
+This namespace exposes the ability to use the *core.async* channel as monadic type and in
+consequence use it in `mlet` or `alet` macros.
+
+Before use it, you should add core.async to your dependencies:
+
+[source, clojure]
+----
+[org.clojure/core.async "0.1.346.0-17112a-alpha"]
+----
+
+Now, let see some code. This will allow you understand how it can be used and why this
+integration between cats and core.async matters. At first step we will go to define a
+function that emulates whatever asynchronous task, that for our case it's consist in a
+just sleep operation:
+
+[source, clojure]
+----
+(require 'cats.labs.channel)
+
+(defn async-call
+  "A function that emulates some asynchronous call."
+  [n]
+  (a/go
+    (println "---> sending request" n)
+    (a/<! (a/timeout n))
+    (println "<--- receiving request" n)
+    n))
+----
+
+Now, instead of using the `go` macro, just use a `let` like bindings with the help of the
+*mlet* macro for bind values to asyncrhonous calls:
+
+[source, clojure]
+----
+(time
+ (<!! (m/mlet [x (async-call 200)
+               y (async-call 100)]
+        (m/return (+ x y)))))
+;; ---> sending request 200
+;; <--- receiving request 200
+;; ---> sending request 100
+;; <--- receiving request 100
+;; "Elapsed time: 202.236804 msecs"
+;; => 200
+----
+
+Here we can observe few things:
+
+* The asynchronous calls are made serially.
+* We are calling a function that return a channel and bind its value to a symbol.
+* At the end, an operation is performed with the `mlet` bindings.
+* The `mlet` macro also returns a channel.
+
+The main difference with the default clojure `let`, is that the bindings are already plain
+values (not channels). The take! operation is already performed automatically by the
+`mlet`. This kind of behavior will make you fully asynchronous code looks like
+synchronous code.
+
+But, cats also comes with `alet` that has identical aspect to the previously used `mlet`
+macro, but it has some advantages over it. Let see an example:
+
+[source, clojure]
+----
+(time
+  (a/<!! (m/alet [x (async-call 100)
+                  y (async-call 100)]
+            (+ x y)))))
+
+;; ---> sending request 100
+;; ---> sending request 100
+;; <--- receiving request 100
+;; <--- receiving request 100
+;; "Elapsed time: 101.06644 msecs"
+;; => 200
+----
+
+And here we can observe few things:
+
+* The asynchronous calls are made in parallel.
+* The total time of processing is half less of if we use `mlet`.
+* The `return` function is not used because `alet` evaluates the body in the context
+  of the applicative.
+
+The alet is a powerfull macro that analyzes the dependencies between bindings and executes
+the expressions in batches resultin in a very atractive feature for asynchronous calls.
+
+Here an other examples that shows in a clearly way how the batches are executed:
+
+[source, clojure]
+----
+(time
+ (a/<!! (m/alet [x (async-call 120)
+                 y (async-call 130)
+                 z (async-call (- x 100))
+                 u (async-call (- y 100))
+                 t (async-call (inc u))]
+          z))))
+;; ---> sending request  130
+;; ---> sending request  120
+;; <--- receiving request  120
+;; <--- receiving request  130
+;; ---> sending request  20
+;; ---> sending request  30
+;; <--- receiving request  20
+;; <--- receiving request  30
+;; ---> sending request  31
+;; <--- receiving request  31
+;; "Elapsed time: 194.536235 msecs"
+;; => 20
+----
 
 
 == FAQ

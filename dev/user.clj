@@ -1,5 +1,7 @@
 (ns user
   (:require [clojure.tools.namespace.repl :as repl]
+            [clojure.walk :refer [macroexpand-all]]
+            [clojure.pprint :refer [pprint]]
             [clojure.test :as test]))
 
 (defonce ^:dynamic
@@ -7,6 +9,7 @@
   ['cats.core-spec
    'cats.builtin-spec
    'cats.applicative.validation-spec
+   'cats.labs.channel-spec
    'cats.monad.identity-spec
    'cats.monad.either-spec
    'cats.monad.exception-spec
@@ -22,3 +25,14 @@
     (binding [*namespaces* nss]
       (repl/refresh :after 'user/run-tests'))
     (repl/refresh :after 'user/run-tests')))
+
+(defn trace
+  "Asynchronous friendly println variant."
+  [& strings]
+  (locking println
+    (apply println strings)))
+
+;; (require '[cats.core :as m]
+;;          '[cats.context :as mc]
+;;          '[cats.monad.either :as either]
+;;          '[cats.builtin])
