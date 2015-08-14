@@ -29,9 +29,11 @@
      (:require-macros [cats.core :refer (mlet)]))
   #?(:cljs
      (:require [cats.protocols :as p]
+               [clojure.set]
                [cats.context :as ctx :include-macros true])
      :clj
      (:require [cats.protocols :as p]
+               [clojure.set]
                [cats.context :as ctx]))
   (:refer-clojure :exclude [when unless filter sequence]))
 
@@ -222,6 +224,206 @@
                                    (fn [~(gensym)] ~acc))
                       `(bind ~r (fn [~l] ~acc))))
                   `(do ~@body)))))
+
+(defn- deps [expr syms]
+  (cond
+    (and (symbol? expr)
+         (contains? syms expr))
+    (list expr)
+
+    (seq? expr)
+    (mapcat #(deps % syms) expr)
+
+    :else
+    '()))
+
+(defn- rename-sym [expr renames]
+  (get renames expr expr))
+
+(defn- rename [expr renames]
+  (cond
+    (symbol? expr)
+    (rename-sym expr renames)
+    (seq? expr)
+    (map #(rename % renames) expr)
+    :else
+    expr))
+
+(defn- dedupe-symbols*
+  [sym->ap body]
+  (letfn [(renamer [{:keys [body syms aps seen renames] :as summ} [s ap]]
+           (let [ap' (rename ap renames)
+                 new-aps (conj aps ap')]
+             (if (seen s)
+               (let [s' (gensym)
+                     new-syms (conj syms s')
+                     new-seen (conj seen s')
+                     new-renames (assoc renames s s')
+                     new-body (rename body new-renames)]
+                 {:syms new-syms
+                  :aps new-aps
+                  :seen new-seen
+                  :renames new-renames
+                  :body new-body})
+               (let [new-syms (conj syms s)
+                     new-seen (conj seen s)]
+                 {:syms new-syms
+                  :aps new-aps
+                  :seen new-seen
+                  :renames renames
+                  :body body}))))]
+    (let [summ
+          (reduce renamer
+                  {:syms []
+                   :aps []
+                   :seen #{}
+                   :renames {}
+                   :body body}
+                  sym->ap)]
+      [(mapv vector (:syms summ) (:aps summ)) (:body summ)])))
+
+(defn- dedupe-symbols
+  [bindings body]
+  (let [syms (map first bindings)
+        aps (map second bindings)
+        sym->ap (mapv vector syms aps)]
+    (dedupe-symbols* sym->ap body)))
+
+(defn- dependency-map
+  [sym->ap]
+  (let [syms (map first sym->ap)
+        symset (set syms)]
+    (into []
+          (for [[s ap] sym->ap
+                :let [ds (set (deps ap symset))]]
+            [s ds]))))
+
+(defn- remove-deps
+  [deps symset]
+  (let [removed (for [[s depset] deps]
+                  [s (clojure.set/difference depset symset)])]
+    (into (empty deps) removed)))
+
+(defn- topo-sort*
+  [deps seen batches current]
+  (if (empty? deps)
+    (conj batches current)
+    (let [dep (first deps)
+          [s dependencies] dep
+          dependant? (some dependencies seen)]
+      (if (nil? dependant?)
+        (recur (subvec deps 1)
+               (conj seen s)
+               batches
+               (conj current s))
+        (recur (remove-deps (subvec deps 1) (set current))
+               (conj seen s)
+               (conj batches current)
+               [s])))))
+
+(defn- topo-sort
+  [deps]
+  (let [syms (into #{} (map first deps))]
+    (topo-sort* deps #{} [] [])))
+
+(defn- bindings->batches
+  [bindings]
+  (let [syms (map first bindings)
+        aps (map second bindings)
+        sym->ap (mapv vector syms aps)
+        sorted-deps (topo-sort (dependency-map sym->ap))]
+    sorted-deps))
+
+(defn- alet*
+  [batches env body]
+  (let [fb (first batches)
+        rb (rest batches)
+        fs (first fb)
+        fa (get env fs)
+        code
+        (reduce (fn [acc syms]
+                  (let [fs (first syms)
+                        fa (get env fs)
+                        rs (rest syms)
+                        faps (map #(get env %) rs)]
+                    (if (= (count syms) 1)
+                      `(fmap (fn [~fs] ~acc) ~fa)
+                      (let [cf (reduce (fn [f sym] `(fn [~sym] ~f))
+                                       acc
+                                       (reverse syms))]
+                        `(fapply (fmap ~cf ~fa) ~@faps)))))
+                `(do ~@body)
+                (reverse batches))
+        join-count (dec (count batches))]
+    (reduce (fn [acc _]
+            `(join ~acc))
+        code
+        (range join-count))))
+
+#?(:clj
+  (defmacro alet
+    "Applicative composition macro similar to Clojure's
+    `let`. This macro facilitates composition of applicative
+    computations using `fmap` and `fapply` and evaluating
+    applicative values in parallel.
+
+    Let's see an example to understand how it works.
+    This code uses fmap for executing computations inside
+    an applicative context:
+
+      (fmap (fn [a] (inc a)) (just 1))
+      ;=> #<Just [2]>
+
+    Now see how this code can be made clearer
+    by using the alet macro:
+
+      (alet [a (just 1)]
+        (inc a))
+      ;=> #<Just [2]>
+
+    Let's look at a more complex example, imagine we have
+    dependencies between applicative values:
+
+      (join
+        (fapply
+         (fmap
+           (fn [a]
+             (fn [b]
+               (fmap (fn [c] (inc c))
+                     (just (+ a b)))))
+           (just 1))
+         (just 2)))
+      ;=> #<Just [4]>
+
+    This is greatly simplified using `alet`:
+
+      (alet [a (just 1)
+             b (just 2)
+             c (just (+ a b))]
+        (inc c))
+     ;=> #<Just [4]>
+
+    The intent of the code is much clearer and evaluates `a` and `b`
+    at the same time, then proceeds to evaluate `c` when all the values
+    it depends on are available. This evaluation strategy is specially
+    helpful for asynchronous applicatives."
+    [bindings & body]
+    (when-not (and (vector? bindings)
+                   (not-empty bindings)
+                   (even? (count bindings)))
+      (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
+    (let [bindings (partition 2 bindings)
+          [bindings body] (dedupe-symbols bindings body)
+          batches (bindings->batches bindings)
+          env (into {} bindings)]
+      (if (and (= (count batches) 1)
+               (= (count (map first bindings)) 1))
+        `(fmap (fn [~@(map first bindings)]
+                 ~@body)
+               ~@(map second bindings))
+        (alet* batches env body))))
+
+)
 
 (defn- arglists
   [var]
