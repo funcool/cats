@@ -1353,7 +1353,7 @@ And here we can observe few things:
   of the applicative.
 
 The alet is a powerfull macro that analyzes the dependencies between bindings and executes
-the expressions in badges resultin in a very atractive feature for asynchronous calls.
+the expressions in batches resultin in a very atractive feature for asynchronous calls.
 
 Here an other examples that shows in a clearly way how the batches are executed:
 
