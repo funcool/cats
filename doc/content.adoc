@@ -746,7 +746,7 @@ return a reified MonadTrans:
   (:require [cats.core :as m]
             [cats.data :as data]
             [cats.monad.maybe :as maybe]
-            [cats.monad.state :as state]))
+            [cats.labs.state :as state]))
 
 (def maybe-state
   (state/state-transformer maybe/maybe-monad))
@@ -1381,6 +1381,183 @@ Here an other examples that shows in a clearly way how the batches are executed:
 ----
 
 
+=== State
+
+*Status:* Experimental
+
+The State monad is one of the special cases of monads most commonly used in
+Haskell. It has several purposes including: lazy computation, composition, and
+maintaining state without explicitly passing it to every function manualy.
+
+The de-facto monadic type of the state monad is a plain function. A function
+represents a computation as is (without executing it). Obviously, a function
+should have some special characteristics to work in monad state composition.
+
+.Valid function for the state monad
+[source, clojure]
+----
+(fn [state]
+  "Takes a state as argument and returns a vector
+  with the first element being the processed value and
+  the second element being the new transformed state."
+  (let [newvalue (first state)
+        newstate (next state)]
+    [newvalue newstate]))
+----
+
+You just saw an example of the low-level primitive state monad. For basic usage
+you do not need to write your own functions, just use some helpers that _cats_ provides.
+
+Let's look at one example before explaining the details:
+
+.Lazy composition of computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.labs.state :as st])
+
+(m/mlet [state (st/get-state)
+         _     (st/put-state (next state))]
+  (m/return (first state)))
+;; => #<State cats.labs.state.State@2eebabb6>
+----
+
+At the moment of evaluation in the previous expression, nothing of what we have defined
+is executed. But instead of returning the unadorned final value of the computation,
+a strange/unknown object of type *State* is returned.
+
+The State type is simply a wrapper for Clojure functions, nothing more.
+
+Now, it's time to execute the composed computation. We can use one of the following
+functions exposed by _cats_ for that: `run-state`, `eval-state` and `exec-state`.
+
+- `run-state` executes the composed computation and returns both the value and the
+  final state.
+- `eval-state` executes the composed computation and returns the resulting
+  value, discarding the state.
+- `exec-state` executes the composed computation and returns only the resulting
+  state, ignoring the resulting value.
+
+.Example of resuls of using the previosly listed functions
+[source, clojure]
+----
+(m/run-state s [1 2 3])
+;; => #<Pair [1 (2 3)]>
+
+(m/eval-state s [1 2 3])
+;; => 1
+
+(m/exec-state s [1 2 3])
+;; => (2 3)
+----
+
+The `run-state` function returns an instance of the Pair type. The Pair type acts like any other seq in
+Clojure with the exception that it can only contain two values.
+
+
+=== Reader
+
+*Status:* Experimental
+
+The reader monad is another commonly used monad in Haskell. It's used for gluing together computations that
+depend on a read-only environment. As with the state monad, we don't have to thread the environment manualy
+since the monadic bind does it for us. The type of the reader monad are one-argument functions.
+
+The Reader type is analogous to State, simply a wrapper for regular Clojure functions. If we want our functions
+to participate in the reader abstraction we have to wrap them in a Reader instance.
+
+.Valid function for the reader monad
+[source, clojure]
+----
+(require '[cats.labs.reader :as r])
+
+(def start-server
+  (r/reader
+    (fn [env]
+      "Takes an environment with options as an argument and runs a web
+       server in the address specified by `:host` and `:port`."
+      (run-http-server (:host env) (:port env)))))
+----
+
+cats provides a few reader functions already. `ask` is the simplest reader, simply returns the environment. We
+can execute readers using the `run-reader` function which accepts a reader and an environment.
+
+.Example of running the ask reader
+[source, clojure]
+----
+(require '[cats.labs.reader :as r])
+
+(r/run-reader r/ask [1 2 3])
+;; => [1 2 3]
+----
+
+Let's use `mlet` for building new readers out of existing ones:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.labs.reader :as r])
+
+(m/mlet [env r/ask]
+  (m/return (inc env)))
+;; => #<Reader cats.labs.reader.Reader@2eebabb6>
+----
+
+We can then run it using `run-reader`:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.labs.reader :as r])
+
+(r/run-reader (m/mlet [env r/ask]
+                (m/return (inc env)))
+              41)
+;; => 42
+----
+
+We can also alter the reader's environment in a context using the `local` function which given a function and
+a reader returns a new reader whose environment is the result of applying the first function given to `local` to
+the original environment. Let's see it in action to understand it better:
+
+.Example of composing reader computations
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.labs.reader :as r])
+
+(r/run-reader (m/mlet [env (r/local #(* 2 %) r/ask)]
+                (m/return (+ env 2)))
+              20)
+;; => 42
+----
+
+Note that since we executed `ask` with the function `#(*2 %)` altering its original environment (20), the resulting
+`env` value is two times the original environment.
+
+
+=== Writer
+
+*Status:* Experimental
+
+
+TODO
+////
+The writer monad comes from Haskell too. It's used for accumulating a log together with the values generated by
+computations. As with the state and reader monads, we don't have to explicitly thread the log manually since
+the monadic bind takes care of that. The type
+////
+
+
+=== Continuation
+
+*Status:* Experimental
+
+TODO
+
+
 == FAQ
 
 === What Clojure types implement some of the Category Theory abstractions?
@@ -1399,11 +1576,6 @@ they should not extend any of the previously explained protocols.
 | hash-set | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
 | hash-map | Semigroup, Monoid
 |==========================================================================================
-
-
-=== Where are the State, Reader, Writer and Continuation monads?
-
-TBD
 
 
 == Developers Guide
