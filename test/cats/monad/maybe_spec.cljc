@@ -72,6 +72,18 @@
              (m/with-monad maybe-vector-transformer
                (m/return 2))))
 
+    (t/is (= [(maybe/just 42)]
+             (m/with-monad maybe-vector-transformer
+               (m/fapply [(maybe/just inc)] [(maybe/just 41)]))))
+
+    (t/is (= [(maybe/just 42)
+              (maybe/just 99)
+              (maybe/just "41")
+              (maybe/just "98")]
+             (m/with-monad maybe-vector-transformer
+               (m/fapply [(maybe/just inc) (maybe/just str)]
+                         [(maybe/just 41) (maybe/just 98)]))))
+
     (t/is (= [(maybe/just 1)
               (maybe/just 2)
               (maybe/just 2)
