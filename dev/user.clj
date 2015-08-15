@@ -10,6 +10,10 @@
    'cats.builtin-spec
    'cats.applicative.validation-spec
    'cats.labs.channel-spec
+   'cats.labs.state-spec
+   'cats.labs.writer-spec
+   'cats.labs.reader-spec
+   'cats.labs.continuation-spec
    'cats.monad.identity-spec
    'cats.monad.either-spec
    'cats.monad.exception-spec
