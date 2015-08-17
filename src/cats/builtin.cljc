@@ -236,3 +236,8 @@
    (extend-type clojure.lang.PersistentArrayMap
      p/Context
      (get-context [_] map-monoid)))
+
+#?(:clj
+   (extend-type clojure.lang.PersistentTreeMap
+     p/Context
+     (get-context [_] map-monoid)))
