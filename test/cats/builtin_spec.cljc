@@ -19,6 +19,14 @@
   (t/testing "extract function"
     (t/is (= (p/extract nil) nil))))
 
+(t/deftest map-tests
+  (t/testing "Map as monoid"
+    (t/is (= (m/mempty b/map-monoid) {})))
+  (t/testing "Map as semigroup"
+    (t/is (= (m/mappend "1" "2") "12"))
+    (t/is (= (m/mappend (m/mempty b/map-monoid) "1") "1"))))
+
+
 (t/deftest vector-monad
   (t/testing "Forms a semigroup"
     (t/is (= [1 2 3 4 5]
