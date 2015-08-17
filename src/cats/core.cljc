@@ -60,9 +60,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn mempty
-  []
-  (let [ctx (ctx/get-current)]
-    (p/mempty ctx)))
+  ([]
+   (let [ctx (ctx/get-current)]
+     (p/mempty ctx)))
+  ([context]
+   (let [ctx (ctx/get-current context)]
+     (p/mempty ctx))))
 
 (defn mappend
   [& svs]
