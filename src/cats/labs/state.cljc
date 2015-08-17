@@ -32,7 +32,7 @@
                      [cats.context :as ctx]
                      [cats.data :as d])))
 
-(declare state-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Protocol declaration
@@ -51,7 +51,7 @@
 
 (deftype State [mfn]
   p/Context
-  (get-context [_] state-monad)
+  (get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -82,8 +82,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  state-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Functor
     (fmap [_ f fv]
       (state-t (fn [s]
@@ -119,6 +122,9 @@
   "The State transformer constructor."
   [inner-monad]
   (reify
+    p/ContextClass
+    (-get-level [_] 100)
+
     p/Functor
     (fmap [_ f fv]
       (state-t (fn [s]
@@ -172,7 +178,7 @@
 
     p/MonadTrans
     (base [_]
-      state-monad)
+      context)
 
     (inner [_]
       inner-monad)
@@ -193,19 +199,21 @@
   "Return a State instance with computation that returns
   the current state."
   []
-  (-get-state (ctx/get-current state-monad)))
+  (-get-state (ctx/get-current context)))
 
 (defn put-state
   "Return a State instance with computation that replaces
   the current state with specified new state."
   [newstate]
-  (-put-state (ctx/get-current state-monad) newstate))
+  (-put-state (ctx/get-current context) newstate))
 
 (defn swap-state
   "Return a State instance with computation that applies the
   specified function to state and returns the old state."
   [f]
-  (-swap-state (ctx/get-current state-monad) f))
+  (-swap-state (ctx/get-current context) f))
+
+;; TODO: seems that ctx/get-current is redundant
 
 (defn run-state
   "Given a State instance, execute the
@@ -221,7 +229,7 @@
 
   This should be return something to: #<Pair [1 2]>"
   [state seed]
-  (ctx/with-monad (ctx/get-current state-monad)
+  (ctx/with-monad (ctx/get-current context)
     (state seed)))
 
 (defn eval-state

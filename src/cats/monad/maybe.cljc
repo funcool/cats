@@ -34,7 +34,7 @@
   "
   (:require [cats.protocols :as p]))
 
-(declare maybe-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructors and functions
@@ -42,7 +42,7 @@
 
 (deftype Just [v]
   p/Context
-  (get-context [_] maybe-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -70,7 +70,7 @@
 
 (deftype Nothing []
   p/Context
-  (get-context [_] maybe-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] nil)
@@ -100,7 +100,7 @@
   of Maybe monad."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) maybe-monad)
+    (identical? (p/get-context v) context)
     false))
 
 (defn just
@@ -163,8 +163,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  maybe-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Semigroup
     (mappend [ctx mv mv']
       (cond
@@ -229,10 +232,13 @@
   "The maybe transformer constructor."
   [inner-monad]
   (reify
+    p/ContextClass
+    (-get-level [_] 100)
+
     p/Functor
     (fmap [_ f fv]
       (p/fmap inner-monad
-              #(p/fmap maybe-monad f %)
+              #(p/fmap context f %)
               fv))
 
     p/Monad
@@ -262,7 +268,7 @@
 
     p/MonadTrans
     (base [_]
-      maybe-monad)
+      context)
 
     (inner [_]
       inner-monad)

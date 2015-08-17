@@ -84,11 +84,11 @@
 
   Example:
 
-      (with-context either/either-monad
+      (with-context either/context
         (pure 1))
       ;; => #<Right [1]>
 
-      (pure either/either-monad 1)
+      (pure either/context 1)
       ;; => #<Right [1]>
   "
   ([v] (pure (ctx/get-current) v))
@@ -723,17 +723,17 @@
           (maybe/just (/ x y))))
 
       (m/foldm m-div 1 [1 2 3])
-      (m/foldm maybe/maybe-monad m-div 1 [1 2 3])
+      (m/foldm maybe/context m-div 1 [1 2 3])
       ;; => #<Just 1/6>
 
-      (m/foldm maybe/maybe-monad m-div 1 [1 0 3])
+      (m/foldm maybe/context m-div 1 [1 0 3])
       ;; => #<Nothing>
 
       (foldm m-div 1 [])
       ;; => Exception
 
-      (m/foldm maybe/maybe-monad m-div 1 [])
-      (ctx/with-context maybe/maybe-monad
+      (m/foldm maybe/context m-div 1 [])
+      (ctx/with-context maybe/context
         (foldm m-div 1 []))
       ;; => #<Just 1>
   "

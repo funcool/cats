@@ -28,7 +28,7 @@
   (:require [cats.protocols :as p])
   (:refer-clojure :exclude [identity]))
 
-(declare identity-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructors
@@ -36,7 +36,7 @@
 
 (deftype Identity [v]
   p/Context
-  (get-context [_] identity-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -74,8 +74,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  identity-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Functor
     (fmap [_ f iv]
       (Identity. (f (.-v iv))))
@@ -102,6 +105,9 @@
   "The Identity transformer constructor."
   [inner-monad]
   (reify
+    p/ContextClass
+    (-get-level [_] 100)
+
     p/Monad
     (mreturn [_ v]
       (identity (p/mreturn inner-monad v)))

@@ -69,8 +69,11 @@
     out))
 
 (def ^{:no-doc true}
-  channel-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Functor
     (fmap [_ f mv]
       (let [c (a/chan 1 (map f))]
@@ -135,5 +138,5 @@
 (extend-type #?(:clj  clojure.core.async.impl.channels.ManyToManyChannel
                 :cljs cljs.core.async.impl.channels.ManyToManyChannel)
   p/Context
-  (get-context [_] channel-monad))
+  (get-context [_] context))
 

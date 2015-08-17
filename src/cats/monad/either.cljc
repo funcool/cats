@@ -43,11 +43,11 @@
 ;; Type constructor and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(declare either-monad)
+(declare context)
 
 (deftype Right [v]
   p/Context
-  (get-context [_] either-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -75,7 +75,7 @@
 
 (deftype Left [v]
   p/Context
-  (get-context [_] either-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -131,7 +131,7 @@
   of Either monad."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) either-monad)
+    (identical? (p/get-context v) context)
     false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -139,8 +139,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  either-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Functor
     (fmap [_ f s]
       (if (right? s)
@@ -185,6 +188,9 @@
   "The Either transformer constructor."
   [inner-monad]
   (reify
+    p/ContextClass
+    (-get-level [_] 100)
+
     p/Monad
     (mreturn [_ v]
       (p/mreturn inner-monad (right v)))
@@ -199,7 +205,7 @@
 
     p/MonadTrans
     (base [_]
-      either-monad)
+      context)
 
     (inner [_]
       inner-monad)
@@ -240,8 +246,7 @@
   either is a left, return it."
   [e rf]
   {:pre [(either? e)]}
-  (let [context either-monad]
-    (p/mbind context e rf)))
+  (p/mbind context e rf))
 
 (def lefts
   "Given a collection of eithers, return only the values that are left."

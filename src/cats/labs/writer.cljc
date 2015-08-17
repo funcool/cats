@@ -34,7 +34,7 @@
                      [cats.context :as ctx]
                      [cats.data :as d])))
 
-(declare writer-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Protocol declaration
@@ -59,7 +59,7 @@
 
 (deftype Writer [mfn]
   p/Context
-  (get-context [_] writer-monad)
+  (get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -91,11 +91,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  writer-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Monad
     (mreturn [_ v]
-      (d/pair v (p/mempty b/vector-monad)))
+      (d/pair v (p/mempty b/vector-context)))
 
     (mbind [_ mv f]
       (let [[v log] mv
@@ -119,75 +122,80 @@
 
 (defn writer-transformer
   "The Writer transformer constructor."
-  [inner-monad]
+  [inner-context]
   (reify
+    p/ContextClass
+    (-get-level [_] 100)
+
     p/Monad
     (mreturn [_ v]
-      (p/mreturn inner-monad
-                 (d/pair v (p/mempty b/vector-monad))))
+      (p/mreturn inner-context
+                 (d/pair v (p/mempty b/vector-context))))
 
     (mbind [_ mv f]
-      (p/mbind inner-monad
+      (p/mbind inner-context
                mv
                (fn [[v log]]
-                 (p/mbind inner-monad
+                 (p/mbind inner-context
                           (f v)
                           (fn [[v' log']]
-                                   (p/mreturn inner-monad
+                                   (p/mreturn inner-context
                                               (d/pair v' (p/mappend (p/get-context log) log log'))))))))
 
     MonadWriter
     (-tell [_ v]
-      (p/mreturn inner-monad (d/pair nil [v])))
+      (p/mreturn inner-context (d/pair nil [v])))
 
     (-listen [_ mv]
-      (p/mbind inner-monad
+      (p/mbind inner-context
                mv
                (fn [mv]
-                 (p/mreturn inner-monad
+                 (p/mreturn inner-context
                             (d/pair mv (second mv))))))
 
     (-pass [_ mv]
-      (p/mbind inner-monad
+      (p/mbind inner-context
                mv
                (fn [w]
                  (let [[v f] (first w)
                        log   (second w)]
-                   (p/mreturn inner-monad
+                   (p/mreturn inner-context
                               (d/pair v (f log)))))))
 
     p/MonadTrans
     (base [_]
-      writer-monad)
+      context)
 
     (inner [_]
-      inner-monad)
+      inner-context)
 
     (lift [_ mv]
-      (p/mbind inner-monad
+      (p/mbind inner-context
                    mv
                    (fn [v]
-                     (p/mreturn inner-monad
-                                    (d/pair v (p/mempty b/vector-monad))))))))
+                     (p/mreturn inner-context
+                                    (d/pair v (p/mempty b/vector-context))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; TODO: seems that with-context is missing here
+
 (defn tell
   "Add the value to the log."
   [v]
-  (-tell (ctx/get-current writer-monad) v))
+  (-tell (ctx/get-current context) v))
 
 (defn listen
   "Get the value from the log."
   [mv]
-  (-listen (ctx/get-current writer-monad) mv))
+  (-listen (ctx/get-current context) mv))
 
 (defn pass
   "Apply a function to the log."
   [mv]
-  (-pass (ctx/get-current writer-monad) mv))
+  (-pass (ctx/get-current context) mv))
 
 (def value first)
 (def log second)

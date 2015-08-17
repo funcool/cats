@@ -35,7 +35,7 @@
 
 (extend-type nil
   p/Context
-  (get-context [_] maybe/maybe-monad)
+  (get-context [_] maybe/context)
 
   p/Extract
   (extract [_] nil))
@@ -44,8 +44,11 @@
 ;; (Lazy) Sequence Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def sequence-monad
+(def sequence-context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Semigroup
     (mappend [_ sv sv']
       (concat sv sv'))
@@ -102,14 +105,17 @@
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
   p/Context
-  (get-context [_] sequence-monad))
+  (get-context [_] sequence-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vector Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def vector-monad
+(def vector-context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Semigroup
     (mappend [_ sv sv']
       (into sv sv'))
@@ -164,14 +170,17 @@
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
   p/Context
-  (get-context [_] vector-monad))
+  (get-context [_] vector-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def set-monad
+(def set-context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Semigroup
     (mappend [_ sv sv']
       (s/union sv (set sv')))
@@ -211,14 +220,17 @@
 (extend-type #?(:clj clojure.lang.PersistentHashSet
                 :cljs cljs.core.PersistentHashSet)
   p/Context
-  (get-context [_] set-monad))
+  (get-context [_] set-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Map Monoid
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def map-monoid
+(def map-context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Semigroup
     (mappend [_ sv sv']
       (merge sv sv'))
@@ -230,14 +242,14 @@
 (extend-type #?(:clj clojure.lang.PersistentHashMap
                 :cljs cljs.core.PersistentHashMap)
   p/Context
-  (get-context [_] map-monoid))
+  (get-context [_] map-context))
 
 #?(:clj
    (extend-type clojure.lang.PersistentArrayMap
      p/Context
-     (get-context [_] map-monoid)))
+     (get-context [_] map-context)))
 
 #?(:clj
    (extend-type clojure.lang.PersistentTreeMap
      p/Context
-     (get-context [_] map-monoid)))
+     (get-context [_] map-context)))

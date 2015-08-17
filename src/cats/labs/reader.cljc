@@ -30,7 +30,7 @@
      :cljs (:require [cats.context :as ctx :include-macros true]
                      [cats.protocols :as p])))
 
-(declare reader-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Protocol declaration
@@ -48,7 +48,7 @@
 
 (deftype Reader [mfn]
   p/Context
-  (get-context [_] reader-monad)
+  (get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -79,8 +79,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  reader-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Functor
     (fmap [_ f fv]
       (reader (fn [env]
@@ -112,6 +115,9 @@
   "The Reader transformer constructor."
   [inner-monad]
   (reify
+    p/ContextClass
+    (-get-level [_] 100)
+
     p/Functor
     (fmap [_ f fv]
       (reader (fn [env]
@@ -119,7 +125,7 @@
 
     p/Monad
     (mreturn [_ v]
-      (p/mreturn reader-monad (p/mreturn inner-monad v)))
+      (p/mreturn context (p/mreturn inner-monad v)))
 
     (mbind [_ mr f]
       (fn [env]
@@ -130,7 +136,7 @@
 
     p/MonadTrans
     (base [_]
-      reader-monad)
+      context)
 
     (inner [_]
       inner-monad)
@@ -152,22 +158,24 @@
 ;; Reader monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; TODO: the usage of get-current seems to be redundant
+
 (defn run-reader
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
   [reader seed]
-  (ctx/with-monad (ctx/get-current reader-monad)
+  (ctx/with-monad (ctx/get-current context)
     (reader seed)))
 
 (def ask
   (reader
    (fn [env]
-     (let [ctx (ctx/get-current reader-monad)]
+     (let [ctx (ctx/get-current context)]
        ((-ask ctx) env)))))
 
 (def local
   (fn [f mr]
     (reader
      (fn [env]
-       (let [ctx (ctx/get-current reader-monad)]
+       (let [ctx (ctx/get-current context)]
          ((-local ctx f mr) env))))))

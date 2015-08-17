@@ -31,6 +31,10 @@
   to be used directly. Is a private api but exposes
   as public for documentation purposes.")
 
+(defprotocol ContextClass
+  "Is a marker protocol for context classes."
+  (-get-level [_] "Get a context priority level."))
+
 (defprotocol Context
   "Abstraction that establish a membership of types
   with one concrete monad.

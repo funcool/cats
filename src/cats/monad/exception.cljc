@@ -76,11 +76,11 @@
 ;; Types and implementations.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(declare exception-monad)
+(declare context)
 
 (deftype Success [v]
   p/Context
-  (get-context [_] exception-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -108,7 +108,7 @@
 
 (deftype Failure [e]
   p/Context
-  (get-context [_] exception-monad)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] e)
@@ -179,7 +179,7 @@
   of Exception monad."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) exception-monad)
+    (identical? (p/get-context v) context)
     false))
 
 (defn extract
@@ -228,7 +228,7 @@
   exec-try-or-recover
   [func recoverfn]
   (let [result (exec-try-on func)]
-    (ctx/with-context exception-monad
+    (ctx/with-context context
       (if (failure? result)
         (recoverfn (.-e result))
         result))))
@@ -269,8 +269,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  exception-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Functor
     (fmap [_ f s]
       (if (success? s)

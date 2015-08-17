@@ -29,7 +29,7 @@
   (:require [cats.protocols :as p]
             [cats.monad.either :as either]))
 
-(declare validation-applicative)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -37,7 +37,7 @@
 
 (deftype Ok [v]
   p/Context
-  (get-context [_] validation-applicative)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -65,7 +65,7 @@
 
 (deftype Fail [v]
   p/Context
-  (get-context [_] validation-applicative)
+  (get-context [_] context)
 
   p/Extract
   (extract [_] v)
@@ -123,7 +123,7 @@
   of the Validation applicative."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) validation-applicative)
+    (identical? (p/get-context v) context)
     false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -131,8 +131,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  validation-applicative
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] 10)
+
     p/Semigroup
     (mappend [_ sv sv']
       (cond
