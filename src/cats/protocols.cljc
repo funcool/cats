@@ -72,6 +72,10 @@
   (-foldl [fctx f z xs] "Left-associative fold of a structure.")
   (-foldr [fctx f z xs] "Right-associative fold of a structure."))
 
+(defprotocol Traversable
+  "TODO"
+  (traverse [tctx f tv] "TODO"))
+
 (defprotocol Monad
   "The Monad abstraction."
   (-mreturn [m v])
