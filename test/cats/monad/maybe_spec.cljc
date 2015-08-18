@@ -4,6 +4,7 @@
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.maybe :as maybe]
+               [cats.monad.either :as either]
                [cats.context :as ctx :include-macros true]
                [cats.core :as m :include-macros true])
      :clj
@@ -11,6 +12,7 @@
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.maybe :as maybe]
+               [cats.monad.either :as either]
                [cats.context :as ctx]
                [cats.core :as m])))
 
@@ -139,3 +141,11 @@
              (m/foldr #(m/return (+ %1 %2)) 1 (maybe/just 1))))
     (t/is (= 1
              (m/foldr #(m/return (+ %1 %2)) 1 (maybe/nothing))))))
+
+(t/deftest traversable-test
+  (t/testing "Traverse"
+    (t/is (= (either/right (maybe/just 42))
+             (m/traverse #(either/right (inc %)) (maybe/just 41))))
+    (t/is (= (either/right (maybe/nothing))
+             (ctx/with-context either/either-monad
+               (m/traverse #(either/right (inc %)) (maybe/nothing)))))))
