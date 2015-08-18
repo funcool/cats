@@ -1,7 +1,7 @@
 cats
 ====
 
-[![Travis Badge](https://img.shields.io/travis/funcool/cats.svg?style=flat)](https://travis-ci.org/funcool/cats "Travis Badge")
+[![Travis Badge](https://img.shields.io/travis/funcool/cats/master.svg)](https://travis-ci.org/funcool/cats "Travis Badge")
 
 ![](./logo/logo.png "cats logo")
 
