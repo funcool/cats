@@ -1,6 +1,6 @@
 ;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
 ;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
-;; All rights reserved.
+;; All rights reserved
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -29,7 +29,8 @@
             [cats.monad.maybe :as maybe]
             [cats.protocols :as p]
             [cats.context :as ctx]
-            [cats.data :as d]))
+            [cats.data :as d]
+            [cats.core :as m]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -179,7 +180,18 @@
         (reduce rf z (reverse xs))))
 
     (-foldl [ctx f z xs]
-      (reduce f z xs))))
+      (reduce f z xs))
+
+    p/Traversable
+    (traverse [ctx f tv]
+      (let [as (map f tv)]
+        (p/-foldr ctx
+                  (fn [a acc]
+                    (m/alet [x a
+                             xs acc]
+                       (into [] (cons x xs))))
+                  (m/pure [])
+                  as)))))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
