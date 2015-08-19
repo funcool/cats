@@ -63,8 +63,8 @@
   ([]
    (let [ctx (ctx/get-current)]
      (p/mempty ctx)))
-  ([context]
-   (let [ctx (ctx/get-current context)]
+  ([ctx-or-val]
+   (let [ctx (ctx/get-current ctx-or-val)]
      (p/mempty ctx))))
 
 (defn mappend
