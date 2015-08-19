@@ -2,37 +2,41 @@
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
   #?(:cljs (:require [cljs.core.async :as a]
                      [cljs.test :as t]
+                     [cats.builtin :as b]
+                     [cats.context :as ctx :include-macros true]
                      [cats.core :as m :include-macros true]
                      [cats.labs.channel :as c]
                      [cats.monad.either :as either])
      :clj  (:require [clojure.core.async :as a :refer [go]]
                      [clojure.test :as t]
+                     [cats.builtin :as b]
+                     [cats.context :as ctx]
                      [cats.core :as m]
                      [cats.labs.channel :as c]
                      [cats.monad.either :as either])))
 
 (t/deftest channel-as-functor
   #?(:clj
-     (let [ch (m/pure c/channel-monad 1)]
+     (let [ch (m/pure c/context 1)]
        (t/is (= 2 (a/<!! (m/fmap inc ch)))))
 
      :cljs
      (t/async done
        (go
-         (let [ch (m/pure c/channel-monad 1)
+         (let [ch (m/pure c/context 1)
                rs (m/fmap inc ch)]
            (t/is (= 2 (a/<! rs)))
            (done))))))
 
 (t/deftest channel-as-monad-1
   #?(:clj
-     (let [ch (m/pure c/channel-monad 1)]
+     (let [ch (m/pure c/context 1)]
        (t/is (= 2 (a/<!! (m/>>= ch (fn [x] (m/return (inc x))))))))
 
      :cljs
      (t/async done
        (go
-         (let [ch (m/pure c/channel-monad 1)
+         (let [ch (m/pure c/context 1)
                result (m/>>= ch (fn [x] (m/return (inc x))))]
            ;; (println 2222 @(a/<! result))
 
@@ -73,8 +77,8 @@
 
 (t/deftest first-monad-law-left-identity
   #?(:clj
-     (let [ch1 (m/pure c/channel-monad 4)
-           ch2 (m/pure c/channel-monad 4)
+     (let [ch1 (m/pure c/context 4)
+           ch2 (m/pure c/context 4)
            vl  (m/>>= ch2 c/with-value)]
        (t/is (= (a/<!! ch1)
                 (a/<!! vl))))
@@ -82,8 +86,8 @@
      :cljs
      (t/async done
        (go
-         (let [ch1 (m/pure c/channel-monad 4)
-               ch2 (m/pure c/channel-monad 4)
+         (let [ch1 (m/pure c/context 4)
+               ch2 (m/pure c/context 4)
                vl  (m/>>= ch2 c/with-value)]
            (t/is (= (a/<! ch1)
                     (a/<! vl)))
@@ -145,7 +149,7 @@
 
 (t/deftest semigroup-with-monoid-tests
   #?(:clj
-     (let [c (m/mappend (m/mempty) (a/to-chan [1]))]
+     (let [c (m/mappend (m/mempty c/context) (a/to-chan [1]))]
        (t/is (= [1] (a/<!! (a/into [] c)))))
      :cljs
      (t/async done
@@ -176,19 +180,19 @@
              (done)))))))
 
 
-(def chaneither-m (either/either-transformer c/channel-monad))
+(def chaneither-m (either/either-transformer c/context))
 
 #?(:clj
    (t/deftest channel-transformer-tests
      (t/testing "channel combination with either"
        (let [funcright (fn [x] (go (either/right x)))
              funcleft (fn [x] (go (either/left x)))
-             r1 (m/with-monad chaneither-m
+             r1 (ctx/with-context chaneither-m
                   (m/mlet [x (funcright 1)
                            y (funcright 2)]
                     (m/return (+ x y))))
 
-             r2 (m/with-monad chaneither-m
+             r2 (ctx/with-context chaneither-m
                   (m/mlet [x (funcright 1)
                            y (funcleft :foo)
                            z (funcright 2)]
@@ -202,12 +206,12 @@
      (t/async done
               (let [funcright #(c/with-value (either/right %))
                     funcleft #(c/with-value (either/left %))
-                    r1 (m/with-monad chaneither-m
+                    r1 (ctx/with-context chaneither-m
                          (m/mlet [x (funcright 1)
                                   y (funcright 2)]
                            (m/return (+ x y))))
 
-                    r2 (m/with-monad chaneither-m
+                    r2 (ctx/with-context chaneither-m
                          (m/mlet [x (funcright 1)
                                   y (funcleft :foo)
                                   z (funcright 2)]

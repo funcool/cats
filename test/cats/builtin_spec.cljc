@@ -3,11 +3,14 @@
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
 
+            #?(:cljs [cats.context :as ctx :include-macros true]
+               :clj  [cats.context :as ctx])
+
             #?(:cljs [cljs.test :as t]
-               :clj [clojure.test :as t])
+               :clj  [clojure.test :as t])
 
             #?(:cljs [cats.core :as m :include-macros true]
-               :clj [cats.core :as m])))
+               :clj  [cats.core :as m])))
 
 (t/deftest test-nil-as-maybe
   (t/testing "Nil works like nothing (for avoid unnecesary null pointers)."
@@ -21,11 +24,17 @@
 
 (t/deftest map-tests
   (t/testing "Map as monoid"
-    (t/is (= (m/mempty b/map-monoid) {})))
+    (t/is (= (m/mempty b/map-context) {})))
   (t/testing "Map as semigroup"
-    (t/is (= (m/mappend "1" "2") "12"))
-    (t/is (= (m/mappend (m/mempty b/map-monoid) "1") "1"))))
+    (t/is (= (m/mappend {:a 1} {:b 2}) {:a 1 :b 2}))
+    (t/is (= (m/mappend (m/mempty b/map-context) {:a 1}) {:a 1}))))
 
+;; (t/deftest string-tests
+;;   (t/testing "String as monoid"
+;;     (t/is (= (m/mempty b/string-context) "")))
+;;   (t/testing "Map as semigroup"
+;;     (t/is (= (m/mappend "1" "2") "12"))
+;;     (t/is (= (m/mappend (m/mempty b/string-context) "1") "1"))))
 
 (t/deftest vector-monad
   (t/testing "Forms a semigroup"
@@ -34,7 +43,7 @@
 
   (t/testing "Forms a monoid"
     (t/is (= [1 2 3]
-             (m/with-monad b/vector-monad
+             (ctx/with-context b/vector-context
                (m/mappend [1 2 3] (m/mempty))))))
 
   (t/testing "The first monad law: left identity"
@@ -66,11 +75,11 @@
 
     (t/testing "Forms a monoid"
       (t/is (= [1 2 3]
-               (m/with-monad b/sequence-monad
+               (ctx/with-context b/sequence-context
                  (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
 
     (t/testing "The first monad law: left identity"
-      (t/is (= s (m/with-monad b/sequence-monad
+      (t/is (= s (ctx/with-context b/sequence-context
                    (m/>>= (m/return 2)
                           val->lazyseq)))))
 
@@ -95,7 +104,7 @@
 
   (t/testing "Forms a monoid"
     (t/is (= #{1 2 3}
-             (m/with-monad b/set-monad
+             (ctx/with-context b/set-context
                (m/mappend #{1 2 3} (m/mempty))))))
 
 
@@ -104,7 +113,7 @@
              (m/fmap inc #{1 2 3}))))
 
   (t/testing "The first monad law: left identity"
-    (t/is (= #{2} (m/with-monad b/set-monad
+    (t/is (= #{2} (ctx/with-context b/set-context
                     (m/>>= (m/return 2)
                            (fn [x] #{x}))))))
 

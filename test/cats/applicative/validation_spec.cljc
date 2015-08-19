@@ -5,6 +5,7 @@
                [cats.protocols :as p]
                [cats.applicative.validation :as validation]
                [cats.monad.either :as either]
+               [cats.context :as ctx :include-macros true]
                [cats.core :as m :include-macros true])
      :clj
      (:require [clojure.test :as t]
@@ -12,6 +13,7 @@
                [cats.protocols :as p]
                [cats.applicative.validation :as validation]
                [cats.monad.either :as either]
+               [cats.context :as ctx]
                [cats.core :as m])))
 
 (t/deftest basic-operations-test
@@ -45,7 +47,7 @@
              (m/mappend ok1 ok2)))))
 
 (t/deftest monoid-test
-  (m/with-monad validation/validation-applicative
+  (ctx/with-context validation/context
     (t/is (= (validation/fail) (m/mempty)))))
 
 (t/deftest functor-test

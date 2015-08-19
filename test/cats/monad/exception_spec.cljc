@@ -5,6 +5,7 @@
                [cats.protocols :as p]
                [cats.monad.exception :as exc :include-macros true]
                [cats.monad.either :as either]
+               [cats.context :as ctx :include-macros true]
                [cats.core :as m :include-macros true])
      :clj
      (:require [clojure.test :as t]
@@ -12,6 +13,7 @@
                [cats.protocols :as p]
                [cats.monad.exception :as exc]
                [cats.monad.either :as either]
+               [cats.context :as ctx]
                [cats.core :as m])))
 
 (t/deftest basic-operations-test
@@ -89,11 +91,11 @@
 
 (t/deftest first-monad-law-left-identity
   (t/is (= (exc/success 2)
-           (m/>>= (p/mreturn exc/exception-monad 2)
+           (m/>>= (p/mreturn exc/context 2)
                   exc/success)))
 
   (t/is (= (exc/success 2)
-           (m/>>= (p/mreturn exc/exception-monad 2)
+           (m/>>= (p/mreturn exc/context 2)
                   exc/success
                   exc/success))))
 

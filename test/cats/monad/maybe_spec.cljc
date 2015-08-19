@@ -4,12 +4,14 @@
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.maybe :as maybe]
+               [cats.context :as ctx :include-macros true]
                [cats.core :as m :include-macros true])
      :clj
      (:require [clojure.test :as t]
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.maybe :as maybe]
+               [cats.context :as ctx]
                [cats.core :as m])))
 
 (t/deftest maybe-monad-tests
@@ -44,12 +46,12 @@
 
   (t/testing "Its identity element is Nothing"
     (t/is (= (maybe/nothing)
-             (m/with-monad maybe/maybe-monad
+             (ctx/with-context maybe/context
                (m/mempty)))))
 
   (t/testing "The first monad law: left identity"
     (t/is (= (maybe/just 2)
-             (m/>>= (p/mreturn maybe/maybe-monad 2) maybe/just))))
+             (m/>>= (p/mreturn maybe/context 2) maybe/just))))
 
   (t/testing "The second monad law: right identity"
     (t/is (= (maybe/just 2)
@@ -64,19 +66,19 @@
                     (fn [x] (m/>>= (maybe/just (inc x))
                                    (fn [y] (maybe/just (inc y))))))))))
 
-(def maybe-vector-transformer (maybe/maybe-transformer b/vector-monad))
+(def maybe-vector-transformer (maybe/maybe-transformer b/vector-context))
 
 (t/deftest maybe-transformer-tests
   (t/testing "It can be combined with the effects of other monads"
     (t/is (= [(maybe/just 2)]
-             (m/with-monad maybe-vector-transformer
+             (ctx/with-context maybe-vector-transformer
                (m/return 2))))
 
     (t/is (= [(maybe/just 1)
               (maybe/just 2)
               (maybe/just 2)
               (maybe/just 3)]
-             (m/with-monad maybe-vector-transformer
+             (ctx/with-context maybe-vector-transformer
                (m/mlet [x [(maybe/just 0) (maybe/just 1)]
                         y [(maybe/just 1) (maybe/just 2)]]
                  (m/return (+ x y))))))
@@ -85,7 +87,7 @@
               (maybe/just 2)
               (maybe/just 2)
               (maybe/just 3)]
-             (m/with-monad maybe-vector-transformer
+             (ctx/with-context maybe-vector-transformer
                (m/mlet [x (m/lift [0 1])
                         y (m/lift [1 2])]
                  (m/return (+ x y))))))
@@ -94,7 +96,7 @@
               (maybe/nothing)
               (maybe/just 2)
               (maybe/nothing)]
-             (m/with-monad maybe-vector-transformer
+             (ctx/with-context maybe-vector-transformer
                (m/mlet [x [(maybe/just 0) (maybe/just 1)]
                         y [(maybe/just 1) (maybe/nothing)]]
                  (m/return (+ x y))))))))

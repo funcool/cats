@@ -5,6 +5,7 @@
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.either :as either]
+               [cats.context :as ctx :include-macros true]
                [cats.core :as m :include-macros true])
      :clj
      (:require [clojure.test :as t]
@@ -12,6 +13,7 @@
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.either :as either]
+               [cats.context :as ctx]
                [cats.core :as m])))
 
 (t/deftest basic-operations-test
@@ -38,7 +40,7 @@
 
 (t/deftest first-monad-law-left-identity
   (t/is (= (either/right 2)
-           (m/>>= (p/mreturn either/either-monad 2) either/right))))
+           (m/>>= (p/mreturn either/context 2) either/right))))
 
 (t/deftest second-monad-law-right-identity
   (t/is (= (either/right 2)
@@ -55,18 +57,18 @@
 
 
 (def either-vector-m
-  (either/either-transformer b/vector-monad))
+  (either/either-transformer b/vector-context))
 
 (t/deftest either-transformer-tests
   (t/is (= [(either/right 2)]
-           (m/with-monad either-vector-m
+           (ctx/with-context either-vector-m
              (m/return 2))))
 
   (t/is (= [(either/right 1)
             (either/right 2)
             (either/right 2)
             (either/right 3)]
-           (m/with-monad either-vector-m
+           (ctx/with-context either-vector-m
              (m/mlet [x [(either/right 0) (either/right 1)]
                       y [(either/right 1) (either/right 2)]]
                (m/return (+ x y))))))
@@ -75,7 +77,7 @@
             (either/right 2)
             (either/right 2)
             (either/right 3)]
-           (m/with-monad either-vector-m
+           (ctx/with-context either-vector-m
              (m/mlet [x (m/lift [0 1])
                       y (m/lift [1 2])]
                (m/return (+ x y))))))
@@ -84,7 +86,7 @@
             (either/left)
             (either/right 2)
             (either/left)]
-           (m/with-monad either-vector-m
+           (ctx/with-context either-vector-m
              (m/mlet [x [(either/right 0) (either/right 1)]
                       y [(either/right 1) (either/left)]]
                (m/return (+ x y)))))))

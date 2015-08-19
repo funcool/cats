@@ -3,12 +3,14 @@
      (:require [cljs.test :as t]
                [cats.builtin :as b]
                [cats.monad.maybe :as maybe]
-               [cats.core :as m :include-macros true])
+               [cats.core :as m :include-macros true]
+               [cats.context :as ctx :include-macros true])
      :clj
      (:require [clojure.test :as t]
                [cats.builtin :as b]
                [cats.monad.maybe :as maybe]
-               [cats.core :as m])))
+               [cats.core :as m]
+               [cats.context :as ctx])))
 
 (defn add2 [x y]
   (+ x y))
@@ -142,11 +144,11 @@
                (monad+ (maybe/just 1) (maybe/nothing)))))
 
     (t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)]
+      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-context)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
                   (maybe/just 3) (maybe/just 4)
                   (maybe/just 5) (maybe/just 6)]
-                 (m/with-monad maybe-sequence-monad
+                 (ctx/with-context maybe-sequence-monad
                    (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
                            [(maybe/just 1) (maybe/just 2)]))))))))
 
@@ -170,12 +172,12 @@
                ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
 
   (t/testing "It can lift a function to a Monad Transformer"
-    (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-monad)
+    (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-context)
           monad+ (m/lift-m 2 add2)]
       (t/is (= [(maybe/just 1) (maybe/just 2)
                 (maybe/just 3) (maybe/just 4)
                 (maybe/just 5) (maybe/just 6)]
-               (m/with-monad maybe-sequence-monad
+               (ctx/with-context maybe-sequence-monad
                  (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
                          [(maybe/just 1) (maybe/just 2)])))))))
 
@@ -237,23 +239,27 @@
             (if (zero? y)
               (maybe/nothing)
               (maybe/just (/ x y))))]
+
     (t/testing "It can fold a non-empty collection without an explicit context"
       (t/is (= (maybe/just #?(:clj 1/6 :cljs (/ 1 6)))
                (m/foldm m-div 1 [1 2 3])))
       (t/is (= (maybe/nothing)
                (m/foldm m-div 1 [1 0 3]))))
+
     (t/testing "It cannot fold an empty collection without an explicit context"
       (t/is (thrown? #?(:clj IllegalArgumentException, :cljs js/Error)
                      (with-redefs [cats.context/get-current (constantly nil)]
                        (m/foldm m-div 1 [])))))
+
     (t/testing "It can fold a non-empty collection, given an explicit context"
       (t/is (= (maybe/just #?(:clj 1/6, :cljs (/ 1 6)))
-               (m/foldm maybe/maybe-monad m-div 1 [1 2 3])))
+               (m/foldm maybe/context m-div 1 [1 2 3])))
       (t/is (= (maybe/nothing)
-               (m/foldm maybe/maybe-monad m-div 1 [1 0 3]))))
+               (m/foldm maybe/context m-div 1 [1 0 3]))))
+
     (t/testing "It can fold an empty collection, given an explicit context"
       (t/is (= (maybe/just 1)
-               (m/foldm maybe/maybe-monad m-div 1 [])))
+               (m/foldm maybe/context m-div 1 [])))
       (t/is (= (maybe/just 1)
-               (m/with-monad maybe/maybe-monad
+               (ctx/with-context maybe/context
                  (m/foldm m-div 1 [])))))))
