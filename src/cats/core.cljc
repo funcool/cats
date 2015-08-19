@@ -632,10 +632,9 @@
       ;=> <Nothing>
   "
   [p mv]
-  (ctx/with-context (ctx/get-current mv)
-    (mlet [v mv
-           :when (p v)]
-      (return v))))
+  (mlet [v mv
+         :when (p v)]
+    (return v)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
