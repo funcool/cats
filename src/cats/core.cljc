@@ -67,6 +67,8 @@
    (let [ctx (ctx/get-current ctx-or-val)]
      (p/mempty ctx))))
 
+
+;; TODO: improve performance
 (defn mappend
   [& svs]
   {:pre [(seq svs)]}
@@ -122,6 +124,8 @@
   ([ctx]
    (p/mzero ctx)))
 
+;; TODO: improve performance
+
 (defn mplus
   [& mvs]
   {:pre [(seq mvs)]}
@@ -163,6 +167,8 @@
   (let [ctx (ctx/get-current af)]
     (reduce (partial p/fapply ctx) af avs)))
 
+
+;; TODO: review it, seems wrong and should be a macro?
 (defn when
   "Given an expression and a monadic value,
   if the expression is logical true, return the monadic value.
@@ -172,6 +178,7 @@
   ([ctx b mv]
    (if b mv (return ctx nil))))
 
+;; TODO: review it, seems wrong and should be a macro?
 (defn unless
   "Given an expression and a monadic value,
   if the expression is not logical true, return the monadic value.
