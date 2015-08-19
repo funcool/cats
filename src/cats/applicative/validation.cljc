@@ -154,7 +154,7 @@
     p/Functor
     (fmap [_ f s]
       (if (ok? s)
-        (ok (f (.-v s)))
+        (ok (f (p/extract s)))
         s))
 
     p/Foldable
