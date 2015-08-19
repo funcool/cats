@@ -235,7 +235,8 @@
                       `(bind ~r (fn [~l] ~acc))))
                   `(do ~@body)))))
 
-(defn- deps [expr syms]
+(defn- deps
+  [expr syms]
   (cond
     (and (symbol? expr)
          (contains? syms expr))
@@ -247,10 +248,12 @@
     :else
     '()))
 
-(defn- rename-sym [expr renames]
+(defn- rename-sym
+  [expr renames]
   (get renames expr expr))
 
-(defn- rename [expr renames]
+(defn- rename
+  [expr renames]
   (cond
     (symbol? expr)
     (rename-sym expr renames)
@@ -431,9 +434,7 @@
         `(fmap (fn [~@(map first bindings)]
                  ~@body)
                ~@(map second bindings))
-        (alet* batches env body))))
-
-)
+        (alet* batches env body)))))
 
 (defn- arglists
   [var]
