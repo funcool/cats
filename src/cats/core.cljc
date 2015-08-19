@@ -504,8 +504,7 @@
               (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for currying.")))
             (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for currying."))))))
      ([n f]
-      {:pre [(or (< n 21)
-                 (throw (IllegalArgumentException. "Clojure doesn't allow more than 20 positional arguments")))]}
+      {:pre [(< n 21)]}
       (let [args (repeatedly n gensym)
             body `(~f ~@args)]
         `(curry* ~args ~body)))))
