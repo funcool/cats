@@ -27,8 +27,10 @@
   "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.monad.maybe :as maybe]
+            [cats.protocols :as p]
             [cats.context :as ctx]
-            [cats.protocols :as p]))
+            [cats.data :as d]
+            [cats.core :as m]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -312,3 +314,21 @@
                 :cljs js/String)
   p/Context
   (get-context [_] string-monoid))
+
+(def pair-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (d/pair
+       (m/mappend (.fst sv) (.fst sv'))
+       (m/mappend (.snd sv) (.snd sv'))))
+    p/Monoid
+    (mempty [_]
+      (d/pair
+       (p/mempty (ctx/get-current))
+       (p/mempty (ctx/get-current))))))
+
+
+(extend-type cats.data.Pair
+  p/Context
+  (get-context [_] pair-monoid))
