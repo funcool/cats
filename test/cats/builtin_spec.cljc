@@ -3,6 +3,7 @@
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
             [cats.context :as ctx]
+            [cats.data :as d]
 
             #?(:cljs [cljs.test :as t]
                :clj [clojure.test :as t])
@@ -190,3 +191,23 @@
   (t/testing "mappend"
     (t/is (= "Hello World" (m/mappend "Hello " "World")))
     (t/is (= "abcdefghi" (m/mappend "abc" "def" "ghi")))))
+
+(t/deftest pair-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/string-monoid
+      (t/is (= (d/pair "" "") (p/mempty b/pair-monoid))))
+    (ctx/with-context b/sum-monoid
+      (t/is (= (d/pair 0 0) (p/mempty b/pair-monoid)))))
+  (t/testing "mappend"
+    (t/is (= (d/pair "Hello buddy" "Hello mate")
+             (m/mappend
+              (d/pair "Hello " "Hello ")
+              (d/pair "buddy" "mate"))))
+    ;; This won't work due to explicitly set context
+    ;; (ctx/with-context b/sum-monoid
+    ;;   (t/is (= (d/pair 10 20)
+    ;;            (m/mappend
+    ;;             (d/pair 3 5)
+    ;;             (d/pair 3 5)
+    ;;             (d/pair 4 10)))))
+    ))
