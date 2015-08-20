@@ -236,3 +236,53 @@
    (extend-type clojure.lang.PersistentArrayMap
      p/Context
      (get-context [_] map-monoid)))
+
+(def any-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (or sv sv'))
+    p/Monoid
+    (mempty [_]
+      false)))
+
+(def all-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (and sv sv'))
+    p/Monoid
+    (mempty [_]
+      true)))
+
+(def sum-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (+ sv sv'))
+    p/Monoid
+    (mempty [_]
+      0)))
+
+(def prod-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (* sv sv'))
+    p/Monoid
+    (mempty [_]
+      1)))
+
+(def string-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (str sv sv'))
+    p/Monoid
+    (mempty [_]
+      "")))
+
+(extend-type #?(:clj java.lang.String
+                :cljs js/String)
+  p/Context
+  (get-context [_] string-monoid))
