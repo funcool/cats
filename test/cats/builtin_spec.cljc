@@ -2,6 +2,8 @@
   (:require [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
+            [cats.context :as ctx]
+            [cats.data :as d]
 
             #?(:cljs [cljs.test :as t]
                :clj [clojure.test :as t])
@@ -142,3 +144,70 @@
         (t/is (= @state 0))
         (t/is (= 2 (first result)))
         (t/is (= @state 1))))))
+
+(t/deftest any-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/any-monoid
+      (t/is (= false (p/mempty (ctx/get-current))))))
+  (t/testing "mappend"
+    (ctx/with-context b/any-monoid
+      (t/is (false? (m/mappend false false)))
+      (t/is (true? (m/mappend true false)))
+      (t/is (true? (m/mappend false true)))
+      (t/is (true? (m/mappend true true))))))
+
+(t/deftest all-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/all-monoid
+      (t/is (= true (p/mempty (ctx/get-current))))))
+  (t/testing "mappend"
+    (ctx/with-context b/all-monoid
+      (t/is (false? (m/mappend false false)))
+      (t/is (false? (m/mappend true false)))
+      (t/is (false? (m/mappend false true)))
+      (t/is (true? (m/mappend true true))))))
+
+(t/deftest sum-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/sum-monoid
+      (t/is (= 0 (p/mempty (ctx/get-current))))))
+  (t/testing "mappend"
+    (ctx/with-context b/sum-monoid
+      (t/is (= 3 (m/mappend 1 2))))))
+
+(t/deftest prod-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/prod-monoid
+      (t/is (= 1 (p/mempty (ctx/get-current))))))
+  (t/testing "mappend"
+    (ctx/with-context b/prod-monoid
+      (t/is (= 6 (m/mappend 1 2 3)))
+      (t/is (= (reduce * (range 1 6)) (apply m/mappend (range 1 6)))))))
+
+(t/deftest string-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/string-monoid
+      (t/is (= "" (p/mempty (ctx/get-current))))))
+  (t/testing "mappend"
+    (t/is (= "Hello World" (m/mappend "Hello " "World")))
+    (t/is (= "abcdefghi" (m/mappend "abc" "def" "ghi")))))
+
+(t/deftest pair-monoid
+  (t/testing "mempty"
+    (ctx/with-context b/string-monoid
+      (t/is (= (d/pair "" "") (p/mempty b/pair-monoid))))
+    (ctx/with-context b/sum-monoid
+      (t/is (= (d/pair 0 0) (p/mempty b/pair-monoid)))))
+  (t/testing "mappend"
+    (t/is (= (d/pair "Hello buddy" "Hello mate")
+             (m/mappend
+              (d/pair "Hello " "Hello ")
+              (d/pair "buddy" "mate"))))
+    ;; This won't work due to explicitly set context
+    ;; (ctx/with-context b/sum-monoid
+    ;;   (t/is (= (d/pair 10 20)
+    ;;            (m/mappend
+    ;;             (d/pair 3 5)
+    ;;             (d/pair 3 5)
+    ;;             (d/pair 4 10)))))
+    ))

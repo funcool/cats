@@ -27,7 +27,10 @@
   "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.monad.maybe :as maybe]
-            [cats.protocols :as p]))
+            [cats.protocols :as p]
+            [cats.context :as ctx]
+            [cats.data :as d]
+            [cats.core :as m]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -236,3 +239,71 @@
    (extend-type clojure.lang.PersistentArrayMap
      p/Context
      (get-context [_] map-monoid)))
+
+(def any-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (or sv sv'))
+    p/Monoid
+    (mempty [_]
+      false)))
+
+(def all-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (and sv sv'))
+    p/Monoid
+    (mempty [_]
+      true)))
+
+(def sum-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (+ sv sv'))
+    p/Monoid
+    (mempty [_]
+      0)))
+
+(def prod-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (* sv sv'))
+    p/Monoid
+    (mempty [_]
+      1)))
+
+(def string-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (str sv sv'))
+    p/Monoid
+    (mempty [_]
+      "")))
+
+(extend-type #?(:clj java.lang.String
+                :cljs js/String)
+  p/Context
+  (get-context [_] string-monoid))
+
+(def pair-monoid
+  (reify
+    p/Semigroup
+    (mappend [_ sv sv']
+      (d/pair
+       (m/mappend (.fst sv) (.fst sv'))
+       (m/mappend (.snd sv) (.snd sv'))))
+    p/Monoid
+    (mempty [_]
+      (d/pair
+       (p/mempty (ctx/get-current))
+       (p/mempty (ctx/get-current))))))
+
+
+(extend-type cats.data.Pair
+  p/Context
+  (get-context [_] pair-monoid))
