@@ -72,7 +72,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Functor
     (-fmap [_ f mv]

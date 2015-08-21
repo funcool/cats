@@ -37,7 +37,8 @@
       (either/left 1)
       ;; => #<Left [1]>
   "
-  (:require [cats.protocols :as p]))
+  (:require [cats.protocols :as p]
+            [cats.context :as ctx]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -142,7 +143,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Functor
     (-fmap [_ f s]
@@ -189,7 +190,7 @@
   [inner-monad]
   (reify
     p/ContextClass
-    (-get-level [_] 100)
+    (-get-level [_] ctx/+level-transformer+)
 
     p/Monad
     (-mreturn [_ v]

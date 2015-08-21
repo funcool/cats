@@ -84,7 +84,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Functor
     (-fmap [_ f fv]
@@ -118,7 +118,7 @@
   [inner-monad]
   (reify
     p/ContextClass
-    (-get-level [_] 100)
+    (-get-level [_] ctx/+level-transformer+)
 
     p/Functor
     (-fmap [_ f fv]

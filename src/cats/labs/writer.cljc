@@ -95,7 +95,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Monad
     (-mreturn [_ v]
@@ -126,7 +126,7 @@
   [inner-context]
   (reify
     p/ContextClass
-    (-get-level [_] 100)
+    (-get-level [_] ctx/+level-transformer+)
 
     p/Monad
     (-mreturn [_ v]

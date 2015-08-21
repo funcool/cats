@@ -32,7 +32,8 @@
       (maybe/just 1)
       ;; => #<Just [1]>
   "
-  (:require [cats.protocols :as p]))
+  (:require [cats.protocols :as p]
+            [cats.context :as ctx]))
 
 (declare context)
 
@@ -166,7 +167,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [ctx mv mv']
@@ -233,7 +234,7 @@
   [inner-monad]
   (reify
     p/ContextClass
-    (-get-level [_] 100)
+    (-get-level [_] ctx/+level-transformer+)
 
     p/Functor
     (-fmap [_ f fv]

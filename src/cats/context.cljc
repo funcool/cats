@@ -24,11 +24,12 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.context
-  "A context management macros."
+  "A cats context management."
   (:require [cats.protocols :as p]))
 
-(def ^{:dynamic true :no-doc true}
-  *context* nil)
+(def ^:dynamic *context* nil)
+(def ^:const +level-default+ 10)
+(def ^:const +level-transformer+ 100)
 
 (defn throw-ilegal-argument
   {:no-doc true :internal true}

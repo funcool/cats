@@ -27,6 +27,7 @@
   "The Validation applicative implementation and helper functions
   for validating values. Isomorphic to Either."
   (:require [cats.protocols :as p]
+            [cats.context :as ctx]
             [cats.monad.either :as either]))
 
 (declare context)
@@ -134,7 +135,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [_ sv sv']

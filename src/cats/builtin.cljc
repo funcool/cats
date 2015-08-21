@@ -27,6 +27,7 @@
   "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.monad.maybe :as maybe]
+            [cats.context :as ctx]
             [cats.protocols :as p]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,7 +48,7 @@
 (def sequence-context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [_ sv sv']
@@ -114,7 +115,7 @@
 (def vector-context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [_ sv sv']
@@ -179,7 +180,7 @@
 (def set-context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [_ sv sv']
@@ -229,7 +230,7 @@
 (def map-context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [_ sv sv']

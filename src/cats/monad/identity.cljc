@@ -25,8 +25,9 @@
 
 (ns cats.monad.identity
   "The Identity Monad."
-  (:require [cats.protocols :as p])
-  (:refer-clojure :exclude [identity]))
+  (:refer-clojure :exclude [identity])
+  (:require [cats.protocols :as p]
+            [cats.context :as ctx]))
 
 (declare context)
 
@@ -77,7 +78,7 @@
   context
   (reify
     p/ContextClass
-    (-get-level [_] 10)
+    (-get-level [_] ctx/+level-default+)
 
     p/Functor
     (-fmap [_ f iv]
@@ -106,7 +107,7 @@
   [inner-monad]
   (reify
     p/ContextClass
-    (-get-level [_] 100)
+    (-get-level [_] ctx/+level-transformer+)
 
     p/Monad
     (-mreturn [_ v]
