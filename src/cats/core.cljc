@@ -62,10 +62,10 @@
 (defn mempty
   ([]
    (let [ctx (ctx/get-current)]
-     (p/mempty ctx)))
+     (p/-mempty ctx)))
   ([ctx-or-val]
    (let [ctx (ctx/get-current ctx-or-val)]
-     (p/mempty ctx))))
+     (p/-mempty ctx))))
 
 
 ;; TODO: improve performance
@@ -73,7 +73,7 @@
   [& svs]
   {:pre [(seq svs)]}
   (let [ctx (ctx/get-current (first svs))]
-    (reduce (partial p/mappend ctx) svs)))
+    (reduce (partial p/-mappend ctx) svs)))
 
 (defn pure
   "Given any value `v`, return it wrapped in
@@ -94,13 +94,13 @@
       ;; => #<Right [1]>
   "
   ([v] (pure (ctx/get-current) v))
-  ([ctx v] (p/pure ctx v)))
+  ([ctx v] (p/-pure ctx v)))
 
 (defn return
   "This is a monad version of `pure` and works
   identically to it."
   ([v] (return (ctx/get-current) v))
-  ([ctx v] (p/mreturn ctx v)))
+  ([ctx v] (p/-mreturn ctx v)))
 
 (defn bind
   "Given a monadic value `mv` and a function `f`,
@@ -116,13 +116,13 @@
   [mv f]
   (let [ctx (ctx/get-current mv)]
     (ctx/with-context ctx
-      (p/mbind ctx mv f))))
+      (p/-mbind ctx mv f))))
 
 (defn mzero
   ([]
-   (p/mzero (ctx/get-current)))
+   (p/-mzero (ctx/get-current)))
   ([ctx]
-   (p/mzero ctx)))
+   (p/-mzero ctx)))
 
 ;; TODO: improve performance
 
@@ -130,7 +130,7 @@
   [& mvs]
   {:pre [(seq mvs)]}
   (let [ctx (ctx/get-current (first mvs))]
-    (reduce (partial p/mplus ctx) mvs)))
+    (reduce (partial p/-mplus ctx) mvs)))
 
 (defn guard
   [b]
@@ -152,7 +152,7 @@
      (fmap f fv)))
   ([f fv]
    (-> (ctx/get-current fv)
-       (p/fmap f fv))))
+       (p/-fmap f fv))))
 
 (defn fapply
   "Given a function wrapped in a monadic context `af`,
@@ -165,7 +165,7 @@
   [af & avs]
   {:pre [(seq avs)]}
   (let [ctx (ctx/get-current af)]
-    (reduce (partial p/fapply ctx) af avs)))
+    (reduce (partial p/-fapply ctx) af avs)))
 
 
 ;; TODO: review it, seems wrong and should be a macro?
@@ -190,8 +190,8 @@
 (defn lift
   "Lift a value from the inner monad of a monad transformer
   into a value of the monad transformer."
-  ([mv] (p/lift ctx/*context* mv))
-  ([m mv] (p/lift m mv)))
+  ([mv] (p/-lift ctx/*context* mv))
+  ([m mv] (p/-lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -696,23 +696,23 @@
   "Generic function to unwrap/extract
   the inner value of a container."
   [v]
-  (p/extract v))
+  (p/-extract v))
 
 (def <> mappend)
 
 (defn foldr
   "Perform a right-associative fold on the data structure."
   [f z xs]
-  (let [ctx (p/get-context xs)]
+  (let [ctx (p/-get-context xs)]
     (ctx/with-context ctx
-      (p/foldr ctx f z xs))))
+      (p/-foldr ctx f z xs))))
 
 (defn foldl
   "Perform a left-associative fold on the data structure."
   [f z xs]
-  (let [ctx (p/get-context xs)]
+  (let [ctx (p/-get-context xs)]
     (ctx/with-context ctx
-      (p/foldl ctx f z xs))))
+      (p/-foldl ctx f z xs))))
 
 (defn foldm
   "Given an optional monadic context, a function that takes two non-monadic

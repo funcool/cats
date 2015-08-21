@@ -75,45 +75,45 @@
     (-get-level [_] 10)
 
     p/Functor
-    (fmap [_ f mv]
+    (-fmap [_ f mv]
       (let [c (a/chan 1 (map f))]
         (a/pipe mv c)
         c))
 
     p/Semigroup
-    (mappend [_ sv sv']
+    (-mappend [_ sv sv']
       (chain-chans sv sv'))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       (let [c (a/chan)]
         (a/close! c)
         c))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (let [c (a/chan 1)]
         (a/put! c v)
         (a/close! c)
         c))
 
-    (fapply [mn af av]
+    (-fapply [mn af av]
       (let [c (a/chan 1)]
         (go
           (let [af' (a/<! (a/reduce conj [] af))
                 av' (a/<! (a/reduce conj [] av))
-                ctx (p/get-context [])]
-            (a/onto-chan c (p/fapply ctx af' av'))))
+                ctx (p/-get-context [])]
+            (a/onto-chan c (p/-fapply ctx af' av'))))
         c))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (let [c (a/chan 1)]
         (a/put! c v)
         (a/close! c)
         c))
 
-    (mbind [it mv f]
+    (-mbind [it mv f]
       (let [ctx ctx/*context*
             c (a/chan 1)]
         (go-loop []
@@ -138,5 +138,5 @@
 (extend-type #?(:clj  clojure.core.async.impl.channels.ManyToManyChannel
                 :cljs cljs.core.async.impl.channels.ManyToManyChannel)
   p/Context
-  (get-context [_] context))
+  (-get-context [_] context))
 

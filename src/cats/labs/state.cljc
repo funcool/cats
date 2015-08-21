@@ -51,7 +51,7 @@
 
 (deftype State [mfn]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -88,16 +88,16 @@
     (-get-level [_] 10)
 
     p/Functor
-    (fmap [_ f fv]
+    (-fmap [_ f fv]
       (state-t (fn [s]
                  (let [[v ns]  (fv s)]
                    (d/pair (f v) ns)))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (state-t (partial d/pair v)))
 
-    (mbind [_ self f]
+    (-mbind [_ self f]
       (state-t (fn [s]
                  (let [p        (self s)
                        value    (.-fst p)
@@ -126,70 +126,70 @@
     (-get-level [_] 100)
 
     p/Functor
-    (fmap [_ f fv]
+    (-fmap [_ f fv]
       (state-t (fn [s]
                  (let [wr (fv s)]
-                   (p/fmap inner-monad
-                           (fn [[v ns]]
-                             (d/pair (f v) ns))
-                           wr)))))
+                   (p/-fmap inner-monad
+                            (fn [[v ns]]
+                              (d/pair (f v) ns))
+                            wr)))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (state-t (fn [s]
-                 (p/mreturn inner-monad
-                            (d/pair v s)))))
+                 (p/-mreturn inner-monad
+                             (d/pair v s)))))
 
-    (mbind [_ self f]
+    (-mbind [_ self f]
       (state-t (fn [s]
                  (let [mp (self s)]
-                   (p/mbind inner-monad
-                            mp
-                            (fn [[v ns]]
-                              ((f v) ns)))))))
+                   (p/-mbind inner-monad
+                             mp
+                             (fn [[v ns]]
+                               ((f v) ns)))))))
 
-    ; FIXME: Conditionally if `inner-monad` is MonadZero
+                                        ; FIXME: Conditionally if `inner-monad` is MonadZero
     p/MonadZero
-    (mzero [_]
+    (-mzero [_]
       (state-t (fn [s]
-                 (p/mzero inner-monad))))
+                 (p/-mzero inner-monad))))
 
-    ; FIXME: Conditionally if `inner-monad` is MonadPlus
+                                        ; FIXME: Conditionally if `inner-monad` is MonadPlus
     p/MonadPlus
-    (mplus [_ mv mv']
+    (-mplus [_ mv mv']
       (state-t (fn [s]
-                 (p/mplus inner-monad (mv s) (mv' s)))))
+                 (p/-mplus inner-monad (mv s) (mv' s)))))
 
     MonadState
     (-get-state [_]
       (state-t (fn [s]
-                 (p/mreturn inner-monad
-                            (d/pair s s)))))
+                 (p/-mreturn inner-monad
+                             (d/pair s s)))))
 
     (-put-state [_ newstate]
       (state-t (fn [s]
-                 (p/mreturn inner-monad
-                            (d/pair s newstate)))))
+                 (p/-mreturn inner-monad
+                             (d/pair s newstate)))))
 
     (-swap-state [_ f]
       (state-t (fn [s]
-                 (p/mreturn inner-monad
-                            (d/pair s (f s))))))
+                 (p/-mreturn inner-monad
+                             (d/pair s (f s))))))
 
     p/MonadTrans
-    (base [_]
+    (-base [_]
       context)
 
-    (inner [_]
+    (-inner [_]
       inner-monad)
 
-    (lift [_ mv]
+    (-lift [_ mv]
       (state-t (fn [s]
-                 (p/mbind inner-monad
-                          mv
-                          (fn [v]
-                            (p/mreturn inner-monad
-                                       (d/pair v s)))))))))
+                 (p/-mbind inner-monad
+                           mv
+                           (fn [v]
+                             (p/-mreturn inner-monad
+                                         (d/pair v s)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Public Api

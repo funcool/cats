@@ -35,10 +35,10 @@
 
 (extend-type nil
   p/Context
-  (get-context [_] maybe/context)
+  (-get-context [_] maybe/context)
 
   p/Extract
-  (extract [_] nil))
+  (-extract [_] nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (Lazy) Sequence Monad
@@ -50,62 +50,62 @@
     (-get-level [_] 10)
 
     p/Semigroup
-    (mappend [_ sv sv']
+    (-mappend [_ sv sv']
       (concat sv sv'))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       (lazy-seq []))
 
     p/Functor
-    (fmap [_ f v]
+    (-fmap [_ f v]
       (map f v))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (lazy-seq [v]))
 
-    (fapply [_ self av]
+    (-fapply [_ self av]
       (for [f self
             v av]
            (f v)))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (lazy-seq [v]))
 
-    (mbind [_ self f]
+    (-mbind [_ self f]
       (apply concat (map f self)))
 
     p/MonadZero
-    (mzero [_]
+    (-mzero [_]
       (lazy-seq []))
 
     p/MonadPlus
-    (mplus [_ mv mv']
+    (-mplus [_ mv mv']
       (concat mv mv'))
 
     p/Foldable
-    (foldr [ctx f z xs]
+    (-foldr [ctx f z xs]
       (lazy-seq
        (let [x (first xs)
              xs (rest xs)]
          (if (nil? x)
            z
-           (f x (p/foldr ctx f z xs))))))
+           (f x (p/-foldr ctx f z xs))))))
 
-    (foldl [ctx f z xs]
+    (-foldl [ctx f z xs]
       (lazy-seq
        (let [x (first xs)
              xs (rest xs)]
          (if (nil? x)
            z
-           (p/foldl ctx f (f z x) xs)))))))
+           (p/-foldl ctx f (f z x) xs)))))))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
   p/Context
-  (get-context [_] sequence-context))
+  (-get-context [_] sequence-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vector Monad
@@ -117,60 +117,60 @@
     (-get-level [_] 10)
 
     p/Semigroup
-    (mappend [_ sv sv']
+    (-mappend [_ sv sv']
       (into sv sv'))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       [])
 
     p/Functor
-    (fmap [_ f v]
+    (-fmap [_ f v]
       (vec (map f v)))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       [v])
 
-    (fapply [_ self av]
+    (-fapply [_ self av]
       (vec (for [f self
                  v av]
              (f v))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       [v])
 
-    (mbind [_ self f]
+    (-mbind [_ self f]
       (vec (mapcat f self)))
 
     p/MonadZero
-    (mzero [_]
+    (-mzero [_]
       [])
 
     p/MonadPlus
-    (mplus [_ mv mv']
+    (-mplus [_ mv mv']
       (into mv mv'))
 
     p/Foldable
-    (foldr [ctx f z xs]
+    (-foldr [ctx f z xs]
       (let [x (first xs)
             xs (rest xs)]
         (if (nil? x)
           z
-          (f x (p/foldr ctx f z xs)))))
+          (f x (p/-foldr ctx f z xs)))))
 
-    (foldl [ctx f z xs]
+    (-foldl [ctx f z xs]
       (let [x (first xs)
             xs (rest xs)]
         (if (nil? x)
           z
-          (p/foldl ctx f (f z x) xs))))))
+          (p/-foldl ctx f (f z x) xs))))))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
   p/Context
-  (get-context [_] vector-context))
+  (-get-context [_] vector-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set Monad
@@ -182,45 +182,45 @@
     (-get-level [_] 10)
 
     p/Semigroup
-    (mappend [_ sv sv']
+    (-mappend [_ sv sv']
       (s/union sv (set sv')))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       #{})
 
     p/Functor
-    (fmap [_ f self]
+    (-fmap [_ f self]
       (set (map f self)))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       #{v})
 
-    (fapply [_ self av]
+    (-fapply [_ self av]
       (set (for [f self
                  v av]
              (f v))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       #{v})
 
-    (mbind [_ self f]
+    (-mbind [_ self f]
       (apply s/union (map f self)))
 
     p/MonadZero
-    (mzero [_]
+    (-mzero [_]
       #{})
 
     p/MonadPlus
-    (mplus [_ mv mv']
+    (-mplus [_ mv mv']
       (s/union mv mv'))))
 
 (extend-type #?(:clj clojure.lang.PersistentHashSet
                 :cljs cljs.core.PersistentHashSet)
   p/Context
-  (get-context [_] set-context))
+  (-get-context [_] set-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Map Monoid
@@ -232,24 +232,32 @@
     (-get-level [_] 10)
 
     p/Semigroup
-    (mappend [_ sv sv']
+    (-mappend [_ sv sv']
       (merge sv sv'))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       {})))
 
 (extend-type #?(:clj clojure.lang.PersistentHashMap
                 :cljs cljs.core.PersistentHashMap)
   p/Context
-  (get-context [_] map-context))
+  (-get-context [_] map-context))
 
 #?(:clj
    (extend-type clojure.lang.PersistentArrayMap
      p/Context
-     (get-context [_] map-context)))
+     (-get-context [_] map-context))
+   :cljs
+   (extend-type cljs.core.PersistentArrayMap
+     p/Context
+     (-get-context [_] map-context)))
 
 #?(:clj
    (extend-type clojure.lang.PersistentTreeMap
      p/Context
-     (get-context [_] map-context)))
+     (-get-context [_] map-context))
+   :cljs
+   (extend-type cljs.core.PersistentTreeMap
+     p/Context
+     (-get-context [_] map-context)))

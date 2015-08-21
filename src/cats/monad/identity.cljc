@@ -36,10 +36,10 @@
 
 (deftype Identity [v]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -80,21 +80,21 @@
     (-get-level [_] 10)
 
     p/Functor
-    (fmap [_ f iv]
+    (-fmap [_ f iv]
       (Identity. (f (.-v iv))))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (Identity. v))
 
-    (fapply [_ af av]
+    (-fapply [_ af av]
       (Identity. ((.-v af) (.-v av))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (Identity. v))
 
-    (mbind [_ mv f]
+    (-mbind [_ mv f]
       (f (.-v mv)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -109,8 +109,8 @@
     (-get-level [_] 100)
 
     p/Monad
-    (mreturn [_ v]
-      (identity (p/mreturn inner-monad v)))
+    (-mreturn [_ v]
+      (identity (p/-mreturn inner-monad v)))
 
-    (mbind [_ mv f]
+    (-mbind [_ mv f]
       nil)))

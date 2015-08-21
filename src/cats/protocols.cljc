@@ -45,57 +45,57 @@
   A great example es Maybe monad type Just. It implements
   this abstraction for establish that Just is part of
   Maybe monad."
-  (get-context [_] "Get the monad instance for curent value."))
+  (-get-context [_] "Get the monad instance for curent value."))
 
 (defprotocol Semigroup
   "A structure with an associative binary operation."
-  (mappend [s sv sv'] "An associative addition operation."))
+  (-mappend [s sv sv'] "An associative addition operation."))
 
 (defprotocol Monoid
   "A Semigroup which has an identity element for is associative binary operation."
-  (mempty [s] "The identity element for the given monoid."))
+  (-mempty [s] "The identity element for the given monoid."))
 
 (defprotocol Extract
   "A type class responsible of extract the
   value from a monad context."
-  (extract [mv] "Extract the value from monad context."))
+  (-extract [mv] "Extract the value from monad context."))
 
 (defprotocol Functor
   "A data type that can be mapped over without altering its context."
-  (fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
+  (-fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
 
 (defprotocol Applicative
   "The Applicative abstraction."
-  (fapply [app af av]
+  (-fapply [app af av]
     "Applies the function(s) inside af's context to the value(s)
      inside av's context while preserving the context.")
-  (pure [app v]
+  (-pure [app v]
     "Takes any context monadic value ctx and any value v, and puts
      the value v in the most minimal context of same type of ctx"))
 
 (defprotocol Foldable
   "Abstraction of data structures that can be folded to a summary value."
-  (foldl [fctx f z xs] "Left-associative fold of a structure.")
-  (foldr [fctx f z xs] "Right-associative fold of a structure."))
+  (-foldl [fctx f z xs] "Left-associative fold of a structure.")
+  (-foldr [fctx f z xs] "Right-associative fold of a structure."))
 
 (defprotocol Monad
   "The Monad abstraction."
-  (mreturn [m v])
-  (mbind [m mv f]))
+  (-mreturn [m v])
+  (-mbind [m mv f]))
 
 (defprotocol MonadZero
   "A complement abstraction for monad that
   supports the notion of an identity element."
-  (mzero [m] "The identity element for the given monadzero."))
+  (-mzero [m] "The identity element for the given monadzero."))
 
 (defprotocol MonadPlus
   "A complement abstraction for Monad that
   supports the notion of addition."
-  (mplus [m mv mv'] "An associative addition operation."))
+  (-mplus [m mv mv'] "An associative addition operation."))
 
 (defprotocol MonadTrans
   "A common abstraction for all monad transformers."
-  (base [mt] "Return the base monad of this transformer.")
-  (inner [mt] "Return the monad that this transformer wraps.")
-  (lift [m mv]
+  (-base [mt] "Return the base monad of this transformer.")
+  (-inner [mt] "Return the monad that this transformer wraps.")
+  (-lift [m mv]
     "Lift a value from the parameterized monad to the transformer."))

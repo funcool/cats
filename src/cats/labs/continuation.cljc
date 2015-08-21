@@ -38,7 +38,7 @@
 
 (deftype Continuation [mfn]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -62,10 +62,10 @@
     (-get-level [_] 10)
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (Continuation. (fn [c] (c v))))
 
-    (mbind [_ self mf]
+    (-mbind [_ self mf]
       (Continuation. (fn [c]
                        (self (fn [v]
                                ((mf v) c))))))))

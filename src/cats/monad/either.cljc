@@ -47,10 +47,10 @@
 
 (deftype Right [v]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -75,10 +75,10 @@
 
 (deftype Left [v]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -131,7 +131,7 @@
   of Either monad."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) context)
+    (identical? (p/-get-context v) context)
     false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -145,38 +145,38 @@
     (-get-level [_] 10)
 
     p/Functor
-    (fmap [_ f s]
+    (-fmap [_ f s]
       (if (right? s)
         (right (f (.-v s)))
         s))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (right v))
 
-    (fapply [m af av]
+    (-fapply [m af av]
       (if (right? af)
-        (p/fmap m (.-v af) av)
+        (p/-fmap m (.-v af) av)
         af))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (right v))
 
-    (mbind [_ s f]
+    (-mbind [_ s f]
       (if (right? s)
         (f (.-v s))
         s))
 
     p/Foldable
-    (foldl [_ f z mv]
+    (-foldl [_ f z mv]
       (if (right? mv)
-        (f z (p/extract mv))
+        (f z (p/-extract mv))
         z))
 
-    (foldr [_ f z mv]
+    (-foldr [_ f z mv]
       (if (right? mv)
-        (f (p/extract mv) z)
+        (f (p/-extract mv) z)
         z))))
 
 
@@ -192,29 +192,29 @@
     (-get-level [_] 100)
 
     p/Monad
-    (mreturn [_ v]
-      (p/mreturn inner-monad (right v)))
+    (-mreturn [_ v]
+      (p/-mreturn inner-monad (right v)))
 
-    (mbind [_ mv f]
-      (p/mbind inner-monad
-               mv
-               (fn [either-v]
-                 (if (left? either-v)
-                   (p/mreturn inner-monad either-v)
-                   (f (p/extract either-v))))))
+    (-mbind [_ mv f]
+      (p/-mbind inner-monad
+                mv
+                (fn [either-v]
+                  (if (left? either-v)
+                    (p/-mreturn inner-monad either-v)
+                    (f (p/-extract either-v))))))
 
     p/MonadTrans
-    (base [_]
+    (-base [_]
       context)
 
-    (inner [_]
+    (-inner [_]
       inner-monad)
 
-    (lift [m mv]
-      (p/mbind inner-monad
-               mv
-               (fn [v]
-                 (p/mreturn inner-monad (right v)))))))
+    (-lift [m mv]
+      (p/-mbind inner-monad
+                mv
+                (fn [v]
+                  (p/-mreturn inner-monad (right v)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
@@ -227,8 +227,8 @@
   [e lf rf]
   {:pre [(either? e)]}
   (if (left? e)
-    (lf (p/extract e))
-    (rf (p/extract e))))
+    (lf (p/-extract e))
+    (rf (p/-extract e))))
 
 (defn branch-left
   "Given an either value and a function, if the either is a
@@ -246,7 +246,7 @@
   either is a left, return it."
   [e rf]
   {:pre [(either? e)]}
-  (p/mbind context e rf))
+  (p/-mbind context e rf))
 
 (def lefts
   "Given a collection of eithers, return only the values that are left."
@@ -269,5 +269,5 @@
   [e]
   {:pre [(either? e)]}
   (if (left? e)
-    (right (p/extract e))
-    (left (p/extract e))))
+    (right (p/-extract e))
+    (left (p/-extract e))))

@@ -80,10 +80,10 @@
 
 (deftype Success [v]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -108,10 +108,10 @@
 
 (deftype Failure [e]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] e)
+  (-extract [_] e)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -179,7 +179,7 @@
   of Exception monad."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) context)
+    (identical? (p/-get-context v) context)
     false))
 
 (defn extract
@@ -196,12 +196,12 @@
   ([mv]
    {:pre [(exception? mv)]}
    (if (success? mv)
-     (p/extract mv)
-     (throw (p/extract mv))))
+     (p/-extract mv)
+     (throw (p/-extract mv))))
   ([mv default]
    {:pre [(exception? mv)]}
    (if (success? mv)
-     (p/extract mv)
+     (p/-extract mv)
      default)))
 
 (defn ^{:no-doc true}
@@ -275,25 +275,25 @@
     (-get-level [_] 10)
 
     p/Functor
-    (fmap [_ f s]
+    (-fmap [_ f s]
       (if (success? s)
-        (try-on (f (p/extract s)))
+        (try-on (f (p/-extract s)))
         s))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (success v))
 
-    (fapply [m af av]
+    (-fapply [m af av]
       (if (success? af)
-        (p/fmap m (p/extract af) av)
+        (p/-fmap m (p/-extract af) av)
         af))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (success v))
 
-    (mbind [_ s f]
+    (-mbind [_ s f]
       (if (success? s)
-        (f (p/extract s))
+        (f (p/-extract s))
         s))))

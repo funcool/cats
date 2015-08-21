@@ -77,7 +77,7 @@
      *context*
 
      (satisfies? p/Context param)
-     (p/get-context param)
+     (p/-get-context param)
 
      (satisfies? p/ContextClass param)
      param

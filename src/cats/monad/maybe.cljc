@@ -42,10 +42,10 @@
 
 (deftype Just [v]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -70,10 +70,10 @@
 
 (deftype Nothing []
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] nil)
+  (-extract [_] nil)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -100,7 +100,7 @@
   of Maybe monad."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) context)
+    (identical? (p/-get-context v) context)
     false))
 
 (defn just
@@ -151,11 +151,11 @@
   ([mv]
    {:pre [(maybe? mv)]}
    (when (just? mv)
-     (p/extract mv)))
+     (p/-extract mv)))
   ([mv default]
    {:pre [(maybe? mv)]}
    (if (just? mv)
-     (p/extract mv)
+     (p/-extract mv)
      default)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -169,59 +169,59 @@
     (-get-level [_] 10)
 
     p/Semigroup
-    (mappend [ctx mv mv']
+    (-mappend [ctx mv mv']
       (cond
         (nothing? mv) mv'
         (nothing? mv') mv
-        :else (just (let [mv (p/extract mv)
-                          mv' (p/extract mv')]
-                      (p/mappend (p/get-context mv) mv mv')))))
+        :else (just (let [mv (p/-extract mv)
+                          mv' (p/-extract mv')]
+                      (p/-mappend (p/-get-context mv) mv mv')))))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       (nothing))
 
     p/Functor
-    (fmap [_ f mv]
+    (-fmap [_ f mv]
       (if (nothing? mv)
         mv
-        (just (f (p/extract mv)))))
+        (just (f (p/-extract mv)))))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (just v))
-    (fapply [m af av]
+    (-fapply [m af av]
       (if (nothing? af)
         af
-        (p/fmap m (p/extract af) av)))
+        (p/-fmap m (p/-extract af) av)))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (just v))
-    (mbind [_ mv f]
+    (-mbind [_ mv f]
       (if (nothing? mv)
         mv
-        (f (p/extract mv))))
+        (f (p/-extract mv))))
 
     p/MonadZero
-    (mzero [_]
+    (-mzero [_]
       (nothing))
 
     p/MonadPlus
-    (mplus [_ mv mv']
+    (-mplus [_ mv mv']
       (if (just? mv)
         mv
         mv'))
 
     p/Foldable
-    (foldl [_ f z mv]
+    (-foldl [_ f z mv]
       (if (just? mv)
-        (f z (p/extract mv))
+        (f z (p/-extract mv))
         z))
 
-    (foldr [_ f z mv]
+    (-foldr [_ f z mv]
       (if (just? mv)
-        (f (p/extract mv) z)
+        (f (p/-extract mv) z)
         z))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -236,48 +236,48 @@
     (-get-level [_] 100)
 
     p/Functor
-    (fmap [_ f fv]
-      (p/fmap inner-monad
-              #(p/fmap context f %)
+    (-fmap [_ f fv]
+      (p/-fmap inner-monad
+              #(p/-fmap context f %)
               fv))
 
     p/Monad
-    (mreturn [m v]
-      (p/mreturn inner-monad (just v)))
+    (-mreturn [m v]
+      (p/-mreturn inner-monad (just v)))
 
-    (mbind [_ mv f]
-      (p/mbind inner-monad
-               mv
-               (fn [maybe-v]
-                 (if (just? maybe-v)
-                   (f (p/extract maybe-v))
-                   (p/mreturn inner-monad (nothing))))))
+    (-mbind [_ mv f]
+      (p/-mbind inner-monad
+                mv
+                (fn [maybe-v]
+                  (if (just? maybe-v)
+                    (f (p/-extract maybe-v))
+                    (p/-mreturn inner-monad (nothing))))))
 
     p/MonadZero
-    (mzero [_]
-      (p/mreturn inner-monad (nothing)))
+    (-mzero [_]
+      (p/-mreturn inner-monad (nothing)))
 
     p/MonadPlus
-    (mplus [_ mv mv']
-      (p/mbind inner-monad
-               mv
-               (fn [maybe-v]
-                 (if (just? maybe-v)
-                   (p/mreturn inner-monad maybe-v)
-                   mv'))))
+    (-mplus [_ mv mv']
+      (p/-mbind inner-monad
+                mv
+                (fn [maybe-v]
+                  (if (just? maybe-v)
+                    (p/-mreturn inner-monad maybe-v)
+                    mv'))))
 
     p/MonadTrans
-    (base [_]
+    (-base [_]
       context)
 
-    (inner [_]
+    (-inner [_]
       inner-monad)
 
-    (lift [_ mv]
-      (p/mbind inner-monad
-               mv
-               (fn [v]
-                 (p/mreturn inner-monad (just v)))))))
+    (-lift [_ mv]
+      (p/-mbind inner-monad
+                mv
+                (fn [v]
+                  (p/-mreturn inner-monad (just v)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
@@ -291,7 +291,7 @@
   {:pre [(maybe? m)]}
   (if (nothing? m)
     default
-    (f (p/extract m))))
+    (f (p/-extract m))))
 
 (defn seq->maybe
   "Given a collection, return a nothing if its empty or a just with its
@@ -308,13 +308,13 @@
   {:pre [(maybe? m)]}
   (if (nothing? m)
     (lazy-seq [])
-    (lazy-seq [(p/extract m)])))
+    (lazy-seq [(p/-extract m)])))
 
 (def ^{:private true :no-doc true}
   +extract-just-xform+
   (comp
    (filter just?)
-   (map p/extract)))
+   (map p/-extract)))
 
 (defn cat-maybes
   "Given a collection of maybes, return a sequence of the values

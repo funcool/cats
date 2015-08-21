@@ -48,7 +48,7 @@
 
 (deftype Reader [mfn]
   p/Context
-  (get-context [_] context)
+  (-get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -85,16 +85,16 @@
     (-get-level [_] 10)
 
     p/Functor
-    (fmap [_ f fv]
+    (-fmap [_ f fv]
       (reader (fn [env]
                 (f (fv env)))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (reader (fn [env]
                 v)))
 
-    (mbind [_ mv f]
+    (-mbind [_ mv f]
       (reader (fn [env]
                 ((f (mv env)) env))))
 
@@ -119,36 +119,36 @@
     (-get-level [_] 100)
 
     p/Functor
-    (fmap [_ f fv]
+    (-fmap [_ f fv]
       (reader (fn [env]
-                (p/fmap inner-monad f (fv env)))))
+                (p/-fmap inner-monad f (fv env)))))
 
     p/Monad
-    (mreturn [_ v]
-      (p/mreturn context (p/mreturn inner-monad v)))
+    (-mreturn [_ v]
+      (p/-mreturn context (p/-mreturn inner-monad v)))
 
-    (mbind [_ mr f]
+    (-mbind [_ mr f]
       (fn [env]
-        (p/mbind inner-monad
+        (p/-mbind inner-monad
                      (mr env)
                      (fn [a]
                        ((f a) env)))))
 
     p/MonadTrans
-    (base [_]
+    (-base [_]
       context)
 
-    (inner [_]
+    (-inner [_]
       inner-monad)
 
-    (lift [m mv]
+    (-lift [m mv]
       (fn [_]
         mv))
 
     MonadReader
     (-ask [_]
       (fn [env]
-        (p/mreturn inner-monad env)))
+        (p/-mreturn inner-monad env)))
 
     (-local [_ f mr]
       (fn [env]
