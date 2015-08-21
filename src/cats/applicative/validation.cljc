@@ -27,9 +27,10 @@
   "The Validation applicative implementation and helper functions
   for validating values. Isomorphic to Either."
   (:require [cats.protocols :as p]
+            [cats.context :as ctx]
             [cats.monad.either :as either]))
 
-(declare validation-applicative)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -37,14 +38,15 @@
 
 (deftype Ok [v]
   p/Context
-  (get-context [_] validation-applicative)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
-  #?(:clj clojure.lang.IDeref
-     :cljs IDeref)
-  (#?(:clj deref :cljs -deref) [_] v)
+  #?@(:cljs [cljs.core/IDeref
+             (-deref [_] v)]
+      :clj  [clojure.lang.IDeref
+             (deref [_] v)])
 
   #?@(:clj
       [Object
@@ -65,10 +67,10 @@
 
 (deftype Fail [v]
   p/Context
-  (get-context [_] validation-applicative)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -123,7 +125,7 @@
   of the Validation applicative."
   [v]
   (if (satisfies? p/Context v)
-    (identical? (p/get-context v) validation-applicative)
+    (identical? (p/-get-context v) context)
     false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -131,53 +133,56 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  validation-applicative
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
     p/Semigroup
-    (mappend [_ sv sv']
+    (-mappend [_ sv sv']
       (cond
         (and (fail? sv) (fail? sv'))
-        (fail (let [sv (p/extract sv)
-                    sv' (p/extract sv')]
-                (p/mappend (p/get-context sv) sv sv')))
+        (fail (let [sv (p/-extract sv)
+                    sv' (p/-extract sv')]
+                (p/-mappend (p/-get-context sv) sv sv')))
 
         (ok? sv) sv
         :else sv'))
 
     p/Monoid
-    (mempty [_]
+    (-mempty [_]
       (fail))
 
     p/Functor
-    (fmap [_ f s]
+    (-fmap [_ f s]
       (if (ok? s)
-        (ok (f (.-v s)))
+        (ok (f (p/-extract s)))
         s))
 
     p/Foldable
-    (foldl [_ f z mv]
+    (-foldl [_ f z mv]
       (if (ok? mv)
-        (f z (p/extract mv))
+        (f z (p/-extract mv))
         z))
 
-    (foldr [_ f z mv]
+    (-foldr [_ f z mv]
       (if (ok? mv)
-        (f (p/extract mv) z)
+        (f (p/-extract mv) z)
         z))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (ok v))
 
-    (fapply [_ af av]
+    (-fapply [_ af av]
       (cond
         (and (ok? af) (ok? av))
-        (ok ((p/extract af) (p/extract av)))
+        (ok ((p/-extract af) (p/-extract av)))
 
         (and (fail? af) (fail? av))
-        (fail (let [af (p/extract af)
-                    av (p/extract av)]
-                (p/mappend (p/get-context af) af av)))
+        (fail (let [af (p/-extract af)
+                    av (p/-extract av)]
+                (p/-mappend (p/-get-context af) af av)))
 
         (ok? af) av
         :else af))))

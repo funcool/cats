@@ -5,6 +5,7 @@
                [cats.protocols :as p]
                [cats.labs.continuation :as cont]
                [cats.monad.maybe :as maybe]
+               [cats.context :as ctx :include-macros true]
                [cats.core :as m :include-macros true])
      :clj
      (:require [clojure.test :as t]
@@ -12,6 +13,7 @@
                [cats.protocols :as p]
                [cats.labs.continuation :as cont]
                [cats.monad.maybe :as maybe]
+               [cats.context :as ctx]
                [cats.core :as m])))
 
 (def cont-42 (cont/continuation (fn [c] (c 42))))
@@ -20,7 +22,7 @@
 
 (t/deftest first-monad-law-left-identity
   (t/is (= (cont/run-cont cont-42)
-           (cont/run-cont (m/with-monad cont/continuation-monad
+           (cont/run-cont (ctx/with-context cont/context
                             (m/>>= (m/return 42)
                                    (fn [v] (cont/continuation (fn [c] c v)))))))))
 

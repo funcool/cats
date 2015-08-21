@@ -30,7 +30,7 @@
      :cljs (:require [cats.context :as ctx :include-macros true]
                      [cats.protocols :as p])))
 
-(declare reader-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Protocol declaration
@@ -48,12 +48,14 @@
 
 (deftype Reader [mfn]
   p/Context
-  (get-context [_] reader-monad)
+  (-get-context [_] context)
 
-  #?(:clj  clojure.lang.IFn
-     :cljs cljs.core/IFn)
-  (#?(:clj invoke :cljs -invoke) [self seed]
-    (mfn seed)))
+  #?@(:cljs [cljs.core/IFn
+             (-invoke [self seed]
+               (mfn seed))]
+      :clj  [clojure.lang.IFn
+             (invoke [self seed]
+               (mfn seed))]))
 
 (alter-meta! #'->Reader assoc :private true)
 
@@ -79,19 +81,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  reader-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
     p/Functor
-    (fmap [_ f fv]
+    (-fmap [_ f fv]
       (reader (fn [env]
                 (f (fv env)))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (reader (fn [env]
                 v)))
 
-    (mbind [_ mv f]
+    (-mbind [_ mv f]
       (reader (fn [env]
                 ((f (mv env)) env))))
 
@@ -112,37 +117,40 @@
   "The Reader transformer constructor."
   [inner-monad]
   (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-transformer+)
+
     p/Functor
-    (fmap [_ f fv]
+    (-fmap [_ f fv]
       (reader (fn [env]
-                (p/fmap inner-monad f (fv env)))))
+                (p/-fmap inner-monad f (fv env)))))
 
     p/Monad
-    (mreturn [_ v]
-      (p/mreturn reader-monad (p/mreturn inner-monad v)))
+    (-mreturn [_ v]
+      (p/-mreturn context (p/-mreturn inner-monad v)))
 
-    (mbind [_ mr f]
+    (-mbind [_ mr f]
       (fn [env]
-        (p/mbind inner-monad
+        (p/-mbind inner-monad
                      (mr env)
                      (fn [a]
                        ((f a) env)))))
 
     p/MonadTrans
-    (base [_]
-      reader-monad)
+    (-base [_]
+      context)
 
-    (inner [_]
+    (-inner [_]
       inner-monad)
 
-    (lift [m mv]
+    (-lift [m mv]
       (fn [_]
         mv))
 
     MonadReader
     (-ask [_]
       (fn [env]
-        (p/mreturn inner-monad env)))
+        (p/-mreturn inner-monad env)))
 
     (-local [_ f mr]
       (fn [env]
@@ -156,18 +164,18 @@
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
   [reader seed]
-  (ctx/with-monad (ctx/get-current reader-monad)
+  (ctx/with-context context
     (reader seed)))
 
 (def ask
   (reader
    (fn [env]
-     (let [ctx (ctx/get-current reader-monad)]
+     (let [ctx (ctx/get-current context)]
        ((-ask ctx) env)))))
 
 (def local
   (fn [f mr]
     (reader
      (fn [env]
-       (let [ctx (ctx/get-current reader-monad)]
+       (let [ctx (ctx/get-current context)]
          ((-local ctx f mr) env))))))

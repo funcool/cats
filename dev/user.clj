@@ -1,5 +1,5 @@
 (ns user
-  (:require [clojure.tools.namespace.repl :as repl]
+  (:require [clojure.tools.namespace.repl :as r]
             [clojure.walk :refer [macroexpand-all]]
             [clojure.pprint :refer [pprint]]
             [clojure.test :as test]))
@@ -27,8 +27,8 @@
   [& nss]
   (if (pos? (count nss))
     (binding [*namespaces* nss]
-      (repl/refresh :after 'user/run-tests'))
-    (repl/refresh :after 'user/run-tests')))
+      (r/refresh :after 'user/run-tests'))
+    (r/refresh :after 'user/run-tests')))
 
 (defn trace
   "Asynchronous friendly println variant."

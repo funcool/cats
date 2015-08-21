@@ -24,27 +24,35 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.context
-  "A context management macros."
+  "A cats context management."
   (:require [cats.protocols :as p]))
 
-(def ^{:dynamic true :no-doc true}
-  *context* nil)
+(def ^:dynamic *context* nil)
+(def ^:const +level-default+ 10)
+(def ^:const +level-transformer+ 100)
+
+(defn throw-ilegal-argument
+  {:no-doc true :internal true}
+  [text]
+  #?(:cljs (throw (ex-info text {}))
+     :clj  (throw (IllegalArgumentException. text))))
 
 #?(:clj
    (defmacro with-context
      "Set current context to specific monad."
      [ctx & body]
-     `(cond
-        (satisfies? p/MonadTrans ~ctx)
-        (binding [*context* ~ctx]
-          ~@body)
-
-        (satisfies? p/MonadTrans *context*)
-        (do ~@body)
-
-        :else
-        (binding [*context* ~ctx]
-          ~@body))))
+     `(do
+        (when (not (satisfies? p/ContextClass ~ctx))
+          (throw-ilegal-argument "The provided context does not implements ContextClass."))
+        (if (nil? *context*)
+          (binding [*context* ~ctx]
+            ~@body)
+          (let [clevel# (p/-get-level *context*)
+                nlevel# (p/-get-level ~ctx)]
+            (if (> nlevel# clevel#)
+              (binding [*context* ~ctx]
+                ~@body)
+              (do ~@body)))))))
 
 #?(:clj
    (defmacro with-monad
@@ -53,23 +61,28 @@
      `(with-context ~ctx
         ~@body)))
 
+(def ^:private not-nil? (comp not nil?))
+
 (defn get-current
   "Get current context or obtain it from
   the provided instance."
   {:no-doc true}
-  ([] (get-current nil))
-  ([default]
+  ([]
+   (if (not-nil? *context*)
+     *context*
+     (throw-ilegal-argument
+      "No context is set and it can not be automatically resolved.")))
+  ([param]
    (cond
-     (not (nil? *context*))
+     (not-nil? *context*)
      *context*
 
-     (satisfies? p/Context default)
-     (p/get-context default)
+     (satisfies? p/Context param)
+     (p/-get-context param)
 
-     (satisfies? p/Monad default)
-     default
+     (satisfies? p/ContextClass param)
+     param
 
      :else
-     (throw (#?(:clj IllegalArgumentException.
-                :cljs js/Error.)
-             "You are using return/pure/mzero function without context.")))))
+     (throw-ilegal-argument
+      "No context is set and it can not be automatically resolved."))))

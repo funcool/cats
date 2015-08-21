@@ -60,15 +60,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn mempty
-  []
-  (let [ctx (ctx/get-current)]
-    (p/mempty ctx)))
+  ([]
+   (let [ctx (ctx/get-current)]
+     (p/-mempty ctx)))
+  ([ctx-or-val]
+   (let [ctx (ctx/get-current ctx-or-val)]
+     (p/-mempty ctx))))
 
 (defn mappend
   [& svs]
   {:pre [(seq svs)]}
   (let [ctx (ctx/get-current (first svs))]
-    (reduce (partial p/mappend ctx) svs)))
+    (reduce (partial p/-mappend ctx) svs)))
 
 (defn pure
   "Given any value `v`, return it wrapped in
@@ -81,21 +84,21 @@
 
   Example:
 
-      (with-context either/either-monad
+      (with-context either/context
         (pure 1))
       ;; => #<Right [1]>
 
-      (pure either/either-monad 1)
+      (pure either/context 1)
       ;; => #<Right [1]>
   "
   ([v] (pure (ctx/get-current) v))
-  ([ctx v] (p/pure ctx v)))
+  ([ctx v] (p/-pure ctx v)))
 
 (defn return
   "This is a monad version of `pure` and works
   identically to it."
   ([v] (return (ctx/get-current) v))
-  ([ctx v] (p/mreturn ctx v)))
+  ([ctx v] (p/-mreturn ctx v)))
 
 (defn bind
   "Given a monadic value `mv` and a function `f`,
@@ -111,19 +114,19 @@
   [mv f]
   (let [ctx (ctx/get-current mv)]
     (ctx/with-context ctx
-      (p/mbind ctx mv f))))
+      (p/-mbind ctx mv f))))
 
 (defn mzero
   ([]
-   (p/mzero (ctx/get-current)))
+   (p/-mzero (ctx/get-current)))
   ([ctx]
-   (p/mzero ctx)))
+   (p/-mzero ctx)))
 
 (defn mplus
   [& mvs]
   {:pre [(seq mvs)]}
   (let [ctx (ctx/get-current (first mvs))]
-    (reduce (partial p/mplus ctx) mvs)))
+    (reduce (partial p/-mplus ctx) mvs)))
 
 (defn guard
   [b]
@@ -145,7 +148,7 @@
      (fmap f fv)))
   ([f fv]
    (-> (ctx/get-current fv)
-       (p/fmap f fv))))
+       (p/-fmap f fv))))
 
 (defn fapply
   "Given a function wrapped in a monadic context `af`,
@@ -158,8 +161,10 @@
   [af & avs]
   {:pre [(seq avs)]}
   (let [ctx (ctx/get-current af)]
-    (reduce (partial p/fapply ctx) af avs)))
+    (reduce (partial p/-fapply ctx) af avs)))
 
+
+;; TODO: review it, seems wrong and should be a macro?
 (defn when
   "Given an expression and a monadic value,
   if the expression is logical true, return the monadic value.
@@ -169,6 +174,7 @@
   ([ctx b mv]
    (if b mv (return ctx nil))))
 
+;; TODO: review it, seems wrong and should be a macro?
 (defn unless
   "Given an expression and a monadic value,
   if the expression is not logical true, return the monadic value.
@@ -180,8 +186,8 @@
 (defn lift
   "Lift a value from the inner monad of a monad transformer
   into a value of the monad transformer."
-  ([mv] (p/lift ctx/*context* mv))
-  ([m mv] (p/lift m mv)))
+  ([mv] (p/-lift ctx/*context* mv))
+  ([m mv] (p/-lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -225,7 +231,8 @@
                       `(bind ~r (fn [~l] ~acc))))
                   `(do ~@body)))))
 
-(defn- deps [expr syms]
+(defn- deps
+  [expr syms]
   (cond
     (and (symbol? expr)
          (contains? syms expr))
@@ -237,10 +244,12 @@
     :else
     '()))
 
-(defn- rename-sym [expr renames]
+(defn- rename-sym
+  [expr renames]
   (get renames expr expr))
 
-(defn- rename [expr renames]
+(defn- rename
+  [expr renames]
   (cond
     (symbol? expr)
     (rename-sym expr renames)
@@ -421,9 +430,7 @@
         `(fmap (fn [~@(map first bindings)]
                  ~@body)
                ~@(map second bindings))
-        (alet* batches env body))))
-
-)
+        (alet* batches env body)))))
 
 (defn- arglists
   [var]
@@ -493,8 +500,7 @@
               (throw (IllegalArgumentException. "The given function is either variadic or has multiple arities, provide an arity for currying.")))
             (throw (IllegalArgumentException. "The given function doesn't have arity metadata, provide an arity for currying."))))))
      ([n f]
-      {:pre [(or (< n 21)
-                 (throw (IllegalArgumentException. "Clojure doesn't allow more than 20 positional arguments")))]}
+      {:pre [(< n 21)]}
       (let [args (repeatedly n gensym)
             body `(~f ~@args)]
         `(curry* ~args ~body)))))
@@ -622,10 +628,9 @@
       ;=> <Nothing>
   "
   [p mv]
-  (ctx/with-context (ctx/get-current mv)
-    (mlet [v mv
-           :when (p v)]
-      (return v))))
+  (mlet [v mv
+         :when (p v)]
+    (return v)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell-style aliases and util functions.
@@ -687,23 +692,23 @@
   "Generic function to unwrap/extract
   the inner value of a container."
   [v]
-  (p/extract v))
+  (p/-extract v))
 
 (def <> mappend)
 
 (defn foldr
   "Perform a right-associative fold on the data structure."
   [f z xs]
-  (let [ctx (p/get-context xs)]
+  (let [ctx (p/-get-context xs)]
     (ctx/with-context ctx
-      (p/foldr ctx f z xs))))
+      (p/-foldr ctx f z xs))))
 
 (defn foldl
   "Perform a left-associative fold on the data structure."
   [f z xs]
-  (let [ctx (p/get-context xs)]
+  (let [ctx (p/-get-context xs)]
     (ctx/with-context ctx
-      (p/foldl ctx f z xs))))
+      (p/-foldl ctx f z xs))))
 
 (defn foldm
   "Given an optional monadic context, a function that takes two non-monadic
@@ -720,17 +725,17 @@
           (maybe/just (/ x y))))
 
       (m/foldm m-div 1 [1 2 3])
-      (m/foldm maybe/maybe-monad m-div 1 [1 2 3])
+      (m/foldm maybe/context m-div 1 [1 2 3])
       ;; => #<Just 1/6>
 
-      (m/foldm maybe/maybe-monad m-div 1 [1 0 3])
+      (m/foldm maybe/context m-div 1 [1 0 3])
       ;; => #<Nothing>
 
       (foldm m-div 1 [])
       ;; => Exception
 
-      (m/foldm maybe/maybe-monad m-div 1 [])
-      (ctx/with-context maybe/maybe-monad
+      (m/foldm maybe/context m-div 1 [])
+      (ctx/with-context maybe/context
         (foldm m-div 1 []))
       ;; => #<Just 1>
   "

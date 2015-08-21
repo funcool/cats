@@ -25,10 +25,11 @@
 
 (ns cats.monad.identity
   "The Identity Monad."
-  (:require [cats.protocols :as p])
-  (:refer-clojure :exclude [identity]))
+  (:refer-clojure :exclude [identity])
+  (:require [cats.protocols :as p]
+            [cats.context :as ctx]))
 
-(declare identity-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructors
@@ -36,10 +37,10 @@
 
 (deftype Identity [v]
   p/Context
-  (get-context [_] identity-monad)
+  (-get-context [_] context)
 
   p/Extract
-  (extract [_] v)
+  (-extract [_] v)
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -74,24 +75,27 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^{:no-doc true}
-  identity-monad
+  context
   (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
     p/Functor
-    (fmap [_ f iv]
+    (-fmap [_ f iv]
       (Identity. (f (.-v iv))))
 
     p/Applicative
-    (pure [_ v]
+    (-pure [_ v]
       (Identity. v))
 
-    (fapply [_ af av]
+    (-fapply [_ af av]
       (Identity. ((.-v af) (.-v av))))
 
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (Identity. v))
 
-    (mbind [_ mv f]
+    (-mbind [_ mv f]
       (f (.-v mv)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -102,9 +106,12 @@
   "The Identity transformer constructor."
   [inner-monad]
   (reify
-    p/Monad
-    (mreturn [_ v]
-      (identity (p/mreturn inner-monad v)))
+    p/ContextClass
+    (-get-level [_] ctx/+level-transformer+)
 
-    (mbind [_ mv f]
+    p/Monad
+    (-mreturn [_ v]
+      (identity (p/-mreturn inner-monad v)))
+
+    (-mbind [_ mv f]
       nil)))

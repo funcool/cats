@@ -30,7 +30,7 @@
      :cljs (:require [cats.protocols :as p]
                      [cats.context :as ctx :include-macros true])))
 
-(declare continuation-monad)
+(declare context)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructors and functions
@@ -38,7 +38,7 @@
 
 (deftype Continuation [mfn]
   p/Context
-  (get-context [_] continuation-monad)
+  (-get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
      :cljs cljs.core/IFn)
@@ -56,13 +56,16 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def continuation-monad
+(def context
   (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
     p/Monad
-    (mreturn [_ v]
+    (-mreturn [_ v]
       (Continuation. (fn [c] (c v))))
 
-    (mbind [_ self mf]
+    (-mbind [_ self mf]
       (Continuation. (fn [c]
                        (self (fn [v]
                                ((mf v) c))))))))
@@ -75,7 +78,7 @@
   "Given a Continuation instance, execute the
   wrapped computation and return its value."
   [cont]
-  (ctx/with-monad continuation-monad
+  (ctx/with-monad context
     (cont identity)))
 
 (defn call-cc

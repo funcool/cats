@@ -31,7 +31,8 @@
    'cats.labs.state-spec
    'cats.labs.reader-spec
    'cats.labs.writer-spec
-   'cats.labs.channel-spec))
+   'cats.labs.channel-spec
+   ))
 
 (defmethod test/report [:cljs.test/default :end-run-tests]
   [m]
