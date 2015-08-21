@@ -67,8 +67,6 @@
    (let [ctx (ctx/get-current ctx-or-val)]
      (p/-mempty ctx))))
 
-
-;; TODO: improve performance
 (defn mappend
   [& svs]
   {:pre [(seq svs)]}
@@ -123,8 +121,6 @@
    (p/-mzero (ctx/get-current)))
   ([ctx]
    (p/-mzero ctx)))
-
-;; TODO: improve performance
 
 (defn mplus
   [& mvs]

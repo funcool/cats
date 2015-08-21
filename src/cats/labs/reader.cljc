@@ -50,10 +50,12 @@
   p/Context
   (-get-context [_] context)
 
-  #?(:clj  clojure.lang.IFn
-     :cljs cljs.core/IFn)
-  (#?(:clj invoke :cljs -invoke) [self seed]
-    (mfn seed)))
+  #?@(:cljs [cljs.core/IFn
+             (-invoke [self seed]
+               (mfn seed))]
+      :clj  [clojure.lang.IFn
+             (invoke [self seed]
+               (mfn seed))]))
 
 (alter-meta! #'->Reader assoc :private true)
 
@@ -158,13 +160,11 @@
 ;; Reader monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; TODO: the usage of get-current seems to be redundant
-
 (defn run-reader
   "Given a Reader instance, execute the
   wrapped computation and returns a value."
   [reader seed]
-  (ctx/with-monad (ctx/get-current context)
+  (ctx/with-context context
     (reader seed)))
 
 (def ask

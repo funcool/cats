@@ -61,11 +61,12 @@
   p/Context
   (-get-context [_] context)
 
-  #?(:clj  clojure.lang.IFn
-     :cljs cljs.core/IFn)
-
-  (#?(:clj invoke :cljs -invoke) [self seed]
-    (mfn seed)))
+  #?@(:cljs [cljs.core/IFn
+             (-invoke [self seed]
+               (mfn seed))]
+      :clj  [clojure.lang.IFn
+             (invoke [self seed]
+               (mfn seed))]))
 
 (alter-meta! #'->Writer assoc :private true)
 
@@ -130,7 +131,7 @@
     p/Monad
     (-mreturn [_ v]
       (p/-mreturn inner-context
-                 (d/pair v (p/-mempty b/vector-context))))
+                  (d/pair v (p/-mempty b/vector-context))))
 
     (-mbind [_ mv f]
       (p/-mbind inner-context
@@ -179,8 +180,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; TODO: seems that with-context is missing here
 
 (defn tell
   "Add the value to the log."

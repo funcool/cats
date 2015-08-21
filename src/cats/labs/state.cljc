@@ -53,10 +53,12 @@
   p/Context
   (-get-context [_] context)
 
-  #?(:clj  clojure.lang.IFn
-     :cljs cljs.core/IFn)
-  (#?(:clj invoke :cljs -invoke) [self seed]
-    (mfn seed)))
+  #?@(:cljs [cljs.core/IFn
+             (-invoke [self seed]
+               (mfn seed))]
+      :clj  [clojure.lang.IFn
+             (invoke [self seed]
+               (mfn seed))]))
 
 (alter-meta! #'->State assoc :private true)
 
@@ -213,8 +215,6 @@
   [f]
   (-swap-state (ctx/get-current context) f))
 
-;; TODO: seems that ctx/get-current is redundant
-
 (defn run-state
   "Given a State instance, execute the
   wrapped computation and returns a cats.data.Pair
@@ -229,7 +229,7 @@
 
   This should be return something to: #<Pair [1 2]>"
   [state seed]
-  (ctx/with-monad (ctx/get-current context)
+  (ctx/with-context context
     (state seed)))
 
 (defn eval-state
