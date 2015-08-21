@@ -24,7 +24,7 @@
 
 (t/deftest first-monad-law-left-identity
   (t/is (= (id/identity 2)
-           (m/>>= (p/mreturn id/context 2) id/identity))))
+           (m/>>= (m/return id/context 2) id/identity))))
 
 (t/deftest second-monad-law-right-identity
   (t/is (= (id/identity 2)

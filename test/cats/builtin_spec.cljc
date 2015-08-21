@@ -20,7 +20,7 @@
     (t/is (maybe/maybe? nil)))
 
   (t/testing "extract function"
-    (t/is (= (p/extract nil) nil))))
+    (t/is (= (m/extract nil) nil))))
 
 (t/deftest map-tests
   (t/testing "Map as monoid"

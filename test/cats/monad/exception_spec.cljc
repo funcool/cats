@@ -91,11 +91,11 @@
 
 (t/deftest first-monad-law-left-identity
   (t/is (= (exc/success 2)
-           (m/>>= (p/mreturn exc/context 2)
+           (m/>>= (m/return exc/context 2)
                   exc/success)))
 
   (t/is (= (exc/success 2)
-           (m/>>= (p/mreturn exc/context 2)
+           (m/>>= (m/return exc/context 2)
                   exc/success
                   exc/success))))
 

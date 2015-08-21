@@ -40,7 +40,7 @@
 
 (t/deftest first-monad-law-left-identity
   (t/is (= (either/right 2)
-           (m/>>= (p/mreturn either/context 2) either/right))))
+           (m/>>= (m/return either/context 2) either/right))))
 
 (t/deftest second-monad-law-right-identity
   (t/is (= (either/right 2)

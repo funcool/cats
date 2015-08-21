@@ -22,8 +22,8 @@
     (t/is (= 42 (maybe/from-maybe (maybe/nothing) 42))))
 
   (t/testing "extract function"
-    (t/is (= (p/extract (maybe/just 1)) 1))
-    (t/is (= (p/extract (maybe/nothing)) nil)))
+    (t/is (= (m/extract (maybe/just 1)) 1))
+    (t/is (= (m/extract (maybe/nothing)) nil)))
 
   (t/testing "Test IDeref"
     (t/is (= nil @(maybe/nothing)))
@@ -51,7 +51,7 @@
 
   (t/testing "The first monad law: left identity"
     (t/is (= (maybe/just 2)
-             (m/>>= (p/mreturn maybe/context 2) maybe/just))))
+             (m/>>= (m/return maybe/context 2) maybe/just))))
 
   (t/testing "The second monad law: right identity"
     (t/is (= (maybe/just 2)

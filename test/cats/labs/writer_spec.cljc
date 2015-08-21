@@ -20,8 +20,8 @@
 
 (t/deftest writer-monad-tests
   ;; Putting a value in a writer context yields an empty log
-  (t/is (= 42 (writer/value (p/mreturn writer/context 42))))
-  (t/is (= [] (writer/log (p/mreturn writer/context 42))))
+  (t/is (= 42 (writer/value (m/return writer/context 42))))
+  (t/is (= [] (writer/log (m/return writer/context 42))))
 
   ;; The `tell` function adds the given value to the log
   (t/is (= ["Hello" "world"]
