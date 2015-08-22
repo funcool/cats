@@ -27,8 +27,9 @@
   "Clojure(Script) built-in types extensions."
   (:require [clojure.set :as s]
             [cats.monad.maybe :as maybe]
+            [cats.protocols :as p]
             [cats.context :as ctx]
-            [cats.protocols :as p]))
+            [cats.data :as d]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -224,10 +225,10 @@
   (-get-context [_] set-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Map Monoid
+;; Monoids
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def map-context
+(def map-monoid
   (reify
     p/ContextClass
     (-get-level [_] ctx/+level-default+)
@@ -243,22 +244,119 @@
 (extend-type #?(:clj clojure.lang.PersistentHashMap
                 :cljs cljs.core.PersistentHashMap)
   p/Context
-  (-get-context [_] map-context))
+  (-get-context [_] map-monoid))
 
 #?(:clj
    (extend-type clojure.lang.PersistentArrayMap
      p/Context
-     (-get-context [_] map-context))
+     (-get-context [_] map-monoid))
    :cljs
    (extend-type cljs.core.PersistentArrayMap
      p/Context
-     (-get-context [_] map-context)))
+     (-get-context [_] map-monoid)))
 
 #?(:clj
    (extend-type clojure.lang.PersistentTreeMap
      p/Context
-     (-get-context [_] map-context))
+     (-get-context [_] map-monoid))
    :cljs
    (extend-type cljs.core.PersistentTreeMap
      p/Context
-     (-get-context [_] map-context)))
+     (-get-context [_] map-monoid)))
+
+(def any-monoid
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (or sv sv'))
+
+    p/Monoid
+    (-mempty [_]
+      false)))
+
+(def all-monoid
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (and sv sv'))
+
+    p/Monoid
+    (-mempty [_]
+      true)))
+
+(def sum-monoid
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (+ sv sv'))
+
+    p/Monoid
+    (-mempty [_]
+      0)))
+
+(def prod-monoid
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (* sv sv'))
+
+    p/Monoid
+    (-mempty [_]
+      1)))
+
+(def string-monoid
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (str sv sv'))
+
+    p/Monoid
+    (-mempty [_]
+      "")))
+
+(extend-type #?(:clj java.lang.String
+                :cljs js/String)
+  p/Context
+  (-get-context [_] string-monoid))
+
+(defn pair-monoid
+  "A pair monoid type constructor."
+  [inner-monoid]
+  (reify
+    p/ContextClass
+    (-get-level [_]
+      (+ (p/-get-level inner-monoid)
+         ctx/+level-default+))
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (d/pair
+       (p/-mappend inner-monoid (.fst sv) (.fst sv'))
+       (p/-mappend inner-monoid (.snd sv) (.snd sv'))))
+
+    p/Monoid
+    (-mempty [_]
+      (d/pair
+       (p/-mempty inner-monoid)
+       (p/-mempty inner-monoid)))))
+
+(extend-type cats.data.Pair
+  p/Context
+  (-get-context [data]
+    (let [first' (.fst data)]
+      (pair-monoid (p/-get-context first')))))
