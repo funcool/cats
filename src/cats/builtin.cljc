@@ -272,6 +272,7 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (or sv sv'))
+
     p/Monoid
     (-mempty [_]
       false)))
@@ -284,6 +285,7 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (and sv sv'))
+
     p/Monoid
     (-mempty [_]
       true)))
@@ -296,6 +298,7 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (+ sv sv'))
+
     p/Monoid
     (-mempty [_]
       0)))
@@ -308,6 +311,7 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (* sv sv'))
+
     p/Monoid
     (-mempty [_]
       1)))
@@ -320,6 +324,7 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (str sv sv'))
+
     p/Monoid
     (-mempty [_]
       "")))
