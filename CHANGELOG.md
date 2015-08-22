@@ -17,6 +17,7 @@ Date: Unreleased
   [haskell wiki](https://ghc.haskell.org/trac/ghc/wiki/ApplicativeDo) and
   [pull request](https://github.com/funcool/cats/pull/63).
 - Add **foldm** implementation to `cats.core` namespace.
+- Add a bunch of monoids: `all`, `any`, `sum`, `prod`, `pair` and `string`.
 
 
 ## Version 0.6.1 ##
