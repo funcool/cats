@@ -334,23 +334,29 @@
   p/Context
   (-get-context [_] string-monoid))
 
-(def pair-monoid
+(defn pair-monoid
+  "A pair monoid type constructor."
+  [inner-monoid]
   (reify
     p/ContextClass
-    (-get-level [_] ctx/+level-default+)
+    (-get-level [_]
+      (+ (p/-get-level inner-monoid)
+         ctx/+level-default+))
 
     p/Semigroup
     (-mappend [_ sv sv']
       (d/pair
-       (m/mappend (.fst sv) (.fst sv'))
-       (m/mappend (.snd sv) (.snd sv'))))
+       (p/-mappend inner-monoid (.fst sv) (.fst sv'))
+       (p/-mappend inner-monoid (.snd sv) (.snd sv'))))
+
     p/Monoid
     (-mempty [_]
       (d/pair
-       (p/-mempty (ctx/get-current))
-       (p/-mempty (ctx/get-current))))))
-
+       (p/-mempty inner-monoid)
+       (p/-mempty inner-monoid)))))
 
 (extend-type cats.data.Pair
   p/Context
-  (-get-context [_] pair-monoid))
+  (-get-context [data]
+    (let [first' (.fst data)]
+      (pair-monoid (p/-get-context first')))))
