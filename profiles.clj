@@ -7,7 +7,7 @@
             :target "doc/dist/latest/api"
             :src-uri "http://github.com/funcool/cats/blob/master/"
             :src-uri-prefix "#L"}
-  :plugins [[funcool/codeina "0.3.0-SNAPSHOT"]
+  :plugins [[funcool/codeina "0.3.0"]
             [lein-ancient "0.6.7" :exclusions [org.clojure/tools.reader]]]}
  :bench
  [:dev
