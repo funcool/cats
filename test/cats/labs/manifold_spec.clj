@@ -15,7 +15,6 @@
   (let [ch (m/pure mf/deferred-context 1)]
     (t/is (= 2 @(m/>>= ch (fn [x] (m/return (inc x))))))))
 
-
 (t/deftest deferred-as-monad-2
   (let [ch1 (d/future 1)
         ch2 (d/future 1)
