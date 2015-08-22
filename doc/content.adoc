@@ -1381,6 +1381,83 @@ Here an other examples that shows in a clearly way how the batches are executed:
 ----
 
 
+=== Manifold Deferred
+
+*Status:* Experimental
+
+This namespace exposes the ability to use the *manifold* deferred as monadic type and in
+consequence use it in `mlet` or `alet` macros.
+
+Before use it, you should add manifold to your dependencies:
+
+[source, clojure]
+----
+[manifold "0.1.0"]
+----
+
+Now, let see some code. This will allow you understand how it can be used and why this
+integration between cats and manifold matters. At first step we will go to define a
+function that emulates whatever asynchronous task, that for our case it's consist in a
+just sleep operation:
+
+For demostration purposes, let's define a function that emulates the asyncrhonous
+call:
+
+[source, clojure]
+----
+(require '[cats.labs.manifold :as mf]
+         '[manifold.deferred :as d])
+
+(defn async-call
+  "A function that emulates some asynchronous call."
+  [n]
+  (d/future
+    (println "---> sending request" n)
+    (Thread/sleep n)
+    (println "<--- receiving request" n)
+    n))
+----
+
+Now, the manifold deferreds can participate in the monad/applicative abstractions
+using `mlet` and `alet` respectivelly.
+
+.Example using manifold deferred with `mlet`.
+[source, clojure]
+----
+(time
+  @(m/mlet [x (async-call 200)
+            y (async-call 100)]
+     (m/return (+ x y)))))
+;; ---> sending request 200
+;; <--- receiving request 200
+;; ---> sending request 100
+;; <--- receiving request 100
+;; "Elapsed time: 202.236804 msecs"
+;; => 200
+----
+
+
+If you are familiar with manifold's `let-flow` macro, the cats `alet` serves for almost
+identical purpose, with difference that `alet` is defined as generic abstraction
+instread of a specific purpose macro.
+
+.Example using manifold deferred with `alet`.
+[source, clojure]
+----
+(time
+  @(m/alet [x (async-call 100)
+            y (async-call 100)]
+     (+ x y)))))
+
+;; ---> sending request 100
+;; ---> sending request 100
+;; <--- receiving request 100
+;; <--- receiving request 100
+;; "Elapsed time: 101.06644 msecs"
+;; => 200
+----
+
+
 === State
 
 *Status:* Experimental
