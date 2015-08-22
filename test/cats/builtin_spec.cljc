@@ -159,9 +159,11 @@
 (t/deftest any-monoid
   (t/testing "mempty"
     (ctx/with-context b/any-monoid
-      (t/is (= false (p/mempty (ctx/get-current))))))
+      (t/is (= false (m/mempty)))))
+
   (t/testing "mappend"
     (ctx/with-context b/any-monoid
+      (t/is (true? (m/mappend (m/mempty) true)))
       (t/is (false? (m/mappend false false)))
       (t/is (true? (m/mappend true false)))
       (t/is (true? (m/mappend false true)))
@@ -170,9 +172,11 @@
 (t/deftest all-monoid
   (t/testing "mempty"
     (ctx/with-context b/all-monoid
-      (t/is (= true (p/mempty (ctx/get-current))))))
+      (t/is (= true (m/mempty)))))
+
   (t/testing "mappend"
     (ctx/with-context b/all-monoid
+      (t/is (false? (m/mappend (m/mempty) false)))
       (t/is (false? (m/mappend false false)))
       (t/is (false? (m/mappend true false)))
       (t/is (false? (m/mappend false true)))
@@ -181,44 +185,54 @@
 (t/deftest sum-monoid
   (t/testing "mempty"
     (ctx/with-context b/sum-monoid
-      (t/is (= 0 (p/mempty (ctx/get-current))))))
+      (t/is (= 0 (m/mempty)))))
+
   (t/testing "mappend"
     (ctx/with-context b/sum-monoid
+      (t/is (= 3 (m/mappend (m/mempty) 3)))
       (t/is (= 3 (m/mappend 1 2))))))
 
 (t/deftest prod-monoid
   (t/testing "mempty"
     (ctx/with-context b/prod-monoid
-      (t/is (= 1 (p/mempty (ctx/get-current))))))
+      (t/is (= 1 (m/mempty)))))
+
   (t/testing "mappend"
     (ctx/with-context b/prod-monoid
+      (t/is (= 6 (m/mappend (m/mempty) 6)))
       (t/is (= 6 (m/mappend 1 2 3)))
       (t/is (= (reduce * (range 1 6)) (apply m/mappend (range 1 6)))))))
 
 (t/deftest string-monoid
   (t/testing "mempty"
     (ctx/with-context b/string-monoid
-      (t/is (= "" (p/mempty (ctx/get-current))))))
+      (t/is (= "" (m/mempty)))))
+
   (t/testing "mappend"
+    (ctx/with-context b/string-monoid
+      (t/is (= "Hello" (m/mappend (m/mempty) "Hello"))))
     (t/is (= "Hello World" (m/mappend "Hello " "World")))
     (t/is (= "abcdefghi" (m/mappend "abc" "def" "ghi")))))
 
 (t/deftest pair-monoid
   (t/testing "mempty"
-    (ctx/with-context b/string-monoid
-      (t/is (= (d/pair "" "") (p/mempty b/pair-monoid))))
-    (ctx/with-context b/sum-monoid
-      (t/is (= (d/pair 0 0) (p/mempty b/pair-monoid)))))
+    (ctx/with-context (b/pair-monoid b/string-monoid)
+      (t/is (= (d/pair "" "") (m/mempty))))
+
+    (ctx/with-context (b/pair-monoid b/sum-monoid)
+      (t/is (= (d/pair 0 0) (m/mempty)))))
+
   (t/testing "mappend"
     (t/is (= (d/pair "Hello buddy" "Hello mate")
              (m/mappend
               (d/pair "Hello " "Hello ")
-              (d/pair "buddy" "mate"))))
-    ;; This won't work due to explicitly set context
-    ;; (ctx/with-context b/sum-monoid
-    ;;   (t/is (= (d/pair 10 20)
-    ;;            (m/mappend
-    ;;             (d/pair 3 5)
-    ;;             (d/pair 3 5)
-    ;;             (d/pair 4 10)))))
-    ))
+              (d/pair "buddy" "mate")))))
+
+  (t/testing "mappend with other-context"
+    (ctx/with-context (b/pair-monoid b/sum-monoid)
+      (t/is (= (d/pair 10 20)
+               (m/mappend
+                (d/pair 3 5)
+                (d/pair 3 5)
+                (d/pair 4 10))))))
+  )
