@@ -49,7 +49,7 @@
             ~@body)
           (let [clevel# (p/-get-level *context*)
                 nlevel# (p/-get-level ~ctx)]
-            (if (> nlevel# clevel#)
+            (if (>= nlevel# clevel#)
               (binding [*context* ~ctx]
                 ~@body)
               (do ~@body)))))))
