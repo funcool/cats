@@ -62,7 +62,7 @@
 
 (alter-meta! #'->State assoc :private true)
 
-(defn state-t
+(defn state
   "The State type constructor.
 
   The purpose of State type is wrap a simple
@@ -91,16 +91,16 @@
 
     p/Functor
     (-fmap [_ f fv]
-      (state-t (fn [s]
+      (state (fn [s]
                  (let [[v ns]  (fv s)]
                    (d/pair (f v) ns)))))
 
     p/Monad
     (-mreturn [_ v]
-      (state-t (partial d/pair v)))
+      (state (partial d/pair v)))
 
     (-mbind [_ self f]
-      (state-t (fn [s]
+      (state (fn [s]
                  (let [p        (self s)
                        value    (.-fst p)
                        newstate (.-snd p)]
@@ -108,19 +108,19 @@
 
     MonadState
     (-get-state [_]
-      (state-t #(d/pair %1 %1)))
+      (state #(d/pair %1 %1)))
 
     (-put-state [_ newstate]
-      (state-t #(d/pair % newstate)))
+      (state #(d/pair % newstate)))
 
     (-swap-state [_ f]
-      (state-t #(d/pair %1 (f %1))))))
+      (state #(d/pair %1 (f %1))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
+;; Monad Transformer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn state-transformer
+(defn state-t
   "The State transformer constructor."
   [inner-monad]
   (reify
@@ -129,7 +129,7 @@
 
     p/Functor
     (-fmap [_ f fv]
-      (state-t (fn [s]
+      (state (fn [s]
                  (let [wr (fv s)]
                    (p/-fmap inner-monad
                             (fn [[v ns]]
@@ -138,60 +138,55 @@
 
     p/Monad
     (-mreturn [_ v]
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mreturn inner-monad
                              (d/pair v s)))))
 
     (-mbind [_ self f]
-      (state-t (fn [s]
+      (state (fn [s]
                  (let [mp (self s)]
                    (p/-mbind inner-monad
                              mp
                              (fn [[v ns]]
                                ((f v) ns)))))))
-
-                                        ; FIXME: Conditionally if `inner-monad` is MonadZero
     p/MonadZero
     (-mzero [_]
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mzero inner-monad))))
 
-                                        ; FIXME: Conditionally if `inner-monad` is MonadPlus
     p/MonadPlus
     (-mplus [_ mv mv']
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mplus inner-monad (mv s) (mv' s)))))
 
     MonadState
     (-get-state [_]
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mreturn inner-monad
                              (d/pair s s)))))
 
     (-put-state [_ newstate]
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mreturn inner-monad
                              (d/pair s newstate)))))
 
     (-swap-state [_ f]
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mreturn inner-monad
                              (d/pair s (f s))))))
 
     p/MonadTrans
-    (-base [_]
-      context)
-
-    (-inner [_]
-      inner-monad)
-
     (-lift [_ mv]
-      (state-t (fn [s]
+      (state (fn [s]
                  (p/-mbind inner-monad
                            mv
                            (fn [v]
                              (p/-mreturn inner-monad
                                          (d/pair v s)))))))))
+
+(def ^{:doc "Deprecated alias for `state-t`."
+       :deprecated true}
+  state-transformer state-t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Public Api

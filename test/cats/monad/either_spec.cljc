@@ -57,9 +57,9 @@
 
 
 (def either-vector-m
-  (either/either-transformer b/vector-context))
+  (either/either-t b/vector-context))
 
-(t/deftest either-transformer-tests
+(t/deftest either-t-tests
   (t/is (= [(either/right 2)]
            (ctx/with-context either-vector-m
              (m/return 2))))

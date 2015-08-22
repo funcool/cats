@@ -66,19 +66,19 @@
                     (fn [x] (m/>>= (maybe/just (inc x))
                                    (fn [y] (maybe/just (inc y))))))))))
 
-(def maybe-vector-transformer (maybe/maybe-transformer b/vector-context))
+(def maybe-vector-t (maybe/maybe-t b/vector-context))
 
-(t/deftest maybe-transformer-tests
+(t/deftest maybe-t-tests
   (t/testing "It can be combined with the effects of other monads"
     (t/is (= [(maybe/just 2)]
-             (ctx/with-context maybe-vector-transformer
+             (ctx/with-context maybe-vector-t
                (m/return 2))))
 
     (t/is (= [(maybe/just 1)
               (maybe/just 2)
               (maybe/just 2)
               (maybe/just 3)]
-             (ctx/with-context maybe-vector-transformer
+             (ctx/with-context maybe-vector-t
                (m/mlet [x [(maybe/just 0) (maybe/just 1)]
                         y [(maybe/just 1) (maybe/just 2)]]
                  (m/return (+ x y))))))
@@ -87,7 +87,7 @@
               (maybe/just 2)
               (maybe/just 2)
               (maybe/just 3)]
-             (ctx/with-context maybe-vector-transformer
+             (ctx/with-context maybe-vector-t
                (m/mlet [x (m/lift [0 1])
                         y (m/lift [1 2])]
                  (m/return (+ x y))))))
@@ -96,7 +96,7 @@
               (maybe/nothing)
               (maybe/just 2)
               (maybe/nothing)]
-             (ctx/with-context maybe-vector-transformer
+             (ctx/with-context maybe-vector-t
                (m/mlet [x [(maybe/just 0) (maybe/just 1)]
                         y [(maybe/just 1) (maybe/nothing)]]
                  (m/return (+ x y))))))))

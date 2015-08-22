@@ -180,12 +180,11 @@
         (f (p/-extract mv) z)
         z))))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
+;; Monad Transformer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn either-transformer
+(defn either-t
   "The Either transformer constructor."
   [inner-monad]
   (reify
@@ -205,17 +204,15 @@
                     (f (p/-extract either-v))))))
 
     p/MonadTrans
-    (-base [_]
-      context)
-
-    (-inner [_]
-      inner-monad)
-
     (-lift [m mv]
       (p/-mbind inner-monad
                 mv
                 (fn [v]
                   (p/-mreturn inner-monad (right v)))))))
+
+(def ^{:doc "Deprecated alias for `either-t`."
+       :deprecated true}
+  either-transformer either-t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions

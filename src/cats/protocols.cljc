@@ -90,8 +90,5 @@
   (-mplus [m mv mv'] "An associative addition operation."))
 
 (defprotocol MonadTrans
-  "A common abstraction for all monad transformers."
-  (-base [mt] "Return the base monad of this transformer.")
-  (-inner [mt] "Return the monad that this transformer wraps.")
-  (-lift [m mv]
-    "Lift a value from the parameterized monad to the transformer."))
+  "A monad transformer abstraction."
+  (-lift [m mv] "Lift a value from the parameterized monad to the transformer."))

@@ -110,10 +110,10 @@
                 (mr (f env)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
+;; Monad Transformer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn reader-transformer
+(defn reader-t
   "The Reader transformer constructor."
   [inner-monad]
   (reify
@@ -137,15 +137,8 @@
                        ((f a) env)))))
 
     p/MonadTrans
-    (-base [_]
-      context)
-
-    (-inner [_]
-      inner-monad)
-
     (-lift [m mv]
-      (fn [_]
-        mv))
+      (fn [_] mv))
 
     MonadReader
     (-ask [_]
@@ -155,6 +148,10 @@
     (-local [_ f mr]
       (fn [env]
         (mr (f env))))))
+
+(def ^{:doc "Deprecated alias for `reader-t`."
+       :deprecated true}
+  reader-transformer reader-t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions

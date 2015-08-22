@@ -67,7 +67,7 @@
       (t/is (d/deferred? result))
       (t/is (= @result 200)))))
 
-(def deferred-either-m (either/either-transformer mf/deferred-context))
+(def deferred-either-m (either/either-t mf/deferred-context))
 
 (t/deftest deferred-transformer-tests
   (t/testing "deferred combination with either"

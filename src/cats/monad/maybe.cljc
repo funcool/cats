@@ -226,59 +226,57 @@
         z))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
+;; Monad Transformer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn maybe-transformer
+(defn maybe-t
   "The maybe transformer constructor."
-  [inner-monad]
+  [inner]
   (reify
     p/ContextClass
     (-get-level [_] ctx/+level-transformer+)
 
     p/Functor
     (-fmap [_ f fv]
-      (p/-fmap inner-monad
-              #(p/-fmap context f %)
-              fv))
+      (p/-fmap inner
+               #(p/-fmap context f %)
+               fv))
 
     p/Monad
     (-mreturn [m v]
-      (p/-mreturn inner-monad (just v)))
+      (p/-mreturn inner (just v)))
 
     (-mbind [_ mv f]
-      (p/-mbind inner-monad
+      (p/-mbind inner
                 mv
                 (fn [maybe-v]
                   (if (just? maybe-v)
                     (f (p/-extract maybe-v))
-                    (p/-mreturn inner-monad (nothing))))))
+                    (p/-mreturn inner (nothing))))))
 
     p/MonadZero
     (-mzero [_]
-      (p/-mreturn inner-monad (nothing)))
+      (p/-mreturn inner (nothing)))
 
     p/MonadPlus
     (-mplus [_ mv mv']
-      (p/-mbind inner-monad
+      (p/-mbind inner
                 mv
                 (fn [maybe-v]
                   (if (just? maybe-v)
-                    (p/-mreturn inner-monad maybe-v)
+                    (p/-mreturn inner maybe-v)
                     mv'))))
 
     p/MonadTrans
-    (-base [_]
-      context)
-
-    (-inner [_]
-      inner-monad)
-
     (-lift [_ mv]
-      (p/-mbind inner-monad
+      (p/-mbind inner
                 mv
                 (fn [v]
-                  (p/-mreturn inner-monad (just v)))))))
+                  (p/-mreturn inner (just v)))))))
+
+(def ^{:doc "Deprecated alias for `maybe-t`."
+       :deprecated true}
+  maybe-transformer maybe-t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
