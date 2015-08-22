@@ -24,23 +24,19 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.protocols
-  "Abstractions of Category Theory over that
-  cats library is build.
+  "A collection of protocols on that cats
+  abstractions is built up on.
 
-  Functions of this namespace are not indented
-  to be used directly. Is a private api but exposes
-  as public for documentation purposes.")
+  NOTE: Functions of this namespace are not indented
+  to be used directly. It is considered internal api.")
 
 (defprotocol ContextClass
-  "Is a marker protocol for context classes."
+  "A marker protocol for identify the valid context types."
   (-get-level [_] "Get a context priority level."))
 
 (defprotocol Context
-  "Abstraction that establish a membership of types
-  with one concrete monad.
-
-  This is a way that cats establishes the relation
-  between a type and the monad that that should play.
+  "Abstraction that establish a membership between the
+  context and the concrete type.
 
   A great example es Maybe monad type Just. It implements
   this abstraction for establish that Just is part of
