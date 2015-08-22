@@ -26,17 +26,11 @@
 
 (t/deftest map-tests
   (t/testing "Map as monoid"
-    (t/is (= (m/mempty b/map-context) {})))
+    (t/is (= (m/mempty b/map-monoid) {})))
+
   (t/testing "Map as semigroup"
     (t/is (= (m/mappend {:a 1} {:b 2}) {:a 1 :b 2}))
-    (t/is (= (m/mappend (m/mempty b/map-context) {:a 1}) {:a 1}))))
-
-;; (t/deftest string-tests
-;;   (t/testing "String as monoid"
-;;     (t/is (= (m/mempty b/string-context) "")))
-;;   (t/testing "Map as semigroup"
-;;     (t/is (= (m/mappend "1" "2") "12"))
-;;     (t/is (= (m/mappend (m/mempty b/string-context) "1") "1"))))
+    (t/is (= (m/mappend (m/mempty b/map-monoid) {:a 1}) {:a 1}))))
 
 (t/deftest vector-monad
   (t/testing "Forms a semigroup"
