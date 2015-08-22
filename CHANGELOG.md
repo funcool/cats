@@ -1,5 +1,24 @@
 # Changelog #
 
+## Version 1.0.0 ##
+
+Date: Unreleased
+
+- The context is fully decoupled from monad.
+- The protocols methods are all renamed to `-name` for consistency with cljs style to
+  name internal functions.
+- Add additional arity to `cats.core/mempty` function, that allows provide a context
+  instead of resolving it.
+- Sorted map is now also implements monoid.
+- Add `cats.labs` namespace for make room for previously removed **reader**, **writer**,
+  **state** and **continuation** monads.
+- Add core.async channel monad/applicative under `cats.labs.channel` namespace.
+- Add **applicative-do* (with `alet` macro) syntax. You can read more about that in
+  [haskell wiki](https://ghc.haskell.org/trac/ghc/wiki/ApplicativeDo) and
+  [pull request](https://github.com/funcool/cats/pull/63).
+- Add **foldm** implementation to `cats.core` namespace.
+
+
 ## Version 0.6.1 ##
 
 Date: 2015-08-02
