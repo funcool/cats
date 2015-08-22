@@ -98,21 +98,3 @@
 
     (-mbind [_ mv f]
       (f (.-v mv)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn identity-transformer
-  "The Identity transformer constructor."
-  [inner-monad]
-  (reify
-    p/ContextClass
-    (-get-level [_] ctx/+level-transformer+)
-
-    p/Monad
-    (-mreturn [_ v]
-      (identity (p/-mreturn inner-monad v)))
-
-    (-mbind [_ mv f]
-      nil)))
