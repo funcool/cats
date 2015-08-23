@@ -251,11 +251,14 @@
              (ctx/with-context maybe/context
                (m/traverse inc-if-even [1 2]))))))
 
-#_(t/deftest lazyseq-traversable
+(t/deftest lazyseq-traversable
   (t/testing "Traverse"
     (t/is (= (maybe/just [])
-             (m/traverse inc-if-even (lazy-seq []))))
-    (t/is (= (maybe/just [3 5])
-             (m/traverse inc-if-even (lazy-seq [2 4]))))
-    (t/is (= (maybe/nothing)
-             (m/traverse inc-if-even (lazy-seq [1 2]))))))
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (lazy-seq [])))))
+    #_(t/is (= (maybe/just [3 5])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (lazy-seq [2 4])))))
+    #_(t/is (= (maybe/nothing)
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (lazy-seq [1 2])))))))
