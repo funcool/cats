@@ -136,21 +136,6 @@
     (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] [1 2 3])))
     (t/is (= 6 (m/foldr + 0 [1 2 3])))))
 
-(defn inc-if-even
-  [n]
-  (if (even? n)
-    (maybe/just (inc n))
-    (maybe/nothing)))
-
-(t/deftest vector-traversable
-  (t/testing "Traverse"
-    (t/is (= (maybe/just [])
-             (m/traverse inc-if-even [])))
-    (t/is (= (maybe/just [3 5])
-             (m/traverse inc-if-even [2 4])))
-    (t/is (= (maybe/nothing)
-             (m/traverse inc-if-even [1 2])))))
-
 (t/deftest lazyseq-foldable
   (t/testing "Foldl"
     (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] (map identity [1 2 3]))))
@@ -247,5 +232,28 @@
                (m/mappend
                 (d/pair 3 5)
                 (d/pair 3 5)
-                (d/pair 4 10))))))
-  )
+                (d/pair 4 10)))))))
+
+(defn inc-if-even
+  [n]
+  (if (even? n)
+    (maybe/just (inc n))
+    (maybe/nothing)))
+
+(t/deftest vector-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just [])
+             (m/traverse inc-if-even [])))
+    (t/is (= (maybe/just [3 5])
+             (m/traverse inc-if-even [2 4])))
+    (t/is (= (maybe/nothing)
+             (m/traverse inc-if-even [1 2])))))
+
+(t/deftest lazyseq-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just [])
+             (m/traverse inc-if-even (lazy-seq []))))
+    (t/is (= (maybe/just [3 5])
+             (m/traverse inc-if-even (lazy-seq [2 4]))))
+    (t/is (= (maybe/nothing)
+             (m/traverse inc-if-even (lazy-seq [1 2]))))))
