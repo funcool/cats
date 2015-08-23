@@ -65,9 +65,9 @@
              (second w)))))
 
 
-(def writer-maybe-t (writer/writer-transformer maybe/context))
+(def writer-maybe-t (writer/writer-t maybe/context))
 
-(t/deftest writer-transformer-tests
+(t/deftest writer-t-tests
   ;; Putting a value in a writer transformer context yields an empty log
   (let [w (ctx/with-context writer-maybe-t
             (m/return 42))]

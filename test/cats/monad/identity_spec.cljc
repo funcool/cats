@@ -38,10 +38,3 @@
            (m/>>= (id/identity 2)
                   (fn [x] (m/>>= (id/identity (inc x))
                                  (fn [y] (id/identity (inc y)))))))))
-
-(def identity-vecotor-t (id/identity-transformer b/vector-context))
-
-(t/deftest identity-transformer-tests
-  (t/is (= (id/identity [2])
-           (ctx/with-context identity-vecotor-t
-             (m/return 2)))))

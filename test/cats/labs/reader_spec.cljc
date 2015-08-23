@@ -29,9 +29,9 @@
   (t/is (= 42 (reader/run-reader (m/fmap inc reader/ask) 41))))
 
 
-(def maybe-reader-t (reader/reader-transformer maybe/context))
+(def maybe-reader-t (reader/reader-t maybe/context))
 
-(t/deftest reader-transformerformer-tests
+(t/deftest reader-t-tests
   ;; The `ask` reader gives you access to the environment
   (t/is (= (maybe/just {:foo "bar"})
            (ctx/with-context maybe-reader-t

@@ -24,23 +24,17 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.protocols
-  "Abstractions of Category Theory over that
-  cats library is build.
+  "A collection of protocols upon which the cats abstractions are built.
 
-  Functions of this namespace are not indented
-  to be used directly. Is a private api but exposes
-  as public for documentation purposes.")
+  NOTE: Functions of this namespace are not intended to be used directly.
+  It is considered internal api.")
 
 (defprotocol ContextClass
-  "Is a marker protocol for context classes."
+  "A marker protocol for identifying the valid context types."
   (-get-level [_] "Get a context priority level."))
 
 (defprotocol Context
-  "Abstraction that establish a membership of types
-  with one concrete monad.
-
-  This is a way that cats establishes the relation
-  between a type and the monad that that should play.
+  "Abstraction that establishes a concrete type as a member of a context.
 
   A great example es Maybe monad type Just. It implements
   this abstraction for establish that Just is part of
@@ -94,8 +88,5 @@
   (-mplus [m mv mv'] "An associative addition operation."))
 
 (defprotocol MonadTrans
-  "A common abstraction for all monad transformers."
-  (-base [mt] "Return the base monad of this transformer.")
-  (-inner [mt] "Return the monad that this transformer wraps.")
-  (-lift [m mv]
-    "Lift a value from the parameterized monad to the transformer."))
+  "A monad transformer abstraction."
+  (-lift [m mv] "Lift a value from the parameterized monad to the transformer."))

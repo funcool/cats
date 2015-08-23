@@ -118,10 +118,10 @@
         (d/pair v (f (second mv)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad transformer definition
+;; Monad Transformer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn writer-transformer
+(defn writer-t
   "The Writer transformer constructor."
   [inner-context]
   (reify
@@ -164,18 +164,16 @@
                                 (d/pair v (f log)))))))
 
     p/MonadTrans
-    (-base [_]
-      context)
-
-    (-inner [_]
-      inner-context)
-
     (-lift [_ mv]
       (p/-mbind inner-context
                 mv
                 (fn [v]
                   (p/-mreturn inner-context
                               (d/pair v (p/-mempty b/vector-context))))))))
+
+(def ^{:doc "Deprecated alias for `writer-t`."
+       :deprecated true}
+  writer-transformer writer-t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions

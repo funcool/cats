@@ -28,8 +28,7 @@
 
 (t/deftest put-state-should-override-the-state
   (let [computation (state/put-state 42)]
-    (t/is (= 42
-             (state/exec-state computation 0)))))
+    (t/is (= 42 (state/exec-state computation 0)))))
 
 (t/deftest state-monad-in-mlet-composition
   ;; State monad composition with mlet should return state
@@ -54,9 +53,9 @@
 
 
 (def state-maybe-t
-  (state/state-transformer maybe/context))
+  (state/state-t maybe/context))
 
-(t/deftest state-transformer-tests
+(t/deftest state-t-tests
   ;; get-state should return the identity wrapped in the inner monad's context.
   (t/is (= (maybe/just (d/pair :foo :foo))
            (ctx/with-context state-maybe-t

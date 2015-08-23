@@ -85,9 +85,10 @@
   p/Extract
   (-extract [_] v)
 
-  #?(:clj clojure.lang.IDeref
-     :cljs IDeref)
-  (#?(:clj deref :cljs -deref) [_] v)
+  #?@(:cljs [cljs.core/IDeref
+             (-deref [_] v)]
+      :clj  [clojure.lang.IDeref
+             (deref [_] v)])
 
   #?@(:clj
       [Object
@@ -113,9 +114,11 @@
   p/Extract
   (-extract [_] e)
 
-  #?(:clj clojure.lang.IDeref
-     :cljs IDeref)
-  (#?(:clj deref :cljs -deref) [_] (throw e))
+  #?@(:cljs [cljs.core/IDeref
+             (-deref [_] (throw e))]
+      :clj  [clojure.lang.IDeref
+             (deref [_] (throw e))])
+
 
   #?@(:clj
       [Object
