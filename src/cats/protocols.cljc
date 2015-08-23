@@ -24,19 +24,17 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.protocols
-  "A collection of protocols on that cats
-  abstractions is built up on.
+  "A collection of protocols upon which the cats abstractions are built.
 
-  NOTE: Functions of this namespace are not indented
-  to be used directly. It is considered internal api.")
+  NOTE: Functions of this namespace are not intended to be used directly.
+  It is considered internal api.")
 
 (defprotocol ContextClass
-  "A marker protocol for identify the valid context types."
+  "A marker protocol for identifying the valid context types."
   (-get-level [_] "Get a context priority level."))
 
 (defprotocol Context
-  "Abstraction that establish a membership between the
-  context and the concrete type.
+  "Abstraction that establishes a concrete type as a member of a context.
 
   A great example es Maybe monad type Just. It implements
   this abstraction for establish that Just is part of
