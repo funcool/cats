@@ -7,6 +7,7 @@ Date: Unreleased
 - The context is fully decoupled from monad.
 - The protocols methods are all renamed to `-name` for consistency with cljs style to
   name internal functions.
+- Revisit monad-transformers abstraction removing useless protocol methods.
 - Add additional arity to `cats.core/mempty` function, that allows provide a context
   instead of resolving it.
 - Sorted map is now also implements monoid.
