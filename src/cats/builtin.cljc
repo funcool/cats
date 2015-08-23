@@ -185,11 +185,11 @@
     p/Traversable
     (-traverse [ctx f tv]
       (let [as (map f tv)]
-        (p/-foldr ctx
-                  (fn [a acc]
+        (p/-foldl ctx
+                  (fn [acc a]
                     (m/alet [x a
                              xs acc]
-                       (into [] (cons x xs))))
+                       (conj xs x)))
                   (m/pure [])
                   as)))))
 
