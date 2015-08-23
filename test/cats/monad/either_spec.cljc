@@ -145,7 +145,8 @@
 (t/deftest traversable-test
   (t/testing "Traverse"
     (t/is (= (maybe/just (either/right 42))
-             (m/traverse #(maybe/just (inc %)) (either/right 41))))
+             (ctx/with-context maybe/context
+               (m/traverse #(maybe/just (inc %)) (either/right 41)))))
     (t/is (= (maybe/just (either/left :nope))
-             (ctx/with-context maybe/maybe-monad
+             (ctx/with-context maybe/context
                (m/traverse #(maybe/just (inc %)) (either/left :nope)))))))

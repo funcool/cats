@@ -228,10 +228,10 @@
         z))
 
     p/Traversable
-    (traverse [_ f mv]
+    (-traverse [_ f mv]
       (if (just? mv)
         (let [a (f (p/-extract mv))]
-          (p/-fmap (p/get-context a) just a))
+          (p/-fmap (p/-get-context a) just a))
         (p/-pure (ctx/get-current) mv)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

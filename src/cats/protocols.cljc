@@ -74,7 +74,7 @@
 
 (defprotocol Traversable
   "TODO"
-  (traverse [tctx f tv] "TODO"))
+  (-traverse [tctx f tv] "TODO"))
 
 (defprotocol Monad
   "The Monad abstraction."
