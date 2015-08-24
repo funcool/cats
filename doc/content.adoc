@@ -413,7 +413,6 @@ The *Foldable* is a generic abstraction for data structures that can be folded. 
 mainly on two functions: `foldl` and `foldr`. `foldl` is also known as `reduce` or `inject`
 in other mainstream programming languages.
 
-
 Both function have an identical signature and differ in how they traverse the data structure.
 Let's look at a little example using `foldl`:
 
@@ -462,20 +461,16 @@ In contrast to the `foldr` internal execution model:
 In languages with strict argument evaluation, `foldr` does not have many
 applications because when the data structure to fold grows it tends to consume all the
 stack (causing the well known stack overflow). In case of Clojure, the unique obvious
-case of using foldr is for small datastructures or lazy sequences.
+case of using foldr is for small datastructures.
 
 [source, clojure]
 ----
-(m/foldr #(cons (inc %1) %2) '() (into [] (range 100000)))
+(m/foldr #(cons (inc %1) %2) '() (range 100000))
 ;; => StackOverflowError
-
-;; The same operation but using lazyseqs works as expected
-(m/foldr #(cons (inc %1) %2) '() (map identity (range 100000)))
-;; => (1 2 3 4 ...)
 ----
 
-The *Foldable* abstraction is already implemented for cloure vectors and lazy seqs plus
-the cats maybe, either and validation types. Let see an example how it behaves with maybe:
+The *Foldable* abstraction is already implemented for cloure vectors, lazy seqs and ranges
+plus the cats maybe, either and validation types. Let see an example how it behaves with maybe:
 
 [source, clojure]
 ----
@@ -503,7 +498,6 @@ Let see an example:
   (if (zero? y)
     (maybe/nothing)
     (maybe/just (/ x y))))
-
 
 (m/foldm m-div 1 [1 2 3])
 ;; => #<Just 1/6>
