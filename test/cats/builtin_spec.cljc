@@ -156,6 +156,15 @@
         (t/is (= 2 (first result)))
         (t/is (= @state 1))))))
 
+(t/deftest range-foldable
+  (t/testing "Foldl"
+    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] (range 1 4))))
+    (t/is (= 6 (m/foldl + 0 (range 1 4)))))
+
+  (t/testing "Foldr"
+    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] (range 1 4))))
+    (t/is (= 6 (m/foldr + 0 (range 1 4))))))
+
 (t/deftest any-monoid
   (t/testing "mempty"
     (ctx/with-context b/any-monoid

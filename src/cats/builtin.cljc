@@ -104,6 +104,31 @@
   (-get-context [_] sequence-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Range
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def range-context
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Foldable
+    (-foldr [ctx f z xs]
+      (let [x (first xs)]
+        (if (nil? x)
+          z
+          (let [xs (rest xs)]
+            (f x (p/-foldr ctx f z xs))))))
+
+    (-foldl [ctx f z xs]
+      (reduce f z xs))))
+
+(extend-type #?(:clj  clojure.lang.LongRange
+                :cljs cljs.core.Range)
+  p/Context
+  (-get-context [_] range-context))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vector Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
