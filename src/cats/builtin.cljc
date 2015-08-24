@@ -89,25 +89,44 @@
 
     p/Foldable
     (-foldr [ctx f z xs]
-      (lazy-seq
-       (let [x (first xs)
-             xs (rest xs)]
-         (if (nil? x)
-           z
-           (f x (p/-foldr ctx f z xs))))))
+      (let [x (first xs)]
+        (if (nil? x)
+          z
+          (let [xs (rest xs)]
+            (f x (p/-foldr ctx f z xs))))))
 
     (-foldl [ctx f z xs]
-      (lazy-seq
-       (let [x (first xs)
-             xs (rest xs)]
-         (if (nil? x)
-           z
-           (p/-foldl ctx f (f z x) xs)))))))
+      (reduce f z xs))))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
   p/Context
   (-get-context [_] sequence-context))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Range
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def range-context
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Foldable
+    (-foldr [ctx f z xs]
+      (let [x (first xs)]
+        (if (nil? x)
+          z
+          (let [xs (rest xs)]
+            (f x (p/-foldr ctx f z xs))))))
+
+    (-foldl [ctx f z xs]
+      (reduce f z xs))))
+
+(extend-type #?(:clj  clojure.lang.LongRange
+                :cljs cljs.core.Range)
+  p/Context
+  (-get-context [_] range-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vector Monad
@@ -156,18 +175,11 @@
 
     p/Foldable
     (-foldr [ctx f z xs]
-      (let [x (first xs)
-            xs (rest xs)]
-        (if (nil? x)
-          z
-          (f x (p/-foldr ctx f z xs)))))
+      (letfn [(rf [acc v] (f v acc))]
+        (reduce rf z (reverse xs))))
 
     (-foldl [ctx f z xs]
-      (let [x (first xs)
-            xs (rest xs)]
-        (if (nil? x)
-          z
-          (p/-foldl ctx f (f z x) xs))))))
+      (reduce f z xs))))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
