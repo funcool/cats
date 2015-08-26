@@ -46,15 +46,15 @@
                                   (fn [y] (d/future (inc y))))))]
     (t/is (= @rs1 @rs2))))
 
-;; (t/deftest semigroup-tests
-;;   (let [c1 (a/to-chan [1 2 3])
-;;         c2 (a/to-chan [4 5 6])
-;;         r (m/mappend c1 c2)]
-;;     (t/is (= [1 2 3 4 5 6] (a/<!! (a/into [] r)))))
-
-;; (t/deftest semigroup-with-monoid-tests
-;;   (let [c (m/mappend (m/mempty c/context) (a/to-chan [1]))]
-;;     (t/is (= [1] (a/<!! (a/into [] c))))))
+(t/deftest semigroup-tests
+  (let [c1 (d/success-deferred {:a 1})
+        c2 (d/success-deferred {:b 2})
+        r (m/mappend c1 c2)]
+    (t/is (= {:a 1 :b 2} @r)))
+  (let [c1 (d/success-deferred {:a 1})
+        c2 (d/error-deferred {:b 2})
+        r (m/mappend c1 c2)]
+    (t/is (thrown? clojure.lang.ExceptionInfo @r))))
 
 (t/deftest applicative-do
   (letfn [(async-call [wait]

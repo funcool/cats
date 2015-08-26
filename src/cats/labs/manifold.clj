@@ -53,6 +53,13 @@
                (fn [[afv avv]]
                  (afv avv))))
 
+    p/Semigroup
+    (-mappend [ctx mv mv']
+      (d/chain (d/zip' mv mv')
+               (fn [[mvv mvv']]
+                 (let [ctx (p/-get-context mvv)]
+                   (p/-mappend ctx mvv mvv')))))
+
     p/Monad
     (-mreturn [_ v]
       (d/success-deferred v))
