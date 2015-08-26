@@ -14,11 +14,13 @@ Date: Unreleased
 - Add `cats.labs` namespace for make room for previously removed **reader**, **writer**,
   **state** and **continuation** monads.
 - Add core.async channel monad/applicative under `cats.labs.channel` namespace.
+- Add manifold deferred monad/applicative under `cats.labs.manifold` namespace.
 - Add **applicative-do* (with `alet` macro) syntax. You can read more about that in
   [haskell wiki](https://ghc.haskell.org/trac/ghc/wiki/ApplicativeDo) and
   [pull request](https://github.com/funcool/cats/pull/63).
 - Add **foldm** implementation to `cats.core` namespace.
 - Add a bunch of monoids: `all`, `any`, `sum`, `prod`, `pair` and `string`.
+- Fix Foldable implementation for clojure builtin collections.
 
 
 ## Version 0.6.1 ##
