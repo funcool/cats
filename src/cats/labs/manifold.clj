@@ -76,3 +76,10 @@
   p/Context
   (-get-context [_] deferred-context))
 
+(extend-type manifold.deferred.SuccessDeferred
+  p/Context
+  (-get-context [_] deferred-context))
+
+(extend-type manifold.deferred.ErrorDeferred
+  p/Context
+  (-get-context [_] deferred-context))
