@@ -56,7 +56,7 @@
 
     p/Applicative
     (-pure [_ v]
-      (d/future v))
+      (d/success-deferred v))
 
     (-fapply [mn af av]
       (d/chain (d/zip' af av)
@@ -65,7 +65,7 @@
 
     p/Monad
     (-mreturn [_ v]
-      (d/future v))
+      (d/success-deferred v))
 
     (-mbind [it mv f]
       (d/chain mv (fn [v]
