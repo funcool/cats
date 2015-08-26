@@ -44,16 +44,6 @@
     (-fmap [_ f mv]
       (d/chain mv f))
 
-    ;; p/Semigroup
-    ;; (-mappend [_ sv sv']
-    ;;   (chain-chans sv sv'))
-
-    ;; p/Monoid
-    ;; (-mempty [_]
-    ;;   (let [c (a/chan)]
-    ;;     (a/close! c)
-    ;;     c))
-
     p/Applicative
     (-pure [_ v]
       (d/success-deferred v))
