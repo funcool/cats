@@ -91,8 +91,9 @@
   composing operations with the `bind` function."
   [mv f]
   (let [ctx (ctx/get-current mv)]
-    (ctx/with-context ctx
-      (p/-mbind ctx mv f))))
+    (p/-mbind ctx mv (fn [v]
+                       (ctx/with-context ctx
+                         (f v))))))
 
 (defn mzero
   ([]
