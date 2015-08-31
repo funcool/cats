@@ -38,24 +38,6 @@
   (:refer-clojure :exclude [when unless filter sequence]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Backward compatiblity aliases
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-#?(:clj
-   (defmacro with-monad
-     "Alias to `with-context` for backward compatibility."
-     {:deprecated true}
-     [ctx & body]
-     `(ctx/with-context ~ctx
-        ~@body)))
-
-(defn get-current-context
-  "Alias to `cats.context/get-current` for backward compatibility."
-  {:deprecated true}
-  ([] (ctx/get-current nil))
-  ([default] (ctx/get-current default)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
