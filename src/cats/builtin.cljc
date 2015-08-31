@@ -358,8 +358,8 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (d/pair
-       (p/-mappend inner-monoid (.fst sv) (.fst sv'))
-       (p/-mappend inner-monoid (.snd sv) (.snd sv'))))
+       (p/-mappend inner-monoid (.-fst sv) (.-fst sv'))
+       (p/-mappend inner-monoid (.-snd sv) (.-snd sv'))))
 
     p/Monoid
     (-mempty [_]
@@ -370,5 +370,5 @@
 (extend-type cats.data.Pair
   p/Context
   (-get-context [data]
-    (let [first' (.fst data)]
+    (let [first' (.-fst data)]
       (pair-monoid (p/-get-context first')))))
