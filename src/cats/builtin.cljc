@@ -342,7 +342,7 @@
       "")))
 
 (extend-type #?(:clj java.lang.String
-                :cljs js/String)
+                :cljs string)
   p/Context
   (-get-context [_] string-monoid))
 
