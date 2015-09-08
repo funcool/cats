@@ -103,6 +103,13 @@
     p/Functor
     (-fmap [_ f mv]
       (pair (.-fst mv) (f (.-snd mv))))
+
+    p/Foldable
+    (-foldl [_ f z mv]
+      (f z (.-snd mv)))
+
+    (-foldr [_ f z mv]
+      (f (.-snd mv) z))
 ))
 
 (defn pair-monoid

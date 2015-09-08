@@ -35,7 +35,16 @@
                 (d/pair 3 5)
                 (d/pair 4 10)))))))
 
-(t/deftest pair-functor
+(t/deftest functor-test
   (t/testing "It maps a function over the second value of the pair"
     (= (d/pair 0 42)
        (m/fmap inc (d/pair 0 41)))))
+
+(t/deftest foldable-test
+  (t/testing "Foldl"
+    (t/is (= 1/3
+             (m/foldl / 1 (d/pair 0 3)))))
+
+  (t/testing "Foldr"
+    (t/is (= 3
+             (m/foldr / 1 (d/pair 0 3))))))
