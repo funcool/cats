@@ -201,6 +201,15 @@
     (t/is (= [nil]
              (m/when false [])))))
 
+(t/deftest unless-tests
+  (t/testing "It returns the monadic value unchanged when the condition is false"
+    (t/is (= (maybe/just 3)
+             (m/unless false (maybe/just 3)))))
+
+  (t/testing "It returns nil in the monadic context when the condition is true"
+    (t/is (= [nil]
+             (m/unless true [])))))
+
 (t/deftest curry-tests
   #?(:clj
      (t/testing "It can curry single and fixed arity functions automatically"
