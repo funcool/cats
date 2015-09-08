@@ -110,7 +110,11 @@
 
     (-foldr [_ f z mv]
       (f (.-snd mv) z))
-))
+
+    p/Traversable
+    (-traverse [_ f mv]
+      (let [a (f (.-snd mv))]
+        (p/-fmap (p/-get-context a) #(pair (.-fst mv) %) a)))))
 
 (defn pair-monoid
   "A pair monoid type constructor."

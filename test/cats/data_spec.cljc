@@ -35,16 +35,31 @@
                 (d/pair 3 5)
                 (d/pair 4 10)))))))
 
-(t/deftest functor-test
+(t/deftest pair-functor
   (t/testing "It maps a function over the second value of the pair"
     (= (d/pair 0 42)
        (m/fmap inc (d/pair 0 41)))))
 
-(t/deftest foldable-test
+(t/deftest pair-foldable
   (t/testing "Foldl"
-    (t/is (= 1/3
+    (t/is (= (/ 1 3)
              (m/foldl / 1 (d/pair 0 3)))))
 
   (t/testing "Foldr"
-    (t/is (= 3
+    (t/is (= (/ 3 1)
              (m/foldr / 1 (d/pair 0 3))))))
+
+(defn inc-if-even
+  [n]
+  (if (even? n)
+    (maybe/just (inc n))
+    (maybe/nothing)))
+
+(t/deftest pair-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just (d/pair 0 3))
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (d/pair 0 2)))))
+    (t/is (= (maybe/nothing)
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (d/pair 0 1)))))))
