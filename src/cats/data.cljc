@@ -24,7 +24,9 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.data
-  "Data structures that are used in various places of the library.")
+  "Data structures that are used in various places of the library."
+  (:require [cats.protocols :as p]
+            [cats.context :as ctx]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pair type constructor and functions
@@ -76,3 +78,30 @@
 (defn pair?
   [v]
   (instance? Pair v))
+
+(defn pair-monoid
+  "A pair monoid type constructor."
+  [inner-monoid]
+  (reify
+    p/ContextClass
+    (-get-level [_]
+      (+ (p/-get-level inner-monoid)
+         ctx/+level-default+))
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (pair
+       (p/-mappend inner-monoid (.-fst sv) (.-fst sv'))
+       (p/-mappend inner-monoid (.-snd sv) (.-snd sv'))))
+
+    p/Monoid
+    (-mempty [_]
+      (pair
+       (p/-mempty inner-monoid)
+       (p/-mempty inner-monoid)))))
+
+(extend-type cats.data.Pair
+  p/Context
+  (-get-context [data]
+    (let [first' (.-fst data)]
+      (pair-monoid (p/-get-context first')))))

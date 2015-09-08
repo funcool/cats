@@ -2,7 +2,6 @@
   (:require [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
-            [cats.data :as d]
 
             #?(:cljs [cats.context :as ctx :include-macros true]
                :clj  [cats.context :as ctx])
@@ -210,28 +209,6 @@
       (t/is (= "Hello" (m/mappend (m/mempty) "Hello"))))
     (t/is (= "Hello World" (m/mappend "Hello " "World")))
     (t/is (= "abcdefghi" (m/mappend "abc" "def" "ghi")))))
-
-(t/deftest pair-monoid
-  (t/testing "mempty"
-    (ctx/with-context (b/pair-monoid b/string-monoid)
-      (t/is (= (d/pair "" "") (m/mempty))))
-
-    (ctx/with-context (b/pair-monoid b/sum-monoid)
-      (t/is (= (d/pair 0 0) (m/mempty)))))
-
-  (t/testing "mappend"
-    (t/is (= (d/pair "Hello buddy" "Hello mate")
-             (m/mappend
-              (d/pair "Hello " "Hello ")
-              (d/pair "buddy" "mate")))))
-
-  (t/testing "mappend with other-context"
-    (ctx/with-context (b/pair-monoid b/sum-monoid)
-      (t/is (= (d/pair 10 20)
-               (m/mappend
-                (d/pair 3 5)
-                (d/pair 3 5)
-                (d/pair 4 10)))))))
 
 (defn inc-if-even
   [n]

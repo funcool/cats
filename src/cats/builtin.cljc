@@ -29,7 +29,6 @@
             [cats.monad.maybe :as maybe]
             [cats.protocols :as p]
             [cats.context :as ctx]
-            [cats.data :as d]
             [cats.core :as m]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -368,30 +367,3 @@
                 :cljs string)
   p/Context
   (-get-context [_] string-monoid))
-
-(defn pair-monoid
-  "A pair monoid type constructor."
-  [inner-monoid]
-  (reify
-    p/ContextClass
-    (-get-level [_]
-      (+ (p/-get-level inner-monoid)
-         ctx/+level-default+))
-
-    p/Semigroup
-    (-mappend [_ sv sv']
-      (d/pair
-       (p/-mappend inner-monoid (.-fst sv) (.-fst sv'))
-       (p/-mappend inner-monoid (.-snd sv) (.-snd sv'))))
-
-    p/Monoid
-    (-mempty [_]
-      (d/pair
-       (p/-mempty inner-monoid)
-       (p/-mempty inner-monoid)))))
-
-(extend-type cats.data.Pair
-  p/Context
-  (-get-context [data]
-    (let [first' (.-fst data)]
-      (pair-monoid (p/-get-context first')))))
