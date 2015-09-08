@@ -142,8 +142,6 @@
   (let [ctx (ctx/get-current af)]
     (reduce (partial p/-fapply ctx) af avs)))
 
-
-;; TODO: review it, seems wrong and should be a macro?
 (defn when
   "Given an expression and a monadic value,
   if the expression is logical true, return the monadic value.
@@ -151,16 +149,18 @@
   ([b mv]
    (when (ctx/get-current mv) b mv))
   ([ctx b mv]
-   (if b mv (return ctx nil))))
+   (if b
+     mv
+     (pure ctx nil))))
 
-;; TODO: review it, seems wrong and should be a macro?
 (defn unless
   "Given an expression and a monadic value,
   if the expression is not logical true, return the monadic value.
   Otherwise, return nil in a monadic context."
-  [b mv]
-  (when-not b
-    mv))
+  ([b mv]
+   (when (not b) mv))
+  ([ctx b mv]
+   (when ctx (not b) b mv)))
 
 (defn lift
   "Lift a value from the inner monad of a monad transformer
