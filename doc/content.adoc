@@ -507,6 +507,101 @@ Let see an example:
 ;; => #<Nothing>
 ----
 
+=== Traversable
+
+The *Traversable* is a generic abstraction for data structures that can be traversed from
+left to right, running an Applicative action for each element. Traversables must also be
+Functors and Foldables.
+
+Note that, since Traversables use the Applicative's `pure` operation, the context of the
+applicative must be set when using the `traverse` function.
+
+Let's look at an example: we have a vector with numbers that we want to map to a Maybe value,
+and we want to aggregate the result in a Maybe. If any of the actions fails (is Nothing) the
+resulting aggregate will be Nothing, but if all succeed we preserve the vector's structure
+inside a Just value.
+
+First of all, we define the function that will transform a number to a Maybe. Our function will
+wrap the value in a Just if it's even and in a Nothing if it's not:
+
+[source, clojure]
+----
+(require '[cats.monad.maybe :as maybe])
+
+(defn just-if-even
+  [n]
+  (if (even? n)
+    (maybe/just n)
+    (maybe/nothing)))
+----
+
+Now that we have a function that maps a value to the Maybe Applicative, we can traverse a vector
+of numbers and aggregate a Maybe value. The applicatives will be evaluated from left to right using
+the applicative's `fapply`.
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.context :as ctx])
+
+(ctx/with-context maybe/context
+  (m/traverse just-if-even []))
+;; => #<Just []>
+
+(ctx/with-context maybe/context
+  (m/traverse just-if-even [2 4]))
+;; => #<Just [2 4]>
+
+(ctx/with-context maybe/context
+  (m/traverse just-if-even [1 2]))
+;; => #<Nothing >
+
+(ctx/with-context maybe/context
+  (m/traverse just-if-even [2 3]))
+;; => #<Nothing >
+----
+
+Maybe is not that much of an interesting applicative, let's see an example of using the Validation
+applicative to validate a vector of values aggregating the results, be them success or failure.
+
+First we will define a validation function that, given a number, will succed if it's even. If it's
+odd, it will fail and record the failure in the map monoid from value to the error type (`:not-even`).
+
+[source, clojure]
+----
+(require '[cats.applicative.validation :as v])
+
+(defn valid-if-even
+  [n]
+  (if (even? n)
+    (v/ok n)
+    (v/fail {n :not-even})))
+----
+
+Now let's try it with some vectors to see how failures are aggregated:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.context :as ctx])
+
+(ctx/with-context v/context
+  (m/traverse valid-if-even []))
+;; => #<Ok []>
+
+(ctx/with-context v/context
+  (m/traverse valid-if-even [2 4]))
+;; => #<Ok [2 4]>
+
+(ctx/with-context v/context
+  (m/traverse valid-if-even [1 2]))
+;; => #<Fail {1 :not-even}>
+
+(ctx/with-context v/context
+  (m/traverse valid-if-even [2 3 4 5]))
+;; => #<Fail {3 :not-even, 5 :not-even}>
+----
+
 
 === Monad
 

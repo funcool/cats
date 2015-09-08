@@ -1,6 +1,6 @@
 ;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
 ;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
-;; All rights reserved.
+;; All rights reserved
 ;;
 ;; Redistribution and use in source and binary forms, with or without
 ;; modification, are permitted provided that the following conditions
@@ -29,7 +29,7 @@
             [cats.monad.maybe :as maybe]
             [cats.protocols :as p]
             [cats.context :as ctx]
-            [cats.data :as d]))
+            [cats.core :as m]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -96,7 +96,18 @@
             (f x (p/-foldr ctx f z xs))))))
 
     (-foldl [ctx f z xs]
-      (reduce f z xs))))
+      (reduce f z xs))
+
+    p/Traversable
+    (-traverse [ctx f tv]
+      (let [as (p/-fmap ctx f tv)]
+        (p/-foldr ctx
+                  (fn [a acc]
+                    (m/alet [x a
+                             xs acc]
+                      (cons x xs)))
+                  (m/pure (lazy-seq []))
+                  as)))))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
@@ -179,7 +190,18 @@
         (reduce rf z (reverse xs))))
 
     (-foldl [ctx f z xs]
-      (reduce f z xs))))
+      (reduce f z xs))
+
+    p/Traversable
+    (-traverse [ctx f tv]
+      (let [as (p/-fmap ctx f tv)]
+        (p/-foldl ctx
+                  (fn [acc a]
+                    (m/alet [x a
+                             xs acc]
+                       (conj xs x)))
+                  (m/pure [])
+                  as)))))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
@@ -345,30 +367,3 @@
                 :cljs string)
   p/Context
   (-get-context [_] string-monoid))
-
-(defn pair-monoid
-  "A pair monoid type constructor."
-  [inner-monoid]
-  (reify
-    p/ContextClass
-    (-get-level [_]
-      (+ (p/-get-level inner-monoid)
-         ctx/+level-default+))
-
-    p/Semigroup
-    (-mappend [_ sv sv']
-      (d/pair
-       (p/-mappend inner-monoid (.-fst sv) (.-fst sv'))
-       (p/-mappend inner-monoid (.-snd sv) (.-snd sv'))))
-
-    p/Monoid
-    (-mempty [_]
-      (d/pair
-       (p/-mempty inner-monoid)
-       (p/-mempty inner-monoid)))))
-
-(extend-type cats.data.Pair
-  p/Context
-  (-get-context [data]
-    (let [first' (.-fst data)]
-      (pair-monoid (p/-get-context first')))))

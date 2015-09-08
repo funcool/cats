@@ -739,3 +739,10 @@
    (if (empty? xs)
      (return ctx z)
      (foldm f z xs))))
+
+(defn traverse
+  ([f tv]
+   (traverse (ctx/get-current) f tv))
+  ([ctx f tv]
+   (ctx/with-context ctx
+     (p/-traverse (p/-get-context tv) f tv))))

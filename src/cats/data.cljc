@@ -24,11 +24,15 @@
 ;; THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (ns cats.data
-  "Data structures that are used in various places of the library.")
+  "Data structures that are used in various places of the library."
+  (:require [cats.protocols :as p]
+            [cats.context :as ctx]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pair type constructor and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(declare context)
 
 (deftype Pair [fst snd]
   #?(:clj  clojure.lang.Seqable
@@ -65,7 +69,10 @@
 
   #?(:clj
       (toString [this]
-                (with-out-str (print [fst snd])))))
+                (with-out-str (print [fst snd]))))
+
+  p/Context
+  (-get-context [data] context))
 
 (alter-meta! #'->Pair assoc :private true)
 
@@ -76,3 +83,56 @@
 (defn pair?
   [v]
   (instance? Pair v))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Context definitions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def ^{:no-doc true}
+  context
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (pair
+        (p/-mappend (p/-get-context (.-fst sv)) (.-fst sv) (.-fst sv'))
+        (p/-mappend (p/-get-context (.-snd sv)) (.-snd sv) (.-snd sv'))))
+
+    p/Functor
+    (-fmap [_ f mv]
+      (pair (.-fst mv) (f (.-snd mv))))
+
+    p/Foldable
+    (-foldl [_ f z mv]
+      (f z (.-snd mv)))
+
+    (-foldr [_ f z mv]
+      (f (.-snd mv) z))
+
+    p/Traversable
+    (-traverse [_ f mv]
+      (let [a (f (.-snd mv))]
+        (p/-fmap (p/-get-context a) #(pair (.-fst mv) %) a)))))
+
+(defn pair-monoid
+  "A pair monoid type constructor."
+  [inner-monoid]
+  (reify
+    p/ContextClass
+    (-get-level [_]
+      (+ (p/-get-level inner-monoid)
+         ctx/+level-default+))
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (pair
+       (p/-mappend inner-monoid (.-fst sv) (.-fst sv'))
+       (p/-mappend inner-monoid (.-snd sv) (.-snd sv'))))
+
+    p/Monoid
+    (-mempty [_]
+      (pair
+       (p/-mempty inner-monoid)
+       (p/-mempty inner-monoid)))))

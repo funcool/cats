@@ -2,8 +2,6 @@
   (:require [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
-            [cats.context :as ctx]
-            [cats.data :as d]
 
             #?(:cljs [cats.context :as ctx :include-macros true]
                :clj  [cats.context :as ctx])
@@ -212,25 +210,32 @@
     (t/is (= "Hello World" (m/mappend "Hello " "World")))
     (t/is (= "abcdefghi" (m/mappend "abc" "def" "ghi")))))
 
-(t/deftest pair-monoid
-  (t/testing "mempty"
-    (ctx/with-context (b/pair-monoid b/string-monoid)
-      (t/is (= (d/pair "" "") (m/mempty))))
+(defn inc-if-even
+  [n]
+  (if (even? n)
+    (maybe/just (inc n))
+    (maybe/nothing)))
 
-    (ctx/with-context (b/pair-monoid b/sum-monoid)
-      (t/is (= (d/pair 0 0) (m/mempty)))))
+(t/deftest vector-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just [])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even []))))
+    (t/is (= (maybe/just [3 5])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even [2 4]))))
+    (t/is (= (maybe/nothing)
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even [1 2]))))))
 
-  (t/testing "mappend"
-    (t/is (= (d/pair "Hello buddy" "Hello mate")
-             (m/mappend
-              (d/pair "Hello " "Hello ")
-              (d/pair "buddy" "mate")))))
-
-  (t/testing "mappend with other-context"
-    (ctx/with-context (b/pair-monoid b/sum-monoid)
-      (t/is (= (d/pair 10 20)
-               (m/mappend
-                (d/pair 3 5)
-                (d/pair 3 5)
-                (d/pair 4 10))))))
-  )
+(t/deftest lazyseq-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just [])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (lazy-seq [])))))
+    #_(t/is (= (maybe/just [3 5])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (lazy-seq [2 4])))))
+    #_(t/is (= (maybe/nothing)
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (lazy-seq [1 2])))))))

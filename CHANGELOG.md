@@ -21,6 +21,9 @@ Date: Unreleased
 - Add **foldm** implementation to `cats.core` namespace.
 - Add a bunch of monoids: `all`, `any`, `sum`, `prod`, `pair` and `string`.
 - Fix Foldable implementation for clojure builtin collections.
+- Add a [Traversable](https://hackage.haskell.org/package/base-4.8.1.0/docs/Data-Traversable.html)
+  protocol and implementations for vector, sequence, pair, maybe, either and validation.
+- Add **traverse** function to `cats.core` namespace.
 
 
 ## Version 0.6.1 ##

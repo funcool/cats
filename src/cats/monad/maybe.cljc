@@ -225,7 +225,14 @@
     (-foldr [_ f z mv]
       (if (just? mv)
         (f (p/-extract mv) z)
-        z))))
+        z))
+
+    p/Traversable
+    (-traverse [_ f mv]
+      (if (just? mv)
+        (let [a (f (p/-extract mv))]
+          (p/-fmap (p/-get-context a) just a))
+        (p/-pure (ctx/get-current) mv)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad Transformer

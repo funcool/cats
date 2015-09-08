@@ -72,6 +72,13 @@
   (-foldl [fctx f z xs] "Left-associative fold of a structure.")
   (-foldr [fctx f z xs] "Right-associative fold of a structure."))
 
+(defprotocol Traversable
+  "Abstraction of data structures that can be traversed from left to right
+  performing an action on every element."
+  (-traverse [tctx f tv]
+    "Map each element to an Applicative, evaluate the applicatives from left
+     to right and collect the results."))
+
 (defprotocol Monad
   "The Monad abstraction."
   (-mreturn [m v])
