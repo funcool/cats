@@ -34,3 +34,8 @@
                 (d/pair 3 5)
                 (d/pair 3 5)
                 (d/pair 4 10)))))))
+
+(t/deftest pair-functor
+  (t/testing "It maps a function over the second value of the pair"
+    (= (d/pair 0 42)
+       (m/fmap inc (d/pair 0 41)))))

@@ -32,6 +32,8 @@
 ;; Pair type constructor and functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(declare context)
+
 (deftype Pair [fst snd]
   #?(:clj  clojure.lang.Seqable
      :cljs cljs.core/ISeqable)
@@ -67,7 +69,10 @@
 
   #?(:clj
       (toString [this]
-                (with-out-str (print [fst snd])))))
+                (with-out-str (print [fst snd]))))
+
+  p/Context
+  (-get-context [data] context))
 
 (alter-meta! #'->Pair assoc :private true)
 
@@ -78,6 +83,27 @@
 (defn pair?
   [v]
   (instance? Pair v))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Context definitions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def ^{:no-doc true}
+  context
+  (reify
+    p/ContextClass
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (pair
+        (p/-mappend (p/-get-context (.-fst sv)) (.-fst sv) (.-fst sv'))
+        (p/-mappend (p/-get-context (.-snd sv)) (.-snd sv) (.-snd sv'))))
+
+    p/Functor
+    (-fmap [_ f mv]
+      (pair (.-fst mv) (f (.-snd mv))))
+))
 
 (defn pair-monoid
   "A pair monoid type constructor."
@@ -99,9 +125,3 @@
       (pair
        (p/-mempty inner-monoid)
        (p/-mempty inner-monoid)))))
-
-(extend-type cats.data.Pair
-  p/Context
-  (-get-context [data]
-    (let [first' (.-fst data)]
-      (pair-monoid (p/-get-context first')))))
