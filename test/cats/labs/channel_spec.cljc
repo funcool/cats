@@ -180,7 +180,7 @@
              (done)))))))
 
 
-(def chaneither-m (either/either-transformer c/context))
+(def chaneither-m (either/either-t c/context))
 
 #?(:clj
    (t/deftest channel-transformer-tests

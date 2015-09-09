@@ -171,10 +171,6 @@
                   (p/-mreturn inner-context
                               (d/pair v (p/-mempty b/vector-context))))))))
 
-(def ^{:doc "Deprecated alias for `writer-t`."
-       :deprecated true}
-  writer-transformer writer-t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

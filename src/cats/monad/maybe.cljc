@@ -283,10 +283,6 @@
                 (fn [v]
                   (p/-mreturn inner (just v)))))))
 
-(def ^{:doc "Deprecated alias for `maybe-t`."
-       :deprecated true}
-  maybe-transformer maybe-t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

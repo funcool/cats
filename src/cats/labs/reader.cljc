@@ -149,10 +149,6 @@
       (fn [env]
         (mr (f env))))))
 
-(def ^{:doc "Deprecated alias for `reader-t`."
-       :deprecated true}
-  reader-transformer reader-t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

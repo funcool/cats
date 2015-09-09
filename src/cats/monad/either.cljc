@@ -219,10 +219,6 @@
                 (fn [v]
                   (p/-mreturn inner-monad (right v)))))))
 
-(def ^{:doc "Deprecated alias for `either-t`."
-       :deprecated true}
-  either-transformer either-t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

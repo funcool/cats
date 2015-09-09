@@ -184,10 +184,6 @@
                              (p/-mreturn inner-monad
                                          (d/pair v s)))))))))
 
-(def ^{:doc "Deprecated alias for `state-t`."
-       :deprecated true}
-  state-transformer state-t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Public Api
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
