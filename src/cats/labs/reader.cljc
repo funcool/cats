@@ -47,7 +47,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Reader [mfn]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   #?@(:cljs [cljs.core/IFn
@@ -83,7 +83,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Functor
@@ -117,7 +117,7 @@
   "The Reader transformer constructor."
   [inner-monad]
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-transformer+)
 
     p/Functor
@@ -148,10 +148,6 @@
     (-local [_ f mr]
       (fn [env]
         (mr (f env))))))
-
-(def ^{:doc "Deprecated alias for `reader-t`."
-       :deprecated true}
-  reader-transformer reader-t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions

@@ -42,8 +42,8 @@
      "Set current context to specific monad."
      [ctx & body]
      `(do
-        (when (not (satisfies? p/ContextClass ~ctx))
-          (throw-ilegal-argument "The provided context does not implements ContextClass."))
+        (when (not (satisfies? p/Context ~ctx))
+          (throw-ilegal-argument "The provided context does not implements Context."))
         (if (nil? *context*)
           (binding [*context* ~ctx]
             ~@body)
@@ -77,10 +77,10 @@
      (not-nil? *context*)
      *context*
 
-     (satisfies? p/Context param)
+     (satisfies? p/Contextual param)
      (p/-get-context param)
 
-     (satisfies? p/ContextClass param)
+     (satisfies? p/Context param)
      param
 
      :else

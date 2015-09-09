@@ -37,7 +37,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Ok [v]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   p/Extract
@@ -66,7 +66,7 @@
            false))]))
 
 (deftype Fail [v]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   p/Extract
@@ -124,7 +124,7 @@
   "Return true in case of `v` is instance
   of the Validation applicative."
   [v]
-  (if (satisfies? p/Context v)
+  (if (satisfies? p/Contextual v)
     (identical? (p/-get-context v) context)
     false))
 
@@ -135,7 +135,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup

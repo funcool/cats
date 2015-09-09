@@ -144,7 +144,7 @@
                (monad+ (maybe/just 1) (maybe/nothing)))))
 
     (t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-context)]
+      (let [maybe-sequence-monad (maybe/maybe-t b/sequence-context)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
                   (maybe/just 3) (maybe/just 4)
                   (maybe/just 5) (maybe/just 6)]
@@ -172,7 +172,7 @@
                ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
 
   (t/testing "It can lift a function to a Monad Transformer"
-    (let [maybe-sequence-monad (maybe/maybe-transformer b/sequence-context)
+    (let [maybe-sequence-monad (maybe/maybe-t b/sequence-context)
           monad+ (m/lift-m 2 add2)]
       (t/is (= [(maybe/just 1) (maybe/just 2)
                 (maybe/just 3) (maybe/just 4)

@@ -71,7 +71,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Functor
@@ -137,6 +137,6 @@
 
 (extend-type #?(:clj  clojure.core.async.impl.channels.ManyToManyChannel
                 :cljs cljs.core.async.impl.channels.ManyToManyChannel)
-  p/Context
+  p/Contextual
   (-get-context [_] context))
 
