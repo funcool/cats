@@ -160,7 +160,7 @@
   ([b mv]
    (when (not b) mv))
   ([ctx b mv]
-   (when ctx (not b) b mv)))
+   (when ctx (not b) mv)))
 
 (defn lift
   "Lift a value from the inner monad of a monad transformer
