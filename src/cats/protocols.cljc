@@ -29,17 +29,17 @@
   NOTE: Functions of this namespace are not intended to be used directly.
   It is considered internal api.")
 
-(defprotocol ContextClass
+(defprotocol Context
   "A marker protocol for identifying the valid context types."
   (-get-level [_] "Get a context priority level."))
 
-(defprotocol Context
+(defprotocol Contextual
   "Abstraction that establishes a concrete type as a member of a context.
 
   A great example es Maybe monad type Just. It implements
   this abstraction for establish that Just is part of
   Maybe monad."
-  (-get-context [_] "Get the monad instance for curent value."))
+  (-get-context [_] "Get the context associated with the type."))
 
 (defprotocol Semigroup
   "A structure with an associative binary operation."

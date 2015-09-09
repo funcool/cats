@@ -71,7 +71,7 @@
       (toString [this]
                 (with-out-str (print [fst snd]))))
 
-  p/Context
+  p/Contextual
   (-get-context [data] context))
 
 (alter-meta! #'->Pair assoc :private true)
@@ -91,7 +91,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -120,7 +120,7 @@
   "A pair monoid type constructor."
   [inner-monoid]
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_]
       (+ (p/-get-level inner-monoid)
          ctx/+level-default+))

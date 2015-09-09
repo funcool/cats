@@ -37,7 +37,7 @@
 (def ^{:no-doc true}
   deferred-context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Functor
@@ -70,13 +70,13 @@
                       (f v)))))))
 
 (extend-type manifold.deferred.Deferred
-  p/Context
+  p/Contextual
   (-get-context [_] deferred-context))
 
 (extend-type manifold.deferred.SuccessDeferred
-  p/Context
+  p/Contextual
   (-get-context [_] deferred-context))
 
 (extend-type manifold.deferred.ErrorDeferred
-  p/Context
+  p/Contextual
   (-get-context [_] deferred-context))

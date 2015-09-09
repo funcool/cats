@@ -37,7 +37,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Continuation [mfn]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   #?(:clj  clojure.lang.IFn
@@ -58,7 +58,7 @@
 
 (def context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Monad

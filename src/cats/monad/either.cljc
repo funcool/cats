@@ -47,7 +47,7 @@
 (declare context)
 
 (deftype Right [v]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   p/Extract
@@ -76,7 +76,7 @@
            false))]))
 
 (deftype Left [v]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   p/Extract
@@ -133,7 +133,7 @@
   "Return true in case of `v` is instance
   of Either monad."
   [v]
-  (if (satisfies? p/Context v)
+  (if (satisfies? p/Contextual v)
     (identical? (p/-get-context v) context)
     false))
 
@@ -144,7 +144,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Functor
@@ -197,7 +197,7 @@
   "The Either transformer constructor."
   [inner-monad]
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-transformer+)
 
     p/Monad

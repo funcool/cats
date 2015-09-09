@@ -58,7 +58,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype Writer [mfn]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   #?@(:cljs [cljs.core/IFn
@@ -94,7 +94,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Monad
@@ -125,7 +125,7 @@
   "The Writer transformer constructor."
   [inner-context]
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-transformer+)
 
     p/Monad

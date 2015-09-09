@@ -36,7 +36,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (extend-type nil
-  p/Context
+  p/Contextual
   (-get-context [_] maybe/context)
 
   p/Extract
@@ -48,7 +48,7 @@
 
 (def sequence-context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -111,7 +111,7 @@
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
-  p/Context
+  p/Contextual
   (-get-context [_] sequence-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -120,7 +120,7 @@
 
 (def range-context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Foldable
@@ -136,7 +136,7 @@
 
 (extend-type #?(:clj  clojure.lang.LongRange
                 :cljs cljs.core.Range)
-  p/Context
+  p/Contextual
   (-get-context [_] range-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -145,7 +145,7 @@
 
 (def vector-context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -205,7 +205,7 @@
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
-  p/Context
+  p/Contextual
   (-get-context [_] vector-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -214,7 +214,7 @@
 
 (def set-context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -255,7 +255,7 @@
 
 (extend-type #?(:clj clojure.lang.PersistentHashSet
                 :cljs cljs.core.PersistentHashSet)
-  p/Context
+  p/Contextual
   (-get-context [_] set-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -264,7 +264,7 @@
 
 (def map-monoid
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -277,30 +277,30 @@
 
 (extend-type #?(:clj clojure.lang.PersistentHashMap
                 :cljs cljs.core.PersistentHashMap)
-  p/Context
+  p/Contextual
   (-get-context [_] map-monoid))
 
 #?(:clj
    (extend-type clojure.lang.PersistentArrayMap
-     p/Context
+     p/Contextual
      (-get-context [_] map-monoid))
    :cljs
    (extend-type cljs.core.PersistentArrayMap
-     p/Context
+     p/Contextual
      (-get-context [_] map-monoid)))
 
 #?(:clj
    (extend-type clojure.lang.PersistentTreeMap
-     p/Context
+     p/Contextual
      (-get-context [_] map-monoid))
    :cljs
    (extend-type cljs.core.PersistentTreeMap
-     p/Context
+     p/Contextual
      (-get-context [_] map-monoid)))
 
 (def any-monoid
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -313,7 +313,7 @@
 
 (def all-monoid
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -326,7 +326,7 @@
 
 (def sum-monoid
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -339,7 +339,7 @@
 
 (def prod-monoid
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -352,7 +352,7 @@
 
 (def string-monoid
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
@@ -365,5 +365,5 @@
 
 (extend-type #?(:clj java.lang.String
                 :cljs string)
-  p/Context
+  p/Contextual
   (-get-context [_] string-monoid))

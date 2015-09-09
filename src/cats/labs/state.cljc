@@ -50,7 +50,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (deftype State [mfn]
-  p/Context
+  p/Contextual
   (-get-context [_] context)
 
   #?@(:cljs [cljs.core/IFn
@@ -86,7 +86,7 @@
 (def ^{:no-doc true}
   context
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Functor
@@ -124,7 +124,7 @@
   "The State transformer constructor."
   [inner-monad]
   (reify
-    p/ContextClass
+    p/Context
     (-get-level [_] ctx/+level-transformer+)
 
     p/Functor
