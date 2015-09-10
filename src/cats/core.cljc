@@ -740,8 +740,21 @@
      (foldm f z xs))))
 
 (defn traverse
+  "Map each element of a structure to an action, evaluate these
+  actions from left to right, and collect the results.
+
+      (defn inc-if-even
+        [n]
+        (if (even? n)
+          (maybe/just (inc n))
+          (maybe/nothing)))
+
+      (ctx/with-context maybe/context
+        (m/traverse inc-if-even [2 4]))
+      ;; => #<Just [3 4]>
+  "
   ([f tv]
-   (traverse (ctx/get-current) f tv))
+   (p/-traverse (p/-get-context tv) f tv))
   ([ctx f tv]
    (ctx/with-context ctx
      (p/-traverse (p/-get-context tv) f tv))))
