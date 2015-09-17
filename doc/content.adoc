@@ -2,7 +2,10 @@
 Andrey Antukh & Alejandro Gómez
 1.0.0
 :toc: left
-:numbered:
+:!numbered:
+:idseparator: -
+:idprefix:
+:sectlinks:
 :source-highlighter: pygments
 :pygments-style: friendly
 
