@@ -4,6 +4,7 @@ lein: lein2
 script:
   - ./.travis/test-cljs.sh
   - ./.travis/test-clj.sh
+
 jdk:
   - openjdk7
   - oraclejdk7
