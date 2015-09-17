@@ -61,7 +61,7 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[funcool/cats "0.6.1"]
+[funcool/cats "1.0.0"]
 ----
 
 
