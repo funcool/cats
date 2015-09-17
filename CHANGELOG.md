@@ -2,12 +2,15 @@
 
 ## Version 1.0.0 ##
 
-Date: Unreleased
+Date: 2015-09-17
 
-- The context is fully decoupled from monad.
-- The protocols methods are all renamed to `-name` for consistency with cljs style to
-  name internal functions.
-- Revisit monad-transformers abstraction removing useless protocol methods.
+### Bug fixes
+
+- The context doesn't need to be a monad anymore.
+- Fix Foldable implementation for clojure builtin collections.
+
+### New features
+
 - Add additional arity to `cats.core/mempty` function, that allows provide a context
   instead of resolving it.
 - Sorted map is now also implements monoid.
@@ -15,15 +18,23 @@ Date: Unreleased
   **state** and **continuation** monads.
 - Add core.async channel monad/applicative under `cats.labs.channel` namespace.
 - Add manifold deferred monad/applicative under `cats.labs.manifold` namespace.
-- Add **applicative-do* (with `alet` macro) syntax. You can read more about that in
+- Add **applicative-do** (with `alet` macro) syntax. You can read more about that in
   [haskell wiki](https://ghc.haskell.org/trac/ghc/wiki/ApplicativeDo) and
   [pull request](https://github.com/funcool/cats/pull/63).
 - Add **foldm** implementation to `cats.core` namespace.
 - Add a bunch of monoids: `all`, `any`, `sum`, `prod`, `pair` and `string`.
-- Fix Foldable implementation for clojure builtin collections.
 - Add a [Traversable](https://hackage.haskell.org/package/base-4.8.1.0/docs/Data-Traversable.html)
   protocol and implementations for vector, sequence, pair, maybe, either and validation.
 - Add **traverse** function to `cats.core` namespace.
+
+### Backwards incompatible changes
+
+- Revisit monad-transformers abstraction removing useless protocol methods: `base` and `inner`
+  are no longer part of the `MonadTrans` protocol.
+- The protocols methods are all renamed to `-name` for consistency with cljs style to
+  name internal functions.
+- The `Context` protocol has been renamed to `Contextual`, and `Context` is now a protocol
+  used to mark context instances and resolve their priority.
 
 
 ## Version 0.6.1 ##
