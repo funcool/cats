@@ -1,6 +1,6 @@
 = Cats Documentation
 Andrey Antukh & Alejandro Gómez
-0.6.1
+1.0.0
 :toc: left
 :numbered:
 :source-highlighter: pygments
