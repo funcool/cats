@@ -1,4 +1,4 @@
-(defproject funcool/cats "1.0.0-SNAPSHOT"
+(defproject funcool/cats "1.0.0"
   :description "Category Theory abstractions for Clojure"
   :url "https://github.com/funcool/cats"
   :license {:name "BSD (2 Clause)"
