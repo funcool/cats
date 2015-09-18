@@ -182,7 +182,7 @@ of the same type as its second argument.
 
 Let's see an example of applying fmap over a Clojure vector:
 
-.Example using fmav over *vector*.
+.Example using fmap over *vector*.
 [source, clojure]
 ----
 (require '[cats.builtin])
