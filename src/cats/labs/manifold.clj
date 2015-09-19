@@ -28,46 +28,64 @@
             [manifold.stream :as s]
             [cats.context :as ctx]
             [cats.core :as m]
-            [cats.protocols :as p]))
+            [cats.protocols :as p]
+            [cats.monad.either :as either]))
 
+(defn ^:private with-timeout
+  [timeout d]
+  (when timeout
+    (d/timeout! d timeout))
+  d)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def ^{:no-doc true}
-  deferred-context
+(defn timeout-deferred-context
+  [timeout]
   (reify
     p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Functor
     (-fmap [_ f mv]
-      (d/chain mv f))
+      (with-timeout
+        timeout
+        (d/chain mv f)))
 
     p/Applicative
     (-pure [_ v]
       (d/success-deferred v))
 
     (-fapply [mn af av]
-      (d/chain (d/zip' af av)
-               (fn [[afv avv]]
-                 (afv avv))))
+      (with-timeout
+        timeout
+        (d/chain (d/zip' af av)
+                 (fn [[afv avv]]
+                   (afv avv)))))
 
     p/Semigroup
     (-mappend [ctx mv mv']
-      (d/chain (d/zip' mv mv')
-               (fn [[mvv mvv']]
-                 (let [ctx (p/-get-context mvv)]
-                   (p/-mappend ctx mvv mvv')))))
+      (with-timeout
+        timeout
+        (d/chain (d/zip' mv mv')
+                 (fn [[mvv mvv']]
+                   (let [ctx (p/-get-context mvv)]
+                     (p/-mappend ctx mvv mvv'))))))
 
     p/Monad
     (-mreturn [_ v]
       (d/success-deferred v))
 
     (-mbind [it mv f]
-      (d/chain mv (fn [v]
-                    (ctx/with-context it
-                      (f v)))))))
+      (with-timeout
+        timeout
+        (d/chain mv (fn [v]
+                      (ctx/with-context it
+                        (f v))))))))
+
+(def ^{:no-doc true}
+  deferred-context
+  (timeout-deferred-context nil))
 
 (extend-type manifold.deferred.Deferred
   p/Contextual
