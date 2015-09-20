@@ -101,5 +101,11 @@
           v (ctx/with-context tctx
               (m/mlet [x (d/future (Thread/sleep 30) :foo)]
                 (m/return x)))]
-      (t/is (thrown? java.util.concurrent.TimeoutException @v)))))
+      (t/is (thrown? java.util.concurrent.TimeoutException @v))))
 
+  (t/testing "Times out with value"
+    (let [tctx (mf/deferred-context* 20 (either/left :foo))
+          v (ctx/with-context tctx
+              (m/mlet [x (d/future (Thread/sleep 30) :foo)]
+                (m/return x)))]
+      (t/is (= (either/left :foo) @v)))))
