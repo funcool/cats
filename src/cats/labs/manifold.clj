@@ -31,16 +31,17 @@
             [cats.protocols :as p]
             [cats.monad.either :as either]))
 
-(defn ^:private with-timeout
+(defn- with-timeout
   [timeout d]
   (when timeout
     (d/timeout! d timeout))
   d)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn timeout-deferred-context
+(defn deferred-context*
   [timeout]
   (reify
     p/Context
@@ -48,8 +49,7 @@
 
     p/Functor
     (-fmap [_ f mv]
-      (with-timeout
-        timeout
+      (with-timeout timeout
         (d/chain mv f)))
 
     p/Applicative
@@ -57,16 +57,14 @@
       (d/success-deferred v))
 
     (-fapply [mn af av]
-      (with-timeout
-        timeout
+      (with-timeout timeout
         (d/chain (d/zip' af av)
                  (fn [[afv avv]]
                    (afv avv)))))
 
     p/Semigroup
     (-mappend [ctx mv mv']
-      (with-timeout
-        timeout
+      (with-timeout timeout
         (d/chain (d/zip' mv mv')
                  (fn [[mvv mvv']]
                    (let [ctx (p/-get-context mvv)]
@@ -77,15 +75,13 @@
       (d/success-deferred v))
 
     (-mbind [it mv f]
-      (with-timeout
-        timeout
+      (with-timeout timeout
         (d/chain mv (fn [v]
                       (ctx/with-context it
                         (f v))))))))
 
-(def ^{:no-doc true}
-  deferred-context
-  (timeout-deferred-context nil))
+(def ^{:doc "A default context for manifold deferred."}
+  deferred-context (deferred-context* nil))
 
 (extend-type manifold.deferred.Deferred
   p/Contextual
