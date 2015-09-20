@@ -87,3 +87,19 @@
 
       (t/is (= (either/right 3) @r1))
       (t/is (= (either/left :foo) @r2)))))
+
+(t/deftest timeout-tests
+  (t/testing "Doesn't timeout"
+    (let [tctx (mf/deferred-context* 20)
+          v (ctx/with-context tctx
+              (m/mlet [x (d/future (Thread/sleep 10) :foo)]
+                (m/return x)))]
+      (t/is (= :foo @v))))
+
+  (t/testing "Times out"
+    (let [tctx (mf/deferred-context* 20)
+          v (ctx/with-context tctx
+              (m/mlet [x (d/future (Thread/sleep 30) :foo)]
+                (m/return x)))]
+      (t/is (thrown? java.util.concurrent.TimeoutException @v)))))
+
