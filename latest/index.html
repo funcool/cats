@@ -233,7 +233,7 @@ Haskell like sugar syntax (instead of Clojure like syntax) and does not have sup
 <h2 id="project-maturity"><a class="link" href="#project-maturity">Project Maturity</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Since <em>cats</em> is a young project, there can be some <a href="api/index.html#id">API</a> breakage.</p>
+<p><em>cats</em> already reached the 1.0.0 version and the <a href="api/index.html#id">API</a> is settled.</p>
 </div>
 </div>
 </div>
@@ -390,7 +390,7 @@ of the same type as its second argument.</p>
 <p>Let&#8217;s see an example of applying fmap over a Clojure vector:</p>
 </div>
 <div class="listingblock">
-<div class="title">Example using fmav over <strong>vector</strong>.</div>
+<div class="title">Example using fmap over <strong>vector</strong>.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
 
@@ -970,14 +970,14 @@ return a reified MonadTrans:</p>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">transformers.example</span>
   <span class="tok-p">(</span><span class="tok-ss">:require</span> <span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.data</span> <span class="tok-ss">:as</span> <span class="tok-nv">data</span><span class="tok-p">]</span>
+            <span class="tok-p">[</span><span class="tok-nv">cats.context</span> <span class="tok-ss">:as</span> <span class="tok-nv">ctx</span><span class="tok-p">]</span>
             <span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">]</span>
             <span class="tok-p">[</span><span class="tok-nv">cats.labs.state</span> <span class="tok-ss">:as</span> <span class="tok-nv">state</span><span class="tok-p">]))</span>
 
 <span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">maybe-state</span>
-  <span class="tok-p">(</span><span class="tok-nf">state/state-transformer</span> <span class="tok-nv">maybe/maybe-monad</span><span class="tok-p">))</span>
+  <span class="tok-p">(</span><span class="tok-nf">state/state-transformer</span> <span class="tok-nv">maybe/context</span><span class="tok-p">))</span>
 
-<span class="tok-p">(</span><span class="tok-nf">m/with-monad</span> <span class="tok-nv">maybe-state</span>
+<span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">maybe-state</span>
   <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-mi">42</span><span class="tok-p">)</span> <span class="tok-p">{}))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just #&lt;Pair [42 {}]&gt;&gt;</span></code></pre>
 </div>
@@ -987,7 +987,7 @@ return a reified MonadTrans:</p>
 function that yields a Maybe containing a pair (value, next state).</p>
 </div>
 <div class="paragraph">
-<p>You probably noticed that we had to wrap the state function invocation with <code>cats.core/with-monad</code>.
+<p>You probably noticed that we had to wrap the state function invocation with <code>cats.context/with-context</code>.
 When working with monad transformers, we have to be explicit about what monad we are using to implement
 the binding policy since there is no way to distinguish values from a transformer type from those of
 a regular monad.</p>
@@ -2402,7 +2402,7 @@ them correctly, you can use <code>define-clojure-indent</code> like in the follo
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-17 17:31:44 EEST
+Last updated 2015-09-26 13:23:53 CEST
 </div>
 </div>
 </body>
