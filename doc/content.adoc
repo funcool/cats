@@ -46,7 +46,7 @@ All listed alternatives are licensed with EPL or similar licenses.
 
 == Project Maturity
 
-Since _cats_ is a young project, there can be some link:api/index.html#id[API] breakage.
+_cats_ already reached the 1.0.0 version and the link:api/index.html#id[API] is settled.
 
 
 == Install
@@ -699,14 +699,14 @@ return a reified MonadTrans:
 ----
 (ns transformers.example
   (:require [cats.core :as m]
-            [cats.data :as data]
+            [cats.context :as ctx]
             [cats.monad.maybe :as maybe]
             [cats.labs.state :as state]))
 
 (def maybe-state
-  (state/state-transformer maybe/maybe-monad))
+  (state/state-transformer maybe/context))
 
-(m/with-monad maybe-state
+(ctx/with-context maybe-state
   (state/run-state (m/return 42) {}))
 ;; => #<Just #<Pair [42 {}]>>
 ----
@@ -714,7 +714,7 @@ return a reified MonadTrans:
 As we can see in the example below, the return of the `maybe-state` monad creates a stateful
 function that yields a Maybe containing a pair (value, next state).
 
-You probably noticed that we had to wrap the state function invocation with `cats.core/with-monad`.
+You probably noticed that we had to wrap the state function invocation with `cats.context/with-context`.
 When working with monad transformers, we have to be explicit about what monad we are using to implement
 the binding policy since there is no way to distinguish values from a transformer type from those of
 a regular monad.
