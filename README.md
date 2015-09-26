@@ -13,10 +13,9 @@ And there are my cats, engaged in a ritual that goes back thousands of years, tr
 
 [![Clojars Project](http://clojars.org/funcool/cats/latest-version.svg)](http://clojars.org/funcool/cats)
 
-Category Theory abstractions for Clojure.
+Category Theory and algebraic abstractions for Clojure.
 
 Stable:
 
 - **Documentation:** http://funcool.github.io/cats/latest/
 - **API reference:** http://funcool.github.io/cats/latest/api/
-
