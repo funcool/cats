@@ -124,6 +124,36 @@
                       (m/>>= #{(inc x)}
                              (fn [y] #{(inc y)}))))))))
 
+(t/deftest function-monad
+  (t/testing "Forms a semigroup"
+    (t/is (= 12
+             ((m/mappend (partial * 2) inc) 5))))
+
+  (t/testing "Forms a monoid"
+    (t/is (= 6
+             (ctx/with-context b/function-context
+               ((m/mappend inc (m/mempty)) 5)))))
+
+  (t/testing "Is a functor"
+    (t/is (= "5"
+             ((m/fmap str inc) 4))))
+
+  (t/testing "The first monad law: left identity"
+    (t/is (= 5 (ctx/with-context b/set-context
+                 ((m/>>= (m/return 1) (fn [x] (partial + x))) 4)))))
+
+  (t/testing "The second monad law: right identity"
+      (t/is (= 5 ((m/>>= inc m/return) 4))))
+
+  (t/testing "The third monad law: associativity"
+    (t/is (= ((m/>>= (m/mlet [x inc
+                              y (partial * x)]
+                             (m/return y))
+                     (fn [y] (partial + y))) 5)
+             ((m/>>= inc
+                      (fn [x]
+                        (m/>>= (partial * x)
+                               (fn [y] (partial + y))))) 5)))))
 
 (t/deftest vector-foldable
   (t/testing "Foldl"

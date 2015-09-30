@@ -259,6 +259,44 @@
   (-get-context [_] set-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Function Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def function-context
+  (reify
+    p/Context
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [ctx f g] (comp f g))
+
+    p/Monoid
+    (-mempty [_] identity)
+
+    p/Functor
+    (-fmap [_ f self]
+      (comp f self))
+
+    p/Applicative
+    (-pure [_ v]
+      (constantly v))
+
+    (-fapply [_ self av]
+      (fn [x] (self x (av x))))
+
+    p/Monad
+    (-mreturn [_ v]
+      (constantly v))
+
+    (-mbind [_ self f]
+      (fn [r] ((f (self r)) r)))))
+
+(extend-type #?(:clj clojure.lang.IFn
+                :cljs cljs.core.IFn)
+  p/Contextual
+  (-get-context [_] function-context))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monoids
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
