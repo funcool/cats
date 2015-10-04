@@ -595,7 +595,7 @@ plus the cats maybe, either and validation types. Let see an example how it beha
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/foldl</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">%1</span> <span class="tok-nv">%2</span><span class="tok-p">))</span> <span class="tok-mi">1</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Just 1&gt;</span>
+<span class="tok-c1">;; =&gt; #&lt;Just 2&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/foldl</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">%1</span> <span class="tok-nv">%2</span><span class="tok-p">))</span> <span class="tok-mi">1</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; 1</span></code></pre>
@@ -2402,7 +2402,7 @@ them correctly, you can use <code>define-clojure-indent</code> like in the follo
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-09-26 13:23:53 CEST
+Last updated 2015-10-04 09:24:04 EEST
 </div>
 </div>
 </body>
