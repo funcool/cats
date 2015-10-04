@@ -357,7 +357,7 @@ plus the cats maybe, either and validation types. Let see an example how it beha
 [source, clojure]
 ----
 (m/foldl #(m/return (+ %1 %2)) 1 (maybe/just 1))
-;; => #<Just 1>
+;; => #<Just 2>
 
 (m/foldl #(m/return (+ %1 %2)) 1 (maybe/nothing))
 ;; => 1
