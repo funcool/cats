@@ -538,7 +538,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn sequence
-  "Given a non-empty collection of monadic values, collect
+  "Given a collection of monadic values, collect
   their values in a seq returned in the monadic context.
 
       (require '[cats.context :as ctx]
