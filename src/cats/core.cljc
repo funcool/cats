@@ -539,32 +539,42 @@
 
 (defn sequence
   "Given a non-empty collection of monadic values, collect
-  their values in a vector returned in the monadic context.
+  their values in a seq returned in the monadic context.
 
-      (sequence [(maybe/just 2) (maybe/just 3)])
-      ;; => <Just [[2, 3]]>
+      (require '[cats.context :as ctx]
+               '[cats.monad.maybe :as maybe]
+               '[cats.core :as m])
 
-      (sequence [(maybe/nothing) (maybe/just 3)])
-      ;; => <Nothing>
+      (m/sequence [(maybe/just 2) (maybe/just 3)])
+      ;; => #<Just [[2, 3]]>
+
+      (m/sequence [(maybe/nothing) (maybe/just 3)])
+      ;; => #<Nothing>
+
+      (ctx/with-context maybe/context
+        (m/sequence []))
+      ;; => #<Just [()]>
   "
   [mvs]
-  {:pre [(not-empty mvs)]}
-  (let [ctx (ctx/get-current (first mvs))]
-    (ctx/with-context ctx
-      (reduce (fn [mvs mv]
-                (mlet [v mv
-                       vs mvs]
-                  (return (cons v vs))))
-              (return '())
-              (reverse mvs)))))
+  (if (empty? mvs)
+    (return (ctx/get-current) ())
+    (let [ctx (ctx/get-current (first mvs))]
+      (ctx/with-context ctx
+        (reduce (fn [mvs mv]
+                  (mlet [v mv
+                         vs mvs]
+                    (return (cons v vs))))
+                (return ())
+                (reverse mvs))))))
 
 (defn mapseq
   "Given a function `mf` that takes a value and puts it into a
   monadic context, and a collection, map `mf` over the collection,
   calling `sequence` on the results.
 
-      (require '[cats.monad.maybe :as maybe])
-      (require '[cats.core :as m])
+      (require '[cats.context :as ctx]
+               '[cats.monad.maybe :as maybe]
+               '[cats.core :as m])
 
       (m/mapseq maybe/just [2 3])
       ;=> <Just [[2 3]]>
@@ -574,7 +584,11 @@
                     (maybe/just v)
                     (maybe/nothing)))
                 [1 2])
-      ;=> <Nothing>
+      ;; => #<Nothing>
+
+      (ctx/with-context maybe/context
+        (mapseq #(maybe/just (* % 2)) []))
+      ;; => #<Just [()]>
   "
   [mf coll]
   (sequence (map mf coll)))
