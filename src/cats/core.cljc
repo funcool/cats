@@ -557,7 +557,7 @@
   "
   [mvs]
   (if (empty? mvs)
-    (return (ctx/get-current) ())
+    (return ())
     (let [ctx (ctx/get-current (first mvs))]
       (ctx/with-context ctx
         (reduce (fn [mvs mv]
