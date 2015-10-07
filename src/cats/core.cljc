@@ -728,7 +728,7 @@
   "
   ([f z xs]
    (if (empty? xs)
-     (return (ctx/get-current) z)
+     (return z)
      (let [[h & t] xs]
        (mlet [z' (f z h)]
          (if (empty? t)
