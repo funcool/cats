@@ -118,19 +118,29 @@
              (m/sequence [(maybe/just 2) (maybe/just 3)])))
 
     (t/is (= (maybe/nothing)
-             (m/sequence [(maybe/just 2) (maybe/nothing)])))))
+             (m/sequence [(maybe/just 2) (maybe/nothing)]))))
 
+  (t/testing "It works with an empty collection"
+    (t/is (= (maybe/just ())
+             (ctx/with-context maybe/context
+               (m/sequence ()))))))
 
 (t/deftest mapseq-tests
   (t/testing "It works with Maybe values"
-    (t/is (= (m/mapseq maybe/just [1 2 3 4 5])
-             (maybe/just [1 2 3 4 5])))
+    (t/is (= (maybe/just [1 2 3 4 5])
+             (m/mapseq maybe/just [1 2 3 4 5])))
     (t/is (= (maybe/nothing)
              (m/mapseq (fn [v]
                          (if (odd? v)
                            (maybe/just v)
                            (maybe/nothing)))
-                       [1 2 3 4 5])))))
+                       [1 2 3 4 5]))))
+
+  (t/testing "It works with an empty collection"
+    (t/is (= (maybe/just ())
+             (ctx/with-context maybe/context
+               (m/mapseq maybe/just []))))))
+
 (t/deftest lift-m-tests
   (let [monad+ (m/lift-m 2 +)]
     (t/testing "It can lift a function to the vector monad"
