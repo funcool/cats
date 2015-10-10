@@ -21,19 +21,6 @@
   (let [c1 (crdt/dec (pncnt/pncounter 1))]
     (t/is (= -1 @c1))))
 
-;; (t/deftest dump-loads-test
-;;   (let [c1 (-> (pncnt/pncounter 1)
-;;                (crdt/inc)
-;;                (crdt/inc)
-;;                (crdt/dec))
-;;         l1 (crdt/dump c1)]
-;;     (t/is (= @c1 1))
-;;     (t/is (= l1 {:type :pncounter
-;;                  :p {:type :gcounter :e {1 2}}
-;;                  :n {:type :gcounter :e {1 1}}}))
-;;     (let [c2 (pncnt/pncounter l1 2)]
-;;       (t/is (= c2 c1)))))
-
 (def c1 (-> (pncnt/pncounter 1)
             (crdt/inc)
             (crdt/inc)
@@ -73,5 +60,8 @@
     (t/is (= r1 r2))
     (t/is (= @r1 @r2))))
 
-
-
+(t/deftest serializability-test
+  (let [c1 (crdt/inc (pncnt/pncounter 1))
+        r1 (crdt/encode c1)]
+    (t/is (= r1 "{:type :cats.labs.crdt/pncounter, :p {:type :cats.labs.crdt/gcounter, :e {1 1}}, :n {:type :cats.labs.crdt/gcounter, :e {}}}"))
+    (t/is (= c1 (crdt/decode r1)))))

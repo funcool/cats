@@ -7,10 +7,7 @@
   (like a vector clock merge). The value of the counter is the sum of all
   actor counts."
   (:require [cats.labs.crdt.protocols :as p]
-            [cats.labs.crdt.util :as u]
             [cats.protocols :as mp]))
-
-(def ^:static +node+ (u/hostname))
 
 (deftype GCounter [e node]
   #?@(:clj [Object
@@ -54,11 +51,11 @@
 (defn gcounter*
   [data node]
   {:pre [(map? data) (:e data)]}
-  (GCounter. (select-keys data [:e]) node))
+  (GCounter. (:e data) node))
 
 (defn gcounter
   "A G-Counter data type constructor."
   ([]
-   (GCounter. {} +node+))
+   (GCounter. {} p/*node*))
   ([node]
    (GCounter. {} node)))
