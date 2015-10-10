@@ -102,3 +102,9 @@
 (defprotocol MonadTrans
   "A monad transformer abstraction."
   (-lift [m mv] "Lift a value from the parameterized monad to the transformer."))
+
+;; More info: http://en.wikipedia.org/wiki/Semilattice
+
+(defprotocol JoinSemiLattice
+  "A algebraic structure with element joins."
+  (-join [_ other] "Converge two data structures."))
