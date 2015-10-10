@@ -59,6 +59,36 @@
                     (fn [x] (m/>>= [(inc x)]
                                    (fn [y] [(inc y)]))))))))
 
+(t/deftest array-map-monad
+  (t/testing "Forms a semigroup"
+    (t/is (= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
+             (m/mappend (array-map :a 1 :b 2 :c 3) (array-map :d 4 :e 5)))))
+
+  (t/testing "Forms a monoid"
+    (t/is (= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
+             (ctx/with-context b/array-map-context
+               (m/mappend (array-map :a 1 :b 2 :c 3 :d 4 :e 5) (m/mempty))))))
+
+  (t/testing "The first monad law: left identity"
+    (t/is (= (array-map :aa 1 :bb 2 :cc 3 :dd 4 :ee 5)
+             (m/>>= (array-map :a 0 :b 1 :c 2 :d 3 :e 4)
+                    (fn [[k v]] (array-map (->> [k k] (map name) (apply str) keyword)
+                                           (inc v)))))))
+
+  (t/testing "The second law: right identity"
+    (t/is (= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
+             (m/>>= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
+                    m/return))))
+
+  (t/testing "The third law: associativity"
+    (t/is (= (m/>>= (m/mlet [x (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
+                             y (let [[k v] x] (array-map k (inc v)))]
+                      (m/return y))
+                    (fn [[k v]] (array-map (str k k) (inc v))))
+             (m/>>= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
+                    (fn [x] (m/>>= (let [[k v] x] (array-map k (inc v)))
+                                   (fn [[k v]] (array-map (str k k) (inc v))))))))))
+
 (t/deftest sequence-monad
   (let [val->lazyseq (fn [x] (lazy-seq [x]))
         s (val->lazyseq 2)]
@@ -133,6 +163,29 @@
   (t/testing "Foldr"
     (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] [1 2 3])))
     (t/is (= 6 (m/foldr + 0 [1 2 3])))))
+
+(t/deftest array-map-foldable
+  (t/testing "Foldl"
+    (t/is (= (array-map :c 3 :b 2 :a 1)
+             (m/foldl (fn [acc [k v]] (into (array-map k v) acc))
+                      (array-map)
+                      (array-map :a 1 :b 2 :c 3))))
+    (t/is (= "a:1;b:2;c:3;d:4;"
+             (m/foldl (fn [acc [k v]] (str acc (name k) ":" v ";"))
+                      ""
+                      (array-map :a 1 :b 2 :c 3 :d 4))))
+    (t/is (= 6 (m/foldl (fn [acc [k v]] (+ acc v)) 0 (array-map :a 1 :b 2 :c 3)))))
+
+  (t/testing "Foldr"
+    (t/is (= (array-map :a 1 :b 2 :c 3)
+             (m/foldr (fn [[k v] acc] (into (array-map k v) acc))
+                      (array-map)
+                      (array-map :a 1 :b 2 :c 3))))
+    (t/is (= "a:1;b:2;c:3;d:4;"
+             (m/foldr (fn [[k v] acc] (str (name k) ":" v ";" acc))
+                      ""
+                      (array-map :a 1 :b 2 :c 3 :d 4))))
+    (t/is (= 6 (m/foldr (fn [[k v] acc] (+ acc v)) 0 (array-map :a 1 :b 2 :c 3))))))
 
 (t/deftest lazyseq-foldable
   (t/testing "Foldl"
