@@ -25,6 +25,11 @@
              cljs.core/IDeref
              (-deref [it] (reduce + 0 (vals e)))])
 
+  #?@(:cljs [cljs.core/IPrintWithWriter
+             (-pr-writer [it writer opts]
+               (->> (str "#<GCounter node=" node ", value=" @it ">")
+                    (cljs.core/-write writer)))])
+
   p/ICounter
   (-add [_ delta]
     (assert (number? delta) "delta should be a number")

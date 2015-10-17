@@ -32,6 +32,11 @@
              cljs.core/IDeref
              (-deref [it] (- @p @n))])
 
+  #?@(:cljs [cljs.core/IPrintWithWriter
+             (-pr-writer [it writer opts]
+               (->> (str "#<PNCounter value=" @it ">")
+                    (cljs.core/-write writer)))])
+
   p/ICounter
   (-add [this delta]
     (assert (number? delta) "delta should be a number")
