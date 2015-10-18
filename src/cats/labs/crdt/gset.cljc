@@ -132,7 +132,12 @@
 
 (defn gset
   "A g-set data type constructor."
-  []
-  (GSet. #{}))
+  ([]
+   (GSet. #{}))
+  ([data]
+   {:pre [(coll? data)]}
+   (if (set? data)
+     (GSet. data)
+     (GSet. (into #{} data)))))
 
 
