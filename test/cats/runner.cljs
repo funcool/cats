@@ -15,7 +15,8 @@
             [cats.labs.reader-spec]
             [cats.labs.writer-spec]
             [cats.labs.crdt.pncounter-spec]
-            [cats.labs.crdt.gcounter-spec]))
+            [cats.labs.crdt.gcounter-spec]
+            [cats.labs.crdt.gset-spec]))
 
 (enable-console-print!)
 
@@ -38,6 +39,7 @@
    'cats.labs.channel-spec
    'cats.labs.crdt.pncounter-spec
    'cats.labs.crdt.gcounter-spec
+   'cats.labs.crdt.gset-spec
    ))
 
 (defmethod test/report [:cljs.test/default :end-run-tests]

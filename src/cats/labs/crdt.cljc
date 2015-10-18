@@ -3,6 +3,7 @@
   (:require [cats.labs.crdt.protocols :as p]
             [cats.labs.crdt.gcounter]
             [cats.labs.crdt.pncounter]
+            [cats.labs.crdt.gset]
             [cats.protocols :as mp]
             #?(:cljs [cljs.reader :as edn]
                :clj [clojure.edn :as edn])))
@@ -53,7 +54,12 @@
   (-dump [it]
     {:type ::pncounter
      :p (-dump (.-p it))
-     :n (-dump (.-n it))}))
+     :n (-dump (.-n it))})
+
+  cats.labs.crdt.gset.GSet
+  (-dump [it]
+    {:type ::gset
+     :s (.-s it)}))
 
 (defmulti -load :type)
 (defmulti -encode (fn [_ type] type))
@@ -75,6 +81,10 @@
 (defmethod -load ::pncounter
   [data]
   (cats.labs.crdt.pncounter/pncounter* data p/*node*))
+
+(defmethod -load ::gset
+  [data]
+  (cats.labs.crdt.gset/gset* data))
 
 ;; Public Api
 
