@@ -107,6 +107,21 @@
            (= v (.-v other))
            false))]))
 
+(defn success->str
+  [mv]
+  (str "#<Success " (pr-str (.-v mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Success
+     [mv writer]
+     (.write writer (success->str mv))))
+
+#?(:cljs
+   (extend-type Success
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (success->str mv)))))
+
 (deftype Failure [e]
   p/Contextual
   (-get-context [_] context)
@@ -136,6 +151,21 @@
          (if (instance? Failure other)
            (= e (.-e other))
            false))]))
+
+(defn failure->str
+  [mv]
+  (str "#<Failure " (pr-str (.-e mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Failure
+     [mv writer]
+     (.write writer (failure->str mv))))
+
+#?(:cljs
+   (extend-type Failure
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (failure->str mv)))))
 
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
