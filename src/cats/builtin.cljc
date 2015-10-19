@@ -345,6 +345,11 @@
   p/Contextual
   (-get-context [_] function-context))
 
+#?(:cljs
+   (extend-type function
+     p/Contextual
+     (-get-context [_] function-context)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monoids
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
