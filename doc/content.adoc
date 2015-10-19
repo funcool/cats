@@ -173,7 +173,7 @@ instance:
 [source, clojure]
 ----
 (m/fmap inc (nothing))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 Oh, awesome, instead of raising a `NullPointerException`, it just returns *nothing*. Another
@@ -269,7 +269,7 @@ can apply the returned greeter to any value without a defensive nil check:
 ;; => #<Just "Hello Alex">
 
 (fapply (make-greeter "it") (just "Alex"))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 Moreover, the applicative functor comes with the *pure* function, which allows
@@ -436,11 +436,11 @@ the applicative's `fapply`.
 
 (ctx/with-context maybe/context
   (m/traverse just-if-even [1 2]))
-;; => #<Nothing >
+;; => #<Nothing>
 
 (ctx/with-context maybe/context
   (m/traverse just-if-even [2 3]))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 Maybe is not that much of an interesting applicative, let's see an example of using the Validation
@@ -568,7 +568,7 @@ For the already familiar Maybe type the identity element is Nothing:
 (require '[cats.monad.maybe :as maybe])
 
 (m/mzero maybe/maybe-monad)
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 Having an identity element we can make a monadic composition short-circuit using a predicate:
@@ -585,7 +585,7 @@ Having an identity element we can make a monadic composition short-circuit using
                     (m/mzero))
                   (fn [_]
                     (m/return (* a 2))))))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 As you can see in the above example the predicate `(= a 2)` returns either a monadic value `(m/return nil)` or the identity value
@@ -612,7 +612,7 @@ The above example could be rewritten as:
           (m/bind (m/guard (= a 2))
                   (fn [_]
                     (m/return (* a 2))))))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 Or, using mlet:
@@ -626,7 +626,7 @@ Or, using mlet:
 (m/mlet [a (maybe/just 1)
          :when (= a 2)]
    (m/return (* a 2)))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 === MonadPlus
@@ -642,7 +642,7 @@ For the Maybe type, `mplus` acts similarly to a logical OR that treats `Nothing`
 (require '[cats.monad.maybe :as maybe])
 
 (m/mplus (maybe/nothing))
-;; => #<Nothing >
+;; => #<Nothing>
 
 (m/mplus (maybe/nothing) (maybe/just 1))
 ;; => #<Just 1>
@@ -746,7 +746,7 @@ _cats_, implements two types:
 ;; => #<Just 1>
 
 (maybe/nothing)
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 There are other useful functions for working with maybe monad types in the same namespace.
@@ -1105,7 +1105,7 @@ using `bind` with `mlet` and `:when` like the following:
 (m/mlet [a (maybe/just 1)
          :when (= a 2)]
    (m/return (* a 2)))
-;; => #<Nothing >
+;; => #<Nothing>
 ----
 
 Any monadic type that implements `MonadZero` can be combined with guards inside `mlet` bindings. Here is an example with
@@ -1312,7 +1312,7 @@ a function and use applicatives for building up results with context-specific ef
 ;; => #<Just 6>
 
 (m/fapply (just curried+) (just 1) (just 2) (nothing))
-;; => #<Nothing >
+;; => #<Nothing>
 
 (m/fapply (just curried+) (just 1) nil (just 3))
 ;; => nil
@@ -1345,7 +1345,7 @@ if the function we are lifting has a fixed and a single arity:
 ;; => #<Just 6>
 
 (add-m (just 1) (nothing) (just 3))
-; => #<Nothing >
+; => #<Nothing>
 
 (add-m (just 1) nil (just 3))
 ;; => nil
@@ -1365,7 +1365,7 @@ variadic:
 ;; => #<Just 6>
 
 (add-m (just 1) (nothing) (just 3))
-; => #<Nothing >
+; => #<Nothing>
 
 (add-m (just 1) nil (just 3))
 ;; => nil
