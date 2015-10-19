@@ -75,6 +75,21 @@
            (= v (.-v other))
            false))]))
 
+(defn right->str
+  [mv]
+  (str "#<Right " (pr-str (.-v mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Right
+     [mv writer]
+     (.write writer (right->str mv))))
+
+#?(:cljs
+   (extend-type Right
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (right->str mv)))))
+
 (deftype Left [v]
   p/Contextual
   (-get-context [_] context)
@@ -103,6 +118,21 @@
          (if (instance? Left other)
            (= v (.-v other))
            false))]))
+
+(defn left->str
+  [mv]
+  (str "#<Left " (pr-str (.-v mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Left
+     [mv writer]
+     (.write writer (left->str mv))))
+
+#?(:cljs
+   (extend-type Left
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (left->str mv)))))
 
 (alter-meta! #'->Right assoc :private true)
 (alter-meta! #'->Left assoc :private true)
