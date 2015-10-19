@@ -74,6 +74,21 @@
   p/Contextual
   (-get-context [data] context))
 
+(defn pair->str
+  [mv]
+  (str "#<Pair [" (pr-str (.-fst mv)) " " (pr-str (.-snd mv)) "]>"))
+
+#?(:clj
+   (defmethod print-method Pair
+     [mv writer]
+     (.write writer (pair->str mv))))
+
+#?(:cljs
+   (extend-type Pair
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (pair->str mv)))))
+
 (alter-meta! #'->Pair assoc :private true)
 
 (defn pair
