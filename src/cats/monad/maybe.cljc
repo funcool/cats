@@ -70,6 +70,21 @@
            (= v (.-v other))
            false))]))
 
+(defn- just->str
+  [mv]
+  (str "#<Just " (pr-str (.-v mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Just
+     [mv writer]
+     (.write writer (just->str mv))))
+
+#?(:cljs
+   (extend-type Just
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (just->str mv)))))
+
 (deftype Nothing []
   p/Contextual
   (-get-context [_] context)
@@ -94,6 +109,17 @@
       [cljs.core/IEquiv
        (-equiv [_ other]
          (instance? Nothing other))]))
+
+#?(:clj
+   (defmethod print-method Nothing
+     [mv writer]
+     (.write writer "#<Nothing>")))
+
+#?(:cljs
+   (extend-type Nothing
+     IPrintWithWriter
+     (-pr-writer [_ writer _]
+       (-write writer "#<Nothing>"))))
 
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)
