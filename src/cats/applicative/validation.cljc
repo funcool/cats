@@ -65,6 +65,21 @@
            (= v (.-v other))
            false))]))
 
+(defn ok->str
+  [mv]
+  (str "#<Ok " (pr-str (.-v mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Ok
+     [mv writer]
+     (.write writer (ok->str mv))))
+
+#?(:cljs
+   (extend-type Ok
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (ok->str mv)))))
+
 (deftype Fail [v]
   p/Contextual
   (-get-context [_] context)
@@ -92,6 +107,21 @@
          (if (instance? Fail other)
            (= v (.-v other))
            false))]))
+
+(defn fail->str
+  [mv]
+  (str "#<Fail " (pr-str (.-v mv)) ">"))
+
+#?(:clj
+   (defmethod print-method Fail
+     [mv writer]
+     (.write writer (fail->str mv))))
+
+#?(:cljs
+   (extend-type Fail
+     IPrintWithWriter
+     (-pr-writer [mv writer _]
+       (-write writer (fail->str mv)))))
 
 (alter-meta! #'->Ok assoc :private true)
 (alter-meta! #'->Fail assoc :private true)
