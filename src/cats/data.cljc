@@ -67,10 +67,6 @@
            (= (.-snd this) (.-snd other)))
       false))
 
-  #?(:clj
-      (toString [this]
-                (with-out-str (print [fst snd]))))
-
   p/Contextual
   (-get-context [data] context))
 

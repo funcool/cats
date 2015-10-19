@@ -95,12 +95,8 @@
        (equals [self other]
          (if (instance? Success other)
            (= v (.-v other))
-           false))
-
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+           false))]
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Success other)
@@ -134,18 +130,14 @@
       :clj  [clojure.lang.IDeref
              (deref [_] (throw e))])
 
-
   #?@(:clj
       [Object
        (equals [self other]
          (if (instance? Failure other)
            (= e (.-e other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [e])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Failure other)

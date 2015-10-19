@@ -63,12 +63,9 @@
        (equals [self other]
          (if (instance? Right other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Right other)
@@ -107,12 +104,9 @@
        (equals [self other]
          (if (instance? Left other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Left other)

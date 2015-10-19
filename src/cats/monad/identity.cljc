@@ -52,12 +52,9 @@
        (equals [self other]
          (if (instance? Identity other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (str v))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Identity other)

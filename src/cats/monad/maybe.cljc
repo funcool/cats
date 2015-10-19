@@ -58,12 +58,8 @@
        (equals [self other]
          (if (instance? Just other)
            (= v (.-v other))
-           false))
-
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+           false))]
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Just other)
@@ -100,12 +96,8 @@
   #?@(:clj
       [Object
        (equals [self other]
-         (instance? Nothing other))
-
-       (toString [self]
-         (with-out-str (print "")))])
-
-  #?@(:cljs
+         (instance? Nothing other))]
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (instance? Nothing other))]))
