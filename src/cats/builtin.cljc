@@ -209,45 +209,45 @@
   (-get-context [_] vector-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Array Map Monad
+;; Map Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def array-map-context
+(def map-context
   (reify
     p/Context
     (-get-level [_] ctx/+level-default+)
 
     p/Semigroup
     (-mappend [_ sv sv']
-      (into sv sv'))
+      (merge sv sv'))
 
     p/Monoid
     (-mempty [_]
-      (array-map))
+      {})
 
     p/Functor
     (-fmap [_ f v]
-      (into (array-map) (map f v)))
+      (into {} (map f v)))
 
     p/Monad
     (-mreturn [_ v]
-      (into (array-map) [v]))
+      (into {} [v]))
 
     (-mbind [_ self f]
-      (into (array-map) (mapcat f self)))
+      (into {} (mapcat f self)))
 
     p/MonadZero
     (-mzero [_]
-      (array-map))
+      {})
 
     p/MonadPlus
     (-mplus [_ mv mv']
-      (into mv mv'))
+      (merge mv mv'))
 
     p/Foldable
     (-foldr [ctx f z xs]
       (letfn [(rf [acc v] (f v acc))]
-        (reduce rf z (reverse xs))))
+        (reduce rf z xs)))
 
     (-foldl [ctx f z xs]
       (reduce f z xs))))
@@ -255,7 +255,17 @@
 (extend-type #?(:clj clojure.lang.PersistentArrayMap
                 :cljs cljs.core.PersistentArrayMap)
   p/Contextual
-  (-get-context [_] array-map-context))
+  (-get-context [_] map-context))
+
+(extend-type #?(:clj clojure.lang.PersistentHashMap
+                :cljs cljs.core.PersistentHashMap)
+  p/Contextual
+  (-get-context [_] map-context))
+
+(extend-type #?(:clj clojure.lang.PersistentTreeMap
+                :cljs cljs.core.PersistentTreeMap)
+  p/Contextual
+  (-get-context [_] map-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set Monad
@@ -353,33 +363,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monoids
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(def map-monoid
-  (reify
-    p/Context
-    (-get-level [_] ctx/+level-default+)
-
-    p/Semigroup
-    (-mappend [_ sv sv']
-      (merge sv sv'))
-
-    p/Monoid
-    (-mempty [_]
-      {})))
-
-(extend-type #?(:clj clojure.lang.PersistentHashMap
-                :cljs cljs.core.PersistentHashMap)
-  p/Contextual
-  (-get-context [_] map-monoid))
-
-#?(:clj
-   (extend-type clojure.lang.PersistentTreeMap
-     p/Contextual
-     (-get-context [_] map-monoid))
-   :cljs
-   (extend-type cljs.core.PersistentTreeMap
-     p/Contextual
-     (-get-context [_] map-monoid)))
 
 (def any-monoid
   (reify
