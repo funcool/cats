@@ -212,6 +212,15 @@
 ;; Array Map Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn- into-array-map
+  "Used to create array-map, as (into (array-map a) b)
+  returns hash-map when number of entries is greater than 8"
+  ([a] (into-array-map a []))
+  ([a b] (->>                          ; [[:a 1] [:b 2]]   [[:c 3] [:d 4]]
+              (concat (vec a) (vec b)) ; [[:a 1] [:b 2] [:c 3] [:d 4]]
+              (apply concat)           ; [:a 1 :b 2 :c 3 :d 4]
+              (apply array-map))))     ; (array-map :a 1 :b 2 :c 3 :d 4)
+
 (def array-map-context
   (reify
     p/Context
@@ -219,7 +228,7 @@
 
     p/Semigroup
     (-mappend [_ sv sv']
-      (into sv sv'))
+      (into-array-map sv sv'))
 
     p/Monoid
     (-mempty [_]
@@ -227,14 +236,14 @@
 
     p/Functor
     (-fmap [_ f v]
-      (into (array-map) (map f v)))
+      (into-array-map (map f v)))
 
     p/Monad
     (-mreturn [_ v]
-      (into (array-map) [v]))
+      (into-array-map [v]))
 
     (-mbind [_ self f]
-      (into (array-map) (mapcat f self)))
+      (into-array-map (mapcat f self)))
 
     p/MonadZero
     (-mzero [_]
@@ -242,7 +251,7 @@
 
     p/MonadPlus
     (-mplus [_ mv mv']
-      (into mv mv'))
+      (into-array-map mv mv'))
 
     p/Foldable
     (-foldr [ctx f z xs]

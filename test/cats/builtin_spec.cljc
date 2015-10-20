@@ -64,6 +64,15 @@
     (t/is (= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
              (m/mappend (array-map :a 1 :b 2 :c 3) (array-map :d 4 :e 5)))))
 
+  (t/testing "Is a functor"
+    (let [a (array-map 1 1, 2 4, 3 9, 4 16, ; conj would normally
+                       5 25, 6 36, 7 49,    ; keep array-map as array-map
+                       8 64, 9 81, 10 100)  ; only up to 8 elements
+          b (m/fmap (fn [[k v]] [k (* k k)])
+              (array-map 1 1, 2 2, 3 3, 4 4, 5 5, 6 6, 7 7, 8 8, 9 9, 10 10))]
+      (t/is (= (keys a) (keys b))) ; check order of keys
+      (t/is (= a b))))
+
   (t/testing "Forms a monoid"
     (t/is (= (array-map :a 1 :b 2 :c 3 :d 4 :e 5)
              (ctx/with-context b/array-map-context
