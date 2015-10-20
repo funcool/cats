@@ -126,8 +126,9 @@
    (fn [fv]
      (fmap f fv)))
   ([f fv]
-   (-> (ctx/get-current fv)
-       (p/-fmap f fv))))
+   (let [ctx (ctx/get-current fv)]
+     (ctx/with-context ctx
+       (p/-fmap ctx f fv)))))
 
 (defn fapply
   "Given a function wrapped in a monadic context `af`,

@@ -15,6 +15,11 @@
 (defn add2 [x y]
   (+ x y))
 
+(t/deftest fmap-test
+  (t/testing "Sets the context."
+    (t/is (= [[1] [2] [3] [4]]
+             (m/fmap #(m/return %) [1 2 3 4])))))
+
 (t/deftest fapply-test
   (t/testing "Simple fapply run."
     (t/is (= 2 @(m/fapply (maybe/just inc) (maybe/just 1)))))
