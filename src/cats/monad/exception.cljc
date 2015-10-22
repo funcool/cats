@@ -55,6 +55,7 @@
   exception."
 
   (:require [cats.protocols :as p]
+            [cats.util :as util]
             #?(:clj [cats.context :as ctx]
                :cljs [cats.context :as ctx :include-macros true]))
   #?(:cljs
@@ -85,6 +86,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Success " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -103,27 +108,16 @@
            (= v (.-v other))
            false))]))
 
-(defn success->str
-  [mv]
-  (str "#<Success " (pr-str (.-v mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Success
-     [mv writer]
-     (.write writer (success->str mv))))
-
-#?(:cljs
-   (extend-type Success
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (success->str mv)))))
-
 (deftype Failure [e]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
   (-extract [_] e)
+
+  p/Printable
+  (-repr [_]
+    (str "#<Failure " (pr-str e) ">"))
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] (throw e))]
@@ -144,23 +138,11 @@
            (= e (.-e other))
            false))]))
 
-(defn failure->str
-  [mv]
-  (str "#<Failure " (pr-str (.-e mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Failure
-     [mv writer]
-     (.write writer (failure->str mv))))
-
-#?(:cljs
-   (extend-type Failure
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (failure->str mv)))))
-
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
+
+(util/make-printable Success)
+(util/make-printable Failure)
 
 (defn success
   "A Success type constructor.

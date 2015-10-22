@@ -38,7 +38,8 @@
       ;; => #<Left [1]>
   "
   (:require [cats.protocols :as p]
-            [cats.context :as ctx]))
+            [cats.context :as ctx]
+            [cats.util :as util]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -53,6 +54,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Right " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -71,21 +76,6 @@
          (if (instance? Right other)
            (= v (.-v other))
            false))]))
-
-(defn right->str
-  [mv]
-  (str "#<Right " (pr-str (.-v mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Right
-     [mv writer]
-     (.write writer (right->str mv))))
-
-#?(:cljs
-   (extend-type Right
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (right->str mv)))))
 
 (deftype Left [v]
   p/Contextual
@@ -94,6 +84,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Left " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -113,23 +107,11 @@
            (= v (.-v other))
            false))]))
 
-(defn left->str
-  [mv]
-  (str "#<Left " (pr-str (.-v mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Left
-     [mv writer]
-     (.write writer (left->str mv))))
-
-#?(:cljs
-   (extend-type Left
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (left->str mv)))))
-
 (alter-meta! #'->Right assoc :private true)
 (alter-meta! #'->Left assoc :private true)
+
+(util/make-printable Right)
+(util/make-printable Left)
 
 (defn left
   "A Left type constructor."

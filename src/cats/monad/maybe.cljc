@@ -33,7 +33,8 @@
       ;; => #<Just [1]>
   "
   (:require [cats.protocols :as p]
-            [cats.context :as ctx]))
+            [cats.context :as ctx]
+            [cats.util :as util]))
 
 (declare context)
 
@@ -47,6 +48,10 @@
 
   p/Extract
   (-extract [_] v)
+
+  p/Printable
+  (-repr [_]
+    (str "#<Just " (pr-str v) ">"))
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
@@ -66,27 +71,16 @@
            (= v (.-v other))
            false))]))
 
-(defn- just->str
-  [mv]
-  (str "#<Just " (pr-str (.-v mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Just
-     [mv writer]
-     (.write writer (just->str mv))))
-
-#?(:cljs
-   (extend-type Just
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (just->str mv)))))
-
 (deftype Nothing []
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
   (-extract [_] nil)
+
+  p/Printable
+  (-repr [_]
+    "#<Nothing>")
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] nil)]
@@ -102,19 +96,11 @@
        (-equiv [_ other]
          (instance? Nothing other))]))
 
-#?(:clj
-   (defmethod print-method Nothing
-     [mv writer]
-     (.write writer "#<Nothing>")))
-
-#?(:cljs
-   (extend-type Nothing
-     IPrintWithWriter
-     (-pr-writer [_ writer _]
-       (-write writer "#<Nothing>"))))
-
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)
+
+(util/make-printable Just)
+(util/make-printable Nothing)
 
 (defn maybe?
   "Return true in case of `v` is instance

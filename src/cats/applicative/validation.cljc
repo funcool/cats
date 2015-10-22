@@ -28,6 +28,7 @@
   for validating values. Isomorphic to Either."
   (:require [cats.protocols :as p]
             [cats.context :as ctx]
+            [cats.util :as util]
             [cats.monad.either :as either]))
 
 (declare context)
@@ -42,6 +43,10 @@
 
   p/Extract
   (-extract [_] v)
+
+  p/Printable
+  (-repr [_]
+    (str "#<Ok " (pr-str v) ">"))
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
@@ -62,27 +67,16 @@
            (= v (.-v other))
            false))]))
 
-(defn ok->str
-  [mv]
-  (str "#<Ok " (pr-str (.-v mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Ok
-     [mv writer]
-     (.write writer (ok->str mv))))
-
-#?(:cljs
-   (extend-type Ok
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (ok->str mv)))))
-
 (deftype Fail [v]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
   (-extract [_] v)
+
+  p/Printable
+  (-repr [_]
+    (str "#<Fail " (pr-str v) ">"))
 
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -102,23 +96,11 @@
            (= v (.-v other))
            false))]))
 
-(defn fail->str
-  [mv]
-  (str "#<Fail " (pr-str (.-v mv)) ">"))
-
-#?(:clj
-   (defmethod print-method Fail
-     [mv writer]
-     (.write writer (fail->str mv))))
-
-#?(:cljs
-   (extend-type Fail
-     IPrintWithWriter
-     (-pr-writer [mv writer _]
-       (-write writer (fail->str mv)))))
-
 (alter-meta! #'->Ok assoc :private true)
 (alter-meta! #'->Fail assoc :private true)
+
+(util/make-printable Ok)
+(util/make-printable Fail)
 
 (defn ok
   "An Ok type constructor."
