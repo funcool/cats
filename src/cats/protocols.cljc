@@ -41,6 +41,11 @@
   Maybe monad."
   (-get-context [_] "Get the context associated with the type."))
 
+(defprotocol Printable
+  "Just an abstraction for make a type printable in a platform
+  independent manner."
+  (-repr [_] "Get the repl ready representation of the object."))
+
 (defprotocol Semigroup
   "A structure with an associative binary operation."
   (-mappend [s sv sv'] "An associative addition operation."))

@@ -28,6 +28,7 @@
   for validating values. Isomorphic to Either."
   (:require [cats.protocols :as p]
             [cats.context :as ctx]
+            [cats.util :as util]
             [cats.monad.either :as either]))
 
 (declare context)
@@ -43,6 +44,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Ok " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -53,12 +58,9 @@
        (equals [self other]
          (if (instance? Ok other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Ok other)
@@ -72,6 +74,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Fail " (pr-str v) ">"))
+
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
   (#?(:clj deref :cljs -deref) [_] v)
@@ -81,12 +87,9 @@
        (equals [self other]
          (if (instance? Fail other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Fail other)
@@ -95,6 +98,9 @@
 
 (alter-meta! #'->Ok assoc :private true)
 (alter-meta! #'->Fail assoc :private true)
+
+(util/make-printable Ok)
+(util/make-printable Fail)
 
 (defn ok
   "An Ok type constructor."

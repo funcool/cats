@@ -27,7 +27,8 @@
   "The Identity Monad."
   (:refer-clojure :exclude [identity])
   (:require [cats.protocols :as p]
-            [cats.context :as ctx]))
+            [cats.context :as ctx]
+            [cats.util :as util]))
 
 (declare context)
 
@@ -42,6 +43,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Identity " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -52,12 +57,9 @@
        (equals [self other]
          (if (instance? Identity other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (str v))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Identity other)
@@ -65,6 +67,8 @@
            false))]))
 
 (alter-meta! #'->Identity assoc :private true)
+
+(util/make-printable Identity)
 
 (defn identity
   "The Identity type constructor."

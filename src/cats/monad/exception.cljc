@@ -55,6 +55,7 @@
   exception."
 
   (:require [cats.protocols :as p]
+            [cats.util :as util]
             #?(:clj [cats.context :as ctx]
                :cljs [cats.context :as ctx :include-macros true]))
   #?(:cljs
@@ -85,6 +86,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Success " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -95,12 +100,8 @@
        (equals [self other]
          (if (instance? Success other)
            (= v (.-v other))
-           false))
-
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+           false))]
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Success other)
@@ -114,23 +115,23 @@
   p/Extract
   (-extract [_] e)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Failure " (pr-str e) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] (throw e))]
       :clj  [clojure.lang.IDeref
              (deref [_] (throw e))])
-
 
   #?@(:clj
       [Object
        (equals [self other]
          (if (instance? Failure other)
            (= e (.-e other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [e])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Failure other)
@@ -139,6 +140,9 @@
 
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
+
+(util/make-printable Success)
+(util/make-printable Failure)
 
 (defn success
   "A Success type constructor.

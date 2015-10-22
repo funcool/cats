@@ -26,7 +26,8 @@
 (ns cats.data
   "Data structures that are used in various places of the library."
   (:require [cats.protocols :as p]
-            [cats.context :as ctx]))
+            [cats.context :as ctx]
+            [cats.util :as util]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pair type constructor and functions
@@ -67,14 +68,16 @@
            (= (.-snd this) (.-snd other)))
       false))
 
-  #?(:clj
-      (toString [this]
-                (with-out-str (print [fst snd]))))
+  p/Printable
+  (-repr [_]
+    (str "#<Pair [" (pr-str fst) " " (pr-str snd) "]>"))
 
   p/Contextual
   (-get-context [data] context))
 
 (alter-meta! #'->Pair assoc :private true)
+
+(util/make-printable Pair)
 
 (defn pair
   [fst snd]

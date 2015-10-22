@@ -38,7 +38,8 @@
       ;; => #<Left [1]>
   "
   (:require [cats.protocols :as p]
-            [cats.context :as ctx]))
+            [cats.context :as ctx]
+            [cats.util :as util]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Type constructor and functions
@@ -53,6 +54,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Right " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -63,12 +68,9 @@
        (equals [self other]
          (if (instance? Right other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Right other)
@@ -82,6 +84,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Left " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -92,12 +98,9 @@
        (equals [self other]
          (if (instance? Left other)
            (= v (.-v other))
-           false))
+           false))]
 
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Left other)
@@ -106,6 +109,9 @@
 
 (alter-meta! #'->Right assoc :private true)
 (alter-meta! #'->Left assoc :private true)
+
+(util/make-printable Right)
+(util/make-printable Left)
 
 (defn left
   "A Left type constructor."

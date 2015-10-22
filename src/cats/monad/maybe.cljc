@@ -33,7 +33,8 @@
       ;; => #<Just [1]>
   "
   (:require [cats.protocols :as p]
-            [cats.context :as ctx]))
+            [cats.context :as ctx]
+            [cats.util :as util]))
 
 (declare context)
 
@@ -48,6 +49,10 @@
   p/Extract
   (-extract [_] v)
 
+  p/Printable
+  (-repr [_]
+    (str "#<Just " (pr-str v) ">"))
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -58,12 +63,8 @@
        (equals [self other]
          (if (instance? Just other)
            (= v (.-v other))
-           false))
-
-       (toString [self]
-         (with-out-str (print [v])))])
-
-  #?@(:cljs
+           false))]
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Just other)
@@ -77,6 +78,10 @@
   p/Extract
   (-extract [_] nil)
 
+  p/Printable
+  (-repr [_]
+    "#<Nothing>")
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] nil)]
       :clj  [clojure.lang.IDeref
@@ -85,18 +90,17 @@
   #?@(:clj
       [Object
        (equals [self other]
-         (instance? Nothing other))
-
-       (toString [self]
-         (with-out-str (print "")))])
-
-  #?@(:cljs
+         (instance? Nothing other))]
+      :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (instance? Nothing other))]))
 
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)
+
+(util/make-printable Just)
+(util/make-printable Nothing)
 
 (defn maybe?
   "Return true in case of `v` is instance
