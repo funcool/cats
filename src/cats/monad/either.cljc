@@ -211,29 +211,29 @@
 
 (defn either-t
   "The Either transformer constructor."
-  [inner-monad]
+  [inner]
   (reify
     p/Context
     (-get-level [_] ctx/+level-transformer+)
 
     p/Monad
     (-mreturn [_ v]
-      (p/-mreturn inner-monad (right v)))
+      (p/-mreturn inner (right v)))
 
     (-mbind [_ mv f]
-      (p/-mbind inner-monad
+      (p/-mbind inner
                 mv
                 (fn [either-v]
                   (if (left? either-v)
-                    (p/-mreturn inner-monad either-v)
+                    (p/-mreturn inner either-v)
                     (f (p/-extract either-v))))))
 
     p/MonadTrans
     (-lift [m mv]
-      (p/-mbind inner-monad
+      (p/-mbind inner
                 mv
                 (fn [v]
-                  (p/-mreturn inner-monad (right v)))))))
+                  (p/-mreturn inner (right v)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
