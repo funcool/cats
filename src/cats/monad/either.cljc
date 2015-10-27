@@ -177,6 +177,16 @@
         (f (.-v s))
         s))
 
+    p/MonadZero
+    (-mzero [_]
+      (left))
+
+    p/MonadPlus
+    (-mplus [_ mv mv']
+      (if (right? mv)
+        mv
+        mv'))
+
     p/Foldable
     (-foldl [_ f z mv]
       (if (right? mv)
