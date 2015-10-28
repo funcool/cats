@@ -29,12 +29,14 @@
                      [cljs.core.async.impl.protocols :as impl]
                      [cats.context :as ctx]
                      [cats.core :as m]
-                     [cats.protocols :as p])
+                     [cats.protocols :as p]
+                     [cats.util :as util])
      :clj  (:require [clojure.core.async :refer [go go-loop] :as a]
                      [clojure.core.async.impl.protocols :as impl]
                      [cats.context :as ctx]
                      [cats.core :as m]
-                     [cats.protocols :as p])))
+                     [cats.protocols :as p]
+                     [cats.util :as util])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
@@ -133,10 +135,15 @@
                     (a/>! c result))))
               (recur))
             (a/close! c)))
-        c))))
+        c))
+
+    p/Printable
+    (-repr [_]
+      "#<Channel>")))
+
+(util/make-printable (type context))
 
 (extend-type #?(:clj  clojure.core.async.impl.channels.ManyToManyChannel
                 :cljs cljs.core.async.impl.channels.ManyToManyChannel)
   p/Contextual
   (-get-context [_] context))
-

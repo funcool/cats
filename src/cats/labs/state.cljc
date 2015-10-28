@@ -27,10 +27,12 @@
   "The State Monad."
   #?(:cljs (:require [cats.protocols :as p]
                      [cats.context :as ctx :include-macros true]
-                     [cats.data :as d])
+                     [cats.data :as d]
+                     [cats.util :as util])
      :clj  (:require [cats.protocols :as p]
                      [cats.context :as ctx]
-                     [cats.data :as d])))
+                     [cats.data :as d]
+                     [cats.util :as util])))
 
 (declare context)
 
@@ -114,7 +116,13 @@
       (state #(d/pair % newstate)))
 
     (-swap-state [_ f]
-      (state #(d/pair %1 (f %1))))))
+      (state #(d/pair %1 (f %1))))
+
+    p/Printable
+    (-repr [_]
+      #"<State>")))
+
+(util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad Transformer
@@ -182,7 +190,11 @@
                            mv
                            (fn [v]
                              (p/-mreturn inner-monad
-                                         (d/pair v s)))))))))
+                                         (d/pair v s)))))))
+
+    p/Printable
+    (-repr [_]
+      "#<State-T>")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Public Api

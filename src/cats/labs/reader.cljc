@@ -26,9 +26,11 @@
 (ns cats.labs.reader
   "The Reader Monad."
   #?(:clj  (:require [cats.context :as ctx]
-                     [cats.protocols :as p])
+                     [cats.protocols :as p]
+                     [cats.util :as util])
      :cljs (:require [cats.context :as ctx :include-macros true]
-                     [cats.protocols :as p])))
+                     [cats.protocols :as p]
+                     [cats.util :as util])))
 
 (declare context)
 
@@ -107,7 +109,13 @@
 
     (-local [_ f mr]
       (reader (fn [env]
-                (mr (f env)))))))
+                (mr (f env)))))
+
+    p/Printable
+    (-repr [_]
+      #"<Reader>")))
+
+(util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad Transformer
@@ -147,7 +155,11 @@
 
     (-local [_ f mr]
       (fn [env]
-        (mr (f env))))))
+        (mr (f env))))
+
+    p/Printable
+    (-repr [_]
+      "#<Reader-T")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Reader monad functions

@@ -26,9 +26,11 @@
 (ns cats.labs.continuation
   "The Continuation Monad."
   #?(:clj  (:require [cats.protocols :as p]
-                     [cats.context :as ctx])
+                     [cats.context :as ctx]
+                     [cats.util :as util])
      :cljs (:require [cats.protocols :as p]
-                     [cats.context :as ctx :include-macros true])))
+                     [cats.context :as ctx :include-macros true]
+                     [cats.util :as util])))
 
 (declare context)
 
@@ -68,7 +70,13 @@
     (-mbind [_ self mf]
       (Continuation. (fn [c]
                        (self (fn [v]
-                               ((mf v) c))))))))
+                               ((mf v) c))))))
+
+    p/Printable
+    (-repr [_]
+      "#<Continuation>")))
+
+(util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Continuation monad functions

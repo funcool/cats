@@ -191,7 +191,13 @@
                 (p/-mappend (p/-get-context af) af av)))
 
         (ok? af) av
-        :else af))))
+        :else af))
+
+    p/Printable
+    (-repr [_]
+      "#<Validation>")))
+
+(util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Either isomorphism
