@@ -28,4 +28,39 @@
    proves its worthiness will graduate to the cats.core namespace."
   (:require [cats.core :as m]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; applicative "idiomatic apply"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defmacro ap
+  "Apply a pure function to applicative arguments, e.g.
+
+   (ap + (just 1) (just 2) (just 3))
+   ;; => #<Just [6]>
+   (ap str [\"hi\" \"lo\"] [\"bye\" \"woah\" \"hey\"])
+   ;; => [\"hibye\" \"hiwoah\" \"hihey\"
+          \"lobye\" \"lowoah\" \"lohey\"]
+
+   `ap` is essentially sugar for `(apply fapply (pure f) args)`,
+   but for the common case where you have a pure, uncurried,
+   possibly variadic function.
+
+   `ap` actually desugars in `alet` form:
+
+   (macroexpand-1 `(ap + (just 1) (just2)))
+   ;; => (alet [a1 (just 1) a2 (just 2)] (+ a1 a2))
+
+   That way, variadic functions Just Work, without needing to specify
+   an arity separately.
+
+   If you're familiar with Haskell, this is closest to writing
+   \"in Applicative style\": you can straightforwardly convert
+   pure function application to effectful application by with
+   some light syntax (<$> and <*> in case of Haskell, and `ap` here).
+
+   See the original Applicative paper for more inspiration:
+   http://staff.city.ac.uk/~ross/papers/Applicative.pdf"
+  [f & args]
+  (let [syms (repeatedly (count args) (partial gensym "arg"))]
+    `(m/alet [~@(interleave syms args)]
+        (~f ~@syms))))
