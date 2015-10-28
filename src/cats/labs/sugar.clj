@@ -108,3 +108,70 @@
   `(let [~name ~expr
          ~@(interleave (repeat name) (for [form forms] `(ap ~@form)))]
      ~name))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monadic arrow macros.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro ->=
+  "Like `->`, but with monadic binding instead of pure application.
+   A mnemonic for the name is a pun on `>>=`, the monadic bind operator,
+   and clojure's regular arrow macros.
+
+   You can think of it as generalizing the `some->` thread macro
+   to all Monads instead of just Maybe.
+
+   Alternatively, if you think of the regular thread macro as
+   sugar for `let`:
+
+   (-> :a b (c (other args)) d)
+   =>
+   (let [res (b :a)
+         res (c res (other args))
+         res (d res)]
+     res)
+
+   Then `->=` is sugar for cats.core/mlet:
+
+   (->= m-a b (c (other args)) d)
+   (mlet [res m-a
+          res (c res (other args))
+          res (d res)]
+     (return res))
+
+   Note that extra args in this context are assumed pure, and will
+   be evaluated along with the function itself; this also matches
+   the behavior of `some->` wrt extra args.
+
+   Threading through pure functions is somewhat awkward, but can be done:
+
+   (->= m-a
+        monadic-fn
+        (-> pure-fn
+            other-pure-fn
+            m/return)
+        other-monadic-fn)"
+  [expr & forms]
+  (let [g (gensym)
+        pstep (fn [step] `(-> ~g ~step))]
+    `(m/mlet [~g ~expr
+              ~@(interleave (repeat g) (map pstep forms))]
+           (m/return ~g))))
+
+(defmacro ->>=
+  "Like ->>, but with monadic binding instead of pure application.
+   See `cats.labs.sugar/->=` for more in-depth discussion."
+  [expr & forms]
+  (let [g (gensym)
+        pstep (fn [step] `(->> ~g ~step))]
+    `(m/mlet [~g ~expr
+              ~@(interleave (repeat g) (map pstep forms))]
+           (m/return ~g))))
+
+(defmacro as->=
+  "Like `as->`, but with monadic binding instead of pure application.
+   See `cats.labs.sugar/->=` for more in-depth discussion."
+  [expr name & forms]
+  `(m/mlet [~name ~expr
+            ~@(interleave (repeat name) forms)]
+     (m/return ~name)))
