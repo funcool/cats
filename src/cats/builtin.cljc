@@ -29,7 +29,8 @@
             [cats.monad.maybe :as maybe]
             [cats.protocols :as p]
             [cats.context :as ctx]
-            [cats.core :as m]))
+            [cats.core :as m]
+            [cats.util :as util]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -107,7 +108,13 @@
                              xs acc]
                       (cons x xs)))
                   (m/pure (lazy-seq []))
-                  as)))))
+                  as)))
+
+    p/Printable
+    (-repr [_]
+      "#<Sequence>")))
+
+(util/make-printable (type sequence-context))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
@@ -132,7 +139,13 @@
             (f x (p/-foldr ctx f z xs))))))
 
     (-foldl [ctx f z xs]
-      (reduce f z xs))))
+      (reduce f z xs))
+
+    p/Printable
+    (-repr [_]
+      "#<Range>")))
+
+(util/make-printable (type range-context))
 
 (extend-type #?(:clj  clojure.lang.LongRange
                 :cljs cljs.core.Range)
@@ -201,7 +214,13 @@
                              xs acc]
                        (conj xs x)))
                   (m/pure [])
-                  as)))))
+                  as)))
+
+    p/Printable
+    (-repr [_]
+      "#<Vector>")))
+
+(util/make-printable (type vector-context))
 
 (extend-type #?(:clj clojure.lang.PersistentVector
                 :cljs cljs.core.PersistentVector)
@@ -250,7 +269,13 @@
         (reduce rf z xs)))
 
     (-foldl [ctx f z xs]
-      (reduce f z xs))))
+      (reduce f z xs))
+
+    p/Printable
+    (-repr [_]
+      "#<Map>")))
+
+(util/make-printable (type map-context))
 
 (extend-type #?(:clj clojure.lang.PersistentArrayMap
                 :cljs cljs.core.PersistentArrayMap)
@@ -310,7 +335,13 @@
 
     p/MonadPlus
     (-mplus [_ mv mv']
-      (s/union mv mv'))))
+      (s/union mv mv'))
+
+    p/Printable
+    (-repr [_]
+      "#<Set>")))
+
+(util/make-printable (type set-context))
 
 (extend-type #?(:clj clojure.lang.PersistentHashSet
                 :cljs cljs.core.PersistentHashSet)
@@ -348,7 +379,13 @@
       (constantly v))
 
     (-mbind [_ self f]
-      (fn [r] ((f (self r)) r)))))
+      (fn [r] ((f (self r)) r)))
+
+    p/Printable
+    (-repr [_]
+      "#<Function>")))
+
+(util/make-printable (type function-context))
 
 (extend-type #?(:clj clojure.lang.IFn
                 :cljs cljs.core.IFn)
@@ -375,7 +412,13 @@
 
     p/Monoid
     (-mempty [_]
-      false)))
+      false)
+
+    p/Printable
+    (-repr [_]
+      "#<Any>")))
+
+(util/make-printable (type any-monoid))
 
 (def all-monoid
   (reify
@@ -388,7 +431,13 @@
 
     p/Monoid
     (-mempty [_]
-      true)))
+      true)
+
+    p/Printable
+    (-repr [_]
+      "#<All>")))
+
+(util/make-printable (type all-monoid))
 
 (def sum-monoid
   (reify
@@ -401,7 +450,13 @@
 
     p/Monoid
     (-mempty [_]
-      0)))
+      0)
+
+    p/Printable
+    (-repr [_]
+      "#<Sum>")))
+
+(util/make-printable (type sum-monoid))
 
 (def prod-monoid
   (reify
@@ -414,7 +469,13 @@
 
     p/Monoid
     (-mempty [_]
-      1)))
+      1)
+
+    p/Printable
+    (-repr [_]
+      "#<Product>")))
+
+(util/make-printable (type prod-monoid))
 
 (def string-monoid
   (reify
@@ -427,7 +488,13 @@
 
     p/Monoid
     (-mempty [_]
-      "")))
+      "")
+
+    p/Printable
+    (-repr [_]
+      "#<String>")))
+
+(util/make-printable (type string-monoid))
 
 (extend-type #?(:clj java.lang.String
                 :cljs string)

@@ -29,7 +29,8 @@
             [cats.context :as ctx]
             [cats.core :as m]
             [cats.protocols :as p]
-            [cats.monad.either :as either]))
+            [cats.monad.either :as either]
+            [cats.util :as util]))
 
 (defn- with-timeout
   [timeout timeout-value d]
@@ -82,10 +83,16 @@
        (with-timeout timeout timeout-value
          (d/chain mv (fn [v]
                        (ctx/with-context it
-                         (f v)))))))))
+                         (f v))))))
+
+     p/Printable
+     (-repr [_]
+       "#<Deferred>"))))
 
 (def ^{:doc "A default context for manifold deferred."}
   deferred-context (deferred-context*))
+
+(util/make-printable (type deferred-context))
 
 (extend-type manifold.deferred.Deferred
   p/Contextual

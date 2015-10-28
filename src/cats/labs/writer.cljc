@@ -28,11 +28,13 @@
   #?(:cljs (:require [cats.protocols :as p]
                      [cats.builtin :as b]
                      [cats.context :as ctx :include-macros true]
-                     [cats.data :as d])
+                     [cats.data :as d]
+                     [cats.util :as util])
      :clj  (:require [cats.protocols :as p]
                      [cats.builtin :as b]
                      [cats.context :as ctx]
-                     [cats.data :as d])))
+                     [cats.data :as d]
+                     [cats.util :as util])))
 
 (declare context)
 
@@ -115,7 +117,13 @@
 
     (-pass [_ mv]
       (let [[v f] (first mv)]
-        (d/pair v (f (second mv)))))))
+        (d/pair v (f (second mv)))))
+
+    p/Printable
+    (-repr [_]
+      #"<Writer>")))
+
+(util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad Transformer
@@ -169,7 +177,11 @@
                 mv
                 (fn [v]
                   (p/-mreturn inner-context
-                              (d/pair v (p/-mempty b/vector-context))))))))
+                              (d/pair v (p/-mempty b/vector-context))))))
+
+    p/Printable
+    (-repr [_]
+      #"<Writer-T>")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writer monad functions

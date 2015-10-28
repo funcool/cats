@@ -303,4 +303,10 @@
     (-mbind [_ s f]
       (if (success? s)
         (f (p/-extract s))
-        s))))
+        s))
+
+    p/Printable
+    (-repr [_]
+      "#<Exception>")))
+
+(util/make-printable (type context))

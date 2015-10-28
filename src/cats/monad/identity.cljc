@@ -101,4 +101,10 @@
       (Identity. v))
 
     (-mbind [_ mv f]
-      (f (.-v mv)))))
+      (f (.-v mv)))
+
+    p/Printable
+    (-repr [_]
+      "#<Identity>")))
+
+(util/make-printable (type context))

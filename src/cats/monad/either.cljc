@@ -203,7 +203,13 @@
       (if (right? mv)
         (let [a (f (p/-extract mv))]
           (p/-fmap (p/-get-context a) right a))
-        (p/-pure (ctx/get-current) mv)))))
+        (p/-pure (ctx/get-current) mv)))
+
+    p/Printable
+    (-repr [_]
+      "#<Either>")))
+
+(util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad Transformer
