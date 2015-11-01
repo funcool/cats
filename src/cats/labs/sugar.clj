@@ -64,3 +64,47 @@
   (let [syms (repeatedly (count args) (partial gensym "arg"))]
     `(m/alet [~@(interleave syms args)]
         (~f ~@syms))))
+
+(defmacro ap->
+  "Thread like `->`, within an applicative idiom.
+
+  Compare:
+
+  (macroexpand-1 `(-> a b c (d e f)))
+  => (d (c (b a) e f)
+
+  with:
+
+  (macroexpand-1 `(ap-> a b c (d e f))
+  => (ap d (ap c (ap b a) e f))
+  "
+  [x & forms]
+  (loop [x x, forms forms]
+    (if forms
+      (let [form (first forms)
+            threaded (if (seq? form)
+                       (with-meta `(ap ~(first form) ~x ~@(next form)) (meta form))
+                       `(ap ~form ~x))]
+        (recur threaded (next forms)))
+      x)))
+
+(defmacro ap->>
+  "Thread like `->>`, within an applicative idiom.
+   See `cats.labs.sugar/ap->` for more in-depth discussion."
+  [x & forms]
+  (loop [x x, forms forms]
+    (if forms
+      (let [form (first forms)
+            threaded (if (seq? form)
+                       (with-meta `(ap ~(first form) ~@(next form)  ~x) (meta form))
+                       `(ap ~form ~x))]
+        (recur threaded (next forms)))
+      x)))
+
+(defmacro as-ap->
+  "Thread like `as->`, within an applicative idiom.
+   See `cats.labs.sugar/ap->` for more in-depth discussion."
+  [expr name & forms]
+  `(let [~name ~expr
+         ~@(interleave (repeat name) (for [form forms] `(ap ~@form)))]
+     ~name))
