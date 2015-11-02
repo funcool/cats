@@ -63,6 +63,10 @@
   "A data type that can be mapped over without altering its context."
   (-fmap [ftor f fv] "Applies function f to the value(s) inside the context of the functor fv."))
 
+(defprotocol Bifunctor
+  "A 'Functor' of two arguments."
+  (-bimap  [btor f g bv] "Map over both arguments at the same time."))
+
 (defprotocol Applicative
   "The Applicative abstraction."
   (-fapply [app af av]
