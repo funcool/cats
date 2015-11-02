@@ -159,6 +159,12 @@
         (right (f (.-v s)))
         s))
 
+    p/Bifunctor
+    (-bimap [_ f g s]
+      (if (left? s)
+        (left  (f (.-v s)))
+        (right (g (.-v s)))))
+
     p/Applicative
     (-pure [_ v]
       (right v))
