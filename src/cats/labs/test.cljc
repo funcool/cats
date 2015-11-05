@@ -154,9 +154,9 @@
          (m/mplus x (m/mzero ctx))
          (m/mplus (m/mzero ctx) x)))))
 
-(defn monadzero-bind [{:keys [ctx gen]}]
+(defn monadzero-bind [{:keys [ctx gen zero] :or {:zero (m/mzero ctx)}}]
   (prop/for-all [m gen]
     (ctx/with-context ctx
-      (= (m/mzero)
-         (m/>>= (m/mzero) (fn [v] (m/return v)))
-         (m/>> m (m/mzero))))))
+      (= zero
+         (m/>>= zero (fn [v] (m/return v)))
+         (m/>> m zero)))))
