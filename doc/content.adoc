@@ -1412,7 +1412,7 @@ Before use it, you should add core.async to your dependencies:
 
 [source, clojure]
 ----
-[org.clojure/core.async "0.1.346.0-17112a-alpha"]
+[org.clojure/core.async "0.2.371"]
 ----
 
 Now, let see some code. This will allow you understand how it can be used and why this
@@ -1528,7 +1528,7 @@ Before use it, you should add manifold to your dependencies:
 
 [source, clojure]
 ----
-[manifold "0.1.0"]
+[manifold "0.1.1"]
 ----
 
 Now, let see some code. This will allow you understand how it can be used and why this
