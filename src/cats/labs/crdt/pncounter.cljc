@@ -7,7 +7,8 @@
   counter is the value of the P counter minus the value of the N counter."
   (:require [cats.labs.crdt.protocols :as p]
             [cats.labs.crdt.gcounter :as gcnt]
-            [cats.protocols :as mp]))
+            [cats.protocols :as mp]
+            [cats.util :as util]))
 
 (defn- make-positive
   [v]
@@ -32,10 +33,9 @@
              cljs.core/IDeref
              (-deref [it] (- @p @n))])
 
-  #?@(:cljs [cljs.core/IPrintWithWriter
-             (-pr-writer [it writer opts]
-               (->> (str "#<PNCounter value=" @it ">")
-                    (cljs.core/-write writer)))])
+  mp/Printable
+  (-repr [it]
+    (str "#<PNCounter value=" @it ">"))
 
   p/ICounter
   (-add [this delta]
@@ -49,6 +49,8 @@
   (-join [_ other]
     (PNCounter. (mp/-join p (.-p other))
                 (mp/-join n (.-n other)))))
+
+(util/make-printable PNCounter)
 
 (defn pncounter*
   [data node]
@@ -67,9 +69,5 @@
   ([node]
    (PNCounter. (gcnt/gcounter node)
                (gcnt/gcounter node))))
-
-
-
-
 
 

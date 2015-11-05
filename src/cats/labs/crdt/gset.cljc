@@ -33,7 +33,6 @@
 
      cljs.core/ISet
      (-disjoin [_ v]
-       ;; (GSet. (cljs.core/-disjoin s v)))
        (throw (ex-info "Operation not allowed" {})))
 
      cljs.core/IPrintWithWriter
@@ -139,5 +138,3 @@
    (if (set? data)
      (GSet. data)
      (GSet. (into #{} data)))))
-
-

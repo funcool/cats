@@ -7,7 +7,8 @@
   (like a vector clock merge). The value of the counter is the sum of all
   actor counts."
   (:require [cats.labs.crdt.protocols :as p]
-            [cats.protocols :as mp]))
+            [cats.protocols :as mp]
+            [cats.util :as util]))
 
 (deftype GCounter [e node]
   #?@(:clj [Object
@@ -25,17 +26,15 @@
              cljs.core/IDeref
              (-deref [it] (reduce + 0 (vals e)))])
 
-  #?@(:cljs [cljs.core/IPrintWithWriter
-             (-pr-writer [it writer opts]
-               (->> (str "#<GCounter node=" node ", value=" @it ">")
-                    (cljs.core/-write writer)))])
+  mp/Printable
+  (-repr [it]
+    (str "#<GCounter node=" node ", value=" @it ">"))
 
   p/ICounter
   (-add [_ delta]
     (assert (number? delta) "delta should be a number")
     (assert (pos? delta) "Only positive delta are allowed.")
     (GCounter. (update e node (fnil #(+ % delta) 0)) node))
-
 
   mp/JoinSemiLattice
   (-join [_ other]
@@ -46,6 +45,8 @@
                        {}
                        keys)]
       (GCounter. res node))))
+
+(util/make-printable GCounter)
 
 (defn gcounter?
   "Return true if `v` is a instance
