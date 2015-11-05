@@ -8,6 +8,7 @@
             [cats.monad.either-spec]
             [cats.monad.maybe-spec]
             [cats.monad.identity-spec]
+            [cats.labs.sugar-spec]
             [cats.labs.continuation-spec]
             [cats.labs.channel-spec]
             [cats.labs.state-spec]
@@ -27,6 +28,7 @@
    'cats.monad.either-spec
    'cats.monad.maybe-spec
    'cats.monad.identity-spec
+   'cats.labs.sugar-spec
    'cats.labs.continuation-spec
    'cats.labs.state-spec
    'cats.labs.reader-spec
