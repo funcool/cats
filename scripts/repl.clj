@@ -1,8 +1,8 @@
 (require
-  '[cljs.repl :as repl]
-  '[cljs.repl.nashorn :as nashorn])
+  '[cljs.repl]
+  '[cljs.repl.node])
 
 (cljs.repl/repl
- (cljs.repl.nashorn/repl-env)
+ (cljs.repl.node/repl-env)
  :output-dir "out"
  :cache-analysis true)
