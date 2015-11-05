@@ -20,4 +20,4 @@ TEST_NAMESPACES=(
     cats.monad.identity-spec
 )
 
-lein2 test ${TEST_NAMESPACES[@]}
+lein test ${TEST_NAMESPACES[@]}
