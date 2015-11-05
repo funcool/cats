@@ -7,6 +7,7 @@ TEST_NAMESPACES=(
     cats.data-spec
     cats.builtin-spec
     cats.applicative.validation-spec
+    cats.labs.sugar-spec
     cats.labs.channel-spec
     cats.labs.manifold-spec
     cats.labs.state-spec
