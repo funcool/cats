@@ -1,5 +1,9 @@
 (ns cats.data-spec
-  (:require [cats.data :as d]
+  (:require [clojure.test.check]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop #?@(:cljs [:include-macros true])]
+            [cats.labs.test :as lt]
+            [cats.data :as d]
             [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
@@ -11,34 +15,40 @@
                :clj  [clojure.test :as t])
 
             #?(:cljs [cats.core :as m :include-macros true]
-               :clj  [cats.core :as m])))
+               :clj  [cats.core :as m])
 
-(t/deftest pair-monoid
-  (t/testing "mempty"
-    (ctx/with-context (d/pair-monoid b/string-monoid)
-      (t/is (= (d/pair "" "") (m/mempty))))
+            #?(:clj
+               [clojure.test.check.clojure-test :refer [defspec]]))
+  #?(:cljs (:require-macros [clojure.test.check.clojure-test :refer (defspec)])))
 
-    (ctx/with-context (d/pair-monoid b/sum-monoid)
-      (t/is (= (d/pair 0 0) (m/mempty)))))
+(def ctx (d/pair-monoid b/string-monoid))
 
-  (t/testing "mappend"
-    (t/is (= (d/pair "Hello buddy" "Hello mate")
-             (m/mappend
-              (d/pair "Hello " "Hello ")
-              (d/pair "buddy" "mate")))))
+(defn pair-gen [g]
+  (m/alet [s1 g
+           s2 g]
+    (d/pair s1 s2)))
 
-  (t/testing "mappend with other-context"
-    (ctx/with-context (d/pair-monoid b/sum-monoid)
-      (t/is (= (d/pair 10 20)
-               (m/mappend
-                (d/pair 3 5)
-                (d/pair 3 5)
-                (d/pair 4 10)))))))
+(defspec pair-semigroup 10
+  (lt/semigroup-associativity {:ctx ctx
+                               :gen (pair-gen gen/string)}))
 
-(t/deftest pair-functor
-  (t/testing "It maps a function over the second value of the pair"
-    (= (d/pair 0 42)
-       (m/fmap inc (d/pair 0 41)))))
+(defspec pair-monoid 10
+  (lt/monoid-identity-element {:ctx ctx
+                               :gen (pair-gen gen/string)
+                               :empty (d/pair "" "")}))
+
+(defspec pair-monoid-sum 10
+  (lt/monoid-identity-element {:ctx (d/pair-monoid b/sum-monoid)
+                               :gen (pair-gen gen/int)
+                               :empty (d/pair 0 0)}))
+
+(defspec pair-first-functor-law 10
+  (lt/first-functor-law {:gen (pair-gen gen/any)}))
+
+(defspec pair-second-functor-law 10
+  (lt/second-functor-law {:gen (pair-gen gen/any)
+                          :f str
+                          :g count}))
 
 (t/deftest pair-foldable
   (t/testing "Foldl"
