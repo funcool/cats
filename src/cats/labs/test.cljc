@@ -62,7 +62,8 @@
 
 ;; Semigroup
 
-(defn semigroup-associativity [{:keys [ctx gen eq] :or {eq =}}]
+(defn semigroup-associativity
+  [{:keys [ctx gen eq] :or {eq =}}]
   (prop/for-all [x gen
                  y gen
                  z gen]
@@ -72,7 +73,8 @@
 
 ;; Monoid
 
-(defn monoid-identity-element [{:keys [ctx gen empty eq] :or {empty (m/mempty ctx) eq =}}]
+(defn monoid-identity-element
+  [{:keys [ctx gen empty eq] :or {empty (m/mempty ctx) eq =}}]
   (prop/for-all [x gen]
     (ctx/with-context ctx
       (eq x
@@ -81,34 +83,40 @@
 
 ;; Functor laws
 
-(defn first-functor-law [{:keys [gen eq] :or {eq =}}]
+(defn first-functor-law
+  [{:keys [gen eq] :or {eq =}}]
   (prop/for-all [fa gen]
     (eq fa
         (m/fmap identity fa))))
 
-(defn second-functor-law [{:keys [gen f g eq] :or {eq =}}]
+(defn second-functor-law
+  [{:keys [gen f g eq] :or {eq =}}]
   (prop/for-all [fa gen]
     (eq (m/fmap (comp g f) fa)
         (m/fmap g (m/fmap f fa)))))
 
 ;; Applicative laws
 
-(defn applicative-identity-law [{:keys [ctx gen eq] :or {eq =}}]
+(defn applicative-identity-law
+  [{:keys [ctx gen eq] :or {eq =}}]
   (prop/for-all [app gen]
     (eq app
         (m/fapply (m/pure ctx identity) app))))
 
-(defn applicative-homomorphism [{:keys [ctx gen f eq] :or {eq =}}]
+(defn applicative-homomorphism
+  [{:keys [ctx gen f eq] :or {eq =}}]
   (prop/for-all [x gen]
     (eq (m/pure ctx (f x))
         (m/fapply (m/pure ctx f) (m/pure ctx x)))))
 
-(defn applicative-interchange [{:keys [ctx gen appf eq] :or {eq =}}]
+(defn applicative-interchange
+  [{:keys [ctx gen appf eq] :or {eq =}}]
   (prop/for-all [x gen]
     (eq (m/fapply appf (m/pure ctx x))
         (m/fapply (m/pure ctx (fn [f] (f x))) appf))))
 
-(defn applicative-composition [{:keys [ctx gen appf appg eq] :or {eq =}}]
+(defn applicative-composition
+  [{:keys [ctx gen appf appg eq] :or {eq =}}]
   (prop/for-all [x gen]
     (eq (m/fapply appg
                  (m/fapply appf (m/pure ctx x)))
@@ -119,18 +127,21 @@
 
 ;; Monad laws
 
-(defn first-monad-law [{:keys [ctx mf gen eq] :or {gen gen/any eq =}}]
+(defn first-monad-law
+  [{:keys [ctx mf gen eq] :or {gen gen/any eq =}}]
   (prop/for-all [a gen]
     (eq (mf a)
         (m/>>= (m/return ctx a) mf))))
 
-(defn second-monad-law [{:keys [ctx eq] :or {eq =}}]
+(defn second-monad-law
+  [{:keys [ctx eq] :or {eq =}}]
   (prop/for-all [a gen/any]
     (let [m (m/return ctx a)]
       (eq m
           (m/>>= m m/return)))))
 
-(defn third-monad-law [{:keys [ctx f g eq] :or {eq =}}]
+(defn third-monad-law
+  [{:keys [ctx f g eq] :or {eq =}}]
   (prop/for-all [a gen/any]
     (let [m (m/return ctx a)]
       (eq (m/>>= (m/>>= m f) g)
@@ -138,26 +149,29 @@
 
 ;; MonadPlus
 
-(defn monadplus-associativity [{:keys [ctx gen]}]
+(defn monadplus-associativity
+  [{:keys [ctx gen eq] :or {eq =}}]
   (prop/for-all [x gen
                  y gen
                  z gen]
     (ctx/with-context ctx
-      (= (m/mplus (m/mplus x y) z)
-         (m/mplus x (m/mplus y z))))))
+      (eq (m/mplus (m/mplus x y) z)
+          (m/mplus x (m/mplus y z))))))
 
 ;; MonadZero
 
-(defn monadzero-identity-element [{:keys [ctx gen]}]
+(defn monadzero-identity-element
+  [{:keys [ctx gen eq] :or {eq =}}]
   (prop/for-all [x gen]
     (ctx/with-context ctx
-      (= x
-         (m/mplus x (m/mzero ctx))
-         (m/mplus (m/mzero ctx) x)))))
+      (eq x
+          (m/mplus x (m/mzero ctx))
+          (m/mplus (m/mzero ctx) x)))))
 
-(defn monadzero-bind [{:keys [ctx gen zero] :or {zero (m/mzero ctx)}}]
+(defn monadzero-bind
+  [{:keys [ctx gen zero eq] :or {zero (m/mzero ctx) eq =}}]
   (prop/for-all [m gen]
     (ctx/with-context ctx
-      (= zero
-         (m/>>= zero (fn [v] (m/return v)))
-         (m/>> m zero)))))
+      (eq zero
+          (m/>>= zero (fn [v] (m/return v)))
+          (m/>> m zero)))))
