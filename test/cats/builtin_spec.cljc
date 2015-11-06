@@ -1,16 +1,26 @@
 (ns cats.builtin-spec
-  (:require [cats.builtin :as b]
-            [cats.protocols :as p]
-            [cats.monad.maybe :as maybe]
-
-            #?(:cljs [cats.context :as ctx :include-macros true]
-               :clj  [cats.context :as ctx])
-
-            #?(:cljs [cljs.test :as t]
-               :clj  [clojure.test :as t])
-
-            #?(:cljs [cats.core :as m :include-macros true]
-               :clj  [cats.core :as m])))
+  #?@(:cljs
+      [(:require [cljs.test :as t]
+                 [clojure.test.check]
+                 [clojure.test.check.generators :as gen]
+                 [clojure.test.check.properties :as prop :include-macros true]
+                 [cats.labs.test :as lt]
+                 [cats.builtin :as b]
+                 [cats.monad.maybe :as maybe]
+                 [cats.context :as ctx :include-macros true]
+                 [cats.core :as m :include-macros true])
+       (:require-macros [clojure.test.check.clojure-test :refer (defspec)])])
+  #?(:clj
+     (:require [clojure.test :as t]
+               [clojure.test.check.clojure-test :refer [defspec]]
+               [clojure.test.check :as tc]
+               [clojure.test.check.generators :as gen]
+               [clojure.test.check.properties :as prop]
+               [cats.labs.test :as lt]
+               [cats.builtin :as b]
+               [cats.monad.maybe :as maybe]
+               [cats.context :as ctx]
+               [cats.core :as m])))
 
 (t/deftest test-nil-as-maybe
   (t/testing "Nil works like nothing (for avoid unnecesary null pointers)."
@@ -22,176 +32,25 @@
   (t/testing "extract function"
     (t/is (= (m/extract nil) nil))))
 
-(t/deftest map-monad
-  (t/testing "Forms a semigroup"
-    (t/is (= {:a 1 :b 2 :c 3 :d 4 :e 5}
-             (m/mappend {:a 1 :b 2 :c 3} {:d 4 :e 5}))))
+;; Map
 
-  (t/testing "Is a functor"
-    (let [a {1 1, 2 4, 3 9, 4 16}
-          b (m/fmap (fn [[k v]] [k (* k k)])
-              {1 1, 2 2, 3 3, 4 4})]
-      (t/is (= a b))))
+(def map-gen (gen/map gen/keyword gen/any))
 
-  (t/testing "Forms a monoid"
-    (t/is (= {:a 1 :b 2 :c 3}
-             (ctx/with-context b/map-context
-               (m/mappend {:a 1 :b 2 :c 3} (m/mempty))))))
+(defspec map-semigroup 10
+  (lt/semigroup-associativity {:ctx b/map-context
+                               :gen map-gen}))
 
-  (t/testing "The first monad law: left identity"
-    (t/is (= {:aa 1 :bb 2 :cc 3}
-             (m/>>= {:a 0 :b 1 :c 2}
-                    (fn [[k v]]
-                      {(->> [k k] (map name) (apply str) keyword)
-                       (inc v)})))))
+(defspec map-monoid 10
+  (lt/monoid-identity-element {:ctx b/map-context
+                               :gen map-gen}))
 
-  (t/testing "The second law: right identity"
-    (t/is (= {:a 1 :b 2 :c 3}
-             (m/>>= {:a 1 :b 2 :c 3}
-                    m/return))))
+(defspec map-first-functor-law 10
+  (lt/first-functor-law {:gen map-gen}))
 
-  (t/testing "The third law: associativity"
-    (t/is (= (m/>>= (m/mlet [x {:a 1 :b 2 :c 3}
-                             y (let [[k v] x] {k (inc v)})]
-                      (m/return y))
-                    (fn [[k v]] {(str k k) (inc v)}))
-             (m/>>= {:a 1 :b 2 :c 3}
-                    (fn [x] (m/>>= (let [[k v] x] {k (inc v)})
-                                   (fn [[k v]] {(str k k) (inc v)}))))))))
-
-(t/deftest vector-monad
-  (t/testing "Forms a semigroup"
-    (t/is (= [1 2 3 4 5]
-             (m/mappend [1 2 3] [4 5]))))
-
-  (t/testing "Forms a monoid"
-    (t/is (= [1 2 3]
-             (ctx/with-context b/vector-context
-               (m/mappend [1 2 3] (m/mempty))))))
-
-  (t/testing "The first monad law: left identity"
-    (t/is (= [1 2 3 4 5]
-             (m/>>= [0 1 2 3 4]
-                    (fn [x] [(inc x)])))))
-
-  (t/testing "The second law: right identity"
-    (t/is (= [1 2 3]
-             (m/>>= [1 2 3]
-                    m/return))))
-
-  (t/testing "The third law: associativity"
-    (t/is (= (m/>>= (m/mlet [x [1 2 3 4 5]
-                             y [(inc x)]]
-                      (m/return y))
-                    (fn [z] [(inc z)]))
-             (m/>>= [1 2 3 4 5]
-                    (fn [x] (m/>>= [(inc x)]
-                                   (fn [y] [(inc y)]))))))))
-
-(t/deftest sequence-monad
-  (let [val->lazyseq (fn [x] (lazy-seq [x]))
-        s (val->lazyseq 2)]
-
-    (t/testing "Forms a semigroup"
-      (t/is (= [1 2 3 4 5]
-               (m/mappend (lazy-seq [1 2 3]) (lazy-seq [4 5])))))
-
-    (t/testing "Forms a monoid"
-      (t/is (= [1 2 3]
-               (ctx/with-context b/sequence-context
-                 (m/mappend (lazy-seq [1 2 3]) (m/mempty))))))
-
-    (t/testing "The first monad law: left identity"
-      (t/is (= s (ctx/with-context b/sequence-context
-                   (m/>>= (m/return 2)
-                          val->lazyseq)))))
-
-    (t/testing "The second monad law: right identity"
-      (t/is (= s (m/>>= s m/return))))
-
-    (t/testing "The third monad law: associativity"
-      (t/is (= (m/>>= (m/mlet [x s
-                               y  (val->lazyseq (inc x))]
-                        (m/return y))
-                      (fn [y] (val->lazyseq (inc y))))
-               (m/>>= s
-                      (fn [x]
-                        (m/>>= (val->lazyseq (inc x))
-                               (fn [y] (val->lazyseq (inc y)))))))))))
-
-
-(t/deftest set-monad
-  (t/testing "Forms a semigroup"
-    (t/is (= #{1 2 3 4 5}
-             (m/mappend #{1 2 3} #{4 5}))))
-
-  (t/testing "Forms a monoid"
-    (t/is (= #{1 2 3}
-             (ctx/with-context b/set-context
-               (m/mappend #{1 2 3} (m/mempty))))))
-
-
-  (t/testing "Is a functor"
-    (t/is (= #{2 3 4}
-             (m/fmap inc #{1 2 3}))))
-
-  (t/testing "The first monad law: left identity"
-    (t/is (= #{2} (ctx/with-context b/set-context
-                    (m/>>= (m/return 2)
-                           (fn [x] #{x}))))))
-
-  (t/testing "The second monad law: right identity"
-    (t/is (= #{2} (m/>>= #{2} m/return))))
-
-  (t/testing "The third monad law: associativity"
-    (t/is (= (m/>>= (m/mlet [x #{2}
-                             y #{(inc x)}]
-                      (m/return y))
-                    (fn [y] #{(inc y)}))
-             (m/>>= #{2}
-                    (fn [x]
-                      (m/>>= #{(inc x)}
-                             (fn [y] #{(inc y)}))))))))
-
-(t/deftest function-monad
-  (t/testing "Forms a semigroup"
-    (t/is (= 12
-             ((m/mappend (partial * 2) inc) 5))))
-
-  (t/testing "Forms a monoid"
-    (t/is (= 6
-             (ctx/with-context b/function-context
-               ((m/mappend inc (m/mempty)) 5)))))
-
-  (t/testing "Is a functor"
-    (t/is (= "5"
-             ((m/fmap str inc) 4))))
-
-  (t/testing "The first monad law: left identity"
-    (t/is (= 5 (ctx/with-context b/set-context
-                 ((m/>>= (m/return 1) (fn [x] (partial + x))) 4)))))
-
-  (t/testing "The second monad law: right identity"
-      (t/is (= 5 ((m/>>= inc m/return) 4))))
-
-  (t/testing "The third monad law: associativity"
-    (t/is (= ((m/>>= (m/mlet [x inc
-                              y (partial * x)]
-                             (m/return y))
-                     (fn [y] (partial + y))) 5)
-             ((m/>>= inc
-                      (fn [x]
-                        (m/>>= (partial * x)
-                               (fn [y] (partial + y))))) 5)))))
-
-(t/deftest vector-foldable
-  (t/testing "Foldl"
-    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] [1 2 3])))
-    (t/is (= 6 (m/foldl + 0 [1 2 3]))))
-
-  (t/testing "Foldr"
-    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] [1 2 3])))
-    (t/is (= 6 (m/foldr + 0 [1 2 3])))))
+(defspec map-second-functor-law 10
+  (lt/second-functor-law {:gen map-gen
+                          :f (fn [[k v]] [k (str k v)])
+                          :g (fn [[k v]] [k (count v)])}))
 
 (t/deftest array-map-foldable
   (t/testing "Foldl"
@@ -216,81 +75,37 @@
                       {:a 1 :b 2 :c 3 :d 4})))
     (t/is (= 6 (m/foldr (fn [[k v] acc] (+ acc v)) 0 {:a 1 :b 2 :c 3})))))
 
-(t/deftest lazyseq-foldable
+
+;; Vector
+
+(defspec vector-semigroup 10
+  (lt/semigroup-associativity {:ctx b/vector-context
+                               :gen (gen/not-empty (gen/vector gen/any))}))
+
+(defspec vector-monoid 10
+  (lt/monoid-identity-element {:ctx b/vector-context
+                               :gen (gen/vector gen/any)}))
+
+(defspec vector-first-monad-law 10
+  (lt/first-monad-law {:ctx b/vector-context
+                       :mf #(if % (vector %) [])}))
+
+(defspec vector-second-monad-law 10
+  (lt/second-monad-law {:ctx b/vector-context}))
+
+(defspec vector-third-monad-law 10
+  (lt/third-monad-law {:ctx b/vector-context
+                       :f (comp vector str)
+                       :g (comp vector count)}))
+
+(t/deftest vector-foldable
   (t/testing "Foldl"
-    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] (map identity [1 2 3]))))
-    (t/is (= 6 (m/foldl + 0 (map identity [1 2 3])))))
+    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] [1 2 3])))
+    (t/is (= 6 (m/foldl + 0 [1 2 3]))))
 
   (t/testing "Foldr"
-    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] (map identity [1 2 3]))))
-    (t/is (= 6 (m/foldr + 0 (map identity [1 2 3]))))))
-
-(t/deftest range-foldable
-  (t/testing "Foldl"
-    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] (range 1 4))))
-    (t/is (= 6 (m/foldl + 0 (range 1 4)))))
-
-  (t/testing "Foldr"
-    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] (range 1 4))))
-    (t/is (= 6 (m/foldr + 0 (range 1 4))))))
-
-(t/deftest any-monoid
-  (t/testing "mempty"
-    (ctx/with-context b/any-monoid
-      (t/is (= false (m/mempty)))))
-
-  (t/testing "mappend"
-    (ctx/with-context b/any-monoid
-      (t/is (true? (m/mappend (m/mempty) true)))
-      (t/is (false? (m/mappend false false)))
-      (t/is (true? (m/mappend true false)))
-      (t/is (true? (m/mappend false true)))
-      (t/is (true? (m/mappend true true))))))
-
-(t/deftest all-monoid
-  (t/testing "mempty"
-    (ctx/with-context b/all-monoid
-      (t/is (= true (m/mempty)))))
-
-  (t/testing "mappend"
-    (ctx/with-context b/all-monoid
-      (t/is (false? (m/mappend (m/mempty) false)))
-      (t/is (false? (m/mappend false false)))
-      (t/is (false? (m/mappend true false)))
-      (t/is (false? (m/mappend false true)))
-      (t/is (true? (m/mappend true true))))))
-
-(t/deftest sum-monoid
-  (t/testing "mempty"
-    (ctx/with-context b/sum-monoid
-      (t/is (= 0 (m/mempty)))))
-
-  (t/testing "mappend"
-    (ctx/with-context b/sum-monoid
-      (t/is (= 3 (m/mappend (m/mempty) 3)))
-      (t/is (= 3 (m/mappend 1 2))))))
-
-(t/deftest prod-monoid
-  (t/testing "mempty"
-    (ctx/with-context b/prod-monoid
-      (t/is (= 1 (m/mempty)))))
-
-  (t/testing "mappend"
-    (ctx/with-context b/prod-monoid
-      (t/is (= 6 (m/mappend (m/mempty) 6)))
-      (t/is (= 6 (m/mappend 1 2 3)))
-      (t/is (= (reduce * (range 1 6)) (apply m/mappend (range 1 6)))))))
-
-(t/deftest string-monoid
-  (t/testing "mempty"
-    (ctx/with-context b/string-monoid
-      (t/is (= "" (m/mempty)))))
-
-  (t/testing "mappend"
-    (ctx/with-context b/string-monoid
-      (t/is (= "Hello" (m/mappend (m/mempty) "Hello"))))
-    (t/is (= "Hello World" (m/mappend "Hello " "World")))
-    (t/is (= "abcdefghi" (m/mappend "abc" "def" "ghi")))))
+    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] [1 2 3])))
+    (t/is (= 6 (m/foldr + 0 [1 2 3])))))
 
 (defn inc-if-even
   [n]
@@ -310,14 +125,175 @@
              (ctx/with-context maybe/context
                (m/traverse inc-if-even [1 2]))))))
 
+;; Sequence
+
+(defn sequence-gen [g]
+  (gen/fmap #(lazy-seq %) (gen/vector g)))
+
+(defspec sequence-semigroup 10
+  (lt/semigroup-associativity {:ctx b/sequence-context
+                               :gen (gen/not-empty (sequence-gen gen/any))}))
+
+(defspec sequence-monoid 10
+  (lt/monoid-identity-element {:ctx b/sequence-context
+                               :gen (sequence-gen gen/any)}))
+
+(defspec sequence-first-monad-law 10
+  (lt/first-monad-law {:ctx b/sequence-context
+                       :mf #(if % (lazy-seq vector %) (lazy-seq []))}))
+
+(defspec sequence-second-monad-law 10
+  (lt/second-monad-law {:ctx b/sequence-context}))
+
+(defspec sequence-third-monad-law 10
+  (lt/third-monad-law {:ctx b/sequence-context
+                       :f (comp seq vector str)
+                       :g (comp seq vector count)}))
+
+(t/deftest lazyseq-foldable
+  (t/testing "Foldl"
+    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] (map identity [1 2 3]))))
+    (t/is (= 6 (m/foldl + 0 (map identity [1 2 3])))))
+
+  (t/testing "Foldr"
+    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] (map identity [1 2 3]))))
+    (t/is (= 6 (m/foldr + 0 (map identity [1 2 3]))))))
+
 (t/deftest lazyseq-traversable
   (t/testing "Traverse"
     (t/is (= (maybe/just [])
              (ctx/with-context maybe/context
                (m/traverse inc-if-even (lazy-seq [])))))
-    #_(t/is (= (maybe/just [3 5])
+    (t/is (= (maybe/just [3 5])
              (ctx/with-context maybe/context
                (m/traverse inc-if-even (lazy-seq [2 4])))))
-    #_(t/is (= (maybe/nothing)
+    (t/is (= (maybe/nothing)
              (ctx/with-context maybe/context
                (m/traverse inc-if-even (lazy-seq [1 2])))))))
+
+;; Range
+
+(t/deftest range-foldable
+  (t/testing "Foldl"
+    (t/is (= [3 2 1] (m/foldl (fn [acc v] (into [v] acc)) [] (range 1 4))))
+    (t/is (= 6 (m/foldl + 0 (range 1 4)))))
+
+  (t/testing "Foldr"
+    (t/is (= [1 2 3] (m/foldr (fn [v acc] (into [v] acc)) [] (range 1 4))))
+    (t/is (= 6 (m/foldr + 0 (range 1 4))))))
+
+;; Set
+
+(defspec set-semigroup 10
+  (lt/semigroup-associativity {:ctx b/set-context
+                               :gen (gen/not-empty (gen/set gen/any))}))
+
+(defspec set-monoid 10
+  (lt/monoid-identity-element {:ctx b/set-context
+                               :gen (gen/set gen/any)}))
+
+(defspec set-first-monad-law 10
+  (lt/first-monad-law {:ctx b/set-context
+                       :mf #(if % #{%} #{})}))
+
+(defspec set-second-monad-law 10
+  (lt/second-monad-law {:ctx b/set-context}))
+
+(defspec set-third-monad-law 10
+  (lt/third-monad-law {:ctx b/set-context
+                       :f (comp set vector str)
+                       :g (comp set vector count)}))
+
+;; Function
+
+(def fn-gen
+  (gen/one-of [(gen/return inc) (gen/return dec)]))
+
+(defspec fn-semigroup 10
+  (lt/semigroup-associativity {:ctx b/function-context
+                               :gen fn-gen
+                               :eq (fn [f g]
+                                     (= (f 42)
+                                        (g 42)))}))
+
+(defspec fn-monoid 10
+  (lt/monoid-identity-element {:ctx b/function-context
+                               :gen fn-gen
+                               :eq (fn [f g h]
+                                     (= (f 42)
+                                        (g 42)
+                                        (h 42)))}))
+
+(defspec fn-first-monad-law 10
+  (lt/first-monad-law {:ctx b/function-context
+                       :gen fn-gen
+                       :mf (fn [_] (constantly 42))
+                       :eq (fn [f g]
+                             (= (f 42)
+                                (g 42)))}))
+
+(defspec fn-second-monad-law 10
+  (lt/second-monad-law {:ctx b/function-context
+                        :eq (fn [f g]
+                             (= (f 42)
+                                (g 42)))}))
+
+(defspec fn-third-monad-law 10
+  (lt/third-monad-law {:ctx b/function-context
+                       :eq (fn [f g]
+                             (= (f 42)
+                                (g 42)))
+                       :f (fn [_]
+                            (fn [x] (str x)))
+                       :g (fn [_]
+                            (fn [x] (vector x)))}))
+
+;; Any
+
+(defspec any-semigroup 10
+  (lt/semigroup-associativity {:ctx b/any-monoid
+                               :gen gen/boolean}))
+
+(defspec any-monoid 10
+  (lt/monoid-identity-element {:ctx b/any-monoid
+                               :gen gen/boolean}))
+
+;; All
+
+(defspec all-semigroup 10
+  (lt/semigroup-associativity {:ctx b/all-monoid
+                               :gen gen/boolean}))
+
+(defspec all-monoid 10
+  (lt/monoid-identity-element {:ctx b/all-monoid
+                               :gen gen/boolean}))
+
+;; Sum
+
+(defspec sum-semigroup 10
+  (lt/semigroup-associativity {:ctx b/sum-monoid
+                               :gen gen/int}))
+
+(defspec sum-monoid 10
+  (lt/monoid-identity-element {:ctx b/sum-monoid
+                               :gen gen/int}))
+
+;; Prod
+
+(defspec prod-semigroup 10
+  (lt/semigroup-associativity {:ctx b/prod-monoid
+                               :gen gen/int}))
+
+(defspec prod-monoid 10
+  (lt/monoid-identity-element {:ctx b/prod-monoid
+                               :gen gen/int}))
+
+;; String
+
+(defspec string-semigroup 10
+  (lt/semigroup-associativity {:ctx b/string-monoid
+                               :gen gen/string}))
+
+(defspec string-monoid 10
+  (lt/monoid-identity-element {:ctx b/string-monoid
+                               :gen gen/string}))

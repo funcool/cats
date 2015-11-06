@@ -28,7 +28,7 @@
             [cats.core :as m]
             [cats.protocols :as p]
             [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as prop]))
+            [clojure.test.check.properties :as prop :include-macros true]))
 
 ;; Generator context
 
@@ -62,21 +62,22 @@
 
 ;; Semigroup
 
-(defn semigroup-associativity [{:keys [ctx gen]}]
+(defn semigroup-associativity [{:keys [ctx gen eq] :or {eq =}}]
   (prop/for-all [x gen
                  y gen
                  z gen]
     (ctx/with-context ctx
-      (= (m/mappend (m/mappend x y) z)
-         (m/mappend x (m/mappend y z))))))
+      (eq (m/mappend (m/mappend x y) z)
+          (m/mappend x (m/mappend y z))))))
 
 ;; Monoid
 
-(defn monoid-identity-element [{:keys [ctx gen empty] :or {:empty (m/mempty ctx)}}]
+(defn monoid-identity-element [{:keys [ctx gen empty eq] :or {empty (m/mempty ctx) eq =}}]
   (prop/for-all [x gen]
-      (= x
-         (m/mappend x empty)
-         (m/mappend empty x))))
+    (ctx/with-context ctx
+      (eq x
+          (m/mappend x empty)
+          (m/mappend empty x)))))
 
 ;; Functor laws
 
@@ -118,22 +119,22 @@
 
 ;; Monad laws
 
-(defn first-monad-law [{:keys [ctx mf]}]
-  (prop/for-all [a gen/any]
-    (= (mf a)
-       (m/>>= (m/return ctx a) mf))))
+(defn first-monad-law [{:keys [ctx mf gen eq] :or {gen gen/any eq =}}]
+  (prop/for-all [a gen]
+    (eq (mf a)
+        (m/>>= (m/return ctx a) mf))))
 
-(defn second-monad-law [{:keys [ctx]}]
+(defn second-monad-law [{:keys [ctx eq] :or {eq =}}]
   (prop/for-all [a gen/any]
     (let [m (m/return ctx a)]
-      (= m
-         (m/>>= m m/return)))))
+      (eq m
+          (m/>>= m m/return)))))
 
-(defn third-monad-law [{:keys [ctx f g]}]
+(defn third-monad-law [{:keys [ctx f g eq] :or {eq =}}]
   (prop/for-all [a gen/any]
     (let [m (m/return ctx a)]
-      (= (m/>>= (m/>>= m f) g)
-         (m/>>= m (fn [x] (m/>>= (f x) g)))))))
+      (eq (m/>>= (m/>>= m f) g)
+          (m/>>= m (fn [x] (m/>>= (f x) g)))))))
 
 ;; MonadPlus
 
@@ -154,7 +155,7 @@
          (m/mplus x (m/mzero ctx))
          (m/mplus (m/mzero ctx) x)))))
 
-(defn monadzero-bind [{:keys [ctx gen zero] :or {:zero (m/mzero ctx)}}]
+(defn monadzero-bind [{:keys [ctx gen zero] :or {zero (m/mzero ctx)}}]
   (prop/for-all [m gen]
     (ctx/with-context ctx
       (= zero
