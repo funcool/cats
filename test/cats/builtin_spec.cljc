@@ -86,6 +86,34 @@
   (lt/monoid-identity-element {:ctx b/vector-context
                                :gen (gen/vector gen/any)}))
 
+(defspec vector-first-functor-law 10
+  (lt/first-functor-law {:gen (gen/vector gen/any)}))
+
+(defspec vector-second-functor-law 10
+  (lt/second-functor-law {:gen (gen/vector gen/any)
+                          :f vector
+                          :g vector}))
+
+(defspec vector-applicative-identity 10
+  (lt/applicative-identity-law {:ctx b/vector-context
+                                :gen (gen/vector gen/any)}))
+
+(defspec vector-applicative-homomorphism 10
+  (lt/applicative-homomorphism {:ctx b/vector-context
+                                :gen gen/any
+                                :f (constantly false)}))
+
+(defspec vector-applicative-interchange 10
+  (lt/applicative-interchange {:ctx b/vector-context
+                               :gen gen/int
+                               :appf [inc]}))
+
+(defspec vector-applicative-composition 10
+  (lt/applicative-composition {:ctx b/vector-context
+                               :gen gen/int
+                               :appf [inc]
+                               :appg [dec]}))
+
 (defspec vector-first-monad-law 10
   (lt/first-monad-law {:ctx b/vector-context
                        :mf #(if % (vector %) [])}))
@@ -137,6 +165,34 @@
 (defspec sequence-monoid 10
   (lt/monoid-identity-element {:ctx b/sequence-context
                                :gen (sequence-gen gen/any)}))
+
+(defspec sequence-first-functor-law 10
+  (lt/first-functor-law {:gen (sequence-gen gen/any)}))
+
+(defspec sequence-second-functor-law 10
+  (lt/second-functor-law {:gen (sequence-gen gen/any)
+                          :f #(lazy-seq [%])
+                          :g #(lazy-seq [%])}))
+
+(defspec sequence-applicative-identity 10
+  (lt/applicative-identity-law {:ctx b/sequence-context
+                                :gen (sequence-gen gen/any)}))
+
+(defspec sequence-applicative-homomorphism 10
+  (lt/applicative-homomorphism {:ctx b/sequence-context
+                                :gen gen/any
+                                :f (constantly false)}))
+
+(defspec sequence-applicative-interchange 10
+  (lt/applicative-interchange {:ctx b/sequence-context
+                               :gen gen/int
+                               :appf (lazy-seq [inc])}))
+
+(defspec sequence-applicative-composition 10
+  (lt/applicative-composition {:ctx b/sequence-context
+                               :gen gen/int
+                               :appf (lazy-seq [inc])
+                               :appg (lazy-seq [dec])}))
 
 (defspec sequence-first-monad-law 10
   (lt/first-monad-law {:ctx b/sequence-context
@@ -192,6 +248,34 @@
   (lt/monoid-identity-element {:ctx b/set-context
                                :gen (gen/set gen/any)}))
 
+(defspec set-first-functor-law 10
+  (lt/first-functor-law {:gen (gen/set gen/any)}))
+
+(defspec set-second-functor-law 10
+  (lt/second-functor-law {:gen (gen/set gen/any)
+                          :f (comp set vector)
+                          :g (comp set vector)}))
+
+(defspec set-applicative-identity 10
+  (lt/applicative-identity-law {:ctx b/set-context
+                                :gen (gen/set gen/any)}))
+
+(defspec set-applicative-homomorphism 10
+  (lt/applicative-homomorphism {:ctx b/set-context
+                                :gen gen/any
+                                :f (constantly false)}))
+
+(defspec set-applicative-interchange 10
+  (lt/applicative-interchange {:ctx b/set-context
+                               :gen gen/int
+                               :appf #{inc}}))
+
+(defspec set-applicative-composition 10
+  (lt/applicative-composition {:ctx b/set-context
+                               :gen gen/int
+                               :appf #{inc}
+                               :appg #{dec}}))
+
 (defspec set-first-monad-law 10
   (lt/first-monad-law {:ctx b/set-context
                        :mf #(if % #{%} #{})}))
@@ -209,40 +293,73 @@
 (def fn-gen
   (gen/one-of [(gen/return inc) (gen/return dec)]))
 
+(defn fn-eq
+  ([f g]
+   (= (f 42)
+      (g 42)))
+  ([f g h]
+   (= (f 42)
+      (g 42)
+      (h 42))))
+
 (defspec fn-semigroup 10
   (lt/semigroup-associativity {:ctx b/function-context
                                :gen fn-gen
-                               :eq (fn [f g]
-                                     (= (f 42)
-                                        (g 42)))}))
+                               :eq fn-eq}))
 
 (defspec fn-monoid 10
   (lt/monoid-identity-element {:ctx b/function-context
                                :gen fn-gen
-                               :eq (fn [f g h]
-                                     (= (f 42)
-                                        (g 42)
-                                        (h 42)))}))
+                               :eq fn-eq}))
+
+(defspec fn-first-functor-law 10
+  (lt/first-functor-law {:gen fn-gen
+                         :eq fn-eq}))
+
+(defspec fn-second-functor-law 10
+  (lt/second-functor-law {:gen fn-gen
+                          :eq fn-eq
+                          :f #(+ % 2)
+                          :g #(- % 2)}))
+
+(defspec fn-applicative-identity 10
+  (lt/applicative-identity-law {:ctx b/function-context
+                                :gen fn-gen
+                                :eq fn-eq}))
+
+(defspec fn-applicative-homomorphism 10
+  (lt/applicative-homomorphism {:ctx b/function-context
+                                :eq fn-eq
+                                :gen gen/int
+                                :f inc}))
+
+(defspec fn-applicative-interchange 10
+  (lt/applicative-interchange {:ctx b/function-context
+                               :eq fn-eq
+                               :gen gen/int
+                               :appf (fn [_] #(inc %))}))
+
+
+(defspec fn-applicative-composition 10
+  (lt/applicative-composition {:ctx b/function-context
+                               :eq fn-eq
+                               :gen gen/int
+                               :appf (fn [_] #(inc %))
+                               :appg (fn [_] #(dec %))}))
 
 (defspec fn-first-monad-law 10
   (lt/first-monad-law {:ctx b/function-context
                        :gen fn-gen
                        :mf (fn [_] (constantly 42))
-                       :eq (fn [f g]
-                             (= (f 42)
-                                (g 42)))}))
+                       :eq fn-eq}))
 
 (defspec fn-second-monad-law 10
   (lt/second-monad-law {:ctx b/function-context
-                        :eq (fn [f g]
-                             (= (f 42)
-                                (g 42)))}))
+                        :eq fn-eq}))
 
 (defspec fn-third-monad-law 10
   (lt/third-monad-law {:ctx b/function-context
-                       :eq (fn [f g]
-                             (= (f 42)
-                                (g 42)))
+                       :eq fn-eq
                        :f (fn [_]
                             (fn [x] (str x)))
                        :g (fn [_]

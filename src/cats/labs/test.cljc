@@ -81,41 +81,41 @@
 
 ;; Functor laws
 
-(defn first-functor-law [{:keys [gen]}]
+(defn first-functor-law [{:keys [gen eq] :or {eq =}}]
   (prop/for-all [fa gen]
-    (= fa
-       (m/fmap identity fa))))
+    (eq fa
+        (m/fmap identity fa))))
 
-(defn second-functor-law [{:keys [gen f g]}]
+(defn second-functor-law [{:keys [gen f g eq] :or {eq =}}]
   (prop/for-all [fa gen]
-    (= (m/fmap (comp g f) fa)
-       (m/fmap g (m/fmap f fa)))))
+    (eq (m/fmap (comp g f) fa)
+        (m/fmap g (m/fmap f fa)))))
 
 ;; Applicative laws
 
-(defn applicative-identity-law [{:keys [ctx gen]}]
+(defn applicative-identity-law [{:keys [ctx gen eq] :or {eq =}}]
   (prop/for-all [app gen]
-    (= app
-       (m/fapply (m/pure ctx identity) app))))
+    (eq app
+        (m/fapply (m/pure ctx identity) app))))
 
-(defn applicative-homomorphism [{:keys [ctx gen f]}]
+(defn applicative-homomorphism [{:keys [ctx gen f eq] :or {eq =}}]
   (prop/for-all [x gen]
-    (= (m/pure ctx (f x))
-       (m/fapply (m/pure ctx f) (m/pure ctx x)))))
+    (eq (m/pure ctx (f x))
+        (m/fapply (m/pure ctx f) (m/pure ctx x)))))
 
-(defn applicative-interchange [{:keys [ctx gen appf]}]
+(defn applicative-interchange [{:keys [ctx gen appf eq] :or {eq =}}]
   (prop/for-all [x gen]
-    (= (m/fapply appf (m/pure ctx x))
-       (m/fapply (m/pure ctx (fn [f] (f x))) appf))))
+    (eq (m/fapply appf (m/pure ctx x))
+        (m/fapply (m/pure ctx (fn [f] (f x))) appf))))
 
-(defn applicative-composition [{:keys [ctx gen appf appg]}]
+(defn applicative-composition [{:keys [ctx gen appf appg eq] :or {eq =}}]
   (prop/for-all [x gen]
-    (= (m/fapply appg
+    (eq (m/fapply appg
                  (m/fapply appf (m/pure ctx x)))
-       (m/fapply (m/pure ctx (m/curry 2 comp))
-                 appf
-                 appg
-                 (m/pure ctx x)))))
+        (m/fapply (m/pure ctx (m/curry 2 comp))
+                  appf
+                  appg
+                  (m/pure ctx x)))))
 
 ;; Monad laws
 
