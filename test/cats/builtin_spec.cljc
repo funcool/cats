@@ -196,7 +196,7 @@
 
 (defspec sequence-first-monad-law 10
   (lt/first-monad-law {:ctx b/sequence-context
-                       :mf #(if % (lazy-seq vector %) (lazy-seq []))}))
+                       :mf #(if % (lazy-seq [%]) (lazy-seq []))}))
 
 (defspec sequence-second-monad-law 10
   (lt/second-monad-law {:ctx b/sequence-context}))
