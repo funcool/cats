@@ -373,7 +373,7 @@
       (constantly v))
 
     (-fapply [_ self av]
-      (fn [x] (self x (av x))))
+      (fn [x] ((self x) (av x))))
 
     p/Monad
     (-mreturn [_ v]
