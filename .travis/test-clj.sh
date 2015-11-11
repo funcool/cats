@@ -13,7 +13,8 @@ TEST_NAMESPACES=(
     cats.labs.state-spec
     cats.labs.reader-spec
     cats.labs.writer-spec
-    cats.labs.continuation
+    cats.labs.continuation-spec
+    cats.labs.lens-spec
     cats.monad.exception-spec
     cats.monad.either-spec
     cats.monad.maybe-spec
