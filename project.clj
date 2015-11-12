@@ -8,7 +8,6 @@
                  [org.clojure/core.async "0.2.371" :scope "provided"]
                  [org.clojure/test.check "0.8.2" :scope "provided"]
                  [manifold "0.1.1" :scope "provided"]]
-  :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
   :deploy-repositories {"releases" :clojars
                         "snapshots" :clojars}
   :source-paths ["src"]
