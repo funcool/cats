@@ -34,27 +34,27 @@
 
 (def gen-context
   (reify
-     p/Context
-     (-get-level [_] ctx/+level-default+)
+    p/Context
+    (-get-level [_] ctx/+level-default+)
 
-     p/Functor
-     (-fmap [_ f mv]
-       (gen/fmap f mv))
+    p/Functor
+    (-fmap [_ f mv]
+      (gen/fmap f mv))
 
-     p/Applicative
-     (-pure [_ v]
-       (gen/return v))
-     (-fapply [_ gf gv]
-       (m/mlet [f gf
-                v gv]
-         (m/return (f v))))
+    p/Applicative
+    (-pure [_ v]
+      (gen/return v))
+    (-fapply [_ gf gv]
+      (m/mlet [f gf
+               v gv]
+        (m/return (f v))))
 
-     p/Monad
-     (-mreturn [_ v]
-       (gen/return v))
+    p/Monad
+    (-mreturn [_ v]
+      (gen/return v))
 
-     (-mbind [_ mv f]
-       (gen/bind mv f))))
+    (-mbind [_ mv f]
+      (gen/bind mv f))))
 
 (extend-type clojure.test.check.generators.Generator
   p/Contextual
@@ -119,7 +119,7 @@
   [{:keys [ctx gen appf appg eq] :or {eq =}}]
   (prop/for-all [x gen]
     (eq (m/fapply appg
-                 (m/fapply appf (m/pure ctx x)))
+                  (m/fapply appf (m/pure ctx x)))
         (m/fapply (m/pure ctx (m/curry 2 comp))
                   appf
                   appg
