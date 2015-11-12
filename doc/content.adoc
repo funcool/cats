@@ -1446,6 +1446,46 @@ application in clojure(script).
 In any case the state of each module will be notified on the start of the
 each section.
 
+=== test.check
+
+*Status:* Experimental
+
+The `cats.labs.test` namespace implements monad and applicative instances for
+generators, which lets you use the `cats.core/alet` and `cats.core/mlet` macros
+for writing generators:
+
+[source, clojure]
+----
+(require '[cats.core :as m])
+(require '[cats.labs.test])
+(require '[clojure.test.check.generators :as gen])
+
+(def color
+  (m/alet [r gen/int
+           g gen/int
+           b gen/int]
+    [r g b]))
+
+(gen/sample color 1)
+;; => ([0 0 0])
+
+(def mcolor
+  (m/mlet [r gen/int
+           g gen/int
+           b gen/int]
+    (m/return [r g b])))
+
+(gen/sample mcolor 1)
+;; => ([0 0 0])
+----
+
+Apart from that, the namespace contains multiple functions for generating test.check
+properties that verify the laws of Semigroup, Monoid, Functor, Applicative, Monad,
+MonadZero and MonadPlus.
+
+The implementation of cats' abstractions are tested using generative testing and
+the `cats.labs.test` property generation functions.
+
 
 === Channel
 
