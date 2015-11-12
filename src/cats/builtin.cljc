@@ -248,22 +248,6 @@
     (-fmap [_ f v]
       (into {} (map f v)))
 
-    ;; FIXME: do these make sense or are useful?
-    ;; p/Monad
-    ;; (-mreturn [_ v]
-    ;;   (into {} [v]))
-
-    ;; (-mbind [_ self f]
-    ;;   (into {} (mapcat f self)))
-
-    ;; p/MonadZero
-    ;; (-mzero [_]
-    ;;   {})
-
-    ;; p/MonadPlus
-    ;; (-mplus [_ mv mv']
-    ;;   (merge mv mv'))
-
     p/Foldable
     (-foldr [ctx f z xs]
       (letfn [(rf [acc v] (f v acc))]
