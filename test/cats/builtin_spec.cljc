@@ -240,25 +240,30 @@
 
 ;; Set
 
+;; fixme: test.check 0.9.0 will include the `set` generator
+(defn set-gen
+  [g]
+  (gen/fmap set (gen/vector g)))
+
 (defspec set-semigroup 10
   (lt/semigroup-associativity {:ctx b/set-context
-                               :gen (gen/not-empty (gen/set gen/any))}))
+                               :gen (gen/not-empty (set-gen gen/any))}))
 
 (defspec set-monoid 10
   (lt/monoid-identity-element {:ctx b/set-context
-                               :gen (gen/set gen/any)}))
+                               :gen (set-gen gen/any)}))
 
 (defspec set-first-functor-law 10
-  (lt/first-functor-law {:gen (gen/set gen/any)}))
+  (lt/first-functor-law {:gen (set-gen gen/any)}))
 
 (defspec set-second-functor-law 10
-  (lt/second-functor-law {:gen (gen/set gen/any)
+  (lt/second-functor-law {:gen (set-gen gen/any)
                           :f (comp set vector)
                           :g (comp set vector)}))
 
 (defspec set-applicative-identity 10
   (lt/applicative-identity-law {:ctx b/set-context
-                                :gen (gen/set gen/any)}))
+                                :gen (set-gen gen/any)}))
 
 (defspec set-applicative-homomorphism 10
   (lt/applicative-homomorphism {:ctx b/set-context
