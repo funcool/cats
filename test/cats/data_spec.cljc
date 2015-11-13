@@ -7,60 +7,52 @@
             [cats.builtin :as b]
             [cats.protocols :as p]
             [cats.monad.maybe :as maybe]
-
-            #?(:cljs [cats.context :as ctx :include-macros true]
-               :clj  [cats.context :as ctx])
-
-            #?(:cljs [cljs.test :as t]
-               :clj  [clojure.test :as t])
-
-            #?(:cljs [cats.core :as m :include-macros true]
-               :clj  [cats.core :as m])
-
-            #?(:clj
-               [clojure.test.check.clojure-test :refer [defspec]]))
+            [cats.context :as ctx #?@(:cljs [:include-macros true])]
+            [#?(:clj clojure.test :cljs cljs.test) :as t]
+            [cats.core :as m #?@(:cljs [:include-macros true])]
+            #?(:clj [clojure.test.check.clojure-test :refer [defspec]]))
   #?(:cljs (:require-macros [clojure.test.check.clojure-test :refer (defspec)])))
 
 (def ctx (d/pair-monoid b/string-monoid))
 
 (defn pair-gen [g]
-  (m/alet [s1 g
-           s2 g]
+  (m/alet [s1 g, s2 g]
     (d/pair s1 s2)))
 
 (defspec pair-semigroup 10
-  (lt/semigroup-associativity {:ctx ctx
-                               :gen (pair-gen gen/string)}))
+  (lt/semigroup-associativity
+   {:ctx ctx
+    :gen (pair-gen gen/string)}))
 
 (defspec pair-monoid 10
-  (lt/monoid-identity-element {:ctx ctx
-                               :gen (pair-gen gen/string)
-                               :empty (d/pair "" "")}))
+  (lt/monoid-identity-element
+   {:ctx   ctx
+    :gen   (pair-gen gen/string)
+    :empty (d/pair "" "")}))
 
 (defspec pair-monoid-sum 10
-  (lt/monoid-identity-element {:ctx (d/pair-monoid b/sum-monoid)
-                               :gen (pair-gen gen/int)
-                               :empty (d/pair 0 0)}))
+  (lt/monoid-identity-element
+   {:ctx   (d/pair-monoid b/sum-monoid)
+    :gen   (pair-gen gen/int)
+    :empty (d/pair 0 0)}))
 
 (defspec pair-first-functor-law 10
   (lt/first-functor-law {:gen (pair-gen gen/any)}))
 
 (defspec pair-second-functor-law 10
-  (lt/second-functor-law {:gen (pair-gen gen/any)
-                          :f str
-                          :g count}))
+  (lt/second-functor-law
+   {:gen (pair-gen gen/any)
+    :f   str
+    :g   count}))
 
 (t/deftest pair-foldable
   (t/testing "Foldl"
-    (t/is (= (/ 1 3)
-             (m/foldl / 1 (d/pair 0 3)))))
+    (t/is (= (/ 1 3) (m/foldl / 1 (d/pair 0 3)))))
 
   (t/testing "Foldr"
-    (t/is (= (/ 3 1)
-             (m/foldr / 1 (d/pair 0 3))))))
+    (t/is (= (/ 3 1) (m/foldr / 1 (d/pair 0 3))))))
 
-(defn inc-if-even
-  [n]
+(defn inc-if-even [n]
   (if (even? n)
     (maybe/just (inc n))
     (maybe/nothing)))

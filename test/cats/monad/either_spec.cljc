@@ -30,8 +30,7 @@
 
 ;; Generators
 
-(defn rights-of
-  [g]
+(defn rights-of [g]
   (gen/fmap either/right g))
 
 (def right-gen
@@ -49,65 +48,76 @@
 ;; Functor
 
 (defspec either-first-functor-law 10
-  (lt/first-functor-law {:gen either-gen}))
+  (lt/first-functor-law
+   {:gen either-gen}))
 
 (defspec either-second-functor-law 10
-  (lt/second-functor-law {:gen either-gen
-                          :f str
-                          :g count}))
+  (lt/second-functor-law
+   {:gen either-gen
+    :f   str
+    :g   count}))
 
 ;; Applicative
 
 (defspec either-applicative-identity 10
-  (lt/applicative-identity-law {:ctx either/context
-                                :gen either-gen}))
+  (lt/applicative-identity-law
+   {:ctx either/context
+    :gen either-gen}))
 
 (defspec either-applicative-homomorphism 10
-  (lt/applicative-homomorphism {:ctx either/context
-                                :gen gen/any
-                                :f (constantly false)}))
+  (lt/applicative-homomorphism
+   {:ctx either/context
+    :gen gen/any
+    :f   (constantly false)}))
 
 (defspec either-applicative-interchange 10
-  (lt/applicative-interchange {:ctx either/context
-                               :gen gen/int
-                               :appf (either/right inc)}))
+  (lt/applicative-interchange
+   {:ctx  either/context
+    :gen  gen/int
+    :appf (either/right inc)}))
 
 (defspec either-applicative-composition 10
-  (lt/applicative-composition {:ctx either/context
-                               :gen gen/int
-                               :appf (either/right inc)
-                               :appg (either/right dec)}))
+  (lt/applicative-composition
+   {:ctx  either/context
+    :gen  gen/int
+    :appf (either/right inc)
+    :appg (either/right dec)}))
 
 ;; Monad
 
 (defspec either-first-monad-law 10
-  (lt/first-monad-law {:ctx either/context
-                       :mf #(if % (either/right %) (either/left :oh-no))}))
+  (lt/first-monad-law
+   {:ctx either/context
+    :mf  #(if % (either/right %) (either/left :oh-no))}))
 
 (defspec either-second-monad-law 10
   (lt/second-monad-law {:ctx either/context}))
 
 (defspec either-third-monad-law 10
-  (lt/third-monad-law {:ctx either/context
-                       :f (comp either/right str)
-                       :g (comp either/right count)}))
+  (lt/third-monad-law
+   {:ctx either/context
+    :f   (comp either/right str)
+    :g   (comp either/right count)}))
 
 ;; MonadPlus
 
 (defspec either-monadplus 10
-  (lt/monadplus-associativity {:ctx either/context
-                               :gen (gen/not-empty vectors-gen)}))
+  (lt/monadplus-associativity
+   {:ctx either/context
+    :gen (gen/not-empty vectors-gen)}))
 
 ;; MonadZero
 
 (defspec either-monadzero-identity 10
-  (lt/monadzero-identity-element {:ctx either/context
-                                  :gen (rights-of (gen/not-empty vectors-gen))}))
+  (lt/monadzero-identity-element
+   {:ctx either/context
+    :gen (rights-of (gen/not-empty vectors-gen))}))
 
 (defspec either-monadzero-bind 10
-  (lt/monadzero-bind {:ctx either/context
-                      :gen right-gen
-                      :zero (either/left :oh-no)}))
+  (lt/monadzero-bind
+   {:ctx  either/context
+    :gen  right-gen
+    :zero (either/left :oh-no)}))
 
 (t/deftest basic-operations-test
   (t/is (= 1 (m/extract (either/right 1))))
