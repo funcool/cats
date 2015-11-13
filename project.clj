@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0" :scope "provided"]
                  [org.clojure/clojurescript "1.7.170" :scope "provided"]
                  [org.clojure/core.async "0.2.374" :scope "provided"]
-                 [org.clojure/test.check "0.8.2" :scope "provided"]
+                 [org.clojure/test.check "0.9.0" :scope "provided"]
                  [manifold "0.1.1" :scope "provided"]]
   :deploy-repositories {"releases"  :clojars
                         "snapshots" :clojars}
