@@ -43,9 +43,9 @@
     (t/is (validation/fail? m2))))
 
 (t/deftest either-conversion-test
-  (let [ok1 (validation/ok 42)
-        fail1 (validation/fail 42)
-        left1 (either/left 42)
+  (let [ok1    (validation/ok 42)
+        fail1  (validation/fail 42)
+        left1  (either/left 42)
         right1 (either/right 42)]
     (t/is (= (either/right 42) (validation/validation->either ok1)))
     (t/is (= (either/left 42) (validation/validation->either fail1)))
@@ -68,8 +68,7 @@
 
 ;; Generators
 
-(defn oks-of
-  [g]
+(defn oks-of [g]
   (gen/fmap validation/ok g))
 
 (def ok-gen
@@ -87,15 +86,17 @@
 ;; Semigroup
 
 (defspec validation-semigroup 10
-  (lt/semigroup-associativity {:ctx validation/context
-                               :gen (oks-of (gen/not-empty vectors-gen))}))
+  (lt/semigroup-associativity
+   {:ctx validation/context
+    :gen (oks-of (gen/not-empty vectors-gen))}))
 
 ;; Monoid
 
 (defspec validation-monoid 10
-  (lt/monoid-identity-element {:ctx validation/context
-                               :gen (oks-of (gen/not-empty vectors-gen))
-                               :empty (validation/fail [])}))
+  (lt/monoid-identity-element
+   {:ctx   validation/context
+    :gen   (oks-of (gen/not-empty vectors-gen))
+    :empty (validation/fail [])}))
 
 ;; Functor
 
@@ -103,28 +104,33 @@
   (lt/first-functor-law {:gen validation-gen}))
 
 (defspec validation-second-functor-law 10
-  (lt/second-functor-law {:gen validation-gen
-                          :f str
-                          :g count}))
+  (lt/second-functor-law
+   {:gen validation-gen
+    :f   str
+    :g   count}))
 
 ;; Applicative
 
 (defspec validation-applicative-identity 10
-  (lt/applicative-identity-law {:ctx validation/context
-                                :gen validation-gen}))
+  (lt/applicative-identity-law
+   {:ctx validation/context
+    :gen validation-gen}))
 
 (defspec validation-applicative-homomorphism 10
-  (lt/applicative-homomorphism {:ctx validation/context
-                                :gen gen/any
-                                :f (constantly false)}))
+  (lt/applicative-homomorphism
+   {:ctx validation/context
+    :gen gen/any
+    :f   (constantly false)}))
 
 (defspec validation-applicative-interchange 10
-  (lt/applicative-interchange {:ctx validation/context
-                               :gen gen/int
-                               :appf (validation/ok inc)}))
+  (lt/applicative-interchange
+   {:ctx  validation/context
+    :gen  gen/int
+    :appf (validation/ok inc)}))
 
 (defspec validation-applicative-composition 10
-  (lt/applicative-composition {:ctx validation/context
-                               :gen gen/int
-                               :appf (validation/ok inc)
-                               :appg (validation/ok dec)}))
+  (lt/applicative-composition
+   {:ctx  validation/context
+    :gen  gen/int
+    :appf (validation/ok inc)
+    :appg (validation/ok dec)}))

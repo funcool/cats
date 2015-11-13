@@ -28,8 +28,7 @@
 
 ;; Generators
 
-(defn justs-of
-  [g]
+(defn justs-of [g]
   (gen/fmap maybe/just g))
 
 (def just-gen
@@ -47,15 +46,17 @@
 ;; Semigroup
 
 (defspec maybe-semigroup 10
-  (lt/semigroup-associativity {:ctx maybe/context
-                               :gen (justs-of (gen/not-empty vectors-gen))}))
+  (lt/semigroup-associativity
+   {:ctx maybe/context
+    :gen (justs-of (gen/not-empty vectors-gen))}))
 
 ;; Monoid
 
 (defspec maybe-monoid 10
-  (lt/monoid-identity-element {:ctx maybe/context
-                               :gen (justs-of (gen/not-empty vectors-gen))
-                               :empty (maybe/just [])}))
+  (lt/monoid-identity-element
+   {:ctx   maybe/context
+    :gen   (justs-of (gen/not-empty vectors-gen))
+    :empty (maybe/just [])}))
 
 ;; Functor
 
@@ -63,61 +64,71 @@
   (lt/first-functor-law {:gen maybe-gen}))
 
 (defspec maybe-second-functor-law 10
-  (lt/second-functor-law {:gen maybe-gen
-                          :f str
-                          :g count}))
+  (lt/second-functor-law
+   {:gen maybe-gen
+    :f   str
+    :g   count}))
 
 ;; Applicative
 
 (defspec maybe-applicative-identity 10
-  (lt/applicative-identity-law {:ctx maybe/context
-                                :gen maybe-gen}))
+  (lt/applicative-identity-law
+   {:ctx maybe/context
+    :gen maybe-gen}))
 
 (defspec maybe-applicative-homomorphism 10
-  (lt/applicative-homomorphism {:ctx maybe/context
-                                :gen gen/any
-                                :f (constantly false)}))
+  (lt/applicative-homomorphism
+   {:ctx maybe/context
+    :gen gen/any
+    :f   (constantly false)}))
 
 (defspec maybe-applicative-interchange 10
-  (lt/applicative-interchange {:ctx maybe/context
-                               :gen gen/int
-                               :appf (maybe/just inc)}))
+  (lt/applicative-interchange
+   {:ctx  maybe/context
+    :gen  gen/int
+    :appf (maybe/just inc)}))
 
 (defspec maybe-applicative-composition 10
-  (lt/applicative-composition {:ctx maybe/context
-                               :gen gen/int
-                               :appf (maybe/just inc)
-                               :appg (maybe/just dec)}))
+  (lt/applicative-composition
+   {:ctx  maybe/context
+    :gen  gen/int
+    :appf (maybe/just inc)
+    :appg (maybe/just dec)}))
 
 ;; Monad
 
 (defspec maybe-first-monad-law 10
-  (lt/first-monad-law {:ctx maybe/context
-                       :mf #(if % (maybe/just %) (maybe/nothing))}))
+  (lt/first-monad-law
+   {:ctx maybe/context
+    :mf  #(if % (maybe/just %) (maybe/nothing))}))
 
 (defspec maybe-second-monad-law 10
   (lt/second-monad-law {:ctx maybe/context}))
 
 (defspec maybe-third-monad-law 10
-  (lt/third-monad-law {:ctx maybe/context
-                       :f (comp maybe/just str)
-                       :g (comp maybe/just count)}))
+  (lt/third-monad-law
+   {:ctx maybe/context
+    :f   (comp maybe/just str)
+    :g   (comp maybe/just count)}))
 
 ;; MonadPlus
 
 (defspec maybe-monadplus 10
-  (lt/monadplus-associativity {:ctx maybe/context
-                               :gen (gen/not-empty vectors-gen)}))
+  (lt/monadplus-associativity
+   {:ctx maybe/context
+    :gen (gen/not-empty vectors-gen)}))
 
 ;; MonadZero
 
 (defspec maybe-monadzero-identity 10
-  (lt/monadzero-identity-element {:ctx maybe/context
-                                  :gen (justs-of (gen/not-empty vectors-gen))}))
+  (lt/monadzero-identity-element
+   {:ctx maybe/context
+    :gen (justs-of (gen/not-empty vectors-gen))}))
 
 (defspec maybe-monadzero-bind 10
-  (lt/monadzero-bind {:ctx maybe/context
-                      :gen just-gen}))
+  (lt/monadzero-bind
+   {:ctx maybe/context
+    :gen just-gen}))
 
 ;; Examples
 

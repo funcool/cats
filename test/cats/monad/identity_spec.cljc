@@ -32,38 +32,45 @@
   (lt/first-functor-law {:gen id-gen}))
 
 (defspec identity-second-functor-law 10
-  (lt/second-functor-law {:gen id-gen
-                          :f str
-                          :g count}))
+  (lt/second-functor-law
+   {:gen id-gen
+    :f   str
+    :g   count}))
 
 (defspec identity-applicative-identity 10
-  (lt/applicative-identity-law {:ctx id/context
-                                :gen id-gen}))
+  (lt/applicative-identity-law
+   {:ctx id/context
+    :gen id-gen}))
 
 (defspec identity-applicative-homomorphism 10
-  (lt/applicative-homomorphism {:ctx id/context
-                                :gen gen/any
-                                :f str}))
+  (lt/applicative-homomorphism
+   {:ctx id/context
+    :gen gen/any
+    :f   str}))
 
 (defspec identity-applicative-interchange 10
-  (lt/applicative-interchange {:ctx id/context
-                               :gen gen/int
-                               :appf (id/identity inc)}))
+  (lt/applicative-interchange
+   {:ctx  id/context
+    :gen  gen/int
+    :appf (id/identity inc)}))
 
 (defspec identity-applicative-composition 10
-  (lt/applicative-composition {:ctx id/context
-                               :gen gen/int
-                               :appf (id/identity inc)
-                               :appg (id/identity dec)}))
+  (lt/applicative-composition
+   {:ctx  id/context
+    :gen  gen/int
+    :appf (id/identity inc)
+    :appg (id/identity dec)}))
 
 (defspec identity-first-monad-law 10
-  (lt/first-monad-law {:ctx id/context
-                       :mf (comp id/identity str)}))
+  (lt/first-monad-law
+   {:ctx id/context
+    :mf  (comp id/identity str)}))
 
 (defspec identity-second-monad-law 10
   (lt/second-monad-law {:ctx id/context}))
 
 (defspec identity-third-monad-law 10
-  (lt/third-monad-law {:ctx id/context
-                       :f (comp id/identity str)
-                       :g (comp id/identity count)}))
+  (lt/third-monad-law
+   {:ctx id/context
+    :f   (comp id/identity str)
+    :g   (comp id/identity count)}))
