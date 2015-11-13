@@ -16,7 +16,8 @@
             [cats.labs.writer-spec]
             [cats.labs.crdt.pncounter-spec]
             [cats.labs.crdt.gcounter-spec]
-            [cats.labs.crdt.gset-spec]))
+            [cats.labs.crdt.gset-spec]
+            [cats.labs.lens-spec]))
 
 (enable-console-print!)
 
@@ -40,6 +41,7 @@
    'cats.labs.crdt.pncounter-spec
    'cats.labs.crdt.gcounter-spec
    'cats.labs.crdt.gset-spec
+   'cats.labs.lens-spec
    ))
 
 (defmethod test/report [:cljs.test/default :end-run-tests]

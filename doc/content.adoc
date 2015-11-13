@@ -1825,6 +1825,317 @@ the monadic bind takes care of that. The type
 
 TODO
 
+=== Lens
+
+*Status:* Experimental
+
+This namespace implements functional references to one (lens) or multiple (traversal) values modeled as
+functions. Lenses and traversals generalize the get, put and mapping to a particular part of a data structure.
+
+==== Lenses
+
+We'll start by using the most basic lens, the identity lens. We can get the value a lens is focused on using
+the `focus` function in `cats.labs.lens`:
+
+[source, clojure]
+----
+(require '[cats.labs.lens :as l])
+
+(l/focus l/id [0 1 2 3])
+;; => [0 1 2 3]
+----
+
+We have two other primitives available: the `put` operation and `over`, which lets us apply a function over
+the focused value of a lens:
+
+[source, clojure]
+----
+(l/put l/id 42 [0 1 2 3])
+;; => 42
+
+(l/over l/id count [0 1 2 3])
+;; => 4
+----
+
+We can focus on the first (`fst`), (`second`), or nth (`nth`) element of a list with a lens:
+
+[source, clojure]
+----
+;; fst
+
+(l/focus l/fst [1 2 3])
+;; => 1
+
+(l/over l/fst inc [1 2 3])
+;; => [2 2 3]
+
+(l/put l/fst 42 [1 2 3])
+;; => [42 2 3]
+
+;; nth
+
+(l/focus (l/nth 2) [1 2 3])
+;; => 3
+
+(l/over (l/nth 2) inc [1 2 3])
+;; => [1 2 4]
+
+(l/put (l/nth 2) 42 [1 2 3])
+;; => [1 2 42]
+----
+
+And compose them arbitrarily using function composition:
+
+[source, clojure]
+----
+;; fst
+
+(l/focus (comp l/fst l/fst (l/nth 2))
+         [[[0 1 2]
+           [3 4 5]]
+          [6 7 8]])
+;; => 2
+
+(l/put (comp l/fst l/fst (l/nth 2))
+       42
+       [[[0 1 2]
+         [3 4 5]]
+        [6 7 8]])
+;; => [[[0 1 42] [3 4 5]] [6 7 8]]
+----
+
+Lenses compose with regular function composition and, like transducers, the combined lens runs from
+left to right.
+
+The `passes` function accepts a predicate and returns a lens that focuses in an element only if it
+passes the predicate.
+
+[source, clojure]
+----
+(l/focus (l/passes even?) 2)
+;; => 2
+
+(l/over (l/passes even?) inc 2)
+;; => 3
+
+(l/put (l/passes even?) 42 2)
+;; => 42
+
+(l/focus (l/passes even?) 1)
+;; => nil
+
+(l/over (l/passes even?) inc 1)
+;; => 1
+
+(l/put (l/passes even?) 42 1)
+;; => 1
+----
+
+There's `key` and `select-keys` for focusing on one or multiple keys respectively:
+
+[source, clojure]
+----
+(l/focus (l/key :a) {:a 1 :b 2})
+;; => 1
+
+(l/over (l/key :a) str {:a 1 :b 2})
+;; => {:a "1", :b 2}
+
+(l/put (l/key :a) 42 {:a 1 :b 2})
+;; => {:a 42, :b 2}
+
+(l/focus (l/select-keys [:a]) {:a 1 :b 2})
+;; => {:a 1}
+
+(l/over (l/select-keys [:a :c])
+        (fn [m]
+         (zipmap (keys m) (repeat 42)))
+        {:a 1 :b 2})
+;; => {:b 2, :a 42}
+
+(l/put (l/select-keys [:a :c])
+       {:a 0}
+       {:a 1 :b 2 :c 42})
+;; => {:b 2, :a 0}
+----
+
+`in` for focusing on a path:
+
+[source, clojure]
+----
+(l/focus (l/in [:a :b])
+         {:a {:b {:c 42}}})
+;; => {:c 42}
+
+(l/over (l/in [:a :b])
+        (fn [m]
+         (zipmap (vals m) (keys m)))
+        {:a {:b {:c 42}}})
+;; => {:a {:b {42 :c}}}
+
+(l/put (l/in [:a :b])
+       42
+       {:a {:b {:c 42}}})
+;; => {:a {:b 42}}
+----
+
+Let's take a look at a combinator that will let us build a unit-conversion lens
+called `units`. We have to supply a function to convert from unit `a` to unit `b` and viceversa:
+
+[source, clojure]
+----
+(defn sec->min [sec] (/ sec 60))
+(defn min->sec [min] (* min 60))
+
+(def mins (l/units sec->min
+                   min->sec))
+
+(l/focus mins 120)
+;; => 2
+
+(l/put mins 3 120)
+;; => 180
+
+(l/over mins inc 60)
+;; => 120
+----
+
+==== Traversals
+
+A traversal is similar to a lens but it focuses on multiple values instead of one. Therefore, we use the `foci`
+function for viewing the focused elements of a traversal.
+
+Traversals should be composed with other traversals. You can compose lenses with a traversal but it will become
+a traversal and you will have to use `foci` for viewing its values.
+
+Let's look at the identity traversal, it's called `it`:
+
+[source, clojure]
+----
+(l/foci l/it 42)
+;; => (42)
+
+(l/foci l/it [0 1 2 3])
+;; => ([0 1 2 3])
+
+(l/put l/it 42 [0 1 2 3])
+;; => 42
+
+(l/over l/it count [0 1 2 3])
+;; => 4
+----
+
+The `each` traversal focuses every value in a collection, allowing us to map preservering structure. The
+`cat` traversal flattens a nested collection:
+
+[source, clojure]
+----
+(l/foci l/each [0 1 2 3])
+;; => (0 1 2 3)
+
+(l/over l/each inc [0 1 2 3])
+;; => [1 2 3 4]
+
+(l/put l/each 42 [0 1 2 3])
+;; => [42 42 42 42]
+
+(l/foci l/cat [[0 1 2] [3 4 5]])
+;; => (0 1 2 3 4 5)
+
+(l/over l/cat inc [[0 1 2] [3 4 5]])
+;; => [[1 2 3] [4 5 6]]
+
+(l/put l/cat 42 [[0 1 2] [3 4 5]])
+;; => [[42 42 42] [42 42 42]]
+----
+
+The `filter` traversal can be used to filter can be used to filter the results of another by
+composition:
+
+[source, clojure]
+----
+(l/foci (comp l/each (l/filter odd?))
+        [1 2 3 4 5])
+;; => (1 3 5)
+
+(l/over (comp l/each (l/filter odd?))
+        inc
+        [1 2 3 4 5])
+;; => [2 2 4 4 6]
+
+(l/put (comp l/each (l/filter odd?))
+       42
+       [1 2 3 4 5])
+;; => [42 2 42 4 42]
+----
+
+Using `only` is equivalent to composing `each` and `filter`:
+
+[source, clojure]
+----
+(l/foci (l/only odd?)
+        [1 2 3 4 5])
+;; => (1 3 5)
+
+(l/over (l/only odd?)
+        inc
+        [1 2 3 4 5])
+;; => [2 2 4 4 6]
+
+(l/put (l/only odd?)
+       42
+       [1 2 3 4 5])
+;; => [42 2 42 4 42]
+----
+
+Another interesting traversals include `keys` for focusing on map keys, `vals` for focusing on map values, and `indexed`
+for focusing on index-value pairs.
+
+==== Interoperability
+
+`cats.labs.lens` implement the `Focus` and `Foci` atom types, which are derived atoms with either a lens or a traversal. We
+can focus on a subpart of the structure and change it, reflecting the changes on the original atom:
+
+[source, clojure]
+----
+(require '[cats.labs.lens :as l])
+
+(def a (atom [1 2 3 4]))
+
+(def fa (l/focus-atom l/fst a))
+
+(def fsa (l/foci-atom l/each a))
+
+@fa
+;; =>1
+
+@fsa
+;; => (1 2 3 4)
+
+(reset! fa 42)
+;; => 42
+
+@fa
+;; => 42
+
+@fsa
+;; => (42 2 3 4)
+
+@a
+;; => [42 2 3 4]
+
+(reset! fsa 42)
+;; => (42 42 42 42)
+
+@a
+;; => [42 42 42 42]
+
+@fa
+;; => 42
+----
+
+`swap!` and watches also work on the derived focus or foci atoms.
+
 == Complementary libraries
 
 Some monads are defined as separated package to avoid additional
