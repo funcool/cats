@@ -291,7 +291,10 @@
        clojure.lang.IRef
        (addWatch [self key cb]
          (add-watch a key (fn [key _ oldval newval]
-                            (cb key self (focus lens oldval) (focus lens newval)))))
+                            (let [old' (focus lens oldval)
+                                  new' (focus lens newval)]
+                              (if (not= old' new')
+                                (cb key self old' new'))))))
        (removeWatch [_ key]
          (remove-watch a key))]
 
@@ -301,8 +304,11 @@
 
        IWatchable
        (-add-watch [self key cb]
-        (add-watch a key (fn [key _ oldval newval]
-                           (cb key self (focus lens oldval) (focus lens newval)))))
+         (add-watch a key (fn [key _ oldval newval]
+                            (let [old' (focus lens oldval)
+                                  new' (focus lens newval)]
+                              (if (not= old' new')
+                                (cb key self old' new'))))))
        (-remove-watch [_ key]
          (remove-watch a key))
 
@@ -357,7 +363,10 @@
        clojure.lang.IRef
        (addWatch [self key cb]
          (add-watch a key (fn [key _ oldval newval]
-                            (cb key self (foci trav oldval) (foci trav newval)))))
+                            (let [old' (foci trav oldval)
+                                  new' (foci trav newval)]
+                              (if (not= old' new')
+                                (cb key self old' new'))))))
        (removeWatch [_ key]
          (remove-watch a key))]
 
@@ -367,8 +376,11 @@
 
        IWatchable
        (-add-watch [self key cb]
-        (add-watch a key (fn [key _ oldval newval]
-                           (cb key self (foci trav oldval) (foci trav newval)))))
+         (add-watch a key (fn [key _ oldval newval]
+                            (let [old' (foci trav oldval)
+                                  new' (foci trav newval)]
+                              (if (not= old' new')
+                                (cb key self old' new'))))))
        (-remove-watch [_ key]
          (remove-watch a key))
 
