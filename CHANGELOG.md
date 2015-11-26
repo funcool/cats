@@ -2,9 +2,21 @@
 
 ## Version 1.1.0 ##
 
-Date: unreleased
+Date: 2015-11-26
 
+- Add Lenses and Traversals.
 - Add timeout support for manifold deferred context.
+- Improved mapseq implementation.
+- Added function monoid and monad.
+- Implement functor, monad and foldable for any kind of map.
+- Make all types printable.
+- Add monadzero and monadplus for either and either-t.
+- Add `cats.labs.sugar` namespace with sugar syntax macros
+  (documentation is very welcome).
+- Update core.async version to 0.2.374
+- Update cljs compiler version to 0.7.170
+- Add basic support for crdt's under labs namespace.
+  (documentation is missing).
 
 
 ## Version 1.0.0 ##
