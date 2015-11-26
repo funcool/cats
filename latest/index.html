@@ -80,7 +80,7 @@
 <h1>Cats Documentation</h1>
 <div class="details">
 <span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">1.0.0</span>
+<span id="revdate">1.1.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -88,11 +88,7 @@
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#rationale">Rationale</a></li>
 <li><a href="#project-maturity">Project Maturity</a></li>
-<li><a href="#install">Install</a>
-<ul class="sectlevel2">
-<li><a href="#leiningen">Leiningen</a></li>
-</ul>
-</li>
+<li><a href="#install">Install</a></li>
 <li><a href="#user-guide">User Guide</a>
 <ul class="sectlevel2">
 <li><a href="#semigroup">Semigroup</a></li>
@@ -136,6 +132,7 @@
 <li><a href="#reader">Reader</a></li>
 <li><a href="#writer">Writer</a></li>
 <li><a href="#continuation">Continuation</a></li>
+<li><a href="#lens">Lens</a></li>
 </ul>
 </li>
 <li><a href="#complementary-libraries">Complementary libraries</a></li>
@@ -148,14 +145,10 @@
 <ul class="sectlevel2">
 <li><a href="#philosophy">Philosophy</a></li>
 <li><a href="#contributing">Contributing</a></li>
+<li><a href="#editor-integration">Editor integration</a></li>
 <li><a href="#source-code">Source Code</a></li>
 <li><a href="#run-tests">Run tests</a></li>
 <li><a href="#license">License</a></li>
-</ul>
-</li>
-<li><a href="#editor-integration">Editor integration</a>
-<ul class="sectlevel2">
-<li><a href="#emacs">Emacs</a></li>
 </ul>
 </li>
 </ul>
@@ -197,8 +190,8 @@ practical and Clojure like approach, always with correctness in mind.</p>
 cats is licensed under the BSD (2 clauses) license.</p>
 </li>
 <li>
-<p>We do not intend to only implement monads. Other category theory and algebraic abstractions
-are also first class in cats.</p>
+<p>We do not intend to only implement monads. Other category theory and algebraic
+abstractions are also first class in cats.</p>
 </li>
 </ul>
 </div>
@@ -208,19 +201,21 @@ are also first class in cats.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>algo.monads</strong>: This is the official Clojure library for monads. Its approach for modeling
-monads is slightly limited, only supports the monad abstraction and does not have support for
-ClojureScript.</p>
+<p><strong>algo.monads</strong>: This is the official Clojure library for monads. Its approach
+for modeling monads is slightly limited, only supports the monad abstraction and
+does not have support for ClojureScript.</p>
 </li>
 <li>
-<p><strong>fluokitten</strong>: Slightly unmaintaned by the original author. It is focused on being very practical
-without taking care of correctness (for example, it extends Clojure types with monadic abstractions
-that do not make sense). It has no support for ClojureScript either.</p>
+<p><strong>fluokitten</strong>: Slightly unmaintaned by the original author. It is focused on
+being very practical without taking care of correctness (for example, it extends
+Clojure types with monadic abstractions that do not make sense). It has no
+support for ClojureScript either.</p>
 </li>
 <li>
-<p><strong>monads</strong>: Is the most advanced monads library, supports also functors, applicatives and other
-related abstractions. It lacks a good and readable documentation, focus on correctness, has
-Haskell like sugar syntax (instead of Clojure like syntax) and does not have support for ClojureScript.</p>
+<p><strong>monads</strong>: Is the most advanced monads library, supports also functors,
+applicatives and other related abstractions. It lacks a good and readable
+documentation, focus on correctness, has Haskell like sugar syntax (instead of
+Clojure like syntax) and does not have support for ClojureScript.</p>
 </li>
 </ul>
 </div>
@@ -233,7 +228,8 @@ Haskell like sugar syntax (instead of Clojure like syntax) and does not have sup
 <h2 id="project-maturity"><a class="link" href="#project-maturity">Project Maturity</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em>cats</em> already reached the 1.0.0 version and the <a href="api/index.html#id">API</a> is settled.</p>
+<p><em>cats</em> already reached the 1.0.0 version and the <a href="api/index.html#id">API</a> is
+ settled.</p>
 </div>
 </div>
 </div>
@@ -241,19 +237,17 @@ Haskell like sugar syntax (instead of Clojure like syntax) and does not have sup
 <h2 id="install"><a class="link" href="#install">Install</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section covers installing <em>cats</em>.</p>
-</div>
-<div class="sect2">
-<h3 id="leiningen"><a class="link" href="#leiningen">Leiningen</a></h3>
-<div class="paragraph">
 <p>The simplest way to use <em>cats</em> in a Clojure project is by including
 it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;1.0.0&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;1.1.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>And it works with the following platforms: <strong>jdk7</strong>, <strong>jdk8</strong>, <strong>node</strong> (0.12.7, 4.2.0,
+5.0.0).</p>
 </div>
 </div>
 </div>
@@ -261,19 +255,20 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 <h2 id="user-guide"><a class="link" href="#user-guide">User Guide</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section introduces almost all the category theory and algebraic abstractions that the <em>cats</em> library
-supports.</p>
+<p>This section introduces almost all the category theory and algebraic abstractions
+that the <em>cats</em> library supports.</p>
 </div>
 <div class="paragraph">
 <p>We will use <em>Maybe</em> for the example snippets, because it has support for all
-the abstractions and is very easy to understand. You can read more about it in the next
-section of this documentation.</p>
+the abstractions and is very easy to understand. You can read more about it in
+the next section of this documentation.</p>
 </div>
 <div class="sect2">
 <h3 id="semigroup"><a class="link" href="#semigroup">Semigroup</a></h3>
 <div class="paragraph">
-<p>A semigroup is an algebraic structure with an associative binary operation (<code>mappend</code>). Most of the builtin collections
-form a semigroup because their associative binary operation is analogous to Clojure&#8217;s <code>into</code>.</p>
+<p>A semigroup is an algebraic structure with an associative binary operation
+(<code>mappend</code>). Most of the builtin collections form a semigroup because their
+associative binary operation is analogous to Clojure&#8217;s <code>into</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -284,7 +279,8 @@ form a semigroup because their associative binary operation is analogous to Cloj
 </div>
 </div>
 <div class="paragraph">
-<p>Given that the values it contains form a Semigroup, we can <code>mappend</code> multiple <em>Maybe</em> values.</p>
+<p>Given that the values it contains form a Semigroup, we can <code>mappend</code> multiple
+<em>Maybe</em> values.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -300,8 +296,8 @@ form a semigroup because their associative binary operation is analogous to Cloj
 <div class="sect2">
 <h3 id="monoid"><a class="link" href="#monoid">Monoid</a></h3>
 <div class="paragraph">
-<p>A Monoid is a Semigroup with an identity element (<code>mempty</code>). For the collection types the <code>mempty</code>
-function is analogous to Clojure&#8217;s <code>empty</code>.</p>
+<p>A Monoid is a Semigroup with an identity element (<code>mempty</code>). For the collection
+types the <code>mempty</code> function is analogous to Clojure&#8217;s <code>empty</code>.</p>
 </div>
 <div class="paragraph">
 <p>Given that the values it contains form a Semigroup, we can <code>mappend</code> multiple
@@ -323,8 +319,8 @@ function is analogous to Clojure&#8217;s <code>empty</code>.</p>
 <div class="sect2">
 <h3 id="functor"><a class="link" href="#functor">Functor</a></h3>
 <div class="paragraph">
-<p>Let&#8217;s dive into the functor. The Functor represents some sort of "computational context", and the
-abstraction consists of one unique function: <strong>fmap</strong>.</p>
+<p>Let&#8217;s dive into the functor. The Functor represents some sort of "computational
+context", and the abstraction consists of one unique function: <strong>fmap</strong>.</p>
 </div>
 <div class="listingblock">
 <div class="title">Signature of <strong>fmap</strong> function</div>
@@ -340,7 +336,8 @@ as the second parameter.</p>
 </div>
 <div class="paragraph">
 <p>But what is the <strong>functor context</strong>? It sounds more complex than it is. A Functor
-wrapper is any type that acts as "Box" and implements the <code>Context</code> and <code>Functor</code> protocols.</p>
+wrapper is any type that acts as "Box" and implements the <code>Context</code> and <code>Functor</code>
+protocols.</p>
 </div>
 <div class="listingblock">
 <div class="title">One good example of a functor is the <strong>Maybe</strong> type:</div>
@@ -352,7 +349,8 @@ wrapper is any type that acts as "Box" and implements the <code>Context</code> a
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>just</code> function is a constructor of the Just type that is part of the Maybe monad.</p>
+<p>The <code>just</code> function is a constructor of the Just type that is part of the
+Maybe monad.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s see one example of using <strong>fmap</strong> over a <strong>just</strong> instance:</p>
@@ -367,24 +365,24 @@ wrapper is any type that acts as "Box" and implements the <code>Context</code> a
 </div>
 </div>
 <div class="paragraph">
-<p>The <strong>Maybe</strong> type also has another constructor: <code>nothing</code>. It represents the absence of a value.
-It is a safe substitute for <code>nil</code> and may represent failure.</p>
+<p>The <strong>Maybe</strong> type also has another constructor: <code>nothing</code>. It represents the
+absence of a value. It is a safe substitute for <code>nil</code> and may represent failure.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see what happens if we perform the same operation as the previous example over a <strong>nothing</strong>
-instance:</p>
+<p>Let&#8217;s see what happens if we perform the same operation as the previous example
+over a <strong>nothing</strong> instance:</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>nothing</strong>.</div>
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Oh, awesome, instead of raising a <code>NullPointerException</code>, it just returns <strong>nothing</strong>. Another
-advantage of using the functor abstraction, is that it always returns a result
-of the same type as its second argument.</p>
+<p>Oh, awesome, instead of raising a <code>NullPointerException</code>, it just returns
+<strong>nothing</strong>. Another advantage of using the functor abstraction, is that it
+always returns a result of the same type as its second argument.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s see an example of applying fmap over a Clojure vector:</p>
@@ -399,8 +397,8 @@ of the same type as its second argument.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The main difference compared to the previous example with Clojure&#8217;s map function, is that
-map returns lazy seqs no matter what collection we pass to it:</p>
+<p>The main difference compared to the previous example with Clojure&#8217;s map function,
+is that map returns lazy seqs no matter what collection we pass to it:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -409,8 +407,9 @@ map returns lazy seqs no matter what collection we pass to it:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>But why can we pass vectors to the <code>fmap</code> function? Because some Clojure container types like vectors,
-lists and sets, also implement the functor abstraction. See the section on built-in types for more information.</p>
+<p>But why can we pass vectors to the <code>fmap</code> function? Because some Clojure container
+types like vectors, lists and sets, also implement the functor abstraction. See
+the section on built-in types for more information.</p>
 </div>
 </div>
 <div class="sect2">
@@ -443,8 +442,8 @@ the <strong>pure</strong> function will be explained later.
 </table>
 </div>
 <div class="paragraph">
-<p>The use case for Applicative Functors is roughly the same as for plain Functors: safe
-evaluation of some computation in a context.</p>
+<p>The use case for Applicative Functors is roughly the same as for plain Functors:
+safe evaluation of some computation in a context.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s see an example to better understand the differences between functor and
@@ -495,7 +494,7 @@ can apply the returned greeter to any value without a defensive nil check:</p>
 <span class="tok-c1">;; =&gt; #&lt;Just &quot;Hello Alex&quot;&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;it&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -521,13 +520,13 @@ should clarify its purpose.</p>
 <div class="sect2">
 <h3 id="foldable"><a class="link" href="#foldable">Foldable</a></h3>
 <div class="paragraph">
-<p>The <strong>Foldable</strong> is a generic abstraction for data structures that can be folded. It consists
-mainly on two functions: <code>foldl</code> and <code>foldr</code>. <code>foldl</code> is also known as <code>reduce</code> or <code>inject</code>
-in other mainstream programming languages.</p>
+<p>The <strong>Foldable</strong> is a generic abstraction for data structures that can be folded. It
+consists mainly on two functions: <code>foldl</code> and <code>foldr</code>. <code>foldl</code> is also known as
+<code>reduce</code> or <code>inject</code> in other mainstream programming languages.</p>
 </div>
 <div class="paragraph">
-<p>Both function have an identical signature and differ in how they traverse the data structure.
-Let&#8217;s look at a little example using <code>foldl</code>:</p>
+<p>Both function have an identical signature and differ in how they traverse the
+data structure. Let&#8217;s look at a little example using <code>foldl</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -554,14 +553,14 @@ Let&#8217;s look at a little example using <code>foldl</code>:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The main difference between <code>foldl</code> and <code>reduce</code> is that <code>foldl</code> has a fixed arity so all
-parameters are mandatory and <code>foldl</code> is a generic abstraction that can work with other
-types apart from collections.</p>
+<p>The main difference between <code>foldl</code> and <code>reduce</code> is that <code>foldl</code> has a fixed
+arity so all parameters are mandatory and <code>foldl</code> is a generic abstraction that
+can work with other types apart from collections.</p>
 </div>
 <div class="paragraph">
-<p>As we said previously, the <code>foldl</code> and <code>foldr</code> differ mainly on how they traverse the
-data structure. Then, for understanding better how they work internally, let&#8217;s see a
-graphical representation of the <code>foldl</code> execution model:</p>
+<p>As we said previously, the <code>foldl</code> and <code>foldr</code> differ mainly on how they traverse
+the data structure. Then, for understanding better how they work internally,
+let&#8217;s see a graphical representation of the <code>foldl</code> execution model:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -578,9 +577,9 @@ graphical representation of the <code>foldl</code> execution model:</p>
 </div>
 <div class="paragraph">
 <p>In languages with strict argument evaluation, <code>foldr</code> does not have many
-applications because when the data structure to fold grows it tends to consume all the
-stack (causing the well known stack overflow). In case of Clojure, the unique obvious
-case of using foldr is for small datastructures.</p>
+applications because when the data structure to fold grows it tends to consume
+all the stack (causing the well known stack overflow). In case of Clojure,
+the unique obvious case of using foldr is for small datastructures.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -589,8 +588,9 @@ case of using foldr is for small datastructures.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The <strong>Foldable</strong> abstraction is already implemented for cloure vectors, lazy seqs and ranges
-plus the cats maybe, either and validation types. Let see an example how it behaves with maybe:</p>
+<p>The <strong>Foldable</strong> abstraction is already implemented for cloure vectors, lazy seqs
+and ranges plus the cats maybe, either and validation types. Let see an example
+how it behaves with maybe:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -602,14 +602,14 @@ plus the cats maybe, either and validation types. Let see an example how it beha
 </div>
 </div>
 <div class="paragraph">
-<p>It there also other fold functions that are implemented in terms of the basic <code>foldl</code>
-or <code>foldr</code> that can be <strong>foldm</strong> and <strong>foldmap</strong>. At this moment, cats comes only with
-<strong>foldm</strong>.</p>
+<p>It there also other fold functions that are implemented in terms of the basic
+<code>foldl</code> or <code>foldr</code> that can be <strong>foldm</strong> and <strong>foldmap</strong>. At this moment, cats comes
+only with <strong>foldm</strong>.</p>
 </div>
 <div class="paragraph">
-<p>The <strong>foldm</strong> function in analgous to the <code>foldl</code> in terms of how it does the fold operation,
-with the difference that is aware of the monad context. Or in other terms, it works with
-reducing function that return monad types.</p>
+<p>The <strong>foldm</strong> function in analgous to the <code>foldl</code> in terms of how it does the
+fold operation, with the difference that is aware of the monad context. Or in
+other terms, it works with reducing function that return monad types.</p>
 </div>
 <div class="paragraph">
 <p>Let see an example:</p>
@@ -634,23 +634,24 @@ reducing function that return monad types.</p>
 <div class="sect2">
 <h3 id="traversable"><a class="link" href="#traversable">Traversable</a></h3>
 <div class="paragraph">
-<p>The <strong>Traversable</strong> is a generic abstraction for data structures that can be traversed from
-left to right, running an Applicative action for each element. Traversables must also be
-Functors and Foldables.</p>
+<p>The <strong>Traversable</strong> is a generic abstraction for data structures that can be
+traversed from left to right, running an Applicative action for each element.
+Traversables must also be Functors and Foldables.</p>
 </div>
 <div class="paragraph">
-<p>Note that, since Traversables use the Applicative&#8217;s <code>pure</code> operation, the context of the
-applicative must be set when using the <code>traverse</code> function.</p>
+<p>Note that, since Traversables use the Applicative&#8217;s <code>pure</code> operation, the context
+of the applicative must be set when using the <code>traverse</code> function.</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s look at an example: we have a vector with numbers that we want to map to a Maybe value,
-and we want to aggregate the result in a Maybe. If any of the actions fails (is Nothing) the
-resulting aggregate will be Nothing, but if all succeed we preserve the vector&#8217;s structure
-inside a Just value.</p>
+<p>Let&#8217;s look at an example: we have a vector with numbers that we want to map to
+a Maybe value, and we want to aggregate the result in a Maybe. If any of the
+actions fails (is Nothing) the resulting aggregate will be Nothing, but if all
+succeed we preserve the vector&#8217;s structure inside a Just value.</p>
 </div>
 <div class="paragraph">
-<p>First of all, we define the function that will transform a number to a Maybe. Our function will
-wrap the value in a Just if it&#8217;s even and in a Nothing if it&#8217;s not:</p>
+<p>First of all, we define the function that will transform a number to a Maybe.
+Our function will wrap the value in a Just if it&#8217;s even and in a Nothing if it&#8217;s
+not:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -664,9 +665,9 @@ wrap the value in a Just if it&#8217;s even and in a Nothing if it&#8217;s not:<
 </div>
 </div>
 <div class="paragraph">
-<p>Now that we have a function that maps a value to the Maybe Applicative, we can traverse a vector
-of numbers and aggregate a Maybe value. The applicatives will be evaluated from left to right using
-the applicative&#8217;s <code>fapply</code>.</p>
+<p>Now that we have a function that maps a value to the Maybe Applicative, we can
+traverse a vector of numbers and aggregate a Maybe value. The applicatives will
+be evaluated from left to right using the applicative&#8217;s <code>fapply</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -683,20 +684,22 @@ the applicative&#8217;s <code>fapply</code>.</p>
 
 <span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">maybe/context</span>
   <span class="tok-p">(</span><span class="tok-nf">m/traverse</span> <span class="tok-nv">just-if-even</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">maybe/context</span>
   <span class="tok-p">(</span><span class="tok-nf">m/traverse</span> <span class="tok-nv">just-if-even</span> <span class="tok-p">[</span><span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Maybe is not that much of an interesting applicative, let&#8217;s see an example of using the Validation
-applicative to validate a vector of values aggregating the results, be them success or failure.</p>
+<p>Maybe is not that much of an interesting applicative, let&#8217;s see an example of
+using the Validation applicative to validate a vector of values aggregating
+the results, be them success or failure.</p>
 </div>
 <div class="paragraph">
-<p>First we will define a validation function that, given a number, will succed if it&#8217;s even. If it&#8217;s
-odd, it will fail and record the failure in the map monoid from value to the error type (<code>:not-even</code>).</p>
+<p>First we will define a validation function that, given a number, will succed if
+it&#8217;s even. If it&#8217;s odd, it will fail and record the failure in the map monoid
+from value to the error type (<code>:not-even</code>).</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -738,12 +741,12 @@ odd, it will fail and record the failure in the map monoid from value to the err
 <div class="sect2">
 <h3 id="monad"><a class="link" href="#monad">Monad</a></h3>
 <div class="paragraph">
-<p>Monads are the most discussed programming concept to come from category theory. Like functors and
-applicatives, monads deal with data in contexts.</p>
+<p>Monads are the most discussed programming concept to come from category theory.
+Like functors and applicatives, monads deal with data in contexts.</p>
 </div>
 <div class="paragraph">
-<p>Additionally, monads can also transform contexts by unwrapping data, applying functions to it and
-putting new values in a completely different context.</p>
+<p>Additionally, monads can also transform contexts by unwrapping data, applying
+functions to it and putting new values in a completely different context.</p>
 </div>
 <div class="paragraph">
 <p>The monad abstraction consists of two functions: <strong>bind</strong> and <strong>return</strong></p>
@@ -755,8 +758,9 @@ putting new values in a completely different context.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see, bind works much like a Functor but with inverted arguments. The main difference is
-that in a monad, the function is responsible for wrapping a returned value in a context.</p>
+<p>As you can see, bind works much like a Functor but with inverted arguments. The
+main difference is that in a monad, the function is responsible for wrapping a
+returned value in a context.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example usage of the bind higher-order function.</div>
@@ -767,10 +771,11 @@ that in a monad, the function is responsible for wrapping a returned value in a 
 </div>
 </div>
 <div class="paragraph">
-<p>One of the key features of the bind function is that any computation executed within the context of
-bind (monad) knows the context type implicitly. With this, if you apply some computation over some
-monadic value and you want to return the result in the same container context but don&#8217;t know
-what that container is, you can use <code>return</code> or <code>pure</code> functions:</p>
+<p>One of the key features of the bind function is that any computation executed
+within the context of bind (monad) knows the context type implicitly. With this,
+if you apply some computation over some monadic value and you want to return
+the result in the same container context but don&#8217;t know what that container is,
+you can use <code>return</code> or <code>pure</code> functions:</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage of return function in bind context.</div>
@@ -782,8 +787,9 @@ what that container is, you can use <code>return</code> or <code>pure</code> fun
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>return</code> or <code>pure</code> functions, when called with one argument, try to use the dynamic scope context
-value that&#8217;s set internally by the <code>bind</code> function. Therefore, you can&#8217;t use them with one argument outside of a <code>bind</code> context.</p>
+<p>The <code>return</code> or <code>pure</code> functions, when called with one argument, try to use
+the dynamic scope context value that&#8217;s set internally by the <code>bind</code> function.
+Therefore, you can&#8217;t use them with one argument outside of a <code>bind</code> context.</p>
 </div>
 <div class="paragraph">
 <p>We now can compose any number of computations using monad <strong>bind</strong>
@@ -815,9 +821,10 @@ macro: <strong>mlet</strong></p>
 <div class="sect2">
 <h3 id="monadzero"><a class="link" href="#monadzero">MonadZero</a></h3>
 <div class="paragraph">
-<p>Some monads also have the notion of an identity element analogous to that of Monoid. When calling <code>bind</code> on a identity element
-for a monad, the same value is returned. This means that whenever we encounter the identity element in a monadic composition it will
-short-circuit.</p>
+<p>Some monads also have the notion of an identity element analogous to that of
+Monoid. When calling <code>bind</code> on a identity element for a monad, the same value is
+returned. This means that whenever we encounter the identity element in a monadic
+composition it will short-circuit.</p>
 </div>
 <div class="paragraph">
 <p>For the already familiar Maybe type the identity element is Nothing:</p>
@@ -828,11 +835,12 @@ short-circuit.</p>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mzero</span> <span class="tok-nv">maybe/maybe-monad</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Having an identity element we can make a monadic composition short-circuit using a predicate:</p>
+<p>Having an identity element we can make a monadic composition short-circuit using
+a predicate:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -846,12 +854,13 @@ short-circuit.</p>
                     <span class="tok-p">(</span><span class="tok-nf">m/mzero</span><span class="tok-p">))</span>
                   <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">_</span><span class="tok-p">]</span>
                     <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">))))))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see in the above example the predicate <code>(= a 2)</code> returns either a monadic value <code>(m/return nil)</code> or the identity value
-for the maybe monad. This can be captured in a function, which is available in <code>cats.core</code> namespace:</p>
+<p>As you can see in the above example the predicate <code>(= a 2)</code> returns either a
+monadic value <code>(m/return nil)</code> or the identity value for the maybe monad. This
+can be captured in a function, which is available in <code>cats.core</code> namespace:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -875,7 +884,7 @@ for the maybe monad. This can be captured in a function, which is available in <
           <span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">m/guard</span> <span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">))</span>
                   <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">_</span><span class="tok-p">]</span>
                     <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">))))))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -889,18 +898,20 @@ for the maybe monad. This can be captured in a function, which is available in <
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
          <span class="tok-ss">:when</span> <span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">)]</span>
    <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">)))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="monadplus"><a class="link" href="#monadplus">MonadPlus</a></h3>
 <div class="paragraph">
-<p>MonadPlus is a complementary abstraction for Monads that support an associative binary operation, analogous to that of a
-Semigroup. If the monad implements the MonadZero and MonadPlus protocols it forms a monoid.</p>
+<p>MonadPlus is a complementary abstraction for Monads that support an associative
+binary operation, analogous to that of a Semigroup. If the monad implements the
+MonadZero and MonadPlus protocols it forms a monoid.</p>
 </div>
 <div class="paragraph">
-<p>For the Maybe type, <code>mplus</code> acts similarly to a logical OR that treats <code>Nothing</code> values as falsey.</p>
+<p>For the Maybe type, <code>mplus</code> acts similarly to a logical OR that treats <code>Nothing</code>
+values as falsey.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -908,7 +919,7 @@ Semigroup. If the monad implements the MonadZero and MonadPlus protocols it form
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mplus</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mplus</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 1&gt;</span>
@@ -923,8 +934,9 @@ Semigroup. If the monad implements the MonadZero and MonadPlus protocols it form
 <div class="sect3">
 <h4 id="motivation"><a class="link" href="#motivation">Motivation</a></h4>
 <div class="paragraph">
-<p>We can combine two functors and get a new one automatically. Given any two functors <em>a</em> and <em>b</em>,
-we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we&#8217;ll call it fmap2:</p>
+<p>We can combine two functors and get a new one automatically. Given any two
+functors <em>a</em> and <em>b</em>, we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>,
+we&#8217;ll call it fmap2:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -945,26 +957,26 @@ we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>, we
 </div>
 </div>
 <div class="paragraph">
-<p>However, monads don&#8217;t compose as nicely as functors do. We have to actually implement
-the composition ourselves.</p>
+<p>However, monads don&#8217;t compose as nicely as functors do. We have to actually
+implement the composition ourselves.</p>
 </div>
 <div class="paragraph">
-<p>In some circumstances we would like combine the effects of two monads into another one. We call the
-resulting monad a monad transformer, which is the composition of a "base" and "inner" monad. A
-monad transformer is itself a monad.</p>
+<p>In some circumstances we would like combine the effects of two monads into
+another one. We call the resulting monad a monad transformer, which is the
+composition of a "base" and "inner" monad. A monad transformer is itself a monad.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="using-monad-transformers"><a class="link" href="#using-monad-transformers">Using monad transformers</a></h4>
 <div class="paragraph">
-<p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the transformer
-using State as the base monad since we want the resulting type to be a stateful computation
-that may fail: <code>s &#8594; Maybe (a, s)</code>.</p>
+<p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the
+transformer using State as the base monad since we want the resulting type to
+be a stateful computation that may fail: <code>s &#8594; Maybe (a, s)</code>.</p>
 </div>
 <div class="paragraph">
-<p>Almost every monad implemented in <em>cats</em> has a monad transformer for combining it with
-any other monad. The transformer functions take a Monad as their argument and they
-return a reified MonadTrans:</p>
+<p>Almost every monad implemented in <em>cats</em> has a monad transformer for combining
+it with any other monad. The transformer functions take a Monad as their
+argument and they return a reified MonadTrans:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -983,13 +995,14 @@ return a reified MonadTrans:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As we can see in the example below, the return of the <code>maybe-state</code> monad creates a stateful
-function that yields a Maybe containing a pair (value, next state).</p>
+<p>As we can see in the example below, the return of the <code>maybe-state</code> monad creates
+a stateful function that yields a Maybe containing a pair (value, next state).</p>
 </div>
 <div class="paragraph">
-<p>You probably noticed that we had to wrap the state function invocation with <code>cats.context/with-context</code>.
-When working with monad transformers, we have to be explicit about what monad we are using to implement
-the binding policy since there is no way to distinguish values from a transformer type from those of
+<p>You probably noticed that we had to wrap the state function invocation with
+<code>cats.context/with-context</code>. When working with monad transformers, we have to
+be explicit about what monad we are using to implement the binding policy since
+there is no way to distinguish values from a transformer type from those of
 a regular monad.</p>
 </div>
 <div class="paragraph">
@@ -1005,14 +1018,15 @@ a regular monad.</p>
 <div class="sect2">
 <h3 id="maybe"><a class="link" href="#maybe">Maybe</a></h3>
 <div class="paragraph">
-<p>This is one of the two most used monad types (also known as Optional in other programming
-languages).</p>
+<p>This is one of the two most used monad types (also known as Optional in other
+programming languages).</p>
 </div>
 <div class="paragraph">
-<p>The Maybe monad represents encapsulation of an optional value; e.g. it is used as the return type
-of functions which may or may not return a meaningful value when they are applied. It consists
-of either an empty constructor (called None or Nothing), or a constructor
-encapsulating the original data type A (e.g. Just A or Some A).</p>
+<p>The Maybe monad represents encapsulation of an optional value; e.g. it is used
+as the return type of functions which may or may not return a meaningful value
+when they are applied. It consists of either an empty constructor (called None
+or Nothing), or a constructor encapsulating the original data type A (e.g.
+Just A or Some A).</p>
 </div>
 <div class="paragraph">
 <p><em>cats</em>, implements two types:</p>
@@ -1034,21 +1048,23 @@ encapsulating the original data type A (e.g. Just A or Some A).</p>
 <span class="tok-c1">;; =&gt; #&lt;Just 1&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>There are other useful functions for working with maybe monad types in the same namespace.
-See the API documentation for a full list of them. But here we will explain a little relevant subset
-of them.</p>
+<p>There are other useful functions for working with maybe monad types in the same
+namespace. See the API documentation for a full list of them. But here we will
+explain a little relevant subset of them.</p>
 </div>
 <div class="paragraph">
-<p>We mentioned above that <strong>fmap</strong> extracts the value from a functor context. You will also want to
-extract values wrapped by <strong>just</strong> and you can do that with <strong>from-maybe</strong>.</p>
+<p>We mentioned above that <strong>fmap</strong> extracts the value from a functor context. You
+will also want to extract values wrapped by <strong>just</strong> and you can do that with
+<strong>from-maybe</strong>.</p>
 </div>
 <div class="paragraph">
-<p>As we said previously, the Just or Nothing instances act like wrappers and in some circumstances
-you will want extract the plain value from them. cats offers the <code>from-maybe</code> function for that.</p>
+<p>As we said previously, the Just or Nothing instances act like wrappers and
+in some circumstances you will want extract the plain value from them. cats offers
+the <code>from-maybe</code> function for that.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using <strong>from-maybe</strong> to extract values wrapped by <strong>just</strong>.</div>
@@ -1064,13 +1080,13 @@ you will want extract the plain value from them. cats offers the <code>from-mayb
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>from-maybe</code> function is a specialized version of a more generic one: <code>cats.core/extract</code>.
-The generic version is a polymorphic function and will also work with different
-types of different monads.</p>
+<p>The <code>from-maybe</code> function is a specialized version of a more generic one:
+<code>cats.core/extract</code>. The generic version is a polymorphic function and will
+also work with different types of different monads.</p>
 </div>
 <div class="paragraph">
-<p>For interoperability with Clojure and ClojureScript&#8217;s <code>IDeref</code> abstraction, maybe values are
-derrefable.</p>
+<p>For interoperability with Clojure and ClojureScript&#8217;s <code>IDeref</code> abstraction,
+maybe values are derrefable.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using <strong>deref</strong> to extract values wrapped by <strong>just</strong>.</div>
@@ -1086,8 +1102,8 @@ derrefable.</p>
 <div class="sect2">
 <h3 id="either"><a class="link" href="#either">Either</a></h3>
 <div class="paragraph">
-<p>Either is another type that represents a result of a computation, but (in contrast with maybe)
-it can return some data with a failed computation result.</p>
+<p>Either is another type that represents a result of a computation, but (in
+contrast with maybe) it can return some data with a failed computation result.</p>
 </div>
 <div class="paragraph">
 <p>In <em>cats</em> it has two constructors:</p>
@@ -1136,23 +1152,26 @@ Either is also (like Maybe) a Functor, Applicative Functor and Monad.
 <p>Also known as the Try monad, as popularized by Scala.</p>
 </div>
 <div class="paragraph">
-<p>It represents a computation that may either result in an exception or return a successfully computed
-value. Is very similar to the Either monad, but is semantically different.</p>
+<p>It represents a computation that may either result in an exception or return
+a successfully computed value. Is very similar to the Either monad, but is
+semantically different.</p>
 </div>
 <div class="paragraph">
 <p>It consists of two types: Success and Failure. The Success type is a simple
 wrapper, like Right of the Either monad. But the Failure type is slightly different
-from Left, because it always wraps an instance of Throwable (or any value in cljs since you can
-throw arbitrary values in the JavaScript host).</p>
+from Left, because it always wraps an instance of Throwable (or any value in
+cljs since you can throw arbitrary values in the JavaScript host).</p>
 </div>
 <div class="paragraph">
-<p>The most common use case of this monad is to wrap third party libraries that use standard Exception
-based error handling. Under normal circumstances, however, you should use Either instead.</p>
+<p>The most common use case of this monad is to wrap third party libraries that
+use standard Exception based error handling. Under normal circumstances,
+however, you should use Either instead.</p>
 </div>
 <div class="paragraph">
-<p>It is an analogue of the try-catch block: it replaces try-catch&#8217;s stack-based error handling with
-heap-based error handling. Instead of having an exception thrown and having to deal with it immediately
-in the same thread, it disconnects the error handling and recovery.</p>
+<p>It is an analogue of the try-catch block: it replaces try-catch&#8217;s stack-based
+error handling with heap-based error handling. Instead of having an exception
+thrown and having to deal with it immediately in the same thread, it disconnects
+the error handling and recovery.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <strong>try-on</strong> macro.</div>
@@ -1167,9 +1186,9 @@ in the same thread, it disconnects the error handling and recovery.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><em>cats</em> comes with other syntactic sugar macros: <code>try-or-else</code> that returns a default value if a
-computation fails, and <code>try-or-recover</code> that lets you handle the return value when executing a
-function with the exception as first parameter.</p>
+<p><em>cats</em> comes with other syntactic sugar macros: <code>try-or-else</code> that returns a
+default value if a computation fails, and <code>try-or-recover</code> that lets you handle
+the return value when executing a function with the exception as first parameter.</p>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <code>try-or-else</code> macro.</div>
@@ -1190,9 +1209,9 @@ function with the exception as first parameter.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The types defined for the Exception monad (Success and Failure) also implement the Clojure IDeref
-interface, which allows library development using monadic composition without forcing a user of
-that library to use or understand monads.</p>
+<p>The types defined for the Exception monad (Success and Failure) also implement
+the Clojure IDeref interface, which allows library development using monadic
+composition without forcing a user of that library to use or understand monads.</p>
 </div>
 <div class="paragraph">
 <p>That is because when you dereference the failure instance, it will reraise the
@@ -1228,9 +1247,10 @@ representing success and failure respectively.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>It implements the Applicative protocol, and its intended usage is as an Applicative. Applying Validation
-values together errs on the side of the failure, and applying failures together aggregates their values
-using the Semigroup&#8217;s <code>mappend</code> function.</p>
+<p>It implements the Applicative protocol, and its intended usage is as an
+Applicative. Applying Validation values together errs on the side of the failure,
+and applying failures together aggregates their values using the Semigroup&#8217;s
+<code>mappend</code> function.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1252,8 +1272,8 @@ using the Semigroup&#8217;s <code>mappend</code> function.</p>
 <div class="sect2">
 <h3 id="built-in-types"><a class="link" href="#built-in-types">Built in types</a></h3>
 <div class="paragraph">
-<p>Some of the abstractions in <em>cats</em> are implemented for built-in types but you can&#8217;t use them directly. First,
-you must load the <code>cats.builtin</code> namespace:</p>
+<p>Some of the abstractions in <em>cats</em> are implemented for built-in types but you
+can&#8217;t use them directly. First, you must load the <code>cats.builtin</code> namespace:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1267,9 +1287,9 @@ you must load the <code>cats.builtin</code> namespace:</p>
 <div class="sect3">
 <h4 id="nil"><a class="link" href="#nil">nil</a></h4>
 <div class="paragraph">
-<p>Given the fact that <code>nil</code> is both a value and a type, we have extended the <code>nil</code> type to be equivalent
-to Maybe monad&#8217;s <code>Nothing</code>. This means that you can use <code>nil</code> as if were a <code>Just</code> instance like in the
-following example:</p>
+<p>Given the fact that <code>nil</code> is both a value and a type, we have extended the <code>nil</code>
+type to be equivalent to Maybe monad&#8217;s <code>Nothing</code>. This means that you can use
+<code>nil</code> as if were a <code>Just</code> instance like in the following example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1290,8 +1310,8 @@ following example:</p>
 <div class="sect3">
 <h4 id="vector"><a class="link" href="#vector">Vector</a></h4>
 <div class="paragraph">
-<p>Clojure vectors also participate in several of the abstractions implemented in <em>cats</em>, most notably
-as a monad. Compare the following <code>for</code> comprehension:</p>
+<p>Clojure vectors also participate in several of the abstractions implemented
+in <em>cats</em>, most notably as a monad. Compare the following <code>for</code> comprehension:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1316,18 +1336,22 @@ as a monad. Compare the following <code>for</code> comprehension:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Note the symmetry between <code>for</code> and <code>mlet</code>. This is not accidental, both are what is called a monad comprehension,
-the difference is that <code>for</code> is limited to sequences and <code>mlet</code> can work with arbitrary monads.</p>
+<p>Note the symmetry between <code>for</code> and <code>mlet</code>. This is not accidental, both are
+what is called a monad comprehension, the difference is that <code>for</code> is limited to
+sequences and <code>mlet</code> can work with arbitrary monads.</p>
 </div>
 <div class="paragraph">
-<p>Also, since <code>mlet</code> desugars into calls to the Monad&#8217;s <code>bind</code> function, its result keeps the type of the monadic values.</p>
+<p>Also, since <code>mlet</code> desugars into calls to the Monad&#8217;s <code>bind</code> function, its result
+keeps the type of the monadic values.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="lazy-sequences"><a class="link" href="#lazy-sequences">Lazy sequences</a></h4>
 <div class="paragraph">
-<p>Lazy sequences implement the same abstractions as vectors with practically an identical implementation. If you don&#8217;t need
-the results right away or are interested in a subset of the final results, you can use lazy sequence comprehensions.</p>
+<p>Lazy sequences implement the same abstractions as vectors with practically an
+identical implementation. If you don&#8217;t need the results right away or are
+interested in a subset of the final results, you can use lazy sequence
+comprehensions.</p>
 </div>
 <div class="paragraph">
 <p>Using <code>mlet</code> with lazy sequences yields exactly the same result as using <code>for</code>:</p>
@@ -1369,8 +1393,9 @@ the results right away or are interested in a subset of the final results, you c
 <div class="sect3">
 <h4 id="map"><a class="link" href="#map">Map</a></h4>
 <div class="paragraph">
-<p>Maps implement the <em>Semigroup</em> protocol, since we can use <code>merge</code> as their associative binary operation. Using
-<code>mappend</code> on maps is a way to merge them together:</p>
+<p>Maps implement the <em>Semigroup</em> protocol, since we can use <code>merge</code> as their
+associative binary operation. Using <code>mappend</code> on maps is a way to merge them
+together:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1382,8 +1407,9 @@ the results right away or are interested in a subset of the final results, you c
 </div>
 </div>
 <div class="paragraph">
-<p>Since we can consider the empty map an identity element for the <code>mappend</code> associative binary operation maps also
-implement <em>Monoid</em> and the <code>mempty</code> function gives an empty map.</p>
+<p>Since we can consider the empty map an identity element for the <code>mappend</code>
+associative binary operation maps also implement <em>Monoid</em> and the <code>mempty</code>
+function gives an empty map.</p>
 </div>
 </div>
 </div>
@@ -1395,8 +1421,9 @@ implement <em>Monoid</em> and the <code>mempty</code> function gives an empty ma
 <div class="sect2">
 <h3 id="mlet"><a class="link" href="#mlet">mlet</a></h3>
 <div class="paragraph">
-<p>For convenience when using the monadic bind the <code>mlet</code> macro is implemented in cats. If you&#8217;ve followed along
-with the documentation you&#8217;ve seen many examples of its usage already, let&#8217;s see what can <code>mlet</code> do.</p>
+<p>For convenience when using the monadic bind the <code>mlet</code> macro is implemented in
+cats. If you&#8217;ve followed along with the documentation you&#8217;ve seen many examples
+of its usage already, let&#8217;s see what can <code>mlet</code> do.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1436,9 +1463,10 @@ If you are coming from Haskell, mlet is analogous to the <strong>do notation</st
 <p>This makes a lot more natural to write code that uses monads.</p>
 </div>
 <div class="paragraph">
-<p>Since the bindings in the mlet macro run the monadic effects of the right-hand values we cannot just put
-any value in there and expect to be bound to its left symbol. For cases where we want the regular behavior
-of let we can inline a <code>:let</code> clause, just like with Clojure&#8217;s <code>for</code>:</p>
+<p>Since the bindings in the mlet macro run the monadic effects of the right-hand
+values we cannot just put any value in there and expect to be bound to its
+left symbol. For cases where we want the regular behavior of let we can inline
+a <code>:let</code> clause, just like with Clojure&#8217;s <code>for</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1449,8 +1477,9 @@ of let we can inline a <code>:let</code> clause, just like with Clojure&#8217;s 
 </div>
 </div>
 <div class="paragraph">
-<p><code>mlet</code> has support for using guards using a <code>:when</code> clause, analogous to the one used in <code>for</code>. We can filter out values
-using <code>bind</code> with <code>mlet</code> and <code>:when</code> like the following:</p>
+<p><code>mlet</code> has support for using guards using a <code>:when</code> clause, analogous to the
+one used in <code>for</code>. We can filter out values using <code>bind</code> with <code>mlet</code> and
+<code>:when</code> like the following:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1460,12 +1489,12 @@ using <code>bind</code> with <code>mlet</code> and <code>:when</code> like the f
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
          <span class="tok-ss">:when</span> <span class="tok-p">(</span><span class="tok-nb">= </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">)]</span>
    <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">a</span> <span class="tok-mi">2</span><span class="tok-p">)))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span></code></pre>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Any monadic type that implements <code>MonadZero</code> can be combined with guards inside <code>mlet</code> bindings. Here is an example with
-vectors:</p>
+<p>Any monadic type that implements <code>MonadZero</code> can be combined with guards
+inside <code>mlet</code> bindings. Here is an example with vectors:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1499,11 +1528,11 @@ happen one at a time. This piece of code illustrates the usage of monadic bind:<
 </div>
 </div>
 <div class="paragraph">
-<p>In the first call to <code>bind</code>, <code>(just 1)</code> and the anonymous function will be evaluated.
-The call of the anonymous function performed by the first <code>bind</code> will cause the
-evaluation of the <code>(just 41)</code> and the next anonymous function, which will be also
-called to create the final result. Note that <code>(just 1)</code> and <code>(just 41)</code> are independent
-and thus could be evaluated at the same time.</p>
+<p>In the first call to <code>bind</code>, <code>(just 1)</code> and the anonymous function will be
+evaluated. The call of the anonymous function performed by the first <code>bind</code>
+will cause the evaluation of the <code>(just 41)</code> and the next anonymous function,
+which will be also called to create the final result. Note that <code>(just 1)</code>
+and <code>(just 41)</code> are independent and thus could be evaluated at the same time.</p>
 </div>
 <div class="paragraph">
 <p>Here is the <code>mlet</code> version for reference and clarity:</p>
@@ -1530,8 +1559,8 @@ and thus could be evaluated at the same time.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Note that no <code>return</code> is used, this is because the <code>alet</code> body runs inside the applicative
-context with <code>fapply</code>. This is roughly what <code>alet</code> desugars to:</p>
+<p>Note that no <code>return</code> is used, this is because the <code>alet</code> body runs inside
+the applicative context with <code>fapply</code>. This is roughly what <code>alet</code> desugars to:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1545,18 +1574,19 @@ context with <code>fapply</code>. This is roughly what <code>alet</code> desugar
 </div>
 </div>
 <div class="paragraph">
-<p>Note that now <code>(just 1)</code> and <code>(just 41)</code> are evaluated at the same time. This use of
-<code>fapply</code> can be called "applicative bind" and in some cases is more efficient than monadic
-bind. Furthermore, the <code>alet</code> macro splits the bindings into batches that have
-dependencies only in previous values and evaluates all applicative values in the batch at
-the same time.</p>
+<p>Note that now <code>(just 1)</code> and <code>(just 41)</code> are evaluated at the same time. This
+use of <code>fapply</code> can be called "applicative bind" and in some cases is more
+efficient than monadic bind. Furthermore, the <code>alet</code> macro splits the bindings
+into batches that have dependencies only in previous values and evaluates all
+applicative values in the batch at the same time.</p>
 </div>
 <div class="paragraph">
-<p>This makes no difference at all for Maybe, but applicatives that have latency in their
-calculations (for example promises that do an async computation) get a pretty good evaluation
-strategy, which can minimize overall latency. In the next examples we use the
-<a href="https://github.com/funcool/promissum">promissum</a> Clojure library. Similar results can
-be achieved in ClojureScript with the <a href="https://github.com/funcool/promesa">promesa</a> library.</p>
+<p>This makes no difference at all for Maybe, but applicatives that have latency
+in their calculations (for example promises that do an async computation) get
+a pretty good evaluation strategy, which can minimize overall latency. In the
+next examples we use the <a href="https://github.com/funcool/promissum">promissum</a>
+Clojure library. Similar results can be achieved in ClojureScript with the
+<a href="https://github.com/funcool/promesa">promesa</a> library.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1568,7 +1598,9 @@ be achieved in ClojureScript with the <a href="https://github.com/funcool/promes
                <span class="tok-p">(</span><span class="tok-nf">Thread/sleep</span> <span class="tok-nv">wait</span><span class="tok-p">)</span>
                <span class="tok-p">(</span><span class="tok-nf">deliver</span> <span class="tok-nv">wait</span><span class="tok-p">))))</span>
 
-<span class="tok-c1">;; note: deref-ing for blocking the current thread waiting for the promise being delivered</span>
+<span class="tok-c1">;; note: deref-ing for blocking the current thread</span>
+<span class="tok-c1">;; waiting for the promise being delivered</span>
+
 <span class="tok-p">(</span><span class="tok-nf">time</span>
  <span class="tok-o">@</span><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">sleep-promise</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
            <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">sleep-promise</span> <span class="tok-mi">41</span><span class="tok-p">)]</span>
@@ -1617,9 +1649,12 @@ be achieved in ClojureScript with the <a href="https://github.com/funcool/promes
 <div class="sect2">
 <h3 id="curry"><a class="link" href="#curry">curry</a></h3>
 <div class="paragraph">
-<p>The first combinator that <em>cats</em> provides is a <code>curry</code> macro. Given a function, it can convert it to a curried
-versions of itself. The generated function will accept parameters until all the expected parameters are given.
-Let&#8217;s see some examples of a curried function in action:</p>
+<p>The first combinator that <em>cats</em> provides is a <code>curry</code> macro. Given a function,
+it can convert it to a curried versions of itself. The generated function will
+accept parameters until all the expected parameters are given.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see some examples of a curried function in action:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1644,12 +1679,13 @@ Let&#8217;s see some examples of a curried function in action:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see above, since the original <code>add</code> has a single arity (3) and is fixed (i.e. it doesn&#8217;t accept a variable
-number of arguments), the <code>curry</code> macro was able to generate a curried function with the correct number of parameters.</p>
+<p>As you can see above, since the original <code>add</code> has a single arity (3) and is
+fixed (i.e. it doesn&#8217;t accept a variable number of arguments), the <code>curry</code> macro
+was able to generate a curried function with the correct number of parameters.</p>
 </div>
 <div class="paragraph">
-<p>This doesn&#8217;t mean that functions with multiple arities or variadic arguments can&#8217;t be curried but an arity for the
-curried function must be given:</p>
+<p>This doesn&#8217;t mean that functions with multiple arities or variadic arguments
+can&#8217;t be curried but an arity for the curried function must be given:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1671,8 +1707,9 @@ curried function must be given:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Curried functions are very useful in combination with the applicative&#8217;s <code>fapply</code> operation, since we can curry
-a function and use applicatives for building up results with context-specific effects.</p>
+<p>Curried functions are very useful in combination with the applicative&#8217;s
+<code>fapply</code> operation, since we can curry a function and use applicatives for
+building up results with context-specific effects.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1685,7 +1722,7 @@ a function and use applicatives for building up results with context-specific ef
 <span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-nv">curried+</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Nothing &gt;</span>
+<span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-nv">curried+</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-nv">nil</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; nil</span>
@@ -1701,8 +1738,9 @@ a function and use applicatives for building up results with context-specific ef
 <div class="sect2">
 <h3 id="lift-m"><a class="link" href="#lift-m">lift-m</a></h3>
 <div class="paragraph">
-<p>The <code>lift-m</code> macro is a combinator for promoting functions that work on regular values to work on monadic values
-instead. It uses the monad&#8217;s bind operation under the hood and, like <code>curry</code>, can be used without specifying arity
+<p>The <code>lift-m</code> macro is a combinator for promoting functions that work on
+regular values to work on monadic values instead. It uses the monad&#8217;s bind
+operation under the hood and, like <code>curry</code>, can be used without specifying arity
 if the function we are lifting has a fixed and a single arity:</p>
 </div>
 <div class="listingblock">
@@ -1719,15 +1757,15 @@ if the function we are lifting has a fixed and a single arity:</p>
 <span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
-<span class="tok-c1">; =&gt; #&lt;Nothing &gt;</span>
+<span class="tok-c1">; =&gt; #&lt;Nothing&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-nv">nil</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; nil</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Like with <code>curry</code>, we must provide an arity in case we are lifting a function that has multiple arities or is
-variadic:</p>
+<p>Like with <code>curry</code>, we must provide an arity in case we are lifting a function
+that has multiple arities or is variadic:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1740,15 +1778,16 @@ variadic:</p>
 <span class="tok-c1">;; =&gt; #&lt;Just 6&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
-<span class="tok-c1">; =&gt; #&lt;Nothing &gt;</span>
+<span class="tok-c1">; =&gt; #&lt;Nothing&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">add-m</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-nv">nil</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">3</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; nil</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Note that you can combine both <code>curry</code> and <code>lift-m</code> to get curried functions that work on monadic types using
-the <code>curry-lift-m</code> macro. The arity is mandatory when using this macro:</p>
+<p>Note that you can combine both <code>curry</code> and <code>lift-m</code> to get curried functions
+that work on monadic types using the <code>curry-lift-m</code> macro. The arity is
+mandatory when using this macro:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1774,12 +1813,14 @@ the <code>curry-lift-m</code> macro. The arity is mandatory when using this macr
 <h2 id="labs"><a class="link" href="#labs">Labs</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section intends to explain different kind of extra features that can be found under
-<strong>cats.labs</strong> namespace. The fact that they are here because they are experimental, requires external
-dependencies or simply does not have much application in clojure(script).</p>
+<p>This section intends to explain different kind of extra features that can be
+found under <strong>cats.labs</strong> namespace. The fact that they are here because they
+are experimental, requires external dependencies or simply does not have much
+application in clojure(script).</p>
 </div>
 <div class="paragraph">
-<p>In any case the state of each module will be notified on the start of the each section.</p>
+<p>In any case the state of each module will be notified on the start of the
+each section.</p>
 </div>
 <div class="sect2">
 <h3 id="channel"><a class="link" href="#channel">Channel</a></h3>
@@ -1787,22 +1828,22 @@ dependencies or simply does not have much application in clojure(script).</p>
 <p><strong>Status:</strong> Experimental</p>
 </div>
 <div class="paragraph">
-<p>This namespace exposes the ability to use the <strong>core.async</strong> channel as monadic type and in
-consequence use it in <code>mlet</code> or <code>alet</code> macros.</p>
+<p>This namespace exposes the ability to use the <strong>core.async</strong> channel as monadic
+type and in consequence use it in <code>mlet</code> or <code>alet</code> macros.</p>
 </div>
 <div class="paragraph">
 <p>Before use it, you should add core.async to your dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">org.clojure/core.async</span> <span class="tok-s">&quot;0.1.346.0-17112a-alpha&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">org.clojure/core.async</span> <span class="tok-s">&quot;0.2.371&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Now, let see some code. This will allow you understand how it can be used and why this
-integration between cats and core.async matters. At first step we will go to define a
-function that emulates whatever asynchronous task, that for our case it&#8217;s consist in a
-just sleep operation:</p>
+<p>Now, let see some code. This will allow you understand how it can be used and
+why this integration between cats and core.async matters. At first step we will
+go to define a function that emulates whatever asynchronous task, that for
+our case it&#8217;s consist in a just sleep operation:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1819,8 +1860,8 @@ just sleep operation:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Now, instead of using the <code>go</code> macro, just use a <code>let</code> like bindings with the help of the
-<strong>mlet</strong> macro for bind values to asyncrhonous calls:</p>
+<p>Now, instead of using the <code>go</code> macro, just use a <code>let</code> like bindings with the
+help of the <strong>mlet</strong> macro for bind values to asyncrhonous calls:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1856,14 +1897,14 @@ just sleep operation:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The main difference with the default clojure <code>let</code>, is that the bindings are already plain
-values (not channels). The take! operation is already performed automatically by the
-<code>mlet</code>. This kind of behavior will make you fully asynchronous code looks like
-synchronous code.</p>
+<p>The main difference with the default clojure <code>let</code>, is that the bindings
+are already plain values (not channels). The take! operation is already
+performed automatically by the <code>mlet</code>. This kind of behavior will make you
+fully asynchronous code looks like synchronous code.</p>
 </div>
 <div class="paragraph">
-<p>But, cats also comes with <code>alet</code> that has identical aspect to the previously used <code>mlet</code>
-macro, but it has some advantages over it. Let see an example:</p>
+<p>But, cats also comes with <code>alet</code> that has identical aspect to the previously
+used <code>mlet</code> macro, but it has some advantages over it. Let see an example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1898,8 +1939,9 @@ of the applicative.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The alet is a powerfull macro that analyzes the dependencies between bindings and executes
-the expressions in batches resultin in a very atractive feature for asynchronous calls.</p>
+<p>The alet is a powerfull macro that analyzes the dependencies between bindings
+and executes the expressions in batches resultin in a very atractive feature
+for asynchronous calls.</p>
 </div>
 <div class="paragraph">
 <p>Here an other examples that shows in a clearly way how the batches are executed:</p>
@@ -1934,22 +1976,22 @@ the expressions in batches resultin in a very atractive feature for asynchronous
 <p><strong>Status:</strong> Experimental</p>
 </div>
 <div class="paragraph">
-<p>This namespace exposes the ability to use the <strong>manifold</strong> deferred as monadic type and in
-consequence use it in <code>mlet</code> or <code>alet</code> macros.</p>
+<p>This namespace exposes the ability to use the <strong>manifold</strong> deferred as monadic
+type and in consequence use it in <code>mlet</code> or <code>alet</code> macros.</p>
 </div>
 <div class="paragraph">
 <p>Before use it, you should add manifold to your dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">manifold</span> <span class="tok-s">&quot;0.1.0&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">manifold</span> <span class="tok-s">&quot;0.1.1&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Now, let see some code. This will allow you understand how it can be used and why this
-integration between cats and manifold matters. At first step we will go to define a
-function that emulates whatever asynchronous task, that for our case it&#8217;s consist in a
-just sleep operation:</p>
+<p>Now, let see some code. This will allow you understand how it can be used
+and why this integration between cats and manifold matters. At first step we
+will go to define a function that emulates whatever asynchronous task, that for
+our case it&#8217;s consist in a just sleep operation:</p>
 </div>
 <div class="paragraph">
 <p>For demostration purposes, let&#8217;s define a function that emulates the asyncrhonous
@@ -1990,9 +2032,9 @@ using <code>mlet</code> and <code>alet</code> respectivelly.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>If you are familiar with manifold&#8217;s <code>let-flow</code> macro, the cats <code>alet</code> serves for almost
-identical purpose, with difference that <code>alet</code> is defined as generic abstraction
-instread of a specific purpose macro.</p>
+<p>If you are familiar with manifold&#8217;s <code>let-flow</code> macro, the cats <code>alet</code> serves
+for almost identical purpose, with difference that <code>alet</code> is defined as
+generic abstraction instread of a specific purpose macro.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example using manifold deferred with <code>alet</code>.</div>
@@ -2040,7 +2082,8 @@ should have some special characteristics to work in monad state composition.</p>
 </div>
 <div class="paragraph">
 <p>You just saw an example of the low-level primitive state monad. For basic usage
-you do not need to write your own functions, just use some helpers that <em>cats</em> provides.</p>
+you do not need to write your own functions, just use some helpers that <em>cats</em>
+provides.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s look at one example before explaining the details:</p>
@@ -2058,9 +2101,9 @@ you do not need to write your own functions, just use some helpers that <em>cats
 </div>
 </div>
 <div class="paragraph">
-<p>At the moment of evaluation in the previous expression, nothing of what we have defined
-is executed. But instead of returning the unadorned final value of the computation,
-a strange/unknown object of type <strong>State</strong> is returned.</p>
+<p>At the moment of evaluation in the previous expression, nothing of what we
+have defined is executed. But instead of returning the unadorned final value
+of the computation, a strange/unknown object of type <strong>State</strong> is returned.</p>
 </div>
 <div class="paragraph">
 <p>The State type is simply a wrapper for Clojure functions, nothing more.</p>
@@ -2099,8 +2142,9 @@ state, ignoring the resulting value.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>run-state</code> function returns an instance of the Pair type. The Pair type acts like any other seq in
-Clojure with the exception that it can only contain two values.</p>
+<p>The <code>run-state</code> function returns an instance of the Pair type. The Pair type
+acts like any other seq in Clojure with the exception that it can only contain
+two values.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2109,13 +2153,16 @@ Clojure with the exception that it can only contain two values.</p>
 <p><strong>Status:</strong> Experimental</p>
 </div>
 <div class="paragraph">
-<p>The reader monad is another commonly used monad in Haskell. It&#8217;s used for gluing together computations that
-depend on a read-only environment. As with the state monad, we don&#8217;t have to thread the environment manualy
-since the monadic bind does it for us. The type of the reader monad are one-argument functions.</p>
+<p>The reader monad is another commonly used monad in Haskell. It&#8217;s used for
+gluing together computations that depend on a read-only environment. As with
+the state monad, we don&#8217;t have to thread the environment manualy since the
+monadic bind does it for us. The type of the reader monad are one-argument
+functions.</p>
 </div>
 <div class="paragraph">
-<p>The Reader type is analogous to State, simply a wrapper for regular Clojure functions. If we want our functions
-to participate in the reader abstraction we have to wrap them in a Reader instance.</p>
+<p>The Reader type is analogous to State, simply a wrapper for regular Clojure
+functions. If we want our functions to participate in the reader abstraction
+we have to wrap them in a Reader instance.</p>
 </div>
 <div class="listingblock">
 <div class="title">Valid function for the reader monad</div>
@@ -2131,8 +2178,9 @@ to participate in the reader abstraction we have to wrap them in a Reader instan
 </div>
 </div>
 <div class="paragraph">
-<p>cats provides a few reader functions already. <code>ask</code> is the simplest reader, simply returns the environment. We
-can execute readers using the <code>run-reader</code> function which accepts a reader and an environment.</p>
+<p>cats provides a few reader functions already. <code>ask</code> is the simplest reader,
+simply returns the environment. We can execute readers using the <code>run-reader</code>
+function which accepts a reader and an environment.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example of running the ask reader</div>
@@ -2173,8 +2221,9 @@ can execute readers using the <code>run-reader</code> function which accepts a r
 </div>
 </div>
 <div class="paragraph">
-<p>We can also alter the reader&#8217;s environment in a context using the <code>local</code> function which given a function and
-a reader returns a new reader whose environment is the result of applying the first function given to <code>local</code> to
+<p>We can also alter the reader&#8217;s environment in a context using the <code>local</code>
+function which given a function and a reader returns a new reader whose
+environment is the result of applying the first function given to <code>local</code> to
 the original environment. Let&#8217;s see it in action to understand it better:</p>
 </div>
 <div class="listingblock">
@@ -2190,8 +2239,9 @@ the original environment. Let&#8217;s see it in action to understand it better:<
 </div>
 </div>
 <div class="paragraph">
-<p>Note that since we executed <code>ask</code> with the function <code>#(*2 %)</code> altering its original environment (20), the resulting
-<code>env</code> value is two times the original environment.</p>
+<p>Note that since we executed <code>ask</code> with the function <code>#(*2 %)</code> altering its
+original environment (20), the resulting <code>env</code> value is two times the original
+environment.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2210,6 +2260,347 @@ the original environment. Let&#8217;s see it in action to understand it better:<
 </div>
 <div class="paragraph">
 <p>TODO</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="lens"><a class="link" href="#lens">Lens</a></h3>
+<div class="paragraph">
+<p><strong>Status:</strong> Experimental</p>
+</div>
+<div class="paragraph">
+<p>This namespace implements functional references to one (lens) or multiple
+(traversal) values modeled as functions. Lenses and traversals generalize the
+get, put and mapping to a particular part of a data structure.</p>
+</div>
+<div class="sect3">
+<h4 id="lenses"><a class="link" href="#lenses">Lenses</a></h4>
+<div class="paragraph">
+<p>We&#8217;ll start by using the most basic lens, the identity lens. We can get the value
+a lens is focused on using the <code>focus</code> function in <code>cats.labs.lens</code> ns:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.lens</span> <span class="tok-ss">:as</span> <span class="tok-nv">l</span><span class="tok-p">])</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">l/id</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [0 1 2 3]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We have two other primitives available: the <code>put</code> operation and <code>over</code>, which lets
+us apply a function over the focused value of a lens:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/id</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 42</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/id</span> <span class="tok-nb">count </span><span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 4</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can focus on the first (<code>fst</code>), (<code>second</code>), or nth (<code>nth</code>) element of a list
+with a lens:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-c1">;; fst</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">l/fst</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 1</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/fst</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [2 2 3]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/fst</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [42 2 3]</span>
+
+<span class="tok-c1">;; nth</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 3</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [1 2 4]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [1 2 42]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And compose them arbitrarily using function composition:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-c1">;; fst</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">l/fst</span> <span class="tok-nv">l/fst</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">))</span>
+         <span class="tok-p">[[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span>
+           <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]]</span>
+          <span class="tok-p">[</span><span class="tok-mi">6</span> <span class="tok-mi">7</span> <span class="tok-mi">8</span><span class="tok-p">]])</span>
+<span class="tok-c1">;; =&gt; 2</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">l/fst</span> <span class="tok-nv">l/fst</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">))</span>
+       <span class="tok-mi">42</span>
+       <span class="tok-p">[[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span>
+         <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]]</span>
+        <span class="tok-p">[</span><span class="tok-mi">6</span> <span class="tok-mi">7</span> <span class="tok-mi">8</span><span class="tok-p">]])</span>
+<span class="tok-c1">;; =&gt; [[[0 1 42] [3 4 5]] [6 7 8]]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Lenses compose with regular function composition and, like transducers, the
+combined lens runs from left to right.</p>
+</div>
+<div class="paragraph">
+<p>The <code>passes</code> function accepts a predicate and returns a lens that focuses
+in an element only if it passes the predicate.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 2</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-nb">inc </span><span class="tok-mi">2</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 3</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 42</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; nil</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-nb">inc </span><span class="tok-mi">1</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 1</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 1</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There&#8217;s <code>key</code> and <code>select-keys</code> for focusing on one or multiple keys respectively:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/key</span> <span class="tok-ss">:a</span><span class="tok-p">)</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
+<span class="tok-c1">;; =&gt; 1</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/key</span> <span class="tok-ss">:a</span><span class="tok-p">)</span> <span class="tok-nb">str </span><span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
+<span class="tok-c1">;; =&gt; {:a &quot;1&quot;, :b 2}</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/key</span> <span class="tok-ss">:a</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
+<span class="tok-c1">;; =&gt; {:a 42, :b 2}</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:a</span><span class="tok-p">])</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
+<span class="tok-c1">;; =&gt; {:a 1}</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:c</span><span class="tok-p">])</span>
+        <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">m</span><span class="tok-p">]</span>
+         <span class="tok-p">(</span><span class="tok-nb">zipmap </span><span class="tok-p">(</span><span class="tok-nb">keys </span><span class="tok-nv">m</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nb">repeat </span><span class="tok-mi">42</span><span class="tok-p">)))</span>
+        <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
+<span class="tok-c1">;; =&gt; {:b 2, :a 42}</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:c</span><span class="tok-p">])</span>
+       <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">0</span><span class="tok-p">}</span>
+       <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span> <span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">})</span>
+<span class="tok-c1">;; =&gt; {:b 2, :a 0}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>in</code> for focusing on a path:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/in</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:b</span><span class="tok-p">])</span>
+         <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-p">{</span><span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">}}})</span>
+<span class="tok-c1">;; =&gt; {:c 42}</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/in</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:b</span><span class="tok-p">])</span>
+        <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">m</span><span class="tok-p">]</span>
+         <span class="tok-p">(</span><span class="tok-nb">zipmap </span><span class="tok-p">(</span><span class="tok-nb">vals </span><span class="tok-nv">m</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nb">keys </span><span class="tok-nv">m</span><span class="tok-p">)))</span>
+        <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-p">{</span><span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">}}})</span>
+<span class="tok-c1">;; =&gt; {:a {:b {42 :c}}}</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/in</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:b</span><span class="tok-p">])</span>
+       <span class="tok-mi">42</span>
+       <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-p">{</span><span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">}}})</span>
+<span class="tok-c1">;; =&gt; {:a {:b 42}}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s take a look at a combinator that will let us build a unit-conversion lens
+called <code>units</code>. We have to supply a function to convert from unit <code>a</code> to unit <code>b</code>
+and viceversa:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">sec-&gt;min</span> <span class="tok-p">[</span><span class="tok-nv">sec</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">/ </span><span class="tok-nv">sec</span> <span class="tok-mi">60</span><span class="tok-p">))</span>
+<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">min-&gt;sec</span> <span class="tok-p">[</span><span class="tok-nv">min</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">* min </span><span class="tok-mi">60</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">mins</span> <span class="tok-p">(</span><span class="tok-nf">l/units</span> <span class="tok-nv">sec-&gt;min</span>
+                   <span class="tok-nv">min-&gt;sec</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">mins</span> <span class="tok-mi">120</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 2</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">mins</span> <span class="tok-mi">3</span> <span class="tok-mi">120</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 180</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">mins</span> <span class="tok-nb">inc </span><span class="tok-mi">60</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 120</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="traversals"><a class="link" href="#traversals">Traversals</a></h4>
+<div class="paragraph">
+<p>A traversal is similar to a lens but it focuses on multiple values instead of one.
+Therefore, we use the <code>foci</code> function for viewing the focused elements of a
+traversal.</p>
+</div>
+<div class="paragraph">
+<p>Traversals should be composed with other traversals. You can compose lenses
+with a traversal but it will become a traversal and you will have to use <code>foci</code>
+for viewing its values.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s look at the identity traversal, it&#8217;s called <code>it</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/foci</span> <span class="tok-nv">l/it</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; (42)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/foci</span> <span class="tok-nv">l/it</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; ([0 1 2 3])</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/it</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 42</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/it</span> <span class="tok-nb">count </span><span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; 4</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>each</code> traversal focuses every value in a collection, allowing us to map
+preservering structure. The <code>cat</code> traversal flattens a nested collection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/foci</span> <span class="tok-nv">l/each</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; (0 1 2 3)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/each</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [1 2 3 4]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/each</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [42 42 42 42]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/foci</span> <span class="tok-nv">l/cat</span> <span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
+<span class="tok-c1">;; =&gt; (0 1 2 3 4 5)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/cat</span> <span class="tok-nb">inc </span><span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
+<span class="tok-c1">;; =&gt; [[1 2 3] [4 5 6]]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/cat</span> <span class="tok-mi">42</span> <span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
+<span class="tok-c1">;; =&gt; [[42 42 42] [42 42 42]]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>filter</code> traversal can be used to filter can be used to filter the results
+of another by composition:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/foci</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">l/each</span> <span class="tok-p">(</span><span class="tok-nf">l/filter</span> <span class="tok-nv">odd?</span><span class="tok-p">))</span>
+        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; (1 3 5)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">l/each</span> <span class="tok-p">(</span><span class="tok-nf">l/filter</span> <span class="tok-nv">odd?</span><span class="tok-p">))</span>
+        <span class="tok-nv">inc</span>
+        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [2 2 4 4 6]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">l/each</span> <span class="tok-p">(</span><span class="tok-nf">l/filter</span> <span class="tok-nv">odd?</span><span class="tok-p">))</span>
+       <span class="tok-mi">42</span>
+       <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [42 2 42 4 42]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using <code>only</code> is equivalent to composing <code>each</code> and <code>filter</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/foci</span> <span class="tok-p">(</span><span class="tok-nf">l/only</span> <span class="tok-nv">odd?</span><span class="tok-p">)</span>
+        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; (1 3 5)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/only</span> <span class="tok-nv">odd?</span><span class="tok-p">)</span>
+        <span class="tok-nv">inc</span>
+        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [2 2 4 4 6]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/only</span> <span class="tok-nv">odd?</span><span class="tok-p">)</span>
+       <span class="tok-mi">42</span>
+       <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<span class="tok-c1">;; =&gt; [42 2 42 4 42]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another interesting traversals include <code>keys</code> for focusing on map keys, <code>vals</code>
+for focusing on map values, and <code>indexed</code> for focusing on index-value pairs.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="interoperability"><a class="link" href="#interoperability">Interoperability</a></h4>
+<div class="paragraph">
+<p><code>cats.labs.lens</code> implement the <code>Focus</code> and <code>Foci</code> atom types, which are derived
+atoms with either a lens or a traversal. We can focus on a subpart of the
+structure and change it, reflecting the changes on the original atom:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.lens</span> <span class="tok-ss">:as</span> <span class="tok-nv">l</span><span class="tok-p">])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">atom</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span><span class="tok-p">]))</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">fa</span> <span class="tok-p">(</span><span class="tok-nf">l/focus-atom</span> <span class="tok-nv">l/fst</span> <span class="tok-nv">a</span><span class="tok-p">))</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">fsa</span> <span class="tok-p">(</span><span class="tok-nf">l/foci-atom</span> <span class="tok-nv">l/each</span> <span class="tok-nv">a</span><span class="tok-p">))</span>
+
+<span class="tok-o">@</span><span class="tok-nv">fa</span>
+<span class="tok-c1">;; =&gt;1</span>
+
+<span class="tok-o">@</span><span class="tok-nv">fsa</span>
+<span class="tok-c1">;; =&gt; (1 2 3 4)</span>
+
+<span class="tok-p">(</span><span class="tok-nf">reset!</span> <span class="tok-nv">fa</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; 42</span>
+
+<span class="tok-o">@</span><span class="tok-nv">fa</span>
+<span class="tok-c1">;; =&gt; 42</span>
+
+<span class="tok-o">@</span><span class="tok-nv">fsa</span>
+<span class="tok-c1">;; =&gt; (42 2 3 4)</span>
+
+<span class="tok-o">@</span><span class="tok-nv">a</span>
+<span class="tok-c1">;; =&gt; [42 2 3 4]</span>
+
+<span class="tok-p">(</span><span class="tok-nf">reset!</span> <span class="tok-nv">fsa</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; (42 42 42 42)</span>
+
+<span class="tok-o">@</span><span class="tok-nv">a</span>
+<span class="tok-c1">;; =&gt; [42 42 42 42]</span>
+
+<span class="tok-o">@</span><span class="tok-nv">fa</span>
+<span class="tok-c1">;; =&gt; 42</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>swap!</code> and watches also work on the derived focus or foci atoms.</p>
+</div>
 </div>
 </div>
 </div>
@@ -2231,7 +2622,7 @@ that build higher-level abstractions on top of what cats offers.</p>
 <p>Promise monad (Clojure): <a href="https://github.com/funcool/promissum" class="bare">https://github.com/funcool/promissum</a></p>
 </li>
 <li>
-<p>Concurrent data fetching: <a href="https://github.com/kachayev/muse" class="bare">https://github.com/kachayev/muse</a></p>
+<p>Concurrent data fetching: <a href="https://github.com/funcool/muse" class="bare">https://github.com/funcool/muse</a></p>
 </li>
 </ul>
 </div>
@@ -2243,9 +2634,10 @@ that build higher-level abstractions on top of what cats offers.</p>
 <div class="sect2">
 <h3 id="what-clojure-types-implement-some-of-the-category-theory-abstractions"><a class="link" href="#what-clojure-types-implement-some-of-the-category-theory-abstractions">What Clojure types implement some of the Category Theory abstractions?</a></h3>
 <div class="paragraph">
-<p>In contrast to other similar libraries in Clojure, <em>cats</em> doesn&#8217;t intend to extend Clojure types
-that don&#8217;t act like containers. For example, Clojure keywords are values but can not be containers so
-they should not extend any of the previously explained protocols.</p>
+<p>In contrast to other similar libraries in Clojure, <em>cats</em> doesn&#8217;t intend to
+extend Clojure types that don&#8217;t act like containers. For example, Clojure
+keywords are values but can not be containers so they should not extend any of
+the previously explained protocols.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <caption class="title">Table 1. Summary of Clojure types and implemented protocols</caption>
@@ -2320,9 +2712,26 @@ restrictions for contributions. Just open an issue or pull request.</p>
 </div>
 </div>
 <div class="sect2">
+<h3 id="editor-integration"><a class="link" href="#editor-integration">Editor integration</a></h3>
+<div class="paragraph">
+<p>For making Emacs' clojure-mode treat <code>alet</code>, <code>mlet</code> et al like a <code>let</code> and indent
+them correctly, you can use <code>define-clojure-indent</code> like in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="elisp"><span class="tok-p">(</span><span class="tok-nb">require</span> <span class="tok-ss">&#39;clojure-mode</span><span class="tok-p">)</span>
+
+<span class="tok-p">(</span><span class="tok-nv">define-clojure-indent</span>
+  <span class="tok-p">(</span><span class="tok-nv">alet</span> <span class="tok-ss">&#39;defun</span><span class="tok-p">)</span>
+  <span class="tok-p">(</span><span class="tok-nv">mlet</span> <span class="tok-ss">&#39;defun</span><span class="tok-p">))</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="source-code"><a class="link" href="#source-code">Source Code</a></h3>
 <div class="paragraph">
-<p><em>cats</em> is open source and can be found on <a href="https://github.com/funcool/cats">github</a>.</p>
+<p><em>cats</em> is open source and can be found on
+<a href="https://github.com/funcool/cats">github</a>.</p>
 </div>
 <div class="paragraph">
 <p>You can clone the public repository with this command:</p>
@@ -2336,11 +2745,20 @@ restrictions for contributions. Just open an issue or pull request.</p>
 <div class="sect2">
 <h3 id="run-tests"><a class="link" href="#run-tests">Run tests</a></h3>
 <div class="paragraph">
-<p>For running tests just execute this:</p>
+<p>For running tests just execute this for clojure:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="text">lein test</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And this for clojurescript:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="text">./scripts/build
+node ./out/tests.js</code></pre>
 </div>
 </div>
 </div>
@@ -2378,31 +2796,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="editor-integration"><a class="link" href="#editor-integration">Editor integration</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="emacs"><a class="link" href="#emacs">Emacs</a></h3>
-<div class="paragraph">
-<p>For making Emacs' clojure-mode treat <code>alet</code>, <code>mlet</code> et al like a <code>let</code> and indent
-them correctly, you can use <code>define-clojure-indent</code> like in the following example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="elisp"><span class="tok-p">(</span><span class="tok-nb">require</span> <span class="tok-ss">&#39;clojure-mode</span><span class="tok-p">)</span>
-
-<span class="tok-p">(</span><span class="tok-nv">define-clojure-indent</span>
-  <span class="tok-p">(</span><span class="tok-nv">alet</span> <span class="tok-ss">&#39;defun</span><span class="tok-p">)</span>
-  <span class="tok-p">(</span><span class="tok-nv">mlet</span> <span class="tok-ss">&#39;defun</span><span class="tok-p">))</span></code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-04 09:24:04 EEST
+Last updated 2015-11-26 19:12:26 EET
 </div>
 </div>
 </body>
