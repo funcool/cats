@@ -1829,13 +1829,15 @@ TODO
 
 *Status:* Experimental
 
-This namespace implements functional references to one (lens) or multiple (traversal) values modeled as
-functions. Lenses and traversals generalize the get, put and mapping to a particular part of a data structure.
+This namespace implements functional references to one (lens) or multiple
+(traversal) values modeled as functions. Lenses and traversals generalize the
+get, put and mapping to a particular part of a data structure.
+
 
 ==== Lenses
 
-We'll start by using the most basic lens, the identity lens. We can get the value a lens is focused on using
-the `focus` function in `cats.labs.lens`:
+We'll start by using the most basic lens, the identity lens. We can get the value
+a lens is focused on using the `focus` function in `cats.labs.lens` ns:
 
 [source, clojure]
 ----
@@ -1845,8 +1847,8 @@ the `focus` function in `cats.labs.lens`:
 ;; => [0 1 2 3]
 ----
 
-We have two other primitives available: the `put` operation and `over`, which lets us apply a function over
-the focused value of a lens:
+We have two other primitives available: the `put` operation and `over`, which lets
+us apply a function over the focused value of a lens:
 
 [source, clojure]
 ----
@@ -1857,7 +1859,8 @@ the focused value of a lens:
 ;; => 4
 ----
 
-We can focus on the first (`fst`), (`second`), or nth (`nth`) element of a list with a lens:
+We can focus on the first (`fst`), (`second`), or nth (`nth`) element of a list
+with a lens:
 
 [source, clojure]
 ----
@@ -1884,6 +1887,7 @@ We can focus on the first (`fst`), (`second`), or nth (`nth`) element of a list 
 ;; => [1 2 42]
 ----
 
+
 And compose them arbitrarily using function composition:
 
 [source, clojure]
@@ -1904,11 +1908,11 @@ And compose them arbitrarily using function composition:
 ;; => [[[0 1 42] [3 4 5]] [6 7 8]]
 ----
 
-Lenses compose with regular function composition and, like transducers, the combined lens runs from
-left to right.
+Lenses compose with regular function composition and, like transducers, the
+combined lens runs from left to right.
 
-The `passes` function accepts a predicate and returns a lens that focuses in an element only if it
-passes the predicate.
+The `passes` function accepts a predicate and returns a lens that focuses
+in an element only if it passes the predicate.
 
 [source, clojure]
 ----
@@ -1980,7 +1984,8 @@ There's `key` and `select-keys` for focusing on one or multiple keys respectivel
 ----
 
 Let's take a look at a combinator that will let us build a unit-conversion lens
-called `units`. We have to supply a function to convert from unit `a` to unit `b` and viceversa:
+called `units`. We have to supply a function to convert from unit `a` to unit `b`
+and viceversa:
 
 [source, clojure]
 ----
@@ -2000,13 +2005,16 @@ called `units`. We have to supply a function to convert from unit `a` to unit `b
 ;; => 120
 ----
 
+
 ==== Traversals
 
-A traversal is similar to a lens but it focuses on multiple values instead of one. Therefore, we use the `foci`
-function for viewing the focused elements of a traversal.
+A traversal is similar to a lens but it focuses on multiple values instead of one.
+Therefore, we use the `foci` function for viewing the focused elements of a
+traversal.
 
-Traversals should be composed with other traversals. You can compose lenses with a traversal but it will become
-a traversal and you will have to use `foci` for viewing its values.
+Traversals should be composed with other traversals. You can compose lenses
+with a traversal but it will become a traversal and you will have to use `foci`
+for viewing its values.
 
 Let's look at the identity traversal, it's called `it`:
 
@@ -2025,8 +2033,8 @@ Let's look at the identity traversal, it's called `it`:
 ;; => 4
 ----
 
-The `each` traversal focuses every value in a collection, allowing us to map preservering structure. The
-`cat` traversal flattens a nested collection:
+The `each` traversal focuses every value in a collection, allowing us to map
+preservering structure. The `cat` traversal flattens a nested collection:
 
 [source, clojure]
 ----
@@ -2049,8 +2057,8 @@ The `each` traversal focuses every value in a collection, allowing us to map pre
 ;; => [[42 42 42] [42 42 42]]
 ----
 
-The `filter` traversal can be used to filter can be used to filter the results of another by
-composition:
+The `filter` traversal can be used to filter can be used to filter the results
+of another by composition:
 
 [source, clojure]
 ----
@@ -2088,13 +2096,16 @@ Using `only` is equivalent to composing `each` and `filter`:
 ;; => [42 2 42 4 42]
 ----
 
-Another interesting traversals include `keys` for focusing on map keys, `vals` for focusing on map values, and `indexed`
-for focusing on index-value pairs.
+Another interesting traversals include `keys` for focusing on map keys, `vals` 
+for focusing on map values, and `indexed` for focusing on index-value pairs.
+
 
 ==== Interoperability
 
-`cats.labs.lens` implement the `Focus` and `Foci` atom types, which are derived atoms with either a lens or a traversal. We
-can focus on a subpart of the structure and change it, reflecting the changes on the original atom:
+`cats.labs.lens` implement the `Focus` and `Foci` atom types, which are derived 
+atoms with either a lens or a traversal. We can focus on a subpart of the 
+structure and change it, reflecting the changes on the original atom:
+
 
 [source, clojure]
 ----
@@ -2136,6 +2147,7 @@ can focus on a subpart of the structure and change it, reflecting the changes on
 
 `swap!` and watches also work on the derived focus or foci atoms.
 
+
 == Complementary libraries
 
 Some monads are defined as separated package to avoid additional
@@ -2145,6 +2157,7 @@ that build higher-level abstractions on top of what cats offers.
 * Promise monad (ClojureScript): https://github.com/funcool/promesa
 * Promise monad (Clojure): https://github.com/funcool/promissum
 * Concurrent data fetching: https://github.com/funcool/muse
+
 
 == FAQ
 
