@@ -1,14 +1,24 @@
 (ns cats.monad.exception-spec
-  #?(:cljs
-     (:require [cljs.test :as t]
-               [cats.builtin :as b]
-               [cats.protocols :as p]
-               [cats.monad.exception :as exc :include-macros true]
-               [cats.monad.either :as either]
-               [cats.context :as ctx :include-macros true]
-               [cats.core :as m :include-macros true])
-     :clj
+  #?@(:cljs
+      [(:require [cljs.test :as t]
+                 [clojure.test.check]
+                 [clojure.test.check.generators :as gen]
+                 [clojure.test.check.properties :as prop :include-macros true]
+                 [cats.labs.test :as lt]
+                 [cats.builtin :as b]
+                 [cats.protocols :as p]
+                 [cats.monad.exception :as exc :include-macros true]
+                 [cats.monad.either :as either]
+                 [cats.context :as ctx :include-macros true]
+                 [cats.core :as m :include-macros true])
+       (:require-macros [clojure.test.check.clojure-test :refer (defspec)])])
+  #?(:clj
      (:require [clojure.test :as t]
+               [clojure.test.check.clojure-test :refer [defspec]]
+               [clojure.test.check :as tc]
+               [clojure.test.check.generators :as gen]
+               [clojure.test.check.properties :as prop]
+               [cats.labs.test :as lt]
                [cats.builtin :as b]
                [cats.protocols :as p]
                [cats.monad.exception :as exc]
@@ -17,8 +27,8 @@
                [cats.core :as m])))
 
 (t/deftest basic-operations-test
-  (let [e #?(:clj (Exception. "test")
-             :cljs (js/Error. "test"))]
+  (let [e #?(:clj  (Exception. "test")
+             :cljs (js/Error.  "test"))]
     (t/is (= 1 (m/extract (exc/try-on 1))))
     (t/is (= e (m/extract (exc/try-on (throw e)))))
     (t/is (= e (m/extract (exc/try-on e))))))
@@ -89,26 +99,73 @@
                         (m/extract (m/fmap inc m2))))
        (t/is (= (exc/success 2) (m/fmap inc m1))))))
 
-(t/deftest first-monad-law-left-identity
-  (t/is (= (exc/success 2)
-           (m/>>= (m/return exc/context 2)
-                  exc/success)))
+;; Generators
 
-  (t/is (= (exc/success 2)
-           (m/>>= (m/return exc/context 2)
-                  exc/success
-                  exc/success))))
+(defn successes-of [g]
+  (gen/fmap exc/success g))
 
-(t/deftest second-monad-law-right-identity
-  (t/is (= (exc/success 2)
-           (m/>>= (exc/try-on 2) m/return))))
+(def success-gen
+  (successes-of gen/any))
 
-(t/deftest third-monad-law-associativity
-  (t/is (= (m/>>= (m/mlet [x (exc/try-on 2)
-                           y (exc/try-on (inc x))]
-                    (m/return y))
-                  (fn [y] (exc/try-on (inc y))))
-           (m/>>= (exc/try-on 2)
-                  (fn [x]
-                    (m/>>= (exc/try-on (inc x))
-                           (fn [y] (exc/try-on (inc y)))))))))
+(def failure-gen
+  (gen/return (exc/failure {})))
+
+(def exc-gen
+  (gen/one-of [success-gen failure-gen]))
+
+(def vectors-gen
+  (gen/vector gen/any))
+
+;; Functor
+
+(defspec exc-first-functor-law 10
+  (lt/first-functor-law
+   {:gen exc-gen}))
+
+(defspec exc-second-functor-law 10
+  (lt/second-functor-law
+   {:gen exc-gen
+    :f   str
+    :g   count}))
+
+;; Applicative
+
+(defspec exc-applicative-identity 10
+  (lt/applicative-identity-law
+   {:ctx exc/context
+    :gen exc-gen}))
+
+(defspec exc-applicative-homomorphism 10
+  (lt/applicative-homomorphism
+   {:ctx exc/context
+    :gen gen/any
+    :f   (constantly false)}))
+
+(defspec exc-applicative-interchange 10
+  (lt/applicative-interchange
+   {:ctx  exc/context
+    :gen  gen/int
+    :appf (exc/success inc)}))
+
+(defspec exc-applicative-composition 10
+  (lt/applicative-composition
+   {:ctx  exc/context
+    :gen  gen/int
+    :appf (exc/success inc)
+    :appg (exc/success dec)}))
+
+;; Monad
+
+(defspec exc-first-monad-law 10
+  (lt/first-monad-law
+   {:ctx exc/context
+    :mf  #(if % (exc/success %) (exc/failure {}))}))
+
+(defspec exc-second-monad-law 10
+  (lt/second-monad-law {:ctx exc/context}))
+
+(defspec exc-third-monad-law 10
+  (lt/third-monad-law
+   {:ctx exc/context
+    :f   (comp exc/success str)
+    :g   (comp exc/success count)}))
