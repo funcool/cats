@@ -130,10 +130,17 @@
      (ctx/with-context ctx
        (p/-fmap ctx f fv)))))
 
-;; "Given functions `f` and `g` and a value wrapped in a bifunctor `bv`,
-;; apply `f` to a first argument or `g` to a second argument."
 (defn bimap
-  "Map over both arguments at the same time."
+  "Map over both arguments at the same time.
+
+  Given functions `f` and `g` and a value wrapped in a bifunctor `bv`,
+  apply `f` to a first argument or `g` to a second argument.
+
+      (bimap dec inc (either/right 1)
+      ;; => #<Right 2>
+
+      (bimap dec inc (either/left 1)
+      ;; => #<Left 0>"
   ([f g]
    (fn [bv]
      (bimap f g bv)))
@@ -143,7 +150,16 @@
        (p/-bimap ctx f g bv)))))
 
 (defn left-map
-  "Map covariantly over the first argument."
+  "Map covariantly over the first argument.
+
+  Given a function `f` and a value wrapped in a bifunctor `bv`,
+  apply `f` to the first argument, if present, otherwise leave `bv` unchanged.
+
+      (left-map dec (either/right 1)
+      ;; => #<Right 1>
+
+      (left-map dec (either/left 1)
+      ;; => #<Left 0>"
   ([f]
    (fn [bv]
      (left-map f bv)))
@@ -151,7 +167,16 @@
    (bimap f identity bv)))
 
 (defn right-map
-  "Map covariantly over the second argument."
+  "Map covariantly over the second argument.
+
+  Given a function `g` and a value wrapped in a bifunctor `bv`,
+  apply `g` to the second argument, if present, otherwise leave `bv` unchanged.
+
+      (right-map inc (either/right 1)
+      ;; => #<Right 2>
+
+      (right-map inc (either/left 1)
+      ;; => #<Left 1>"
   ([g]
    (fn [bv]
      (right-map g bv)))
