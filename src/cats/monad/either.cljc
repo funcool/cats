@@ -274,6 +274,8 @@
     (lf (p/-extract e))
     (rf (p/-extract e))))
 
+(def either branch)
+
 (defn branch-left
   "Given an either value and a function, if the either is a
   left, apply the function to the value it contains; if the
