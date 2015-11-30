@@ -130,6 +130,18 @@
      (ctx/with-context ctx
        (p/-fmap ctx f fv)))))
 
+;; "Given functions `f` and `g` and a value wrapped in a bifunctor `bv`,
+;; apply `f` to a first argument or `g` to a second argument."
+(defn bimap
+  "Map over both arguments at the same time."
+  ([f g]
+   (fn [bv]
+     (bimap f g bv)))
+  ([f g bv]
+   (let [ctx (ctx/get-current bv)]
+     (ctx/with-context ctx
+       (p/-bimap ctx f g bv)))))
+
 (defn fapply
   "Given a function wrapped in a monadic context `af`,
   and a value wrapped in a monadic context `av`,
