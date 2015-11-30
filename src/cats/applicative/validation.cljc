@@ -200,6 +200,38 @@
 (util/make-printable (type context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn branch
+  "Given a validation value and two functions, if the validation is a
+  failure apply the first function to the value it contains; if the
+  validation is a success apply the second function to its value."
+  [v fail-f ok-f]
+  {:pre [(validation? v)]}
+  (if (fail? v)
+    (fail-f (p/-extract v))
+    (ok-f   (p/-extract v))))
+
+(def validation branch)
+
+(defn branch-fail
+  "Given a validation value and a function, if the validation is a
+  failure, apply the function to the value it contains; if the
+  validation is a success, return it."
+  [v fail-f]
+  {:pre [(validation? v)]}
+  (branch v fail-f ok))
+
+(defn branch-ok
+  "Given a validation value and a function, if the validation is a
+  success, apply the function to the value it contains; if the
+  validation is a failure, return it."
+  [v ok-f]
+  {:pre [(validation? v)]}
+  (branch v fail ok-f))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Either isomorphism
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
