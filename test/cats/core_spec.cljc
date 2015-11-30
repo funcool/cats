@@ -146,6 +146,28 @@
              (ctx/with-context maybe/context
                (m/mapseq maybe/just []))))))
 
+(t/deftest lift-a-tests
+  (let [app+ (m/lift-a 2 +)]
+    (t/testing "It can lift a function to the vector applicative"
+      (t/is (= [1 2 3 4 5 6]
+               (app+ [0 2 4] [1 2]))))
+
+    (t/testing "It can lift a function to the Maybe applicative"
+      (t/is (= (maybe/just 6)
+               (app+ (maybe/just 2) (maybe/just 4))))
+      (t/is (= (maybe/nothing)
+               (app+ (maybe/just 1) (maybe/nothing)))))
+
+    ;; FIXME: uncomment when finishing funcool/cats#77
+    #_(t/testing "It can lift a function to a Monad Transformer"
+      (let [maybe-sequence-monad (maybe/maybe-t b/sequence-context)]
+        (t/is (= [(maybe/just 1) (maybe/just 2)
+                  (maybe/just 3) (maybe/just 4)
+                  (maybe/just 5) (maybe/just 6)]
+                 (ctx/with-context maybe-sequence-monad
+                   (app+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
+                         [(maybe/just 1) (maybe/just 2)]))))))))
+
 (t/deftest lift-m-tests
   (let [monad+ (m/lift-m 2 +)]
     (t/testing "It can lift a function to the vector monad"
