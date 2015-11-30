@@ -45,6 +45,26 @@
     :f   str
     :g   count}))
 
+;; Bifunctor
+
+(defspec pair-first-identity 10
+  (lt/bifunctor-first-identity
+   {:gen (pair-gen gen/any)}))
+
+(defspec pair-second-identity 10
+  (lt/bifunctor-second-identity
+   {:gen (pair-gen gen/any)}))
+
+(defspec pair-bimap-identity 10
+  (lt/bifunctor-bimap-identity
+   {:gen (pair-gen gen/any)}))
+
+(defspec pair-bifunctor-composition 10
+  (lt/bifunctor-composition
+   {:gen (pair-gen gen/any)
+    :f   str
+    :g   count}))
+
 (t/deftest pair-foldable
   (t/testing "Foldl"
     (t/is (= (/ 1 3) (m/foldl / 1 (d/pair 0 3)))))

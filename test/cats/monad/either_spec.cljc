@@ -57,6 +57,26 @@
     :f   str
     :g   count}))
 
+;; Bifunctor
+
+(defspec either-first-identity 10
+  (lt/bifunctor-first-identity
+   {:gen either-gen}))
+
+(defspec either-second-identity 10
+  (lt/bifunctor-second-identity
+   {:gen either-gen}))
+
+(defspec either-bimap-identity 10
+  (lt/bifunctor-bimap-identity
+   {:gen either-gen}))
+
+(defspec either-bifunctor-composition 10
+  (lt/bifunctor-composition
+   {:gen either-gen
+    :f   str
+    :g   count}))
+
 ;; Applicative
 
 (defspec either-applicative-identity 10

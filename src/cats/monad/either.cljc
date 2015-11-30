@@ -159,6 +159,12 @@
         (right (f (.-v s)))
         s))
 
+    p/Bifunctor
+    (-bimap [_ f g s]
+      (if (left? s)
+        (left  (f (.-v s)))
+        (right (g (.-v s)))))
+
     p/Applicative
     (-pure [_ v]
       (right v))
@@ -267,6 +273,8 @@
   (if (left? e)
     (lf (p/-extract e))
     (rf (p/-extract e))))
+
+(def either branch)
 
 (defn branch-left
   "Given an either value and a function, if the either is a
