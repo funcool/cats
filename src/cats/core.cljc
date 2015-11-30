@@ -35,7 +35,7 @@
      (:require [cats.protocols :as p]
                [clojure.set]
                [cats.context :as ctx]))
-  (:refer-clojure :exclude [when unless filter sequence]))
+  (:refer-clojure :exclude [filter sequence unless when]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware functions
@@ -141,6 +141,22 @@
    (let [ctx (ctx/get-current bv)]
      (ctx/with-context ctx
        (p/-bimap ctx f g bv)))))
+
+(defn left-map
+  "Map covariantly over the first argument."
+  ([f]
+   (fn [bv]
+     (left-map f bv)))
+  ([f bv]
+   (bimap f identity bv)))
+
+(defn right-map
+  "Map covariantly over the second argument."
+  ([g]
+   (fn [bv]
+     (right-map g bv)))
+  ([g bv]
+   (bimap identity g bv)))
 
 (defn fapply
   "Given a function wrapped in a monadic context `af`,
