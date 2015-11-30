@@ -95,6 +95,31 @@
     (eq (m/fmap (comp g f) fa)
         (m/fmap g (m/fmap f fa)))))
 
+;; Bifunctor laws
+
+(defn bifunctor-first-identity
+  [{:keys [gen eq] :or {eq =}}]
+  (prop/for-all [bv gen]
+    (eq bv (m/left-map identity bv))))
+
+(defn bifunctor-second-identity
+  [{:keys [gen eq] :or {eq =}}]
+  (prop/for-all [bv gen]
+    (eq bv
+        (m/right-map identity bv))))
+
+(defn bifunctor-bimap-identity
+  [{:keys [gen eq] :or {eq =}}]
+  (prop/for-all [bv gen]
+    (eq bv
+        (m/bimap identity identity bv))))
+
+(defn bifunctor-composition
+  [{:keys [gen f g eq] :or {eq =}}]
+  (prop/for-all [bv gen]
+    (eq (m/bimap f g bv)
+        (m/left-map f (m/right-map g bv)))))
+
 ;; Applicative laws
 
 (defn applicative-identity-law
