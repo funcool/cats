@@ -1,5 +1,12 @@
 # Changelog #
 
+## Version 1.2.0 ##
+
+Date: 2015-12-01
+
+- Add Bifunctor (@yurriq)
+- Add a macro for lifting functions to applicatives
+
 ## Version 1.1.0 ##
 
 Date: 2015-11-26
@@ -16,7 +23,8 @@ Date: 2015-11-26
 - Update core.async version to 0.2.374
 - Update cljs compiler version to 0.7.170
 - Add basic support for crdt's under labs namespace.
-  (documentation is missing).
+(documentation is missing).
+- Add test.check generators integration and property constructors
 
 
 ## Version 1.0.0 ##
