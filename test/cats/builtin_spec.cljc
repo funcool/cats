@@ -53,8 +53,11 @@
 (defspec map-second-functor-law 10
   (lt/second-functor-law
    {:gen map-gen
-    :f   (fn [[k v]] [k (str k v)])
-    :g   (fn [[k v]] [k (count v)])}))
+    :f   prn-str
+    :g   count}))
+
+(t/deftest map-functor
+  (t/is (= {:a 2 :b 3 :c 4} (m/fmap inc {:a 1 :b 2 :c 3}))))
 
 (t/deftest array-map-foldable
   (t/testing "Foldl"
