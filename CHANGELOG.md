@@ -4,7 +4,7 @@
 
 Date: 2015-12-01
 
-- Add Bifunctor (@yurriq)
+- Add Bifunctor (@yurrriq)
 - Add a macro for lifting functions to applicatives
 
 ## Version 1.1.0 ##
