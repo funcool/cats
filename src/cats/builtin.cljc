@@ -246,7 +246,7 @@
 
     p/Functor
     (-fmap [_ f v]
-      (into {} (map f v)))
+      (into {} (map (fn [[key value]] [key (f value)]) v)))
 
     p/Foldable
     (-foldr [ctx f z xs]
