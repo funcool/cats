@@ -80,7 +80,7 @@
 <h1>Cats Documentation</h1>
 <div class="details">
 <span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">1.1.0</span>
+<span id="revdate">1.2.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -126,6 +126,7 @@
 </li>
 <li><a href="#labs">Labs</a>
 <ul class="sectlevel2">
+<li><a href="#test-check">test.check</a></li>
 <li><a href="#channel">Channel</a></li>
 <li><a href="#manifold-deferred">Manifold Deferred</a></li>
 <li><a href="#state">State</a></li>
@@ -242,7 +243,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;1.1.0&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;1.2.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1823,6 +1824,51 @@ application in clojure(script).</p>
 each section.</p>
 </div>
 <div class="sect2">
+<h3 id="test-check"><a class="link" href="#test-check">test.check</a></h3>
+<div class="paragraph">
+<p><strong>Status:</strong> Experimental</p>
+</div>
+<div class="paragraph">
+<p>The <code>cats.labs.test</code> namespace implements monad and applicative instances for
+generators, which lets you use the <code>cats.core/alet</code> and <code>cats.core/mlet</code> macros
+for writing generators:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.test</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">clojure.test.check.generators</span> <span class="tok-ss">:as</span> <span class="tok-nv">gen</span><span class="tok-p">])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">color</span>
+  <span class="tok-p">(</span><span class="tok-nf">m/alet</span> <span class="tok-p">[</span><span class="tok-nv">r</span> <span class="tok-nv">gen/int</span>
+           <span class="tok-nv">g</span> <span class="tok-nv">gen/int</span>
+           <span class="tok-nv">b</span> <span class="tok-nv">gen/int</span><span class="tok-p">]</span>
+    <span class="tok-p">[</span><span class="tok-nv">r</span> <span class="tok-nv">g</span> <span class="tok-nv">b</span><span class="tok-p">]))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">gen/sample</span> <span class="tok-nv">color</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; ([0 0 0])</span>
+
+<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">mcolor</span>
+  <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">r</span> <span class="tok-nv">gen/int</span>
+           <span class="tok-nv">g</span> <span class="tok-nv">gen/int</span>
+           <span class="tok-nv">b</span> <span class="tok-nv">gen/int</span><span class="tok-p">]</span>
+    <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">[</span><span class="tok-nv">r</span> <span class="tok-nv">g</span> <span class="tok-nv">b</span><span class="tok-p">])))</span>
+
+<span class="tok-p">(</span><span class="tok-nf">gen/sample</span> <span class="tok-nv">mcolor</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<span class="tok-c1">;; =&gt; ([0 0 0])</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Apart from that, the namespace contains multiple functions for generating test.check
+properties that verify the laws of Semigroup, Monoid, Functor, Applicative, Monad,
+MonadZero and MonadPlus.</p>
+</div>
+<div class="paragraph">
+<p>The implementation of cats' abstractions are tested using generative testing and
+the <code>cats.labs.test</code> property generation functions.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="channel"><a class="link" href="#channel">Channel</a></h3>
 <div class="paragraph">
 <p><strong>Status:</strong> Experimental</p>
@@ -2799,7 +2845,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-11-26 19:12:26 EET
+Last updated 2015-12-16 00:55:47 EET
 </div>
 </div>
 </body>
