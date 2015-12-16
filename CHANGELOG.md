@@ -1,5 +1,14 @@
 # Changelog #
 
+## Version 1.2.1 ##
+
+Date: 2015-12-16
+
+- Fix functor implementation for Map.
+- Fix key overwritting on lenses focus/foci types.
+- Add utility functions to validation ns.
+
+
 ## Version 1.2.0 ##
 
 Date: 2015-12-01
