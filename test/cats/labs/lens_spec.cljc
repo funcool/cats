@@ -335,15 +335,15 @@
           watched (volatile! nil)
           fsource (l/focus-atom l/fst source)]
       (add-watch fsource :test (fn [key ref old new]
-                                 (vreset! watched [key ref old new])))
+                                 (vreset! watched [ref old new])))
 
       (swap! source #(subvec % 1))
       (t/is (= @watched
-               [:test fsource 0 1]))
+               [fsource 0 1]))
 
       (swap! fsource inc)
       (t/is (= @watched
-               [:test fsource 1 2]))
+               [fsource 1 2]))
 
       (remove-watch fsource :test))))
 
@@ -367,15 +367,15 @@
           watched (volatile! nil)
           fsource (l/foci-atom (l/only odd?) source)]
       (add-watch fsource :test (fn [key ref old new]
-                                 (vreset! watched [key ref old new])))
+                                 (vreset! watched [ref old new])))
 
       (swap! source #(subvec % 2))
       (t/is (= @watched
-               [:test fsource [1 3 5] [3 5]]))
+               [fsource [1 3 5] [3 5]]))
 
       (swap! fsource inc)
       (t/is (= @watched
-               [:test fsource [3 5] []]))
+               [fsource [3 5] []]))
       (t/is (= @source
                [4 4 6]))
 

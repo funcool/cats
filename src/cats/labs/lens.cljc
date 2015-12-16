@@ -262,7 +262,11 @@
 
 ;; interop
 
-(deftype Focus [lens a]
+(defn- prefix-key
+  [key id]
+  (keyword (str id "-" (name key))))
+
+(deftype Focus [id lens a]
   p/Printable
   (-repr [m]
     (str "#<Focus [" (pr-str lens) "," (pr-str a) "]>"))
@@ -290,13 +294,15 @@
 
        clojure.lang.IRef
        (addWatch [self key cb]
-         (add-watch a key (fn [key _ oldval newval]
-                            (let [old' (focus lens oldval)
-                                  new' (focus lens newval)]
-                              (if (not= old' new')
-                                (cb key self old' new'))))))
+         (let [key (prefix-key key id)]
+           (add-watch a key (fn [key _ oldval newval]
+                              (let [old' (focus lens oldval)
+                                    new' (focus lens newval)]
+                                (if (not= old' new')
+                                  (cb key self old' new')))))))
        (removeWatch [_ key]
-         (remove-watch a key))]
+         (let [key (prefix-key key id)]
+           (remove-watch a key)))]
 
       :cljs
       [IDeref
@@ -304,13 +310,15 @@
 
        IWatchable
        (-add-watch [self key cb]
-         (add-watch a key (fn [key _ oldval newval]
-                            (let [old' (focus lens oldval)
-                                  new' (focus lens newval)]
-                              (if (not= old' new')
-                                (cb key self old' new'))))))
+         (let [key (prefix-key key id)]
+           (add-watch a key (fn [key _ oldval newval]
+                              (let [old' (focus lens oldval)
+                                    new' (focus lens newval)]
+                                (if (not= old' new')
+                                  (cb key self old' new')))))))
        (-remove-watch [_ key]
-         (remove-watch a key))
+         (let [key (prefix-key key id)]
+           (remove-watch a key)))
 
        IReset
        (-reset! [self newval]
@@ -334,7 +342,7 @@
          (swap! a (fn [s] (over lens #(apply f % x y more) s)))
          (deref self))]))
 
-(deftype Foci [trav a]
+(deftype Foci [id trav a]
   p/Printable
   (-repr [m]
     (str "#<Foci [" (pr-str trav) "," (pr-str a) "]>"))
@@ -362,13 +370,15 @@
 
        clojure.lang.IRef
        (addWatch [self key cb]
-         (add-watch a key (fn [key _ oldval newval]
-                            (let [old' (foci trav oldval)
-                                  new' (foci trav newval)]
-                              (if (not= old' new')
-                                (cb key self old' new'))))))
+         (let [key (prefix-key key id)]
+           (add-watch a key (fn [key _ oldval newval]
+                              (let [old' (foci trav oldval)
+                                    new' (foci trav newval)]
+                                (if (not= old' new')
+                                  (cb key self old' new')))))))
        (removeWatch [_ key]
-         (remove-watch a key))]
+         (let [key (prefix-key key id)]
+           (remove-watch a key)))]
 
       :cljs
       [IDeref
@@ -376,13 +386,15 @@
 
        IWatchable
        (-add-watch [self key cb]
-         (add-watch a key (fn [key _ oldval newval]
-                            (let [old' (foci trav oldval)
-                                  new' (foci trav newval)]
-                              (if (not= old' new')
-                                (cb key self old' new'))))))
+         (let [key (prefix-key key id)]
+           (add-watch a key (fn [key _ oldval newval]
+                              (let [old' (foci trav oldval)
+                                    new' (foci trav newval)]
+                                (if (not= old' new')
+                                  (cb key self old' new')))))))
        (-remove-watch [_ key]
-         (remove-watch a key))
+         (let [key (prefix-key key id)]
+           (remove-watch a key)))
 
        IReset
        (-reset! [self newval]
@@ -408,11 +420,13 @@
 
 (defn focus-atom
   [lens a]
-  (Focus. lens a))
+  (let [id (str (gensym "cats-lens"))]
+    (Focus. id lens a)))
 
 (defn foci-atom
   [traversal a]
-  (Foci. traversal a))
+  (let [id (str (gensym "cats-lens"))]
+    (Foci. id traversal a)))
 
 (util/make-printable Focus)
 (util/make-printable Foci)
