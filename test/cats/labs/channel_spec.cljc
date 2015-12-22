@@ -75,6 +75,39 @@
            (t/is (= 3 (a/<! r))))
          (done)))))
 
+(t/deftest channel-with-empty
+  #?(:clj
+     (let [r (m/mlet [v (a/to-chan [1])
+                      empty (a/to-chan [])]
+                     (m/return v))]
+       (t/is (= nil (a/<!! r))))
+     :cljs
+     (t/async done
+        (go
+          (let [r (m/mlet [v (a/to-chan [1])
+                           empty (a/to-chan [])]
+                          (m/return v))]
+            (t/is (= nil (a/<! r)))
+            (done))))))
+
+(t/deftest channel-comprehension
+  #?(:clj
+     (let [r (m/mlet [x (a/to-chan (range 1 4))
+                      y (a/to-chan (range x))]
+                     (m/return [x y]))]
+       (t/is (= [[1 0] [2 0] [2 1] [3 0] [3 1] [3 2]]
+                (a/<!! (a/into [] r)))))
+     :cljs
+     (t/async done
+              (go
+                (let [r (m/mlet [x (a/to-chan (range 1 4))
+                                 y (a/to-chan (range x))]
+                                (m/return [x y]))]
+                  (t/is (= [[1 0] [2 0] [2 1] [3 0] [3 1] [3 2]]
+                           (a/<! (a/into [] r))))
+                  (done))))))
+
+
 (t/deftest first-monad-law-left-identity
   #?(:clj
      (let [ch1 (m/pure c/context 4)
@@ -136,14 +169,14 @@
      (let [c1 (a/to-chan [1 2 3])
            c2 (a/to-chan [4 5 6])
            r (m/mappend c1 c2)]
-       (t/is (= [1 2 3 4 5 6] (a/<!! (a/into [] r)))))
+       (t/is (= #{1 2 3 4 5 6} (a/<!! (a/into #{} r)))))
      :cljs
      (t/async done
        (go
          (let [c1 (a/to-chan [1 2 3])
                c2 (a/to-chan [4 5 6])
                r (m/mappend c1 c2)]
-           (t/is (= [1 2 3 4 5 6] (a/<! (a/into [] r))))
+           (t/is (= #{1 2 3 4 5 6} (a/<! (a/into #{} r))))
            (done))))))
 
 
@@ -154,7 +187,7 @@
      :cljs
      (t/async done
        (go
-         (let [c (m/mappend (m/mempty) (a/to-chan [1]))]
+         (let [c (m/mappend (m/mempty c/context) (a/to-chan [1]))]
            (t/is (= [1] (a/<! (a/into [] c))))
            (done))))))
 
@@ -220,6 +253,60 @@
                   (t/is (= (either/right 3) (a/<! r1)))
                   (t/is (= (either/left :foo) (a/<! r2)))
                   (done))))))
+
+(t/deftest monadzero-tests
+  #?(:clj
+     (t/is (= #{} (a/<!! (a/into #{} (m/mzero c/context)))))
+     :cljs
+     (t/async
+      done
+      (go (t/is (= #{} (a/<! (a/into #{} (m/mzero c/context)))))
+          (done)))))
+
+(t/deftest monadplus-tests
+  #?(:clj
+     (do (t/is (= #{1 2 3}
+                  (a/<!! (a/into #{} (m/mplus (m/mzero c/context)
+                                              (a/to-chan #{1 2 3}))))))
+         (t/is (= #{1 2 3}
+                  (a/<!! (a/into #{} (m/mplus (a/to-chan #{1 2 3})
+                                              (m/mzero c/context))))))
+         (t/is (= (a/<!! (a/into #{} (m/mplus (a/to-chan [1])
+                                              (m/mplus (a/to-chan [2])
+                                                       (a/to-chan [3])))))
+                  (a/<!! (a/into #{} (m/mplus (m/mplus (a/to-chan [1])
+                                                       (a/to-chan [2]))
+                                              (a/to-chan [3])))))))
+     :cljs
+     (t/async
+      done
+      (go (t/is (= #{1 2 3}
+                   (a/<! (a/into #{} (m/mplus (m/mzero c/context)
+                                              (a/to-chan #{1 2 3}))))))
+          (t/is (= #{1 2 3}
+                   (a/<! (a/into #{} (m/mplus (a/to-chan #{1 2 3})
+                                              (m/mzero c/context))))))
+          (t/is (= (a/<! (a/into #{} (m/mplus (a/to-chan [1])
+                                              (m/mplus (a/to-chan [2])
+                                                       (a/to-chan [3])))))
+                   (a/<! (a/into #{} (m/mplus (m/mplus (a/to-chan [1])
+                                                       (a/to-chan [2]))
+                                              (a/to-chan [3]))))))
+          (done)))))
+
+(t/deftest channel-mlet-when
+  #?(:clj
+     (t/is (= [2] (a/<!! (a/into [] (m/mlet [v (a/to-chan [1 2])
+                                             :when (even? v)]
+                                            (m/return v))))))
+     :cljs
+     (t/async done
+              (go (t/is (= [2] (a/<! (a/into [] (m/mlet [v (a/to-chan [1 2])
+                                                         :when (even? v)]
+                                                        (m/return v))))))
+                  (done)))))
+
+
 
 ;; #?(:cljs (defn main [] (node/run-tests)))
 
