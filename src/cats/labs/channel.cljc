@@ -56,20 +56,6 @@
   (instance? #?(:clj  clojure.core.async.impl.channels.ManyToManyChannel
                 :cljs cljs.core.async.impl.channels.ManyToManyChannel) c))
 
-(defn- chain-chans
-  [& chans]
-  (let [out (a/chan)]
-    (go-loop [chs chans]
-      (if (pos? (count chs))
-        (let [r (a/<! (first chs))]
-          (if (nil? r)
-            (recur (rest chs))
-            (do
-              (a/>! out r)
-              (recur chs))))
-        (a/close! out)))
-    out))
-
 (def ^{:no-doc true}
   context
   (reify
@@ -78,64 +64,47 @@
 
     p/Functor
     (-fmap [_ f mv]
-      (let [c (a/chan 1 (map f))]
-        (a/pipe mv c)
-        c))
+      (a/pipe mv (a/chan 1 (map f))))
 
     p/Semigroup
     (-mappend [_ sv sv']
-      (chain-chans sv sv'))
+      (a/merge [sv sv']))
 
     p/Monoid
     (-mempty [_]
-      (let [c (a/chan)]
-        (a/close! c)
-        c))
+      (a/to-chan []))
 
     p/Applicative
     (-pure [_ v]
-      (let [c (a/chan 1)]
-        (a/put! c v)
-        (a/close! c)
-        c))
+      (a/to-chan [(if (nil? v) ::nil v)]))
 
     (-fapply [mn af av]
       (let [c (a/chan 1)]
         (go
-          (let [af' (a/<! (a/reduce conj [] af))
-                av' (a/<! (a/reduce conj [] av))
+          (let [af' (a/<! (a/into [] af))
+                av' (a/<! (a/into [] av))
                 ctx (p/-get-context [])]
             (a/onto-chan c (p/-fapply ctx af' av'))))
         c))
 
     p/Monad
     (-mreturn [_ v]
-      (let [c (a/chan 1)]
-        (a/put! c v)
-        (a/close! c)
-        c))
+      (a/to-chan [(if (nil? v) ::nil v)]))
 
     (-mbind [it mv f]
       (let [ctx ctx/*context*
-            c (a/chan 1)]
-        (go-loop []
-          (if-let [v (a/<! mv)]
-            (do
-              (if (channel? v)
-                (let [result (a/<! v)
-                      result (binding [ctx/*context* ctx]
-                               (f result))]
-                  (if (channel? result)
-                    (a/>! c (a/<! result))
-                    (a/>! c result)))
-                (let [result (binding [ctx/*context* ctx]
-                               (f v))]
-                  (if (channel? result)
-                    (a/>! c (a/<! result))
-                    (a/>! c result))))
-              (recur))
-            (a/close! c)))
-        c))
+            out (a/chan)
+            bindf #(binding [ctx/*context* ctx] (f %))]
+        (a/pipeline-async 1 out #(a/pipe (bindf %1) %2) mv)
+        out))
+
+    p/MonadZero
+    (-mzero [it]
+      (a/to-chan []))
+
+    p/MonadPlus
+    (-mplus [it mv mv']
+      (a/merge [mv mv']))
 
     p/Printable
     (-repr [_]
