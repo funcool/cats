@@ -1,5 +1,6 @@
 {:dev
- {:dependencies [[org.clojure/tools.namespace "0.2.11"]
+ {:aliases {"test-all" ["with-profile" "dev,1.8:dev" "test"]}
+  :dependencies [[org.clojure/tools.namespace "0.2.11"]
                  [criterium "0.4.3"]]
   :source-paths ["dev"]
   :codeina {:sources ["src"]
@@ -9,6 +10,7 @@
             :src-uri-prefix "#L"}
   :plugins [[funcool/codeina "0.3.0"]
             [lein-ancient "0.6.7" :exclusions [org.clojure/tools.reader]]]}
+ :1.8 {:dependencies [[org.clojure/clojure "1.8.0-RC4"]]}
  :bench
  [:dev
   {:main ^:skip-aot benchmarks
