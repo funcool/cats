@@ -1901,9 +1901,6 @@ Implementation of functional references to one value modeled as functions. Is
 a generalization of get and put mapping to the particular part of a data
 structure.
 
-It there are also traversals that in contrast to lenses, maps to
-multiple values. And you can read about them in the next section.
-
 
 ==== First steps
 
@@ -2122,6 +2119,7 @@ And do not forget that you also can attach watchers to focused atoms in the same
 way as you will do that with clojure(script) atoms.
 
 
+[[traversals]]
 === Traversals
 
 *Status:* Experimental
