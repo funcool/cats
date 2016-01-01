@@ -85,6 +85,7 @@ associative binary operation is analogous to Clojure's `into`.
 [source, clojure]
 ----
 (require '[cats.core :as m])
+(require '[cats.builtin])
 
 (m/mappend [1 2 3] [4 5 6])
 ;; => [1 2 3 4 5 6]
@@ -96,6 +97,7 @@ _Maybe_ values.
 [source, clojure]
 ----
 (require '[cats.core :as m])
+(require '[cats.builtin])
 (require '[cats.monad.maybe :as maybe])
 
 (m/mappend (maybe/just [1 2 3])
@@ -115,6 +117,7 @@ _Maybe_, with Nothing being the identity element.
 [source, clojure]
 ----
 (require '[cats.core :as m])
+(require '[cats.builtin])
 (require '[cats.monad.maybe :as maybe])
 
 (m/mappend (maybe/just [1 2 3])
