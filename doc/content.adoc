@@ -342,7 +342,7 @@ let's see a graphical representation of the `foldl` execution model:
 ((((acc⊕1)⊕2)⊕3)⊕4)⊕5
 ----
 
-In contrast to the `foldr` internal execution model:
+In contrast to the `foldr` internal execution model that looks like that:
 
 [source, text]
 ----
@@ -398,6 +398,7 @@ Let see an example:
 (m/foldm m-div 1 [1 0 3])
 ;; => #<Nothing>
 ----
+
 
 === Traversable
 
