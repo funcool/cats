@@ -5,7 +5,8 @@
                [clojure.test.check.generators :as gen :include-macros true]
                [clojure.test.check.properties :as prop :include-macros true]
                [cats.core :as m]
-               [cats.labs.lens :as l])
+               [cats.labs.lens :as l]
+               [cats.labs.traversals :as tv])
      :clj
      (:require [clojure.test :as t]
                [clojure.test.check]
@@ -13,7 +14,8 @@
                [clojure.test.check.generators :as gen]
                [clojure.test.check.properties :as prop]
                [cats.core :as m]
-               [cats.labs.lens :as l]))
+               [cats.labs.lens :as l]
+               [cats.labs.traversals :as tv]))
   #?(:cljs
      (:require-macros [clojure.test.check.clojure-test :refer (defspec)])))
 
@@ -221,13 +223,13 @@
 
 (defn first-traversal-law [{:keys [gen trav]}]
   (prop/for-all [s gen]
-    (coll? (l/foci trav s))))
+    (coll? (tv/foci trav s))))
 
 ;; it
 
 (def it-traversal
   {:gen gen/any
-   :trav l/it})
+   :trav tv/it})
 
 (defspec it-first-traversal-law 10
   (first-traversal-law it-traversal))
@@ -236,7 +238,7 @@
 
 (def each-traversal
   {:gen gen/any
-   :trav l/each})
+   :trav tv/each})
 
 (defspec each-first-traversal-law 10
   (first-traversal-law each-traversal))
@@ -245,7 +247,7 @@
 
 (def filter-traversal
   {:gen gen/any
-   :trav (l/filter identity)})
+   :trav (tv/filter identity)})
 
 (defspec filter-first-traversal-law 10
   (first-traversal-law filter-traversal))
@@ -254,7 +256,7 @@
 
 (def only-traversal
   {:gen gen/any
-   :trav (l/only identity)})
+   :trav (tv/only identity)})
 
 (defspec only-first-traversal-law 10
   (first-traversal-law only-traversal))
@@ -263,7 +265,7 @@
 
 (def keys-traversal
   {:gen (gen/map gen/keyword gen/any)
-   :trav l/keys})
+   :trav tv/keys})
 
 (defspec keys-first-traversal-law 10
   (first-traversal-law keys-traversal))
@@ -272,7 +274,7 @@
 
 (def vals-traversal
   {:gen (gen/map gen/keyword gen/any)
-   :trav l/vals})
+   :trav tv/vals})
 
 (defspec vals-first-traversal-law 10
   (first-traversal-law vals-traversal))
@@ -281,7 +283,7 @@
 
 (def indexed-traversal
   {:gen (gen/vector gen/any)
-   :trav l/indexed})
+   :trav tv/indexed})
 
 (defspec indexed-first-traversal-law 10
   (first-traversal-law indexed-traversal))
@@ -290,7 +292,7 @@
 
 (def nothing-traversal
   {:gen gen/any
-   :trav l/nothing})
+   :trav tv/nothing})
 
 (defspec nothing-first-traversal-law 10
   (first-traversal-law nothing-traversal))
@@ -299,7 +301,7 @@
 
 (def both-traversal
   {:gen (gen/vector gen/int)
-   :trav (l/both (filter odd?) (filter #(< % 5)))})
+   :trav (tv/both (filter odd?) (filter #(< % 5)))})
 
 (defspec both-first-traversal-law 10
   (first-traversal-law both-traversal))
@@ -308,7 +310,7 @@
 
 (def lens->traversal
   {:gen (with-key :a)
-   :trav (l/lens->traversal (l/key :a))})
+   :trav (tv/lens->traversal (l/key :a))})
 
 (defspec lens->traversal-first-traversal-law 10
   (first-traversal-law lens->traversal))
@@ -350,7 +352,7 @@
 (t/deftest foci-atom
   (t/testing "Reflects an atoms focused values"
     (let [source (atom [0 1 2 3 4 5])
-          fsource (l/foci-atom (l/only odd?) source)]
+          fsource (tv/foci-atom (tv/only odd?) source)]
       (t/is (= @fsource [1 3 5]))
 
       (swap! source #(subvec % 2))
@@ -365,7 +367,7 @@
   (t/testing "Supports watches"
     (let [source (atom [1 2 3 4 5])
           watched (volatile! nil)
-          fsource (l/foci-atom (l/only odd?) source)]
+          fsource (tv/foci-atom (tv/only odd?) source)]
       (add-watch fsource :test (fn [key ref old new]
                                  (vreset! watched [ref old new])))
 
