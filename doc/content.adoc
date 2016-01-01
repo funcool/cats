@@ -1096,15 +1096,19 @@ function gives an empty map.
 
 == Syntax sugar
 
+Additionally to the abstractions and types, *cats* exposes some powerfull
+syntax abstractions that surelly will make the usage of that abstractions
+in a more familiar way.
+
+
 === mlet
 
-For convenience when using the monadic bind the `mlet` macro is implemented in
-cats. If you've followed along with the documentation you've seen many examples
-of its usage already, let's see what can `mlet` do.
+The `mlet` syntactic abstraction intends to facilitate the composition
+of monadic operations.
 
-NOTE: If you are coming from Haskell, mlet is analogous to the *do notation*.
-
-First of all, mlet turns this let-like bindings
+If you've followed along with the documentation you've seen many examples
+of its usage already, let's see what can `mlet` do. First of all, mlet turns
+this let-like bindings:
 
 [source, clojure]
 ----
@@ -1124,7 +1128,11 @@ into a chain of calls to bind:
                     (m/return (* a b))))))
 ----
 
-This makes a lot more natural to write code that uses monads.
+That makes a lot more natural to write code that uses monads and gives a very
+familiar `let` like syntax abstraction that makes the clojure code that uses
+monads less "strange".
+
+If you are coming from Haskell, mlet is mostly analogous to the *do notation*.
 
 Since the bindings in the mlet macro run the monadic effects of the right-hand
 values we cannot just put any value in there and expect to be bound to its
@@ -1167,6 +1175,7 @@ inside `mlet` bindings. Here is an example with vectors:
    (m/return (* a 2)))
 ;; => [2 6]
 ----
+
 
 === alet
 
