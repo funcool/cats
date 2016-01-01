@@ -1470,6 +1470,7 @@ application in clojure(script).
 In any case the state of each module will be notified on the start of the
 each section.
 
+
 === test.check
 
 *Status:* Experimental
@@ -1522,7 +1523,7 @@ Before use it, you should add core.async to your dependencies:
 
 [source, clojure]
 ----
-[org.clojure/core.async "0.2.371"]
+[org.clojure/core.async "0.2.374"]
 ----
 
 Now, let see some code. This will allow you understand how it can be used and
@@ -1532,7 +1533,8 @@ our case it's consist in a just sleep operation:
 
 [source, clojure]
 ----
-(require 'cats.labs.channel)
+(require '[clojure.core.async :as a])
+(require '[cats.labs.channel])
 
 (defn async-call
   "A function that emulates some asynchronous call."
@@ -1890,16 +1892,20 @@ the monadic bind takes care of that. The type
 
 TODO
 
+
 === Lens
 
-*Status:* Experimental
+*Status:* Stable
 
-This namespace implements functional references to one (lens) or multiple
-(traversal) values modeled as functions. Lenses and traversals generalize the
-get, put and mapping to a particular part of a data structure.
+Implementation of functional references to one value modeled as functions. Is
+a generalization of get and put mapping to the particular part of a data
+structure.
+
+It there are also traversals that in contrast to lenses, maps to
+multiple values. And you can read about them in the next section.
 
 
-==== Lenses
+==== First steps
 
 We'll start by using the most basic lens, the identity lens. We can get the value
 a lens is focused on using the `focus` function in `cats.labs.lens` ns:
@@ -1924,24 +1930,28 @@ us apply a function over the focused value of a lens:
 ;; => 4
 ----
 
-We can focus on the first (`fst`), (`second`), or nth (`nth`) element of a list
-with a lens:
+There are some builtin lenses that can be used out of the box such as `fst`, `snd`
+and `nth`. Let see some examples on how them can be used:
 
+.Example using `fst` lense
 [source, clojure]
 ----
-;; fst
-
+;; Focus over the first element of a vector
 (l/focus l/fst [1 2 3])
 ;; => 1
 
+;; Apply a function over first element of a vector
 (l/over l/fst inc [1 2 3])
 ;; => [2 2 3]
 
+;; Replace the first value of an element of a vector
 (l/put l/fst 42 [1 2 3])
 ;; => [42 2 3]
+----
 
-;; nth
-
+.Example using the `nth` lense
+[source, clojure]
+----
 (l/focus (l/nth 2) [1 2 3])
 ;; => 3
 
@@ -1953,55 +1963,35 @@ with a lens:
 ----
 
 
-And compose them arbitrarily using function composition:
+==== Lenses composition
+
+One of the big advantatges of the lenses implementation of cats library is that
+them are implemented using plain functions:
 
 [source, clojure]
 ----
-;; fst
+(def my-lens (comp l/fst l/fst (l/nth 2)))
 
-(l/focus (comp l/fst l/fst (l/nth 2))
-         [[[0 1 2]
-           [3 4 5]]
-          [6 7 8]])
+(def data
+  [[0 1 2]
+   [3 4 5]])
+
+(l/focus my-lens data)
 ;; => 2
 
-(l/put (comp l/fst l/fst (l/nth 2))
-       42
-       [[[0 1 2]
-         [3 4 5]]
-        [6 7 8]])
-;; => [[[0 1 42] [3 4 5]] [6 7 8]]
+(l/put my-lens 42 data)
+;; => [[0 1 42] [3 4 5]]
 ----
 
 Lenses compose with regular function composition and, like transducers, the
 combined lens runs from left to right.
 
-The `passes` function accepts a predicate and returns a lens that focuses
-in an element only if it passes the predicate.
 
-[source, clojure]
-----
-(l/focus (l/passes even?) 2)
-;; => 2
-
-(l/over (l/passes even?) inc 2)
-;; => 3
-
-(l/put (l/passes even?) 42 2)
-;; => 42
-
-(l/focus (l/passes even?) 1)
-;; => nil
-
-(l/over (l/passes even?) inc 1)
-;; => 1
-
-(l/put (l/passes even?) 42 1)
-;; => 1
-----
+==== Builtin lenses
 
 There's `key` and `select-keys` for focusing on one or multiple keys respectively:
 
+.Example focusing in a specific key/keys of associative data structure
 [source, clojure]
 ----
 (l/focus (l/key :a) {:a 1 :b 2})
@@ -2030,15 +2020,14 @@ There's `key` and `select-keys` for focusing on one or multiple keys respectivel
 
 `in` for focusing on a path:
 
+.Example focusing in neest data structures
 [source, clojure]
 ----
 (l/focus (l/in [:a :b])
          {:a {:b {:c 42}}})
 ;; => {:c 42}
 
-(l/over (l/in [:a :b])
-        (fn [m]
-         (zipmap (vals m) (keys m)))
+(l/over (l/in [:a :b]) #(zipmap (vals %) (keys %))
         {:a {:b {:c 42}}})
 ;; => {:a {:b {42 :c}}}
 
@@ -2052,6 +2041,7 @@ Let's take a look at a combinator that will let us build a unit-conversion lens
 called `units`. We have to supply a function to convert from unit `a` to unit `b`
 and viceversa:
 
+.Example definiting a "unit conversion" lense
 [source, clojure]
 ----
 (defn sec->min [sec] (/ sec 60))
@@ -2070,73 +2060,153 @@ and viceversa:
 ;; => 120
 ----
 
+And conditional lenses that can be defined using a predicate function and
+returns a lens that focuses in an element only if it passes the predicate:
 
-==== Traversals
+.Example focusing using conditional lenses
+[source, clojure]
+----
+(l/focus (l/passes even?) 2)
+;; => 2
+
+(l/over (l/passes even?) inc 2)
+;; => 3
+
+(l/put (l/passes even?) 42 2)
+;; => 42
+
+(l/focus (l/passes even?) 1)
+;; => nil
+
+(l/over (l/passes even?) inc 1)
+;; => 1
+
+(l/put (l/passes even?) 42 1)
+;; => 1
+----
+
+==== Interoperability
+
+There are also `Focus` type that allows you to derive atom like objects from
+clojure atoms focusing to a specific portion of it using lenses.
+
+Let see an example focusing on a concrete set of keys on an asociative
+data structure referenced by an atom:
+
+[source, clojure]
+----
+(def state (atom {:x 1 :y 2 :z 3}))
+
+(def state-d
+  (l/focus-atom (l/select-keys [:x :y]) state))
+
+@state-d
+;; => {:x 1 :y 2}
+----
+
+The object returned by `focus-atom` function behaves identically to a clojure
+atom and it can be treated as drop in replacement of it:
+
+[source, clojure]
+----
+(swap! state-d update :x inc)
+
+@state
+;; => {:x 2 :y 2 :z 3}
+
+@state-d
+;; => {:x 2 :y 2}
+----
+
+And do not forget that you also can attach watchers to focused atoms in the same
+way as you will do that with clojure(script) atoms.
+
+
+=== Traversals
+
+*Status:* Experimental
 
 A traversal is similar to a lens but it focuses on multiple values instead of one.
+
+
+==== First steps
+
 Therefore, we use the `foci` function for viewing the focused elements of a
 traversal.
-
-Traversals should be composed with other traversals. You can compose lenses
-with a traversal but it will become a traversal and you will have to use `foci`
-for viewing its values.
 
 Let's look at the identity traversal, it's called `it`:
 
 [source, clojure]
 ----
-(l/foci l/it 42)
+(require '[cats.labs.traversals :as t])
+(t/foci t/it 42)
 ;; => (42)
 
-(l/foci l/it [0 1 2 3])
+(t/foci t/it [0 1 2 3])
 ;; => ([0 1 2 3])
 
-(l/put l/it 42 [0 1 2 3])
+(t/put t/it 42 [0 1 2 3])
 ;; => 42
 
-(l/over l/it count [0 1 2 3])
+(t/over t/it count [0 1 2 3])
 ;; => 4
 ----
+
+
+==== Traversals composition
+
+Traversals like lenses are defined in terms of functions so the same approach
+also applies to traversals. Them can be composed just using `comp` or any
+other function composition technique.
+
+Traversals should be composed with other traversals. You can compose lenses
+with a traversal but it will become a traversal and you will have to use `foci`
+for viewing its values.
+
+
+==== Builtin traversals
 
 The `each` traversal focuses every value in a collection, allowing us to map
 preservering structure. The `cat` traversal flattens a nested collection:
 
+.Example using `each` traversal
 [source, clojure]
 ----
-(l/foci l/each [0 1 2 3])
+(t/foci t/each [0 1 2 3])
 ;; => (0 1 2 3)
 
-(l/over l/each inc [0 1 2 3])
+(t/over t/each inc [0 1 2 3])
 ;; => [1 2 3 4]
 
-(l/put l/each 42 [0 1 2 3])
+(t/put t/each 42 [0 1 2 3])
 ;; => [42 42 42 42]
 
-(l/foci l/cat [[0 1 2] [3 4 5]])
+(t/foci t/cat [[0 1 2] [3 4 5]])
 ;; => (0 1 2 3 4 5)
 
-(l/over l/cat inc [[0 1 2] [3 4 5]])
+(t/over t/cat inc [[0 1 2] [3 4 5]])
 ;; => [[1 2 3] [4 5 6]]
 
-(l/put l/cat 42 [[0 1 2] [3 4 5]])
+(t/put t/cat 42 [[0 1 2] [3 4 5]])
 ;; => [[42 42 42] [42 42 42]]
 ----
 
 The `filter` traversal can be used to filter can be used to filter the results
 of another by composition:
 
+.Example using `filter` traversal
 [source, clojure]
 ----
-(l/foci (comp l/each (l/filter odd?))
+(t/foci (comp t/each (t/filter odd?))
         [1 2 3 4 5])
 ;; => (1 3 5)
 
-(l/over (comp l/each (l/filter odd?))
+(t/over (comp t/each (t/filter odd?))
         inc
         [1 2 3 4 5])
 ;; => [2 2 4 4 6]
 
-(l/put (comp l/each (l/filter odd?))
+(t/put (comp t/each (t/filter odd?))
        42
        [1 2 3 4 5])
 ;; => [42 2 42 4 42]
@@ -2146,16 +2216,16 @@ Using `only` is equivalent to composing `each` and `filter`:
 
 [source, clojure]
 ----
-(l/foci (l/only odd?)
+(t/foci (t/only odd?)
         [1 2 3 4 5])
 ;; => (1 3 5)
 
-(l/over (l/only odd?)
+(t/over (t/only odd?)
         inc
         [1 2 3 4 5])
 ;; => [2 2 4 4 6]
 
-(l/put (l/only odd?)
+(t/put (t/only odd?)
        42
        [1 2 3 4 5])
 ;; => [42 2 42 4 42]
@@ -2167,50 +2237,31 @@ for focusing on map values, and `indexed` for focusing on index-value pairs.
 
 ==== Interoperability
 
-`cats.labs.lens` implement the `Focus` and `Foci` atom types, which are derived
-atoms with either a lens or a traversal. We can focus on a subpart of the
-structure and change it, reflecting the changes on the original atom:
+There are also `Foci` type that allows you to derive atom like objects from
+clojure atoms focusing to a specific portion of it using traversals.
 
+Let see an example:
 
 [source, clojure]
 ----
-(require '[cats.labs.lens :as l])
+(require '[cats.labs.traversals :as t])
 
 (def a (atom [1 2 3 4]))
 
-(def fa (l/focus-atom l/fst a))
-
-(def fsa (l/foci-atom l/each a))
-
-@fa
-;; =>1
+(def fsa (t/foci-atom t/each a))
 
 @fsa
 ;; => (1 2 3 4)
-
-(reset! fa 42)
-;; => 42
-
-@fa
-;; => 42
-
-@fsa
-;; => (42 2 3 4)
-
-@a
-;; => [42 2 3 4]
 
 (reset! fsa 42)
 ;; => (42 42 42 42)
 
 @a
 ;; => [42 42 42 42]
-
-@fa
-;; => 42
 ----
 
-`swap!` and watches also work on the derived focus or foci atoms.
+And do not forget that you also can attach watchers to focused atoms in the same
+way as you will do that with clojure(script) atoms.
 
 
 == Complementary libraries
