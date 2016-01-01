@@ -649,6 +649,7 @@ Or, using mlet:
 ;; => #<Nothing>
 ----
 
+
 === MonadPlus
 
 MonadPlus is a complementary abstraction for Monads that support an associative
@@ -747,6 +748,10 @@ The `maybe-state` monad combines the semantics of both State and Maybe.
 
 
 == Types
+
+This section will take a tour over the types exposed in cats library and explain
+how they can be used in the previously explained abstractions.
+
 
 === Maybe
 
