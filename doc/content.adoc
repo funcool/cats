@@ -2363,8 +2363,8 @@ node ./out/tests.js
 
 [source,text]
 ----
-Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 
 All rights reserved.
 
