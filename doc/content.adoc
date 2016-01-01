@@ -2268,9 +2268,8 @@ Some monads are defined as separated package to avoid additional
 and unnecesary dependencies to cats. Also, there are some libraries
 that build higher-level abstractions on top of what cats offers.
 
-* Promise monad (ClojureScript): https://github.com/funcool/promesa
-* Promise monad (Clojure): https://github.com/funcool/promissum
-* Concurrent data fetching: https://github.com/funcool/muse
+* Promise monad: https://github.com/funcool/promesa
+* Concurrent data fetching: https://github.com/funcool/urania
 
 
 == FAQ
