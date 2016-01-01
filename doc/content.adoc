@@ -821,6 +821,7 @@ maybe values are derrefable.
 ;; => nil
 ----
 
+
 === Either
 
 Either is another type that represents a result of a computation, but (in
@@ -968,7 +969,7 @@ can't use them directly. First, you must load the `cats.builtin` namespace:
 
 [source, clojure]
 ----
-(use 'cats.builtin)
+(require '[cats.builtin])
 (require '[cats.core :as m])
 
 (m/fmap inc [1 2 3 4])
