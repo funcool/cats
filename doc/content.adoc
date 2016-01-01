@@ -1246,19 +1246,22 @@ applicative values in the batch at the same time.
 This makes no difference at all for Maybe, but applicatives that have latency
 in their calculations (for example promises that do an async computation) get
 a pretty good evaluation strategy, which can minimize overall latency. In the
-next examples we use the link:https://github.com/funcool/promissum[promissum]
-Clojure library. Similar results can be achieved in ClojureScript with the
-link:https://github.com/funcool/promesa[promesa] library.
+next examples we use the link:https://github.com/funcool/promesa[promesa]
+clj/cljs library for emulate asynchronous behavior:
 
 [source, clojure]
 ----
 (require '[cats.core :as m])
-(require '[promissum.core :as p])
+(require '[promesa.core :as p])
 
-(defn sleep-promise [wait]
-  (p/promise (fn [deliver]
-               (Thread/sleep wait)
-               (deliver wait))))
+(defn sleep-promise
+  "A simple function that emulates an
+  asynchronous operation."
+  [wait]
+  (p/promise (fn [resolve reject]
+               (future
+                 (Thread/sleep wait)
+                 (resolve wait)))))
 
 ;; note: deref-ing for blocking the current thread
 ;; waiting for the promise being delivered
@@ -1300,6 +1303,7 @@ Another example for illustrating dependencies between batches:
 ;; "Elapsed time: 86.20699 msecs"
 ;; => 85
 ----
+
 
 == Higher-order functions
 
