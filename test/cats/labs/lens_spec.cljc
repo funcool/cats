@@ -6,7 +6,7 @@
                [clojure.test.check.properties :as prop :include-macros true]
                [cats.core :as m]
                [cats.labs.lens :as l]
-               [cats.labs.traversals :as tv])
+               [cats.labs.traversal :as tv])
      :clj
      (:require [clojure.test :as t]
                [clojure.test.check]
@@ -15,7 +15,7 @@
                [clojure.test.check.properties :as prop]
                [cats.core :as m]
                [cats.labs.lens :as l]
-               [cats.labs.traversals :as tv]))
+               [cats.labs.traversal :as tv]))
   #?(:cljs
      (:require-macros [clojure.test.check.clojure-test :refer (defspec)])))
 

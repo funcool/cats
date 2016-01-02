@@ -1,4 +1,4 @@
-(ns cats.labs.traversals
+(ns cats.labs.traversal
   (:require [cats.util :as util]
             [cats.protocols :as p]
             [cats.labs.lens :as l])
