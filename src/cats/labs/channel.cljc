@@ -79,13 +79,7 @@
       (a/to-chan [(if (nil? v) ::nil v)]))
 
     (-fapply [mn af av]
-      (let [c (a/chan 1)]
-        (go
-          (let [af' (a/<! (a/into [] af))
-                av' (a/<! (a/into [] av))
-                ctx (p/-get-context [])]
-            (a/onto-chan c (p/-fapply ctx af' av'))))
-        c))
+      (a/map #(%1 %2) [af av]))
 
     p/Monad
     (-mreturn [_ v]
