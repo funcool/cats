@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [cljs.test :as test]
             [cats.core-spec]
+            [cats.monad-spec]
             [cats.builtin-spec]
             [cats.applicative.validation]
             [cats.monad.exception-spec]
@@ -26,6 +27,7 @@
   (test/run-tests
    (test/empty-env)
    'cats.core-spec
+   'cats.monad-spec
    'cats.builtin-spec
    'cats.applicative.validation
    'cats.monad.exception-spec
