@@ -44,10 +44,10 @@
   (-extract [_] nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (Lazy) Sequence Monad
+;; Lazy Sequence Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def sequence-context
+(def lazy-sequence-context
   (reify
     p/Context
     (-get-level [_] ctx/+level-default+)
@@ -112,14 +112,14 @@
 
     p/Printable
     (-repr [_]
-      "#<Sequence>")))
+      "#<LazySequence>")))
 
-(util/make-printable (type sequence-context))
+(util/make-printable (type lazy-sequence-context))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
   p/Contextual
-  (-get-context [_] sequence-context))
+  (-get-context [_] lazy-sequence-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Range

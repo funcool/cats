@@ -166,66 +166,66 @@
              (ctx/with-context maybe/context
                (m/traverse inc-if-even [1 2]))))))
 
-;; Sequence
+;; Lazy Sequence
 
-(defn sequence-gen [g]
+(defn lazy-sequence-gen [g]
   (gen/fmap #(lazy-seq %) (gen/vector g)))
 
-(defspec sequence-semigroup 10
+(defspec lazy-sequence-semigroup 10
   (lt/semigroup-associativity
-   {:ctx b/sequence-context
-    :gen (gen/not-empty (sequence-gen gen/any))}))
+   {:ctx b/lazy-sequence-context
+    :gen (gen/not-empty (lazy-sequence-gen gen/any))}))
 
-(defspec sequence-monoid 10
+(defspec lazy-sequence-monoid 10
   (lt/monoid-identity-element
-   {:ctx b/sequence-context
-    :gen (sequence-gen gen/any)}))
+   {:ctx b/lazy-sequence-context
+    :gen (lazy-sequence-gen gen/any)}))
 
-(defspec sequence-first-functor-law 10
+(defspec lazy-sequence-first-functor-law 10
   (lt/first-functor-law
-   {:gen (sequence-gen gen/any)}))
+   {:gen (lazy-sequence-gen gen/any)}))
 
-(defspec sequence-second-functor-law 10
+(defspec lazy-sequence-second-functor-law 10
   (lt/second-functor-law
-   {:gen (sequence-gen gen/any)
+   {:gen (lazy-sequence-gen gen/any)
     :f   #(lazy-seq [%])
     :g   #(lazy-seq [%])}))
 
-(defspec sequence-applicative-identity 10
+(defspec lazy-sequence-applicative-identity 10
   (lt/applicative-identity-law
-   {:ctx b/sequence-context
-    :gen (sequence-gen gen/any)}))
+   {:ctx b/lazy-sequence-context
+    :gen (lazy-sequence-gen gen/any)}))
 
-(defspec sequence-applicative-homomorphism 10
+(defspec lazy-sequence-applicative-homomorphism 10
   (lt/applicative-homomorphism
-   {:ctx b/sequence-context
+   {:ctx b/lazy-sequence-context
     :gen gen/any
     :f   (constantly false)}))
 
-(defspec sequence-applicative-interchange 10
+(defspec lazy-sequence-applicative-interchange 10
   (lt/applicative-interchange
-   {:ctx  b/sequence-context
+   {:ctx  b/lazy-sequence-context
     :gen  gen/int
     :appf (lazy-seq [inc])}))
 
-(defspec sequence-applicative-composition 10
+(defspec lazy-sequence-applicative-composition 10
   (lt/applicative-composition
-   {:ctx  b/sequence-context
+   {:ctx  b/lazy-sequence-context
     :gen  gen/int
     :appf (lazy-seq [inc])
     :appg (lazy-seq [dec])}))
 
-(defspec sequence-first-monad-law 10
+(defspec lazy-sequence-first-monad-law 10
   (lt/first-monad-law
-   {:ctx b/sequence-context
+   {:ctx b/lazy-sequence-context
     :mf  #(if % (lazy-seq [%]) (lazy-seq []))}))
 
-(defspec sequence-second-monad-law 10
-  (lt/second-monad-law {:ctx b/sequence-context}))
+(defspec lazy-sequence-second-monad-law 10
+  (lt/second-monad-law {:ctx b/lazy-sequence-context}))
 
-(defspec sequence-third-monad-law 10
+(defspec lazy-sequence-third-monad-law 10
   (lt/third-monad-law
-   {:ctx b/sequence-context
+   {:ctx b/lazy-sequence-context
     :f   (comp seq vector str)
     :g   (comp seq vector count)}))
 
