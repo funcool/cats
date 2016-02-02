@@ -166,6 +166,92 @@
              (ctx/with-context maybe/context
                (m/traverse inc-if-even [1 2]))))))
 
+;; Sequence
+
+(defn sequence-gen [g]
+  (gen/list g))
+
+(defspec sequence-semigroup 10
+  (lt/semigroup-associativity
+   {:ctx b/sequence-context
+    :gen (gen/not-empty (sequence-gen gen/any))}))
+
+(defspec sequence-monoid 10
+  (lt/monoid-identity-element
+   {:ctx b/sequence-context
+    :gen (sequence-gen gen/any)}))
+
+(defspec sequence-first-functor-law 10
+  (lt/first-functor-law
+   {:gen (sequence-gen gen/any)}))
+
+(defspec sequence-second-functor-law 10
+  (lt/second-functor-law
+   {:gen (sequence-gen gen/any)
+    :f   #(list %)
+    :g   #(list %)}))
+
+(defspec sequence-applicative-identity 10
+  (lt/applicative-identity-law
+   {:ctx b/sequence-context
+    :gen (sequence-gen gen/any)}))
+
+(defspec sequence-applicative-homomorphism 10
+  (lt/applicative-homomorphism
+   {:ctx b/sequence-context
+    :gen gen/any
+    :f   (constantly false)}))
+
+(defspec sequence-applicative-interchange 10
+  (lt/applicative-interchange
+   {:ctx  b/sequence-context
+    :gen  gen/int
+    :appf (list inc)}))
+
+(defspec sequence-applicative-composition 10
+  (lt/applicative-composition
+   {:ctx  b/sequence-context
+    :gen  gen/int
+    :appf (list inc)
+    :appg (list dec)}))
+
+(defspec sequence-first-monad-law 10
+  (lt/first-monad-law
+   {:ctx b/sequence-context
+    :mf  #(if % (lazy-seq [%]) (lazy-seq []))}))
+
+(defspec sequence-second-monad-law 10
+  (lt/second-monad-law {:ctx b/sequence-context}))
+
+(defspec sequence-third-monad-law 10
+  (lt/third-monad-law
+   {:ctx b/sequence-context
+    :f   (comp seq vector str)
+    :g   (comp seq vector count)}))
+
+(t/deftest sequence-foldable
+  (t/testing "Foldl"
+    (t/is (= [3 2 1]
+             (m/foldl (fn [acc v] (into [v] acc)) [] (list 1 2 3))))
+    (t/is (= 6 (m/foldl + 0 (list 1 2 3)))))
+
+  (t/testing "Foldr"
+    (t/is (= [1 2 3]
+             (m/foldr (fn [v acc] (into [v] acc)) [] (list 1 2 3))))
+    (t/is (= 6 (m/foldr + 0 (list 1 2 3))))))
+
+(t/deftest sequence-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just [])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even '()))))
+    (t/is (= (maybe/just [3 5])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (list 2 4)))))
+    (t/is (= (maybe/nothing)
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (list 1 2)))))))
+
 ;; Lazy Sequence
 
 (defn lazy-sequence-gen [g]

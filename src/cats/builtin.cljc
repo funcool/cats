@@ -44,6 +44,109 @@
   (-extract [_] nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Sequence Monad i.e. PersistentList
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def sequence-context
+  (reify
+    p/Context
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (into sv' (reverse sv)))
+
+    p/Monoid
+    (-mempty [_]
+      '())
+
+    p/Functor
+    (-fmap [_ f v]
+      ;; Essentially (doall (map f v)) but without an
+      ;; intermediary lazy-seq, therefore it is faster.
+      (loop [[x & xs :as coll] v
+             ys '()]
+        (if (empty? coll)
+          (reverse ys)
+          (recur xs
+                 (cons (f x) ys)))))
+
+    p/Applicative
+    (-pure [_ v]
+      (list v))
+
+    (-fapply [_ self av]
+      (loop [[f & fs :as fcoll] self
+             [v & vs :as vcoll] av
+             ys '()]
+        (if (or (empty? fcoll)
+                (empty? vcoll))
+          (reverse ys)
+          (recur fs
+                 vs
+                 (cons (f v) ys)))))
+
+    p/Monad
+    (-mreturn [_ v]
+      (list v))
+
+    (-mbind [_ self f]
+      ;; Essentially (doall (apply concat (map f self))) but without
+      ;; an intermediary lazy-seq, therefore it is faster.
+      (loop [[x & xs :as coll] self
+             result '()]
+        (if (empty? coll)
+          (reverse result)
+          (recur xs
+                 (into result (f x))))))
+
+    p/MonadZero
+    (-mzero [_]
+      '())
+
+    p/MonadPlus
+    (-mplus [_ mv mv']
+      (into mv' (reverse mv)))
+
+    p/Foldable
+    (-foldr [ctx f z xs]
+      (let [x (first xs)]
+        (if (nil? x)
+          z
+          (let [xs (rest xs)]
+            (f x (p/-foldr ctx f z xs))))))
+
+    (-foldl [ctx f z xs]
+      (reduce f z xs))
+
+    p/Traversable
+    (-traverse [ctx f tv]
+      (let [as (p/-fmap ctx f tv)]
+        (p/-foldr ctx
+                  (fn [a acc]
+                    (m/alet [x a
+                             xs acc]
+                      (cons x xs)))
+                  (m/pure '())
+                  as)))
+
+    p/Printable
+    (-repr [_]
+      "#<List>")))
+
+(util/make-printable (type sequence-context))
+
+(extend-type #?(:clj  clojure.lang.PersistentList
+                :cljs cljs.core.List)
+  p/Contextual
+  (-get-context [_] sequence-context))
+
+(extend-type #?(:clj  clojure.lang.PersistentList$EmptyList
+                :cljs cljs.core.EmptyList)
+  p/Contextual
+  (-get-context [_] sequence-context))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Lazy Sequence Monad
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
