@@ -77,14 +77,20 @@
 
     (-fapply [_ self av]
       (loop [[f & fs :as fcoll] self
-             [v & vs :as vcoll] av
-             ys '()]
-        (if (or (empty? fcoll)
-                (empty? vcoll))
-          (reverse ys)
+             results []]
+        (if (empty? fcoll)
+          (loop [[x & xs :as coll] results
+                 result '()]
+            (if (empty? coll)
+              (reverse result)
+              (recur xs
+                     (into result x))))
           (recur fs
-                 vs
-                 (cons (f v) ys)))))
+                 (conj results (loop [[v & vs :as vcoll] av
+                                      r '()]
+                                 (if (empty? vcoll)
+                                   (reverse r)
+                                   (recur vs (cons (f v) r)))))))))
 
     p/Monad
     (-mreturn [_ v]
