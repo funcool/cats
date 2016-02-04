@@ -30,7 +30,9 @@
             [cats.protocols :as p]
             [cats.context :as ctx]
             [cats.core :as m]
-            [cats.util :as util]))
+            [cats.util :as util])
+  #?(:clj (:require [cats.util :refer [flattenl-1 mapl]])
+     :cljs (:require-macros [cats.util :refer [flattenl-1 mapl]])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -62,49 +64,23 @@
 
     p/Functor
     (-fmap [_ f v]
-      ;; Essentially (doall (map f v)) but without an
-      ;; intermediary lazy-seq, therefore it is faster.
-      (loop [[x & xs :as coll] v
-             ys '()]
-        (if (empty? coll)
-          (reverse ys)
-          (recur xs
-                 (cons (f x) ys)))))
+      (mapl f v))
 
     p/Applicative
     (-pure [_ v]
       (list v))
 
     (-fapply [_ self av]
-      (loop [[f & fs :as fcoll] self
-             results []]
-        (if (empty? fcoll)
-          (loop [[x & xs :as coll] results
-                 result '()]
-            (if (empty? coll)
-              (reverse result)
-              (recur xs
-                     (into result x))))
-          (recur fs
-                 (conj results (loop [[v & vs :as vcoll] av
-                                      r '()]
-                                 (if (empty? vcoll)
-                                   (reverse r)
-                                   (recur vs (cons (f v) r)))))))))
+      (flattenl-1 (mapl #(mapl % av) self)))
 
     p/Monad
     (-mreturn [_ v]
       (list v))
 
     (-mbind [_ self f]
-      ;; Essentially (doall (apply concat (map f self))) but without
-      ;; an intermediary lazy-seq, therefore it is faster.
-      (loop [[x & xs :as coll] self
-             result '()]
-        (if (empty? coll)
-          (reverse result)
-          (recur xs
-                 (into result (f x))))))
+      (->> self
+           (mapl f)
+           (flattenl-1)))
 
     p/MonadZero
     (-mzero [_]
