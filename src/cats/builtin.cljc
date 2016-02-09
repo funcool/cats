@@ -30,9 +30,7 @@
             [cats.protocols :as p]
             [cats.context :as ctx]
             [cats.core :as m]
-            [cats.util :as util])
-  #?(:clj (:require [cats.util :refer [flattenl-1 mapl]])
-     :cljs (:require-macros [cats.util :refer [flattenl-1 mapl]])))
+            [cats.util :as util]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nil as Nothing of Maybe monad
@@ -59,32 +57,58 @@
       (into sv' (reverse sv)))
 
     p/Monoid
-    (-mempty [_]
-      '())
+    (-mempty [_] ())
 
     p/Functor
     (-fmap [_ f v]
-      (mapl f v))
+      (loop [[h & t :as c] v
+             result ()]
+        (if (empty? c)
+          (reverse result)
+          (recur t (cons (f h) result)))))
 
     p/Applicative
-    (-pure [_ v]
-      (list v))
+    (-pure [_ v] (list v))
 
     (-fapply [_ self av]
-      (flattenl-1 (mapl #(mapl % av) self)))
+      ;; Each function (outer loop) applied to each value (inner loop).
+      (->> (loop [[h & t :as c] self
+                   result ()]
+             (if (empty? c)
+               result
+               (recur t
+                      (cons (loop [[h' & t' :as c'] av
+                               result' ()]
+                              (if (empty? c')
+                                result'
+                                (recur t' (cons (h h') result'))))
+                            result))))
+           ;; Note that both `result` & `result'` above are
+           ;; in reverse order.
+           ;; Conjing elements of %2 into %1 below is done in
+           ;; in reverse order, so final result is correctly
+           ;; ordered.
+           (reduce #(into %1 %2) ())))
+
 
     p/Monad
     (-mreturn [_ v]
       (list v))
 
     (-mbind [_ self f]
-      (->> self
-           (mapl f)
-           (flattenl-1)))
+      (->> (loop [[h & t :as c] self
+                  result ()]
+             (if (empty? c)
+               result
+               (recur t (cons (f h) result))))
+           ;; Note that `result` above is in reverse order.
+           ;; Conjing elements of %2 into %1 below is done in
+           ;; in reverse order, so final result is correctly
+           ;; ordered.
+           (reduce #(into %1 %2) ())))
 
     p/MonadZero
-    (-mzero [_]
-      '())
+    (-mzero [_] ())
 
     p/MonadPlus
     (-mplus [_ mv mv']
@@ -109,7 +133,7 @@
                     (m/alet [x a
                              xs acc]
                       (cons x xs)))
-                  (m/pure '())
+                  (m/pure ())
                   as)))
 
     p/Printable

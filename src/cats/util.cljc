@@ -27,12 +27,6 @@
   "A collection of utils that used around the library."
   (:require [cats.protocols]))
 
-(defmacro flattenl-1 [coll]
-  "Like (doall (apply concat coll)) but without the laziness.
-
-  This is not a generic operation. Use for PersistentList's only."
-  `(reduce #(into %1 (reverse %2)) '() ~coll))
-
 (defn make-printable
   [klass]
   #?(:clj  (defmethod print-method klass
@@ -42,14 +36,3 @@
              IPrintWithWriter
              (-pr-writer [mv writer _]
                (-write writer (cats.protocols/-repr mv))))))
-
-(defmacro mapl [f coll]
-  "Lie (doall (map f v)) but without the laziness.
-
-  This is not a generic operation. Use for PersistentList's only."
-  `(loop [[x# & xs# :as c#] ~coll
-         result# '()]
-    (if (empty? c#)
-      (reverse result#)
-      (recur xs#
-             (cons (~f x#) result#)))))
