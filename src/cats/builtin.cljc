@@ -73,12 +73,12 @@
     (-fapply [_ self av]
       ;; Each function (outer loop) applied to each value (inner loop).
       (->> (loop [[h & t :as c] self
-                   result ()]
+                  result ()]
              (if (empty? c)
                result
                (recur t
                       (cons (loop [[h' & t' :as c'] av
-                               result' ()]
+                                   result' ()]
                               (if (empty? c')
                                 result'
                                 (recur t' (cons (h h') result'))))
