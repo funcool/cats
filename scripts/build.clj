@@ -8,7 +8,7 @@
    {:main 'cats.runner
     :output-to "out/tests.js"
     :output-dir "out"
-    :optimizations :advanced
+    :optimizations :simple
     :target :nodejs
     :verbose true})
   (println "... done. Elapsed" (/ (- (System/nanoTime) start) 1e9) "seconds"))
