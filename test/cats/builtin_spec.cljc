@@ -169,7 +169,7 @@
 ;; Sequence
 
 (defn sequence-gen [g]
-  (gen/fmap #(lazy-seq %) (gen/vector g)))
+  (gen/list g))
 
 (defspec sequence-semigroup 10
   (lt/semigroup-associativity
@@ -188,8 +188,8 @@
 (defspec sequence-second-functor-law 10
   (lt/second-functor-law
    {:gen (sequence-gen gen/any)
-    :f   #(lazy-seq [%])
-    :g   #(lazy-seq [%])}))
+    :f   #(list %)
+    :g   #(list %)}))
 
 (defspec sequence-applicative-identity 10
   (lt/applicative-identity-law
@@ -206,14 +206,14 @@
   (lt/applicative-interchange
    {:ctx  b/sequence-context
     :gen  gen/int
-    :appf (lazy-seq [inc])}))
+    :appf (list inc)}))
 
 (defspec sequence-applicative-composition 10
   (lt/applicative-composition
    {:ctx  b/sequence-context
     :gen  gen/int
-    :appf (lazy-seq [inc])
-    :appg (lazy-seq [dec])}))
+    :appf (list inc)
+    :appg (list dec)}))
 
 (defspec sequence-first-monad-law 10
   (lt/first-monad-law
@@ -226,6 +226,92 @@
 (defspec sequence-third-monad-law 10
   (lt/third-monad-law
    {:ctx b/sequence-context
+    :f   (comp seq vector str)
+    :g   (comp seq vector count)}))
+
+(t/deftest sequence-foldable
+  (t/testing "Foldl"
+    (t/is (= [3 2 1]
+             (m/foldl (fn [acc v] (into [v] acc)) [] (list 1 2 3))))
+    (t/is (= 6 (m/foldl + 0 (list 1 2 3)))))
+
+  (t/testing "Foldr"
+    (t/is (= [1 2 3]
+             (m/foldr (fn [v acc] (into [v] acc)) [] (list 1 2 3))))
+    (t/is (= 6 (m/foldr + 0 (list 1 2 3))))))
+
+(t/deftest sequence-traversable
+  (t/testing "Traverse"
+    (t/is (= (maybe/just [])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even '()))))
+    (t/is (= (maybe/just [3 5])
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (list 2 4)))))
+    (t/is (= (maybe/nothing)
+             (ctx/with-context maybe/context
+               (m/traverse inc-if-even (list 1 2)))))))
+
+;; Lazy Sequence
+
+(defn lazy-sequence-gen [g]
+  (gen/fmap #(lazy-seq %) (gen/vector g)))
+
+(defspec lazy-sequence-semigroup 10
+  (lt/semigroup-associativity
+   {:ctx b/lazy-sequence-context
+    :gen (gen/not-empty (lazy-sequence-gen gen/any))}))
+
+(defspec lazy-sequence-monoid 10
+  (lt/monoid-identity-element
+   {:ctx b/lazy-sequence-context
+    :gen (lazy-sequence-gen gen/any)}))
+
+(defspec lazy-sequence-first-functor-law 10
+  (lt/first-functor-law
+   {:gen (lazy-sequence-gen gen/any)}))
+
+(defspec lazy-sequence-second-functor-law 10
+  (lt/second-functor-law
+   {:gen (lazy-sequence-gen gen/any)
+    :f   #(lazy-seq [%])
+    :g   #(lazy-seq [%])}))
+
+(defspec lazy-sequence-applicative-identity 10
+  (lt/applicative-identity-law
+   {:ctx b/lazy-sequence-context
+    :gen (lazy-sequence-gen gen/any)}))
+
+(defspec lazy-sequence-applicative-homomorphism 10
+  (lt/applicative-homomorphism
+   {:ctx b/lazy-sequence-context
+    :gen gen/any
+    :f   (constantly false)}))
+
+(defspec lazy-sequence-applicative-interchange 10
+  (lt/applicative-interchange
+   {:ctx  b/lazy-sequence-context
+    :gen  gen/int
+    :appf (lazy-seq [inc])}))
+
+(defspec lazy-sequence-applicative-composition 10
+  (lt/applicative-composition
+   {:ctx  b/lazy-sequence-context
+    :gen  gen/int
+    :appf (lazy-seq [inc])
+    :appg (lazy-seq [dec])}))
+
+(defspec lazy-sequence-first-monad-law 10
+  (lt/first-monad-law
+   {:ctx b/lazy-sequence-context
+    :mf  #(if % (lazy-seq [%]) (lazy-seq []))}))
+
+(defspec lazy-sequence-second-monad-law 10
+  (lt/second-monad-law {:ctx b/lazy-sequence-context}))
+
+(defspec lazy-sequence-third-monad-law 10
+  (lt/third-monad-law
+   {:ctx b/lazy-sequence-context
     :f   (comp seq vector str)
     :g   (comp seq vector count)}))
 

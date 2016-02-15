@@ -160,7 +160,7 @@
 
     ;; FIXME: uncomment when finishing funcool/cats#77
     #_(t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-t b/sequence-context)]
+      (let [maybe-sequence-monad (maybe/maybe-t b/lazy-sequence-context)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
                   (maybe/just 3) (maybe/just 4)
                   (maybe/just 5) (maybe/just 6)]
@@ -181,7 +181,7 @@
                (monad+ (maybe/just 1) (maybe/nothing)))))
 
     (t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-t b/sequence-context)]
+      (let [maybe-sequence-monad (maybe/maybe-t b/lazy-sequence-context)]
         (t/is (= [(maybe/just 1) (maybe/just 2)
                   (maybe/just 3) (maybe/just 4)
                   (maybe/just 5) (maybe/just 6)]
@@ -209,7 +209,7 @@
                ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
 
   (t/testing "It can lift a function to a Monad Transformer"
-    (let [maybe-sequence-monad (maybe/maybe-t b/sequence-context)
+    (let [maybe-sequence-monad (maybe/maybe-t b/lazy-sequence-context)
           monad+ (m/lift-m 2 add2)]
       (t/is (= [(maybe/just 1) (maybe/just 2)
                 (maybe/just 3) (maybe/just 4)

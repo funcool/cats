@@ -44,10 +44,119 @@
   (-extract [_] nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (Lazy) Sequence Monad
+;; Sequence Monad i.e. PersistentList
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def sequence-context
+  (reify
+    p/Context
+    (-get-level [_] ctx/+level-default+)
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (into sv' (reverse sv)))
+
+    p/Monoid
+    (-mempty [_] ())
+
+    p/Functor
+    (-fmap [_ f v]
+      (loop [[h & t :as c] v
+             result ()]
+        (if (empty? c)
+          (reverse result)
+          (recur t (cons (f h) result)))))
+
+    p/Applicative
+    (-pure [_ v] (list v))
+
+    (-fapply [_ self av]
+      ;; Each function (outer loop) applied to each value (inner loop).
+      (->> (loop [[h & t :as c] self
+                  result ()]
+             (if (empty? c)
+               result
+               (recur t
+                      (cons (loop [[h' & t' :as c'] av
+                                   result' ()]
+                              (if (empty? c')
+                                result'
+                                (recur t' (cons (h h') result'))))
+                            result))))
+           ;; Note that both `result` & `result'` above are
+           ;; in reverse order.
+           ;; Conjing elements of %2 into %1 below is done in
+           ;; in reverse order, so final result is correctly
+           ;; ordered.
+           (reduce #(into %1 %2) ())))
+
+
+    p/Monad
+    (-mreturn [_ v]
+      (list v))
+
+    (-mbind [_ self f]
+      (->> (loop [[h & t :as c] self
+                  result ()]
+             (if (empty? c)
+               result
+               (recur t (cons (f h) result))))
+           ;; Note that `result` above is in reverse order.
+           ;; Conjing elements of %2 into %1 below is done in
+           ;; in reverse order, so final result is correctly
+           ;; ordered.
+           (reduce #(into %1 %2) ())))
+
+    p/MonadZero
+    (-mzero [_] ())
+
+    p/MonadPlus
+    (-mplus [_ mv mv']
+      (into mv' (reverse mv)))
+
+    p/Foldable
+    (-foldr [ctx f z xs]
+      (let [x (first xs)]
+        (if (nil? x)
+          z
+          (let [xs (rest xs)]
+            (f x (p/-foldr ctx f z xs))))))
+
+    (-foldl [ctx f z xs]
+      (reduce f z xs))
+
+    p/Traversable
+    (-traverse [ctx f tv]
+      (let [as (p/-fmap ctx f tv)]
+        (p/-foldr ctx
+                  (fn [a acc]
+                    (m/alet [x a
+                             xs acc]
+                      (cons x xs)))
+                  (m/pure ())
+                  as)))
+
+    p/Printable
+    (-repr [_]
+      "#<List>")))
+
+(util/make-printable (type sequence-context))
+
+(extend-type #?(:clj  clojure.lang.PersistentList
+                :cljs cljs.core.List)
+  p/Contextual
+  (-get-context [_] sequence-context))
+
+(extend-type #?(:clj  clojure.lang.PersistentList$EmptyList
+                :cljs cljs.core.EmptyList)
+  p/Contextual
+  (-get-context [_] sequence-context))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Lazy Sequence Monad
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def lazy-sequence-context
   (reify
     p/Context
     (-get-level [_] ctx/+level-default+)
@@ -112,14 +221,14 @@
 
     p/Printable
     (-repr [_]
-      "#<Sequence>")))
+      "#<LazySequence>")))
 
-(util/make-printable (type sequence-context))
+(util/make-printable (type lazy-sequence-context))
 
 (extend-type #?(:clj  clojure.lang.LazySeq
                 :cljs cljs.core.LazySeq)
   p/Contextual
-  (-get-context [_] sequence-context))
+  (-get-context [_] lazy-sequence-context))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Range
