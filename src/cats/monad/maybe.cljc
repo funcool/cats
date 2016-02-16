@@ -261,6 +261,25 @@
                #(p/-fmap context f %)
                fv))
 
+    p/Applicative
+    (pure [_ v]
+      (p/mreturn inner-monad (just v)))
+
+    (fapply [_ af av]
+      (p/mbind inner-monad
+               af
+               (fn [mf]
+                 (p/mbind maybe-monad
+                          mf
+                          (fn [f]
+                            (p/mbind inner-monad
+                                     av
+                                     (fn [mv]
+                                       (p/mbind maybe-monad
+                                                mv
+                                                (fn [v]
+                                                  (p/mreturn inner-monad (just (f v))))))))))))
+
     p/Monad
     (-mreturn [m v]
       (p/-mreturn inner (just v)))
