@@ -202,7 +202,9 @@
 
     p/Monad
     (-mreturn [_ v]
-      (just v))
+      (if (nil? v)
+        (nothing)
+        (just v)))
     (-mbind [_ mv f]
       (if (nothing? mv)
         mv
