@@ -1,6 +1,8 @@
 cats
 ====
 
+[![Join the chat at https://gitter.im/funcool/cats](https://badges.gitter.im/funcool/cats.svg)](https://gitter.im/funcool/cats?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Travis Badge](https://img.shields.io/travis/funcool/cats/master.svg)](https://travis-ci.org/funcool/cats "Travis Badge")
 
 ![](./logo/logo.png "cats logo")
