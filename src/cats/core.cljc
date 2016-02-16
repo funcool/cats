@@ -110,7 +110,7 @@
 (defn guard
   [b]
   (if b
-    (return nil)
+    (return b)
     (mzero)))
 
 (defn join
