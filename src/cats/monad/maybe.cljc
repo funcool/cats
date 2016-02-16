@@ -111,12 +111,10 @@
     false))
 
 (defn just
-  "A Just type constructor.
-
-  Without arguments it returns a Just instance
-  with nil as wrapped value."
-  ([] (Just. nil))
-  ([v] (Just. v)))
+  "A Just type constructor."
+  [v]
+  {:pre [(some? v)]}
+  (Just. v))
 
 (defn nothing
   "A Nothing type constructor."
