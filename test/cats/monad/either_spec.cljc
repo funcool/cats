@@ -248,3 +248,15 @@
     (t/is (= (maybe/just (either/left :nope))
              (ctx/with-context maybe/context
                (m/traverse #(maybe/just (inc %)) (either/left :nope)))))))
+
+(t/deftest try-success-test
+  (t/testing "try-either for a successful function"
+    (let [result (either/try-either (inc 1))]
+      (t/is (either/right? result))
+      (t/is (= 2 @result)))))
+
+(t/deftest try-exception-test
+  (t/testing "try-either for a exceptional function"
+    (let [result (either/try-either (throw (Exception. "oh no!")))]
+      (t/is (either/left? result))
+      (t/is (= "oh no!" (.getMessage @result))))))
