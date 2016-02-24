@@ -317,3 +317,11 @@
   (if (left? e)
     (right (p/-extract e))
     (left (p/-extract e))))
+
+(defmacro try-either
+  "try to evalute the body and return the result as an either
+  if an exception is throw return the exception as a left,
+  otherwise returns the result as a right"
+  [& body]
+  `(try (right ~@body)
+        (catch Exception e# (left e#))))
