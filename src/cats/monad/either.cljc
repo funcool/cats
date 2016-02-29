@@ -324,5 +324,8 @@
      if an exception is throw return the exception as a left,
      otherwise returns the result as a right"
      [& body]
-     `(try (right ~@body)
-           (catch Exception e# (left e#)))))
+     ;; detect compilation of a cljs namespace and inject the appropriate error
+     ;; see https://groups.google.com/forum/#!topic/clojurescript/iBY5HaQda4A
+     (if (:ns &env)
+       `(try (right ~@body) (catch js/Error e# (left e#)))
+       `(try (right ~@body) (catch Exception e# (left e#))))))
