@@ -44,7 +44,7 @@
 (defprotocol Printable
   "Just an abstraction for make a type printable in a platform
   independent manner."
-  (-repr [_] "Get the repl ready representation of the object."))
+  (-repr ^String [_] "Get the repl ready representation of the object."))
 
 (defprotocol Semigroup
   "A structure with an associative binary operation."

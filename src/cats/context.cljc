@@ -33,7 +33,7 @@
 
 (defn throw-illegal-argument
   {:no-doc true :internal true}
-  [text]
+  [^String text]
   #?(:cljs (throw (ex-info text {}))
      :clj  (throw (IllegalArgumentException. text))))
 
