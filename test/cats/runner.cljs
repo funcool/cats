@@ -21,8 +21,7 @@
 
 (enable-console-print!)
 
-(defn main
-  []
+(defn -main []
   (test/run-tests
    (test/empty-env)
    'cats.core-spec
@@ -41,13 +40,10 @@
    'cats.labs.crdt.pncounter-spec
    'cats.labs.crdt.gcounter-spec
    'cats.labs.crdt.gset-spec
-   'cats.labs.lens-spec
-   ))
+   'cats.labs.lens-spec))
 
-(defmethod test/report [:cljs.test/default :end-run-tests]
-  [m]
-  (if (test/successful? m)
-    (set! (.-exitCode js/process) 0)
-    (set! (.-exitCode js/process) 1)))
+(defmethod test/report [:cljs.test/default :end-run-tests] [m]
+  (when-not (test/successful? m)
+    ((aget js/process "exit") 1)))
 
-(set! *main-cli-fn* main)
+(set! *main-cli-fn* -main)
