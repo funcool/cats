@@ -62,13 +62,13 @@
       [Object
        (equals [self other]
          (if (instance? Just other)
-           (= v (.-v other))
+           (= v (.-v ^Just other))
            false))]
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Just other)
-           (= v (.-v other))
+           (= v (.-v ^Just other))
            false))]))
 
 (deftype Nothing []

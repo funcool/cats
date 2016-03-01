@@ -67,14 +67,14 @@
       [Object
        (equals [self other]
          (if (instance? Right other)
-           (= v (.-v other))
+           (= v (.-v ^Right other))
            false))]
 
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Right other)
-           (= v (.-v other))
+           (= v (.-v ^Right other))
            false))]))
 
 (deftype Left [v]
@@ -97,14 +97,14 @@
       [Object
        (equals [self other]
          (if (instance? Left other)
-           (= v (.-v other))
+           (= v (.-v ^Left other))
            false))]
 
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Left other)
-           (= v (.-v other))
+           (= v (.-v ^Left other))
            false))]))
 
 (alter-meta! #'->Right assoc :private true)
@@ -156,14 +156,14 @@
     p/Functor
     (-fmap [_ f s]
       (if (right? s)
-        (right (f (.-v s)))
+        (right (f (.-v ^Right s)))
         s))
 
     p/Bifunctor
     (-bimap [_ f g s]
       (if (left? s)
-        (left  (f (.-v s)))
-        (right (g (.-v s)))))
+        (left  (f (.-v ^Left s)))
+        (right (g (.-v ^Right s)))))
 
     p/Applicative
     (-pure [_ v]
@@ -171,7 +171,7 @@
 
     (-fapply [m af av]
       (if (right? af)
-        (p/-fmap m (.-v af) av)
+        (p/-fmap m (.-v ^Right af) av)
         af))
 
     p/Monad
@@ -180,7 +180,7 @@
 
     (-mbind [_ s f]
       (if (right? s)
-        (f (.-v s))
+        (f (.-v ^Right s))
         s))
 
     p/MonadZero
@@ -324,5 +324,8 @@
      if an exception is throw return the exception as a left,
      otherwise returns the result as a right"
      [& body]
-     `(try (right ~@body)
-           (catch Exception e# (left e#)))))
+     ;; detect compilation of a cljs namespace and inject the appropriate error
+     ;; see https://groups.google.com/forum/#!topic/clojurescript/iBY5HaQda4A
+     (if (:ns &env)
+       `(try (right ~@body) (catch js/Error e# (left e#)))
+       `(try (right ~@body) (catch Exception e# (left e#))))))

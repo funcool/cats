@@ -57,14 +57,14 @@
       [Object
        (equals [self other]
          (if (instance? Ok other)
-           (= v (.-v other))
+           (= v (.-v ^Ok other))
            false))]
 
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Ok other)
-           (= v (.-v other))
+           (= v (.-v ^Ok other))
            false))]))
 
 (deftype Fail [v]
@@ -86,14 +86,14 @@
       [Object
        (equals [self other]
          (if (instance? Fail other)
-           (= v (.-v other))
+           (= v (.-v ^Fail other))
            false))]
 
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Fail other)
-           (= v (.-v other))
+           (= v (.-v ^Fail other))
            false))]))
 
 (alter-meta! #'->Ok assoc :private true)
@@ -239,12 +239,12 @@
   [av]
   {:pre [(validation? av)]}
   (if (ok? av)
-    (either/right (.-v av))
-    (either/left (.-v av))))
+    (either/right (.-v ^Ok av))
+    (either/left (.-v ^Fail av))))
 
 (defn either->validation
   [ae]
   {:pre [(either/either? ae)]}
   (if (either/right? ae)
-    (ok (.-v ae))
-    (fail (.-v ae))))
+    (ok (.-v ^cats.monad.either.Right ae))
+    (fail (.-v ^cats.monad.either.Left ae))))

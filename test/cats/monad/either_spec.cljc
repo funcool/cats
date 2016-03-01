@@ -9,7 +9,7 @@
                  [cats.builtin :as b]
                  [cats.protocols :as p]
                  [cats.monad.maybe :as maybe]
-                 [cats.monad.either :as either]
+                 [cats.monad.either :as either :include-macros true]
                  [cats.context :as ctx :include-macros true]
                  [cats.core :as m :include-macros true])
        (:require-macros [clojure.test.check.clojure-test :refer (defspec)])])
@@ -257,6 +257,9 @@
 
 (t/deftest try-exception-test
   (t/testing "try-either for a exceptional function"
-    (let [result (either/try-either (throw (Exception. "oh no!")))]
+    (let [result (either/try-either #?(:clj  (throw (Exception. "oh no!"))
+                                       :cljs (throw (js/Error "oh no!"))))]
       (t/is (either/left? result))
-      (t/is (= "oh no!" (.getMessage @result))))))
+      #?(:clj  (t/is (= "oh no!" (.getMessage @result)))
+         :cljs (t/is (= "oh no!" (.-message @result))))
+      )))

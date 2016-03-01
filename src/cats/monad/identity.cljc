@@ -56,14 +56,14 @@
       [Object
        (equals [self other]
          (if (instance? Identity other)
-           (= v (.-v other))
+           (= v (.-v ^Identity other))
            false))]
 
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Identity other)
-           (= v (.-v other))
+           (= v (.-v ^Identity other))
            false))]))
 
 (alter-meta! #'->Identity assoc :private true)
@@ -87,21 +87,21 @@
 
     p/Functor
     (-fmap [_ f iv]
-      (Identity. (f (.-v iv))))
+      (Identity. (f (.-v ^Identity iv))))
 
     p/Applicative
     (-pure [_ v]
       (Identity. v))
 
     (-fapply [_ af av]
-      (Identity. ((.-v af) (.-v av))))
+      (Identity. ((.-v ^Identity af) (.-v ^Identity av))))
 
     p/Monad
     (-mreturn [_ v]
       (Identity. v))
 
     (-mbind [_ mv f]
-      (f (.-v mv)))
+      (f (.-v ^Identity mv)))
 
     p/Printable
     (-repr [_]

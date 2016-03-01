@@ -31,9 +31,9 @@
 (def ^:const +level-default+ 10)
 (def ^:const +level-transformer+ 100)
 
-(defn throw-ilegal-argument
+(defn throw-illegal-argument
   {:no-doc true :internal true}
-  [text]
+  [^String text]
   #?(:cljs (throw (ex-info text {}))
      :clj  (throw (IllegalArgumentException. text))))
 
@@ -43,7 +43,7 @@
      [ctx & body]
      `(do
         (when (not (satisfies? p/Context ~ctx))
-          (throw-ilegal-argument "The provided context does not implements Context."))
+          (throw-illegal-argument "The provided context does not implements Context."))
         (if (nil? *context*)
           (binding [*context* ~ctx]
             ~@body)
@@ -70,7 +70,7 @@
   ([]
    (if (not-nil? *context*)
      *context*
-     (throw-ilegal-argument
+     (throw-illegal-argument
       "No context is set and it can not be automatically resolved.")))
   ([param]
    (cond
@@ -84,5 +84,5 @@
      param
 
      :else
-     (throw-ilegal-argument
+     (throw-illegal-argument
       "No context is set and it can not be automatically resolved."))))
