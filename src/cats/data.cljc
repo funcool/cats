@@ -64,8 +64,8 @@
      :cljs cljs.core/IEquiv)
   (#?(:clj equals :cljs -equiv) [this other]
     (if (instance? Pair other)
-      (and (= (.-fst this) (.-fst other))
-           (= (.-snd this) (.-snd other)))
+      (and (= (.-fst this) (.-fst ^Pair other))
+           (= (.-snd this) (.-snd ^Pair other)))
       false))
 
   p/Printable
@@ -100,28 +100,30 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (pair
-        (p/-mappend (p/-get-context (.-fst sv)) (.-fst sv) (.-fst sv'))
-        (p/-mappend (p/-get-context (.-snd sv)) (.-snd sv) (.-snd sv'))))
+        (p/-mappend (p/-get-context (.-fst ^Pair sv))
+                    (.-fst ^Pair sv) (.-fst ^Pair sv'))
+        (p/-mappend (p/-get-context (.-snd ^Pair sv))
+                    (.-snd ^Pair sv) (.-snd ^Pair sv'))))
 
     p/Functor
     (-fmap [_ f mv]
-      (pair (.-fst mv) (f (.-snd mv))))
+      (pair (.-fst ^Pair mv) (f (.-snd ^Pair mv))))
 
     p/Bifunctor
     (-bimap [_ f g s]
-      (pair (f (.-fst s)) (g (.-snd s))))
+      (pair (f (.-fst ^Pair s)) (g (.-snd ^Pair s))))
 
     p/Foldable
     (-foldl [_ f z mv]
-      (f z (.-snd mv)))
+      (f z (.-snd ^Pair mv)))
 
     (-foldr [_ f z mv]
-      (f (.-snd mv) z))
+      (f (.-snd ^Pair mv) z))
 
     p/Traversable
     (-traverse [_ f mv]
-      (let [a (f (.-snd mv))]
-        (p/-fmap (p/-get-context a) #(pair (.-fst mv) %) a)))))
+      (let [a (f (.-snd ^Pair mv))]
+        (p/-fmap (p/-get-context a) #(pair (.-fst ^Pair mv) %) a)))))
 
 (defn pair-monoid
   "A pair monoid type constructor."
@@ -135,8 +137,8 @@
     p/Semigroup
     (-mappend [_ sv sv']
       (pair
-       (p/-mappend inner-monoid (.-fst sv) (.-fst sv'))
-       (p/-mappend inner-monoid (.-snd sv) (.-snd sv'))))
+       (p/-mappend inner-monoid (.-fst ^Pair sv) (.-fst ^Pair sv'))
+       (p/-mappend inner-monoid (.-snd ^Pair sv) (.-snd ^Pair sv'))))
 
     p/Monoid
     (-mempty [_]

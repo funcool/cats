@@ -62,7 +62,7 @@
      (:require-macros [cats.monad.exception :refer (try-on)])))
 
 (defn throw-exception
-  [message]
+  [^String message]
   (throw (#?(:clj IllegalArgumentException.
              :cljs js/Error.)
             message)))
@@ -99,13 +99,13 @@
       [Object
        (equals [self other]
          (if (instance? Success other)
-           (= v (.-v other))
+           (= v (.-v ^Success other))
            false))]
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Success other)
-           (= v (.-v other))
+           (= v (.-v ^Success other))
            false))]))
 
 (deftype Failure [e]
@@ -128,14 +128,14 @@
       [Object
        (equals [self other]
          (if (instance? Failure other)
-           (= e (.-e other))
+           (= e (.-e ^Failure other))
            false))]
 
       :cljs
       [cljs.core/IEquiv
        (-equiv [_ other]
          (if (instance? Failure other)
-           (= e (.-e other))
+           (= e (.-e ^Failure other))
            false))]))
 
 (alter-meta! #'->Success assoc :private true)
@@ -237,7 +237,7 @@
   (let [result (exec-try-on func)]
     (ctx/with-context context
       (if (failure? result)
-        (recoverfn (.-e result))
+        (recoverfn (.-e ^Failure result))
         result))))
 
 #?(:clj
