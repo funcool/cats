@@ -33,7 +33,7 @@
   "A marker protocol for identifying the valid context types."
   (-get-level [_] "Get a context priority level."))
 
- (defprotocol Contextual
+(defprotocol Contextual
   "Abstraction that establishes a concrete type as a member of a context.
 
   A great example es Maybe monad type Just. It implements
