@@ -36,7 +36,7 @@
 (defprotocol Contextual
   "Abstraction that establishes a concrete type as a member of a context.
 
-  A great example es Maybe monad type Just. It implements
+  A great example is the Maybe monad type Just. It implements
   this abstraction to establish that Just is part of
   the Maybe monad."
   (-get-context [_] "Get the context associated with the type."))
