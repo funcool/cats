@@ -76,9 +76,9 @@
   "The Writer type constructor.
 
   The purpose of Writer type is wrap a simple
-  function that fullfills the writer signature.
+  function that fullfills the Writer signature.
 
-  It exists just to avoid extending the clojure
+  It exists to avoid extending the Clojure
   function type (it is already very generic) ."
   [f]
   (Writer. f))
