@@ -74,7 +74,7 @@
      inside av's context while preserving the context.")
   (-pure [app v]
     "Takes any context or monadic value `app` and any value `v`, and puts
-     the value `v` in the most minimal context (normally `mempty`) of same type of app"))
+     the value `v` in the most minimal context (normally `mempty`) of same type of `app`"))
 
 (defprotocol Foldable
   "Abstraction of data structures that can be folded to a summary value."
