@@ -324,5 +324,7 @@
      if an exception is throw return the exception as a left,
      otherwise returns the result as a right"
      [& body]
-     `(try (right ~@body)
-           (catch Exception e# (left e#)))))
+     `(try
+        ~@(butlast body)
+        (right ~(last body))
+        (catch Exception e# (left e#)))))
