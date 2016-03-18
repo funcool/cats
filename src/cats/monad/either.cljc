@@ -325,6 +325,5 @@
      otherwise returns the result as a right"
      [& body]
      `(try
-        ~@(butlast body)
-        (right ~(last body))
+        (right (do ~@body))
         (catch Exception e# (left e#)))))
