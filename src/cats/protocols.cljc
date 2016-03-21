@@ -36,13 +36,13 @@
 (defprotocol Contextual
   "Abstraction that establishes a concrete type as a member of a context.
 
-  A great example es Maybe monad type Just. It implements
-  this abstraction for establish that Just is part of
-  Maybe monad."
+  A great example is the Maybe monad type Just. It implements
+  this abstraction to establish that Just is part of
+  the Maybe monad."
   (-get-context [_] "Get the context associated with the type."))
 
 (defprotocol Printable
-  "Just an abstraction for make a type printable in a platform
+  "An abstraction to make a type printable in a platform
   independent manner."
   (-repr ^String [_] "Get the repl ready representation of the object."))
 
@@ -51,11 +51,11 @@
   (-mappend [s sv sv'] "An associative addition operation."))
 
 (defprotocol Monoid
-  "A Semigroup which has an identity element for is associative binary operation."
+  "A Semigroup which has an identity element with respect to an associative binary operation."
   (-mempty [s] "The identity element for the given monoid."))
 
 (defprotocol Extract
-  "A type class responsible of extract the
+  "A type class to extract the
   value from a monad context."
   (-extract [mv] "Extract the value from monad context."))
 
@@ -73,8 +73,8 @@
     "Applies the function(s) inside af's context to the value(s)
      inside av's context while preserving the context.")
   (-pure [app v]
-    "Takes any context monadic value ctx and any value v, and puts
-     the value v in the most minimal context of same type of ctx"))
+    "Takes any context or monadic value `app` and any value `v`, and puts
+     the value `v` in the most minimal context (normally `mempty`) of same type of `app`"))
 
 (defprotocol Foldable
   "Abstraction of data structures that can be folded to a summary value."
