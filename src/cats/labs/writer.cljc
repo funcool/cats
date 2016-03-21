@@ -76,16 +76,16 @@
   "The Writer type constructor.
 
   The purpose of Writer type is wrap a simple
-  function that fullfill the writer signature.
+  function that fullfills the Writer signature.
 
-  It exists just for avoid extend the clojure
-  function type because is very generic type."
+  It exists to avoid extending the Clojure
+  function type (it is already very generic) ."
   [f]
   (Writer. f))
 
 (defn writer?
-  "Return true if `s` is instance
-  of Writer type."
+  "Return true if `s` is an instance
+  of the Writer type."
   [s]
   (instance? Writer s))
 
