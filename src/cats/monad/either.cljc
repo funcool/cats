@@ -327,5 +327,5 @@
      ;; detect compilation of a cljs namespace and inject the appropriate error
      ;; see https://groups.google.com/forum/#!topic/clojurescript/iBY5HaQda4A
      (if (:ns &env)
-       `(try (right ~@body) (catch js/Error e# (left e#)))
-       `(try (right ~@body) (catch Exception e# (left e#))))))
+       `(try (right (do ~@body)) (catch js/Error e# (left e#)))
+       `(try (right (do ~@body)) (catch Exception e# (left e#))))))
