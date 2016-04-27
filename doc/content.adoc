@@ -1560,7 +1560,7 @@ help of the *mlet* macro for bind values to asyncrhonous calls:
 ;; ---> sending request 100
 ;; <--- receiving request 100
 ;; "Elapsed time: 202.236804 msecs"
-;; => 200
+;; => 300
 ----
 
 Here we can observe few things:
