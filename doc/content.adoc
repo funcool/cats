@@ -1096,7 +1096,7 @@ function gives an empty map.
 
 == Syntax sugar
 
-Additionally to the abstractions and types, *cats* exposes some powerfull
+Additionally to the abstractions and types, *cats* exposes some powerful
 syntax abstractions that surelly will make the usage of that abstractions
 in a more familiar way.
 
@@ -1600,7 +1600,7 @@ And here we can observe few things:
 * The `return` function is not used because `alet` evaluates the body in the context
   of the applicative.
 
-The alet is a powerfull macro that analyzes the dependencies between bindings
+The alet is a powerful macro that analyzes the dependencies between bindings
 and executes the expressions in batches resultin in a very atractive feature
 for asynchronous calls.
 
