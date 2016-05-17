@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 1.3.0 ##
+
+Date: 2016-05-17
+
+- Rewrite `cats.labs.channel` integration with core.async combinators (@yanatan16)
+- Rename `cats.builtin.sequence-context` to `cats.builtin.lazy-sequence-context` (@muhuk)
+- Fix bug in sequence context's fapply implementation (@muhuk)
+- Performance improvements in sequence context implementation (@muhuk)
+- Add `cats.monad.either/try-either` macro for capturing exceptions as left, values as right (@shmish111)
+
 ## Version 1.2.1 ##
 
 Date: 2015-12-16
