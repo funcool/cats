@@ -320,9 +320,9 @@
 
 #?(:clj
    (defmacro try-either
-     "try to evalute the body and return the result as an either
-     if an exception is throw return the exception as a left,
-     otherwise returns the result as a right"
+     "Try to evalute the body and return the result as an either.
+     If an exception is thrown return the exception as a left,
+     otherwise return the result as a right."
      [& body]
      ;; detect compilation of a cljs namespace and inject the appropriate error
      ;; see https://groups.google.com/forum/#!topic/clojurescript/iBY5HaQda4A
