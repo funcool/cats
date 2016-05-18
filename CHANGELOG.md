@@ -2,7 +2,7 @@
 
 ## Version 1.3.0 ##
 
-Date: 2016-05-17
+Date: 2016-05-18
 
 - Rewrite `cats.labs.channel` integration with core.async combinators (@yanatan16)
 - Add `cats.builtin.lazy-sequence-context` (@muhuk)
