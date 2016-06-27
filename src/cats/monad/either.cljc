@@ -213,52 +213,7 @@
 
 (util/make-printable (type context))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad Transformer
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn either-t
-  "The Either transformer constructor."
-  [inner]
-  (reify
-    p/Context
-    (-get-level [_] ctx/+level-transformer+)
-
-    p/Monad
-    (-mreturn [_ v]
-      (p/-mreturn inner (right v)))
-
-    (-mbind [_ mv f]
-      (p/-mbind inner
-                mv
-                (fn [either-v]
-                  (if (left? either-v)
-                    (p/-mreturn inner either-v)
-                    (f (p/-extract either-v))))))
-
-    p/MonadZero
-    (-mzero [_]
-      (p/-mreturn inner (left)))
-
-    p/MonadPlus
-    (-mplus [_ mv mv']
-      (p/-mbind inner
-                mv
-                (fn [either-v]
-                  (if (right? either-v)
-                    (p/-mreturn inner either-v)
-                    mv'))))
-
-    p/MonadTrans
-    (-lift [m mv]
-      (p/-mbind inner
-                mv
-                (fn [v]
-                  (p/-mreturn inner (right v)))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Utility functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Utility functions
 
 (defn branch
   "Given an either value and two functions, if the either is a
