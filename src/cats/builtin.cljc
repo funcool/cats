@@ -50,8 +50,6 @@
 (def sequence-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (into sv' (reverse sv)))
@@ -159,8 +157,6 @@
 (def lazy-sequence-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (concat sv sv'))
@@ -237,8 +233,6 @@
 (def range-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Foldable
     (-foldr [ctx f z xs]
       (let [x (first xs)]
@@ -268,8 +262,6 @@
 (def vector-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (into sv sv'))
@@ -343,8 +335,6 @@
 (def map-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (merge sv sv'))
@@ -393,8 +383,6 @@
 (def set-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (s/union sv (set sv')))
@@ -449,8 +437,6 @@
 (def function-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [ctx f g] (comp f g))
 
@@ -498,8 +484,6 @@
 (def any-monoid
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (or sv sv'))
@@ -517,8 +501,6 @@
 (def all-monoid
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (and sv sv'))
@@ -536,8 +518,6 @@
 (def sum-monoid
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (+ sv sv'))
@@ -555,8 +535,6 @@
 (def prod-monoid
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (* sv sv'))
@@ -574,8 +552,6 @@
 (def string-monoid
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (str sv sv'))
