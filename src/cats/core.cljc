@@ -216,12 +216,6 @@
   ([ctx b mv]
    (when ctx (not b) mv)))
 
-(defn lift
-  "Lift a value from the inner monad of a monad transformer
-  into a value of the monad transformer."
-  ([mv] (p/-lift ctx/*context* mv))
-  ([m mv] (p/-lift m mv)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
