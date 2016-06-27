@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,7 @@
             [cats.context :as ctx]
             [cats.util :as util]))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Type constructor and functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Type constructor and functions
 
 (declare context)
 
@@ -151,8 +149,6 @@
   context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Functor
     (-fmap [_ f s]
       (if (right? s)

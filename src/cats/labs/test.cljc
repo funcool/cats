@@ -35,8 +35,6 @@
 (def gen-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Functor
     (-fmap [_ f mv]
       (gen/fmap f mv))

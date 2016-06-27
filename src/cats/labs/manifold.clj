@@ -1,5 +1,5 @@
-;; Copyright (c) 2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2015-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2015-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -50,8 +50,6 @@
   ([timeout timeout-value]
    (reify
      p/Context
-     (-get-level [_] ctx/+level-default+)
-
      p/Functor
      (-fmap [_ f mv]
        (with-timeout timeout timeout-value

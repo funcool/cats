@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -36,11 +36,9 @@
             [cats.context :as ctx]
             [cats.util :as util]))
 
-(declare context)
+;; --- Type constructors and functions
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Type constructors and functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare context)
 
 (deftype Just [v]
   p/Contextual
@@ -163,16 +161,12 @@
      (p/-extract mv)
      default)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad definition
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Monad definition
 
 (def ^{:no-doc true}
   context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [ctx mv mv']
       (cond
