@@ -155,42 +155,6 @@
     (t/is (either/right? m1))
     (t/is (either/left? m2))))
 
-
-(def either-vector-m
-  (either/either-t b/vector-context))
-
-(t/deftest either-t-tests
-  (t/is (= [(either/right 2)]
-           (ctx/with-context either-vector-m
-             (m/return 2))))
-
-  (t/is (= [(either/right 1)
-            (either/right 2)
-            (either/right 2)
-            (either/right 3)]
-           (ctx/with-context either-vector-m
-             (m/mlet [x [(either/right 0) (either/right 1)]
-                      y [(either/right 1) (either/right 2)]]
-               (m/return (+ x y))))))
-
-  (t/is (= [(either/right 1)
-            (either/right 2)
-            (either/right 2)
-            (either/right 3)]
-           (ctx/with-context either-vector-m
-             (m/mlet [x (m/lift [0 1])
-                      y (m/lift [1 2])]
-               (m/return (+ x y))))))
-
-  (t/is (= [(either/right 1)
-            (either/left)
-            (either/right 2)
-            (either/left)]
-           (ctx/with-context either-vector-m
-             (m/mlet [x [(either/right 0) (either/right 1)]
-                      y [(either/right 1) (either/left)]]
-               (m/return (+ x y)))))))
-
 (t/deftest branch-test
   (let [l (either/left "oh no")
         r (either/right 42)]

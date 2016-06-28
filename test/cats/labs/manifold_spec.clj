@@ -67,27 +67,6 @@
       (t/is (d/deferred? result))
       (t/is (= @result 200)))))
 
-(def deferred-either-m (either/either-t mf/deferred-context))
-
-(t/deftest deferred-transformer-tests
-  (t/testing "deferred combination with either"
-    (let [funcright #(d/future (either/right %))
-          funcleft #(d/future (either/left %))
-
-          r1 (ctx/with-context deferred-either-m
-               (m/mlet [x (funcright 1)
-                        y (funcright 2)]
-                 (m/return (+ x y))))
-
-          r2 (ctx/with-context deferred-either-m
-               (m/mlet [x (funcright 1)
-                        y (funcleft :foo)
-                        z (funcright 2)]
-                 (m/return (+ x y))))]
-
-      (t/is (= (either/right 3) @r1))
-      (t/is (= (either/left :foo) @r2)))))
-
 (t/deftest timeout-tests
   (t/testing "Doesn't timeout"
     (let [tctx (mf/deferred-context* 20)
