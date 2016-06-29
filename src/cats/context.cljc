@@ -30,6 +30,11 @@
 (def ^:dynamic *context* nil)
 (def ^:dynamic *strict* false)
 
+(defn use-strict!
+  ([] (use-strict! true))
+  ([v]
+   (alter-var-root *strict* (constantly v))))
+
 (defn throw-illegal-argument
   {:no-doc true :internal true}
   [^String text]
@@ -66,26 +71,29 @@
      `(with-context ~ctx
         ~@body)))
 
-;; TODO: improve error messages
-
 (defn infer
   "Given an optional value infer its context. If context is already set, it
   is returned as is without any inference operation."
   {:no-doc true}
   ([]
-   (if (nil? *context*)
-     (throw-illegal-argument "No context is set.")
-     *context*))
+   (when (nil? *context*)
+     (throw-illegal-argument "No context is set."))
+   *context*)
   ([v]
+   (infer v *strict*))
+  ([v strict?]
    (cond
      (not (nil? *context*))
-     *context*
+     (do
+       (when (and strict?
+                  (satisfies? p/Contextual v)
+                  (not= (p/-get-context v) *context*))
+         (throw-illegal-argument
+          (str "Context mismatch: you can't mix different context.")))
+       *context*)
 
      (satisfies? p/Contextual v)
      (p/-get-context v)
-
-     (satisfies? p/Context v)
-     v
 
      :else
      (throw-illegal-argument
