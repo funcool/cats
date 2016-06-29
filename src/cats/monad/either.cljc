@@ -205,7 +205,7 @@
       (if (right? mv)
         (let [a (f (p/-extract mv))]
           (p/-fmap (p/-get-context a) right a))
-        (p/-pure (ctx/get-current) mv)))
+        (p/-pure (ctx/infer) mv)))
 
     p/Printable
     (-repr [_]
