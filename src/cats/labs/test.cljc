@@ -35,8 +35,6 @@
 (def gen-context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Functor
     (-fmap [_ f mv]
       (gen/fmap f mv))
@@ -176,12 +174,10 @@
 
 (defn monadplus-associativity
   [{:keys [ctx gen eq] :or {eq =}}]
-  (prop/for-all [x gen
-                 y gen
-                 z gen]
-    (ctx/with-context ctx
-      (eq (m/mplus (m/mplus x y) z)
-          (m/mplus x (m/mplus y z))))))
+  (prop/for-all
+   [x gen y gen z gen]
+   (eq (m/mplus (m/mplus x y) z)
+       (m/mplus x (m/mplus y z)))))
 
 ;; MonadZero
 

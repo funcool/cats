@@ -95,8 +95,6 @@
   context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [_ sv sv']
       (pair
@@ -130,10 +128,6 @@
   [inner-monoid]
   (reify
     p/Context
-    (-get-level [_]
-      (+ (p/-get-level inner-monoid)
-         ctx/+level-default+))
-
     p/Semigroup
     (-mappend [_ sv sv']
       (pair

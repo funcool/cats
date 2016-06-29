@@ -212,48 +212,6 @@
              (t/is (= (a/<! result) 200))
              (done)))))))
 
-
-(def chaneither-m (either/either-t c/context))
-
-#?(:clj
-   (t/deftest channel-transformer-tests
-     (t/testing "channel combination with either"
-       (let [funcright (fn [x] (go (either/right x)))
-             funcleft (fn [x] (go (either/left x)))
-             r1 (ctx/with-context chaneither-m
-                  (m/mlet [x (funcright 1)
-                           y (funcright 2)]
-                    (m/return (+ x y))))
-
-             r2 (ctx/with-context chaneither-m
-                  (m/mlet [x (funcright 1)
-                           y (funcleft :foo)
-                           z (funcright 2)]
-                    (m/return (+ x y))))]
-
-         (t/is (= (either/right 3) (a/<!! r1)))
-         (t/is (= (either/left :foo) (a/<!! r2))))))
-
-   :cljs
-   (t/deftest channel-transformer-tests
-     (t/async done
-              (let [funcright #(c/with-value (either/right %))
-                    funcleft #(c/with-value (either/left %))
-                    r1 (ctx/with-context chaneither-m
-                         (m/mlet [x (funcright 1)
-                                  y (funcright 2)]
-                           (m/return (+ x y))))
-
-                    r2 (ctx/with-context chaneither-m
-                         (m/mlet [x (funcright 1)
-                                  y (funcleft :foo)
-                                  z (funcright 2)]
-                           (m/return (+ x y))))]
-                (go
-                  (t/is (= (either/right 3) (a/<! r1)))
-                  (t/is (= (either/left :foo) (a/<! r2)))
-                  (done))))))
-
 (t/deftest monadzero-tests
   #?(:clj
      (t/is (= #{} (a/<!! (a/into #{} (m/mzero c/context)))))

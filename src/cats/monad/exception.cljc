@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,8 @@
   #?(:cljs
      (:require-macros [cats.monad.exception :refer (try-on)])))
 
+;; --- Helpers
+
 (defn throw-exception
   [^String message]
   (throw (#?(:clj IllegalArgumentException.
@@ -73,9 +75,7 @@
   [e]
   (instance? #?(:clj Exception :cljs js/Error) e))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Types and implementations.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Types and implementations.
 
 (declare context)
 
@@ -271,16 +271,12 @@
     (-> (fn [& args] (try-on (apply func args)))
         (with-meta metadata))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad definition
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Monad definition
 
 (def ^{:no-doc true}
   context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Functor
     (-fmap [_ f s]
       (if (success? s)

@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,12 @@
   (:require [cats.protocols :as p]))
 
 (def ^:dynamic *context* nil)
-(def ^:const +level-default+ 10)
-(def ^:const +level-transformer+ 100)
+(def ^:dynamic *strict* false)
+
+(defn use-strict!
+  ([] (use-strict! true))
+  ([v]
+   (alter-var-root *strict* (constantly v))))
 
 (defn throw-illegal-argument
   {:no-doc true :internal true}
@@ -37,22 +41,28 @@
   #?(:cljs (throw (ex-info text {}))
      :clj  (throw (IllegalArgumentException. text))))
 
+(defn context?
+  "Returnt `true` if the provided value satisfies
+  the Context protocol."
+  [v]
+  (satisfies? p/Context v))
+
 #?(:clj
    (defmacro with-context
      "Set current context to specific monad."
      [ctx & body]
      `(do
-        (when (not (satisfies? p/Context ~ctx))
-          (throw-illegal-argument "The provided context does not implements Context."))
+        (when-not (context? ~ctx)
+          (throw-illegal-argument
+           "The provided context does not implements Context."))
         (if (nil? *context*)
           (binding [*context* ~ctx]
             ~@body)
-          (let [clevel# (p/-get-level *context*)
-                nlevel# (p/-get-level ~ctx)]
-            (if (>= nlevel# clevel#)
-              (binding [*context* ~ctx]
-                ~@body)
-              (do ~@body)))))))
+          (if (and *strict* (not= *context* ~ctx))
+            (throw-illegal-argument
+             "Context already set, no redefinition is posible in strict mode.")
+            (binding [*context* ~ctx]
+              ~@body))))))
 
 #?(:clj
    (defmacro with-monad
@@ -61,28 +71,39 @@
      `(with-context ~ctx
         ~@body)))
 
-(def ^:private not-nil? (comp not nil?))
-
-(defn get-current
-  "Get current context or obtain it from
-  the provided instance."
+(defn infer
+  "Given an optional value infer its context. If context is already set, it
+  is returned as is without any inference operation."
   {:no-doc true}
   ([]
-   (if (not-nil? *context*)
-     *context*
-     (throw-illegal-argument
-      "No context is set and it can not be automatically resolved.")))
-  ([param]
+   (when (nil? *context*)
+     (throw-illegal-argument "No context is set."))
+   *context*)
+  ([v]
+   (infer v *strict*))
+  ([v strict?]
    (cond
-     (not-nil? *context*)
-     *context*
+     (not (nil? *context*))
+     (do
+       (when (and strict?
+                  (satisfies? p/Contextual v)
+                  (not= (p/-get-context v) *context*))
+         (throw-illegal-argument
+          (str "Context mismatch: you can't mix different context.")))
+       *context*)
 
-     (satisfies? p/Contextual param)
-     (p/-get-context param)
-
-     (satisfies? p/Context param)
-     param
+     (satisfies? p/Contextual v)
+     (p/-get-context v)
 
      :else
      (throw-illegal-argument
-      "No context is set and it can not be automatically resolved."))))
+      (str "No context is set and it can not be automatically "
+           "resolved from provided value")))))
+
+(defn get-current
+  "Deprecated alias to `infer`."
+  {:deprecated true}
+  [& args]
+  (apply infer args))
+
+

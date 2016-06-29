@@ -1,5 +1,5 @@
-;; Copyright (c) 2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2015-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2015-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -44,50 +44,59 @@
 ;; Monad definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(deftype DeferredContext [timeout timeout-value]
+  Object
+  (equals [self other]
+    ;; Two context with different values are considered
+    ;; equals because as context they are represent
+    ;; the same context.
+    ;; FIXME: abstract this using own abstraction
+    ;; without overriding the default equality checks.
+    (instance? DeferredContext other))
+
+  p/Context
+  p/Functor
+  (-fmap [_ f mv]
+    (with-timeout timeout timeout-value
+      (d/chain mv f)))
+
+  p/Applicative
+  (-pure [_ v]
+    (d/success-deferred v))
+
+  (-fapply [mn af av]
+    (with-timeout timeout timeout-value
+      (d/chain (d/zip' af av)
+               (fn [[afv avv]]
+                 (afv avv)))))
+
+  p/Semigroup
+  (-mappend [ctx mv mv']
+    (with-timeout timeout timeout-value
+      (d/chain (d/zip' mv mv')
+               (fn [[mvv mvv']]
+                 (let [ctx (p/-get-context mvv)]
+                   (p/-mappend ctx mvv mvv'))))))
+
+  p/Monad
+  (-mreturn [_ v]
+    (d/success-deferred v))
+
+  (-mbind [it mv f]
+    (with-timeout timeout timeout-value
+      (d/chain mv (fn [v]
+                    (ctx/with-context it
+                      (f v))))))
+
+  p/Printable
+  (-repr [_]
+    "#<Deferred>"))
+
 (defn deferred-context*
   ([] (deferred-context* nil nil))
   ([timeout] (deferred-context* timeout nil))
   ([timeout timeout-value]
-   (reify
-     p/Context
-     (-get-level [_] ctx/+level-default+)
-
-     p/Functor
-     (-fmap [_ f mv]
-       (with-timeout timeout timeout-value
-         (d/chain mv f)))
-
-     p/Applicative
-     (-pure [_ v]
-       (d/success-deferred v))
-
-     (-fapply [mn af av]
-       (with-timeout timeout timeout-value
-         (d/chain (d/zip' af av)
-                  (fn [[afv avv]]
-                    (afv avv)))))
-
-     p/Semigroup
-     (-mappend [ctx mv mv']
-       (with-timeout timeout timeout-value
-         (d/chain (d/zip' mv mv')
-                  (fn [[mvv mvv']]
-                    (let [ctx (p/-get-context mvv)]
-                      (p/-mappend ctx mvv mvv'))))))
-
-     p/Monad
-     (-mreturn [_ v]
-       (d/success-deferred v))
-
-     (-mbind [it mv f]
-       (with-timeout timeout timeout-value
-         (d/chain mv (fn [v]
-                       (ctx/with-context it
-                         (f v))))))
-
-     p/Printable
-     (-repr [_]
-       "#<Deferred>"))))
+   (DeferredContext. timeout timeout-value)))
 
 (def ^{:doc "A default context for manifold deferred."}
   deferred-context (deferred-context*))

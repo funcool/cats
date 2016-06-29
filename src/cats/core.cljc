@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -42,13 +42,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn mempty
-  ([] (p/-mempty (ctx/get-current)))
+  ([] (p/-mempty (ctx/infer)))
   ([ctx] (p/-mempty ctx)))
 
 (defn mappend
   [& svs]
   {:pre [(seq svs)]}
-  (let [ctx (ctx/get-current (first svs))]
+  (let [ctx (ctx/infer (first svs) false)]
     (reduce (partial p/-mappend ctx) svs)))
 
 (defn pure
@@ -69,13 +69,13 @@
       (pure either/context 1)
       ;; => #<Right [1]>
   "
-  ([v] (pure (ctx/get-current) v))
+  ([v] (pure (ctx/infer) v))
   ([ctx v] (p/-pure ctx v)))
 
 (defn return
   "This is a monad version of `pure` and works
   identically to it."
-  ([v] (return (ctx/get-current) v))
+  ([v] (return (ctx/infer) v))
   ([ctx v] (p/-mreturn ctx v)))
 
 (defn bind
@@ -90,21 +90,21 @@
   which provides a beautiful, `let`-like syntax for
   composing operations with the `bind` function."
   [mv f]
-  (let [ctx (ctx/get-current mv)]
+  (let [ctx (ctx/infer mv)]
     (p/-mbind ctx mv (fn [v]
                        (ctx/with-context ctx
                          (f v))))))
 
 (defn mzero
   ([]
-   (p/-mzero (ctx/get-current)))
+   (p/-mzero (ctx/infer)))
   ([ctx]
    (p/-mzero ctx)))
 
 (defn mplus
   [& mvs]
   {:pre [(seq mvs)]}
-  (let [ctx (ctx/get-current (first mvs))]
+  (let [ctx (ctx/infer (first mvs))]
     (reduce (partial p/-mplus ctx) mvs)))
 
 (defn guard
@@ -126,7 +126,7 @@
    (fn [fv]
      (fmap f fv)))
   ([f fv]
-   (let [ctx (ctx/get-current fv)]
+   (let [ctx (ctx/infer fv)]
      (ctx/with-context ctx
        (p/-fmap ctx f fv)))))
 
@@ -145,7 +145,7 @@
    (fn [bv]
      (bimap f g bv)))
   ([f g bv]
-   (let [ctx (ctx/get-current bv)]
+   (let [ctx (ctx/infer bv)]
      (ctx/with-context ctx
        (p/-bimap ctx f g bv)))))
 
@@ -193,7 +193,7 @@
   a Haskell-style left-associative fapply."
   [af & avs]
   {:pre [(seq avs)]}
-  (let [ctx (ctx/get-current af)]
+  (let [ctx (ctx/infer af)]
     (reduce (partial p/-fapply ctx) af avs)))
 
 (defn when
@@ -201,7 +201,7 @@
   if the expression is logical true, return the monadic value.
   Otherwise, return nil in a monadic context."
   ([b mv]
-   (when (ctx/get-current mv) b mv))
+   (when (ctx/infer mv) b mv))
   ([ctx b mv]
    (if b
      mv
@@ -215,12 +215,6 @@
    (when (not b) mv))
   ([ctx b mv]
    (when ctx (not b) mv)))
-
-(defn lift
-  "Lift a value from the inner monad of a monad transformer
-  into a value of the monad transformer."
-  ([mv] (p/-lift ctx/*context* mv))
-  ([m mv] (p/-lift m mv)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro
@@ -647,7 +641,7 @@
   [mvs]
   (if (empty? mvs)
     (return ())
-    (let [ctx (ctx/get-current (first mvs))]
+    (let [ctx (ctx/infer (first mvs))]
       (ctx/with-context ctx
         (reduce (fn [mvs mv]
                   (mlet [v mv
@@ -764,7 +758,7 @@
 (defn >=>
   "Left-to-right composition of monads."
   [mf mg x]
-  (ctx/with-context (ctx/get-current mf)
+  (ctx/with-context (ctx/infer mf)
     (mlet [a (mf x)
            b (mg a)]
       (return b))))
@@ -773,7 +767,7 @@
   "Right-to-left composition of monads.
   Same as `>=>` with its first two arguments flipped."
   [mg mf x]
-  (ctx/with-context (ctx/get-current mf)
+  (ctx/with-context (ctx/infer mf)
     (mlet [a (mf x)
            b (mg a)]
       (return b))))

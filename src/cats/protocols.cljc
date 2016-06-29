@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,7 @@
   It is considered internal api.")
 
 (defprotocol Context
-  "A marker protocol for identifying the valid context types."
-  (-get-level [_] "Get a context priority level."))
+  "A marker protocol for identifying the valid context types.")
 
 (defprotocol Contextual
   "Abstraction that establishes a concrete type as a member of a context.
@@ -102,13 +101,3 @@
   "A complement abstraction for Monad that
   supports the notion of addition."
   (-mplus [m mv mv'] "An associative addition operation."))
-
-(defprotocol MonadTrans
-  "A monad transformer abstraction."
-  (-lift [m mv] "Lift a value from the parameterized monad to the transformer."))
-
-;; More info: http://en.wikipedia.org/wiki/Semilattice
-
-(defprotocol JoinSemiLattice
-  "A algebraic structure with element joins."
-  (-join [_ other] "Converge two data structures."))

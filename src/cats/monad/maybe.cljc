@@ -1,5 +1,5 @@
-;; Copyright (c) 2014-2015 Andrey Antukh <niwi@niwi.nz>
-;; Copyright (c) 2014-2015 Alejandro Gómez <alejandro@dialelo.com>
+;; Copyright (c) 2014-2016 Andrey Antukh <niwi@niwi.nz>
+;; Copyright (c) 2014-2016 Alejandro Gómez <alejandro@dialelo.com>
 ;; All rights reserved.
 ;;
 ;; Redistribution and use in source and binary forms, with or without
@@ -36,11 +36,9 @@
             [cats.context :as ctx]
             [cats.util :as util]))
 
-(declare context)
+;; --- Type constructors and functions
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Type constructors and functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(declare context)
 
 (deftype Just [v]
   p/Contextual
@@ -163,16 +161,12 @@
      (p/-extract mv)
      default)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad definition
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Monad definition
 
 (def ^{:no-doc true}
   context
   (reify
     p/Context
-    (-get-level [_] ctx/+level-default+)
-
     p/Semigroup
     (-mappend [ctx mv mv']
       (cond
@@ -236,7 +230,7 @@
       (if (just? mv)
         (let [a (f (p/-extract mv))]
           (p/-fmap (p/-get-context a) just a))
-        (p/-pure (ctx/get-current) mv)))
+        (p/-pure (ctx/infer) mv)))
 
     p/Printable
     (-repr [_]
@@ -244,62 +238,7 @@
 
 (util/make-printable (type context))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Monad Transformer
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn maybe-t
-  "The maybe transformer constructor."
-  [inner]
-  (reify
-    p/Context
-    (-get-level [_] ctx/+level-transformer+)
-
-    p/Functor
-    (-fmap [_ f fv]
-      (p/-fmap inner
-               #(p/-fmap context f %)
-               fv))
-
-    p/Monad
-    (-mreturn [m v]
-      (p/-mreturn inner (just v)))
-
-    (-mbind [_ mv f]
-      (p/-mbind inner
-                mv
-                (fn [maybe-v]
-                  (if (just? maybe-v)
-                    (f (p/-extract maybe-v))
-                    (p/-mreturn inner (nothing))))))
-
-    p/MonadZero
-    (-mzero [_]
-      (p/-mreturn inner (nothing)))
-
-    p/MonadPlus
-    (-mplus [_ mv mv']
-      (p/-mbind inner
-                mv
-                (fn [maybe-v]
-                  (if (just? maybe-v)
-                    (p/-mreturn inner maybe-v)
-                    mv'))))
-
-    p/MonadTrans
-    (-lift [_ mv]
-      (p/-mbind inner
-                mv
-                (fn [v]
-                  (p/-mreturn inner (just v)))))
-
-    p/Printable
-    (-repr [_]
-      "#<Maybe-T>")))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Utility functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; --- Utility functions
 
 (defn maybe
   "Given a default value, a maybe and a function, return the default

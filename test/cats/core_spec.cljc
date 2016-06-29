@@ -156,17 +156,7 @@
       (t/is (= (maybe/just 6)
                (app+ (maybe/just 2) (maybe/just 4))))
       (t/is (= (maybe/nothing)
-               (app+ (maybe/just 1) (maybe/nothing)))))
-
-    ;; FIXME: uncomment when finishing funcool/cats#77
-    #_(t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-t b/lazy-sequence-context)]
-        (t/is (= [(maybe/just 1) (maybe/just 2)
-                  (maybe/just 3) (maybe/just 4)
-                  (maybe/just 5) (maybe/just 6)]
-                 (ctx/with-context maybe-sequence-monad
-                   (app+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
-                         [(maybe/just 1) (maybe/just 2)]))))))))
+               (app+ (maybe/just 1) (maybe/nothing)))))))
 
 (t/deftest lift-m-tests
   (let [monad+ (m/lift-m 2 +)]
@@ -178,16 +168,7 @@
       (t/is (= (maybe/just 6)
                (monad+ (maybe/just 2) (maybe/just 4))))
       (t/is (= (maybe/nothing)
-               (monad+ (maybe/just 1) (maybe/nothing)))))
-
-    (t/testing "It can lift a function to a Monad Transformer"
-      (let [maybe-sequence-monad (maybe/maybe-t b/lazy-sequence-context)]
-        (t/is (= [(maybe/just 1) (maybe/just 2)
-                  (maybe/just 3) (maybe/just 4)
-                  (maybe/just 5) (maybe/just 6)]
-                 (ctx/with-context maybe-sequence-monad
-                   (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
-                           [(maybe/just 1) (maybe/just 2)]))))))))
+               (monad+ (maybe/just 1) (maybe/nothing)))))))
 
 (t/deftest fixed-arity-lift-m-tests
   #?(:clj
@@ -206,17 +187,7 @@
   (t/testing "Currying and lifting can be combined"
     (let [curry-monad+ (m/curry-lift-m 2 add2)]
       (t/is (= (maybe/just 6)
-               ((curry-monad+ (maybe/just 1)) (maybe/just 5))))))
-
-  (t/testing "It can lift a function to a Monad Transformer"
-    (let [maybe-sequence-monad (maybe/maybe-t b/lazy-sequence-context)
-          monad+ (m/lift-m 2 add2)]
-      (t/is (= [(maybe/just 1) (maybe/just 2)
-                (maybe/just 3) (maybe/just 4)
-                (maybe/just 5) (maybe/just 6)]
-               (ctx/with-context maybe-sequence-monad
-                 (monad+ [(maybe/just 0) (maybe/just 2) (maybe/just 4)]
-                         [(maybe/just 1) (maybe/just 2)])))))))
+               ((curry-monad+ (maybe/just 1)) (maybe/just 5)))))))
 
 (t/deftest filter-tests
   (t/testing "It can filter Maybe monadic values"
