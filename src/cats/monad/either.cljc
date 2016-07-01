@@ -137,9 +137,15 @@
   "Return true in case of `v` is instance
   of Either monad."
   [v]
-  (if (satisfies? p/Contextual v)
+  (cond
+    (or (instance? Right v)
+        (instance? Left v))
+    true
+
+    (satisfies? p/Contextual v)
     (identical? (p/-get-context v) context)
-    false))
+
+    :else false))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monad definition
