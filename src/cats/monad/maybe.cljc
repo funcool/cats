@@ -200,6 +200,8 @@
         (nothing)
         (just v)))
     (-mbind [_ mv f]
+      (assert (maybe? mv) (str "Context mismatch: " (p/-repr mv)
+                               " is not allowed to use with maybe context."))
       (if (nothing? mv)
         mv
         (f (p/-extract mv))))
