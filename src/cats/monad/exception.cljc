@@ -303,8 +303,8 @@
       (success v))
 
     (-mbind [_ s f]
-      (assert (exception? mv) (str "Context mismatch: " (p/-repr mv)
-                                   " is not allowed to use with exception context."))
+      (assert (exception? s) (str "Context mismatch: " (p/-repr s)
+                                  " is not allowed to use with exception context."))
 
       (if (success? s)
         (f (p/-extract s))

@@ -181,7 +181,7 @@
       (right v))
 
     (-mbind [_ s f]
-      (assert (either? mv) (str "Context mismatch: " (p/-repr mv)
+      (assert (either? s) (str "Context mismatch: " (p/-repr s)
                                " is not allowed to use with either context."))
       (if (right? s)
         (f (.-v ^Right s))
