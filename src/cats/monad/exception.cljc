@@ -185,9 +185,15 @@
   "Return true in case of `v` is instance
   of Exception monad."
   [v]
-  (if (satisfies? p/Contextual v)
+  (cond
+    (or (instance? Failure v)
+        (instance? Success v))
+    true
+
+    (satisfies? p/Contextual v)
     (identical? (p/-get-context v) context)
-    false))
+
+    :else false))
 
 (defn extract
   "Return inner value from exception monad.
