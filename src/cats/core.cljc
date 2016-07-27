@@ -26,7 +26,7 @@
 (ns cats.core
   "Category Theory abstractions for Clojure"
   #?(:cljs
-     (:require-macros [cats.core :refer (mlet)]))
+     (:require-macros [cats.core :refer (mlet alet)]))
   #?(:cljs
      (:require [cats.protocols :as p]
                [clojure.set]
@@ -462,6 +462,155 @@
                   ~@body)
                 ~@(map second bindings))
          (alet* batches env body)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; applicative "idiomatic apply"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro ap
+  "Apply a pure function to applicative arguments, e.g.
+
+   (ap + (just 1) (just 2) (just 3))
+   ;; => #<Just [6]>
+   (ap str [\"hi\" \"lo\"] [\"bye\" \"woah\" \"hey\"])
+   ;; => [\"hibye\" \"hiwoah\" \"hihey\"
+          \"lobye\" \"lowoah\" \"lohey\"]
+
+   `ap` is essentially sugar for `(apply fapply (pure f) args)`,
+   but for the common case where you have a pure, uncurried,
+   possibly variadic function.
+
+   `ap` actually desugars in `alet` form:
+
+   (macroexpand-1 `(ap + (just 1) (just2)))
+   ;; => (alet [a1 (just 1) a2 (just 2)] (+ a1 a2))
+
+   That way, variadic functions Just Work, without needing to specify
+   an arity separately.
+
+   If you're familiar with Haskell, this is closest to writing
+   \"in Applicative style\": you can straightforwardly convert
+   pure function application to effectful application by with
+   some light syntax (<$> and <*> in case of Haskell, and `ap` here).
+
+   See the original Applicative paper for more inspiration:
+   http://staff.city.ac.uk/~ross/papers/Applicative.pdf"
+  [f & args]
+  (let [syms (repeatedly (count args) (partial gensym "arg"))]
+    `(alet [~@(interleave syms args)]
+        (~f ~@syms))))
+
+(defmacro ap->
+  "Thread like `->`, within an applicative idiom.
+
+  Compare:
+
+  (macroexpand-1 `(-> a b c (d e f)))
+  => (d (c (b a) e f)
+
+  with:
+
+  (macroexpand-1 `(ap-> a b c (d e f))
+  => (ap d (ap c (ap b a) e f))
+  "
+  [x & forms]
+  (loop [x x, forms forms]
+    (if forms
+      (let [form (first forms)
+            threaded (if (seq? form)
+                       (with-meta `(ap ~(first form) ~x ~@(next form)) (meta form))
+                       `(ap ~form ~x))]
+        (recur threaded (next forms)))
+      x)))
+
+(defmacro ap->>
+  "Thread like `->>`, within an applicative idiom.
+   See `cats.labs.sugar/ap->` for more in-depth discussion."
+  [x & forms]
+  (loop [x x, forms forms]
+    (if forms
+      (let [form (first forms)
+            threaded (if (seq? form)
+                       (with-meta `(ap ~(first form) ~@(next form)  ~x) (meta form))
+                       `(ap ~form ~x))]
+        (recur threaded (next forms)))
+      x)))
+
+(defmacro as-ap->
+  "Thread like `as->`, within an applicative idiom.
+   See `cats.labs.sugar/ap->` for more in-depth discussion."
+  [expr name & forms]
+  `(let [~name ~expr
+         ~@(interleave (repeat name) (for [form forms] `(ap ~@form)))]
+     ~name))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Monadic arrow macros.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro ->=
+  "Like `->`, but with monadic binding instead of pure application.
+   A mnemonic for the name is a pun on `>>=`, the monadic bind operator,
+   and clojure's regular arrow macros.
+
+   You can think of it as generalizing the `some->` thread macro
+   to all Monads instead of just Maybe.
+
+   Alternatively, if you think of the regular thread macro as
+   sugar for `let`:
+
+   (-> :a b (c (other args)) d)
+   =>
+   (let [res (b :a)
+         res (c res (other args))
+         res (d res)]
+     res)
+
+   Then `->=` is sugar for cats.core/mlet:
+
+   (->= m-a b (c (other args)) d)
+   (mlet [res m-a
+          res (c res (other args))
+          res (d res)]
+     (return res))
+
+   Note that extra args in this context are assumed pure, and will
+   be evaluated along with the function itself; this also matches
+   the behavior of `some->` wrt extra args.
+
+   Threading through pure functions is somewhat awkward, but can be done:
+
+   (->= m-a
+        monadic-fn
+        (-> pure-fn
+            other-pure-fn
+            m/return)
+        other-monadic-fn)"
+  [expr & forms]
+  (let [g (gensym)
+        pstep (fn [step] `(-> ~g ~step))]
+    `(mlet [~g ~expr
+              ~@(interleave (repeat g) (map pstep forms))]
+           (return ~g))))
+
+(defmacro ->>=
+  "Like ->>, but with monadic binding instead of pure application.
+   See `cats.labs.sugar/->=` for more in-depth discussion."
+  [expr & forms]
+  (let [g (gensym)
+        pstep (fn [step] `(->> ~g ~step))]
+    `(mlet [~g ~expr
+              ~@(interleave (repeat g) (map pstep forms))]
+           (return ~g))))
+
+(defmacro as->=
+  "Like `as->`, but with monadic binding instead of pure application.
+   See `cats.labs.sugar/->=` for more in-depth discussion."
+  [expr name & forms]
+  `(mlet [~name ~expr
+            ~@(interleave (repeat name) forms)]
+     (return ~name)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Curry Facilities
