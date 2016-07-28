@@ -4,37 +4,40 @@
 
 Date: ---
 
-This version intend to clean the library from unused and out of context stuff and
-leave only the useful abstractions. This is a list of main changes (mostly
+This version intend to clean the library from unused and out of context stuff
+and leave only the useful abstractions. This is a list of main changes (mostly
 breaking):
 
 - Removed support for monad transformers. They add too many complex to the
-  implementation but in return adds very low value in context of dynamic languages
-  as is clojure.
+  implementation but in return adds very low value in context of dynamic
+  languages as is clojure.
 - Removed state, writer, reader and continuation monad namespaces.  They are not
   very useful in clojure so having them without any particular usefulness it not
   make sense.
-- Removed `cats.applicative` namespace because it is too many opinionated and not
-  really useful in the real world. The use case vary depending on when that
+- Removed `cats.applicative` namespace because it is too many opinionated and
+  not really useful in the real world. The use case vary depending on when that
   abstraction is used so we encourage users to define their own abstraction with
   specific behavior for their application.
-- Removed CRDT's labs. It was an experiment and the final sensacion is that is not
-  very useful and in most circumstances the users defines their own datastructures
-  instead of rely on ones from third party packages. So, maintaining them in the
-  code base also does not make sense
-- Removed `lens` and `traversals` namespaces. The first one becomes very useful and
-  is properly externalized as [separated package][1]. The last one, seems like it is
-  not very useful and seems out of context of cats library. If anyone is interested
-  in maintaining it, the code can be extracted from the previos git revisions
-  and released as separated library.
+- Removed CRDT's labs. It was an experiment and the final sensacion is that is
+  not very useful and in most circumstances the users defines their own
+  datastructures instead of rely on ones from third party packages. So,
+  maintaining them in the code base also does not make sense
+- Removed `lens` and `traversals` namespaces. The first one becomes very useful
+  and is properly externalized as [separated package][1]. The last one, seems
+  like it is not very useful and seems out of context of cats library. If anyone
+  is interested in maintaining it, the code can be extracted from the previos
+  git revisions and released as separated library.
+- Move `cats.labs.sugar` into `cats.core` namespace (`cats.labs.sugar` ns is
+  removed)
 
 And a list of other changes and contributions:
 
-- Rewrite `cats.labs.channel` integration with core.async combinators (@yanatan16)
+- PersistentListq support in sequence context (@muhuk)
+- Rewrite `cats.labs.channel` integration with core.async combinators
+  (@yanatan16)
 - Add `cats.builtin.lazy-sequence-context` (@muhuk)
 - Fix bug in sequence context's fapply implementation (@muhuk)
 - Performance improvements in sequence context implementation (@muhuk)
-- PersistentList support in sequence context (@muhuk)
 - Add `cats.monad.either/try-either` macro for capturing exceptions as left, values
   as right (@shmish111)
 - Move `promesa.monad` namespace under `cats.labs.promise` ns.
