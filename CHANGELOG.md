@@ -2,7 +2,7 @@
 
 ## Version 2.0.0 ##
 
-Date: ---
+Date: 2016-07-28
 
 This version intend to clean the library from unused and out of context stuff
 and leave only the useful abstractions. This is a list of main changes (mostly
