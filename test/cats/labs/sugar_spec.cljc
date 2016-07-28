@@ -1,15 +1,14 @@
 (ns cats.labs.sugar-spec
-  #?(:cljs (:require-macros [cats.labs.sugar :refer [ap ap-> ap->> as-ap->
-                                                   ->= ->>= as->=]]))
+  #?(:cljs (:require-macros [cats.core :refer [ap ap-> ap->> as-ap->
+                                               ->= ->>= as->=]]))
   #?(:cljs
      (:require [cljs.test :as t]
                [cats.core :as m :include-macros true]
                [cats.monad.maybe :as maybe])
      :clj
      (:require [clojure.test :as t]
-               [cats.core :as m]
                [cats.monad.maybe :as maybe]
-               [cats.labs.sugar :refer [ap ap-> ap->> as-ap->
+               [cats.core :as m :refer [ap ap-> ap->> as-ap->
                                         ->= ->>= as->=]])))
 
 (t/deftest ap-example-test
