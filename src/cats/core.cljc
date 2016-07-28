@@ -48,7 +48,7 @@
 (defn mappend
   [& svs]
   {:pre [(seq svs)]}
-  (let [ctx (ctx/infer (first svs) false)]
+  (let [ctx (ctx/infer (first svs))]
     (reduce (partial p/-mappend ctx) svs)))
 
 (defn pure

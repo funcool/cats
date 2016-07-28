@@ -28,12 +28,6 @@
   (:require [cats.protocols :as p]))
 
 (def ^:dynamic *context* nil)
-(def ^:dynamic *strict* false)
-
-(defn use-strict!
-  ([] (use-strict! true))
-  ([v]
-   (alter-var-root *strict* (constantly v))))
 
 (defn throw-illegal-argument
   {:no-doc true :internal true}
@@ -55,14 +49,8 @@
         (when-not (context? ~ctx)
           (throw-illegal-argument
            "The provided context does not implements Context."))
-        (if (nil? *context*)
-          (binding [*context* ~ctx]
-            ~@body)
-          (if (and *strict* (not= *context* ~ctx))
-            (throw-illegal-argument
-             "Context already set, no redefinition is posible in strict mode.")
-            (binding [*context* ~ctx]
-              ~@body))))))
+        (binding [*context* ~ctx]
+          ~@body))))
 
 #?(:clj
    (defmacro with-monad
@@ -80,17 +68,9 @@
      (throw-illegal-argument "No context is set."))
    *context*)
   ([v]
-   (infer v *strict*))
-  ([v strict?]
    (cond
      (not (nil? *context*))
-     (do
-       (when (and strict?
-                  (satisfies? p/Contextual v)
-                  (not= (p/-get-context v) *context*))
-         (throw-illegal-argument
-          (str "Context mismatch: you can't mix different context.")))
-       *context*)
+     *context*
 
      (satisfies? p/Contextual v)
      (p/-get-context v)
