@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.3">
+<meta name="generator" content="Asciidoctor 1.5.4">
 <meta name="author" content="Andrey Antukh &amp; Alejandro Gómez">
 <title>Cats Documentation</title>
 <style>
@@ -80,14 +80,13 @@
 <h1>Cats Documentation</h1>
 <div class="details">
 <span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">1.2.1</span>
+<span id="revdate">2.0.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#rationale">Rationale</a></li>
-<li><a href="#project-maturity">Project Maturity</a></li>
 <li><a href="#install">Install</a></li>
 <li><a href="#user-guide">User Guide</a>
 <ul class="sectlevel2">
@@ -100,7 +99,6 @@
 <li><a href="#monad">Monad</a></li>
 <li><a href="#monadzero">MonadZero</a></li>
 <li><a href="#monadplus">MonadPlus</a></li>
-<li><a href="#monad-transformers">Monad Transformers</a></li>
 </ul>
 </li>
 <li><a href="#types">Types</a>
@@ -108,7 +106,6 @@
 <li><a href="#maybe">Maybe</a></li>
 <li><a href="#either">Either</a></li>
 <li><a href="#exception">Exception</a></li>
-<li><a href="#validation">Validation</a></li>
 <li><a href="#built-in-types">Built in types</a></li>
 </ul>
 </li>
@@ -129,12 +126,6 @@
 <li><a href="#test-check">test.check</a></li>
 <li><a href="#channel">Channel</a></li>
 <li><a href="#manifold-deferred">Manifold Deferred</a></li>
-<li><a href="#state">State</a></li>
-<li><a href="#reader">Reader</a></li>
-<li><a href="#writer">Writer</a></li>
-<li><a href="#continuation">Continuation</a></li>
-<li><a href="#lens">Lens</a></li>
-<li><a href="#traversals">Traversals</a></li>
 </ul>
 </li>
 <li><a href="#complementary-libraries">Complementary libraries</a></li>
@@ -185,7 +176,7 @@
 </li>
 <li>
 <p>We do not intend to write a little Haskell inside Clojure. We have adopted a
-practical and Clojure like approach, always with correctness in mind.</p>
+practical and Clojure like pragmatic approach, always with correctness in mind.</p>
 </li>
 <li>
 <p>We do not like viral/copyleft like licenses and in contrast to other libraries
@@ -196,42 +187,6 @@ cats is licensed under the BSD (2 clauses) license.</p>
 abstractions are also first class in cats.</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p><strong>Alternatives:</strong></p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>algo.monads</strong>: This is the official Clojure library for monads. Its approach
-for modeling monads is slightly limited, only supports the monad abstraction and
-does not have support for ClojureScript.</p>
-</li>
-<li>
-<p><strong>fluokitten</strong>: Slightly unmaintaned by the original author. It is focused on
-being very practical without taking care of correctness (for example, it extends
-Clojure types with monadic abstractions that do not make sense). It has no
-support for ClojureScript either.</p>
-</li>
-<li>
-<p><strong>monads</strong>: Is the most advanced monads library, supports also functors,
-applicatives and other related abstractions. It lacks a good and readable
-documentation, focus on correctness, has Haskell like sugar syntax (instead of
-Clojure like syntax) and does not have support for ClojureScript.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>All listed alternatives are licensed with EPL or similar licenses.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="project-maturity"><a class="link" href="#project-maturity">Project Maturity</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p><em>cats</em> already reached the 1.0.0 version and the <a href="api/index.html#id">API</a> is
- settled.</p>
 </div>
 </div>
 </div>
@@ -244,12 +199,12 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;1.2.1&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;2.0.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>And it works with the following platforms: <strong>jdk7</strong>, <strong>jdk8</strong>, <strong>node</strong> (0.12.7, 4.2.0,
-5.0.0).</p>
+<p>And it works with the following platforms: <strong>jdk7</strong>, <strong>jdk8</strong>, <strong>node</strong>
+(4.2.0, 5.10.1 and 6.2.0).</p>
 </div>
 </div>
 </div>
@@ -696,52 +651,6 @@ be evaluated from left to right using the applicative&#8217;s <code>fapply</code
 <span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Maybe is not that much of an interesting applicative, let&#8217;s see an example of
-using the Validation applicative to validate a vector of values aggregating
-the results, be them success or failure.</p>
-</div>
-<div class="paragraph">
-<p>First we will define a validation function that, given a number, will succed if
-it&#8217;s even. If it&#8217;s odd, it will fail and record the failure in the map monoid
-from value to the error type (<code>:not-even</code>).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.applicative.validation</span> <span class="tok-ss">:as</span> <span class="tok-nv">v</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">valid-if-even</span>
-  <span class="tok-p">[</span><span class="tok-nv">n</span><span class="tok-p">]</span>
-  <span class="tok-p">(</span><span class="tok-k">if </span><span class="tok-p">(</span><span class="tok-nf">even?</span> <span class="tok-nv">n</span><span class="tok-p">)</span>
-    <span class="tok-p">(</span><span class="tok-nf">v/ok</span> <span class="tok-nv">n</span><span class="tok-p">)</span>
-    <span class="tok-p">(</span><span class="tok-nf">v/fail</span> <span class="tok-p">{</span><span class="tok-nv">n</span> <span class="tok-ss">:not-even</span><span class="tok-p">})))</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now let&#8217;s try it with some vectors to see how failures are aggregated:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.context</span> <span class="tok-ss">:as</span> <span class="tok-nv">ctx</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">v/context</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/traverse</span> <span class="tok-nv">valid-if-even</span> <span class="tok-p">[]))</span>
-<span class="tok-c1">;; =&gt; #&lt;Ok []&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">v/context</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/traverse</span> <span class="tok-nv">valid-if-even</span> <span class="tok-p">[</span><span class="tok-mi">2</span> <span class="tok-mi">4</span><span class="tok-p">]))</span>
-<span class="tok-c1">;; =&gt; #&lt;Ok [2 4]&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">v/context</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/traverse</span> <span class="tok-nv">valid-if-even</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]))</span>
-<span class="tok-c1">;; =&gt; #&lt;Fail {1 :not-even}&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">v/context</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/traverse</span> <span class="tok-nv">valid-if-even</span> <span class="tok-p">[</span><span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]))</span>
-<span class="tok-c1">;; =&gt; #&lt;Fail {3 :not-even, 5 :not-even}&gt;</span></code></pre>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="monad"><a class="link" href="#monad">Monad</a></h3>
@@ -931,87 +840,6 @@ values as falsey.</p>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mplus</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">2</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 1&gt;</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="monad-transformers"><a class="link" href="#monad-transformers">Monad Transformers</a></h3>
-<div class="sect3">
-<h4 id="motivation"><a class="link" href="#motivation">Motivation</a></h4>
-<div class="paragraph">
-<p>We can combine two functors and get a new one automatically. Given any two
-functors <em>a</em> and <em>b</em>, we can implement a generic <code>fmap</code> for the type <em>a (b Any)</em>,
-we&#8217;ll call it fmap2:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">functor.example</span>
-  <span class="tok-p">(</span><span class="tok-ss">:require</span> <span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">fmap</span><span class="tok-p">]]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span><span class="tok-p">]]))</span>
-
-<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">fmap2</span>
-  <span class="tok-p">[</span><span class="tok-nv">f</span> <span class="tok-nv">fv</span><span class="tok-p">]</span>
-  <span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-p">(</span><span class="tok-nb">partial </span><span class="tok-nv">fmap</span> <span class="tok-nv">f</span><span class="tok-p">)</span> <span class="tok-nv">fv</span><span class="tok-p">))</span>
-
-<span class="tok-c1">; Here, &#39;a&#39; is [] and &#39;b&#39; is Maybe, so the type of the</span>
-<span class="tok-c1">; combined functor is a vector of Maybe values that could</span>
-<span class="tok-c1">; contain a value of any type.</span>
-<span class="tok-p">(</span><span class="tok-nf">fmap2</span> <span class="tok-nb">inc </span><span class="tok-p">[(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">2</span><span class="tok-p">)])</span>
-<span class="tok-c1">;; =&gt; [#&lt;Just 2&gt; #&lt;Just 3&gt;]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>However, monads don&#8217;t compose as nicely as functors do. We have to actually
-implement the composition ourselves.</p>
-</div>
-<div class="paragraph">
-<p>In some circumstances we would like combine the effects of two monads into
-another one. We call the resulting monad a monad transformer, which is the
-composition of a "base" and "inner" monad. A monad transformer is itself a monad.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="using-monad-transformers"><a class="link" href="#using-monad-transformers">Using monad transformers</a></h4>
-<div class="paragraph">
-<p>Let&#8217;s combine the effects of two monads: State and Maybe. We&#8217;ll create the
-transformer using State as the base monad since we want the resulting type to
-be a stateful computation that may fail: <code>s &#8594; Maybe (a, s)</code>.</p>
-</div>
-<div class="paragraph">
-<p>Almost every monad implemented in <em>cats</em> has a monad transformer for combining
-it with any other monad. The transformer functions take a Monad as their
-argument and they return a reified MonadTrans:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">ns </span><span class="tok-nv">transformers.example</span>
-  <span class="tok-p">(</span><span class="tok-ss">:require</span> <span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.context</span> <span class="tok-ss">:as</span> <span class="tok-nv">ctx</span><span class="tok-p">]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">]</span>
-            <span class="tok-p">[</span><span class="tok-nv">cats.labs.state</span> <span class="tok-ss">:as</span> <span class="tok-nv">state</span><span class="tok-p">]))</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">maybe-state</span>
-  <span class="tok-p">(</span><span class="tok-nf">state/state-transformer</span> <span class="tok-nv">maybe/context</span><span class="tok-p">))</span>
-
-<span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">maybe-state</span>
-  <span class="tok-p">(</span><span class="tok-nf">state/run-state</span> <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-mi">42</span><span class="tok-p">)</span> <span class="tok-p">{}))</span>
-<span class="tok-c1">;; =&gt; #&lt;Just #&lt;Pair [42 {}]&gt;&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>As we can see in the example below, the return of the <code>maybe-state</code> monad creates
-a stateful function that yields a Maybe containing a pair (value, next state).</p>
-</div>
-<div class="paragraph">
-<p>You probably noticed that we had to wrap the state function invocation with
-<code>cats.context/with-context</code>. When working with monad transformers, we have to
-be explicit about what monad we are using to implement the binding policy since
-there is no way to distinguish values from a transformer type from those of
-a regular monad.</p>
-</div>
-<div class="paragraph">
-<p>The <code>maybe-state</code> monad combines the semantics of both State and Maybe.</p>
 </div>
 </div>
 </div>
@@ -1237,48 +1065,6 @@ enclosed exception.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="validation"><a class="link" href="#validation">Validation</a></h3>
-<div class="paragraph">
-<p>The validation type is similar to the Either or Exception types except that it
-doesn&#8217;t implement a Monad instance. It has two constructors: <code>ok</code> and <code>fail</code>,
-representing success and failure respectively.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.applicative.validation</span> <span class="tok-ss">:as</span> <span class="tok-nv">v</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">v/ok</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; #&lt;Ok 42&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">v/fail</span> <span class="tok-p">[])</span>
-<span class="tok-c1">;; =&gt; #&lt;Fail []&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>It implements the Applicative protocol, and its intended usage is as an
-Applicative. Applying Validation values together errs on the side of the failure,
-and applying failures together aggregates their values using the Semigroup&#8217;s
-<code>mappend</code> function.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.applicative.validation</span> <span class="tok-ss">:as</span> <span class="tok-nv">v</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/fapply</span> <span class="tok-p">(</span><span class="tok-nf">v/ok</span> <span class="tok-mi">42</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">v/fail</span> <span class="tok-s">&quot;OH NOES&quot;</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Fail &quot;OH NOES&quot;&gt;</span>
-
-<span class="tok-c1">;; Note that `&lt;*&gt;` is a variadic fapply</span>
-<span class="tok-p">(</span><span class="tok-nf">m/&lt;*&gt;</span> <span class="tok-p">(</span><span class="tok-nf">v/ok</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
-       <span class="tok-p">(</span><span class="tok-nf">v/fail</span> <span class="tok-p">{</span><span class="tok-ss">:foo</span> <span class="tok-s">&quot;bar&quot;</span><span class="tok-p">})</span>
-       <span class="tok-p">(</span><span class="tok-nf">v/fail</span> <span class="tok-p">{</span><span class="tok-ss">:baz</span> <span class="tok-s">&quot;fubar&quot;</span><span class="tok-p">})</span>
-       <span class="tok-p">(</span><span class="tok-nf">v/ok</span> <span class="tok-mi">99</span><span class="tok-p">))</span>
-<span class="tok-c1">;; =&gt; #&lt;Fail {:baz &quot;fubar&quot;, :foo &quot;bar&quot;}&gt;</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="built-in-types"><a class="link" href="#built-in-types">Built in types</a></h3>
 <div class="paragraph">
 <p>Some of the abstractions in <em>cats</em> are implemented for built-in types but you
@@ -1428,7 +1214,7 @@ function gives an empty map.</p>
 <h2 id="syntax-sugar"><a class="link" href="#syntax-sugar">Syntax sugar</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Additionally to the abstractions and types, <strong>cats</strong> exposes some powerfull
+<p>Additionally to the abstractions and types, <strong>cats</strong> exposes some powerful
 syntax abstractions that surelly will make the usage of that abstractions
 in a more familiar way.</p>
 </div>
@@ -1598,6 +1384,7 @@ clj/cljs library for emulate asynchronous behavior:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.promise</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">promesa.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">p</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">sleep-promise</span>
@@ -1892,7 +1679,7 @@ type and in consequence use it in <code>mlet</code> or <code>alet</code> macros.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">org.clojure/core.async</span> <span class="tok-s">&quot;0.2.374&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">org.clojure/core.async</span> <span class="tok-s">&quot;0.2.385&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1931,7 +1718,7 @@ help of the <strong>mlet</strong> macro for bind values to asyncrhonous calls:</
 <span class="tok-c1">;; ---&gt; sending request 100</span>
 <span class="tok-c1">;; &lt;--- receiving request 100</span>
 <span class="tok-c1">;; &quot;Elapsed time: 202.236804 msecs&quot;</span>
-<span class="tok-c1">;; =&gt; 200</span></code></pre>
+<span class="tok-c1">;; =&gt; 300</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1996,7 +1783,7 @@ of the applicative.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>The alet is a powerfull macro that analyzes the dependencies between bindings
+<p>The alet is a powerful macro that analyzes the dependencies between bindings
 and executes the expressions in batches resultin in a very atractive feature
 for asynchronous calls.</p>
 </div>
@@ -2110,622 +1897,11 @@ generic abstraction instread of a specific purpose macro.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="state"><a class="link" href="#state">State</a></h3>
-<div class="paragraph">
-<p><strong>Status:</strong> Experimental</p>
-</div>
-<div class="paragraph">
-<p>The State monad is one of the special cases of monads most commonly used in
-Haskell. It has several purposes including: lazy computation, composition, and
-maintaining state without explicitly passing it to every function manualy.</p>
-</div>
-<div class="paragraph">
-<p>The de-facto monadic type of the state monad is a plain function. A function
-represents a computation as is (without executing it). Obviously, a function
-should have some special characteristics to work in monad state composition.</p>
-</div>
-<div class="listingblock">
-<div class="title">Valid function for the state monad</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">state</span><span class="tok-p">]</span>
-  <span class="tok-s">&quot;Takes a state as argument and returns a vector</span>
-<span class="tok-s">  with the first element being the processed value and</span>
-<span class="tok-s">  the second element being the new transformed state.&quot;</span>
-  <span class="tok-p">(</span><span class="tok-k">let </span><span class="tok-p">[</span><span class="tok-nv">newvalue</span> <span class="tok-p">(</span><span class="tok-nb">first </span><span class="tok-nv">state</span><span class="tok-p">)</span>
-        <span class="tok-nv">newstate</span> <span class="tok-p">(</span><span class="tok-nb">next </span><span class="tok-nv">state</span><span class="tok-p">)]</span>
-    <span class="tok-p">[</span><span class="tok-nv">newvalue</span> <span class="tok-nv">newstate</span><span class="tok-p">]))</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You just saw an example of the low-level primitive state monad. For basic usage
-you do not need to write your own functions, just use some helpers that <em>cats</em>
-provides.</p>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s look at one example before explaining the details:</p>
-</div>
-<div class="listingblock">
-<div class="title">Lazy composition of computations</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.state</span> <span class="tok-ss">:as</span> <span class="tok-nv">st</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">state</span> <span class="tok-p">(</span><span class="tok-nf">st/get-state</span><span class="tok-p">)</span>
-         <span class="tok-nv">_</span>     <span class="tok-p">(</span><span class="tok-nf">st/put-state</span> <span class="tok-p">(</span><span class="tok-nb">next </span><span class="tok-nv">state</span><span class="tok-p">))]</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">first </span><span class="tok-nv">state</span><span class="tok-p">)))</span>
-<span class="tok-c1">;; =&gt; #&lt;State cats.labs.state.State@2eebabb6&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>At the moment of evaluation in the previous expression, nothing of what we
-have defined is executed. But instead of returning the unadorned final value
-of the computation, a strange/unknown object of type <strong>State</strong> is returned.</p>
-</div>
-<div class="paragraph">
-<p>The State type is simply a wrapper for Clojure functions, nothing more.</p>
-</div>
-<div class="paragraph">
-<p>Now, it&#8217;s time to execute the composed computation. We can use one of the following
-functions exposed by <em>cats</em> for that: <code>run-state</code>, <code>eval-state</code> and <code>exec-state</code>.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>run-state</code> executes the composed computation and returns both the value and the
-final state.</p>
-</li>
-<li>
-<p><code>eval-state</code> executes the composed computation and returns the resulting
-value, discarding the state.</p>
-</li>
-<li>
-<p><code>exec-state</code> executes the composed computation and returns only the resulting
-state, ignoring the resulting value.</p>
-</li>
-</ul>
-</div>
-<div class="listingblock">
-<div class="title">Example of resuls of using the previosly listed functions</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/run-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; #&lt;Pair [1 (2 3)]&gt;</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/eval-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 1</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/exec-state</span> <span class="tok-nv">s</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; (2 3)</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>run-state</code> function returns an instance of the Pair type. The Pair type
-acts like any other seq in Clojure with the exception that it can only contain
-two values.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="reader"><a class="link" href="#reader">Reader</a></h3>
-<div class="paragraph">
-<p><strong>Status:</strong> Experimental</p>
-</div>
-<div class="paragraph">
-<p>The reader monad is another commonly used monad in Haskell. It&#8217;s used for
-gluing together computations that depend on a read-only environment. As with
-the state monad, we don&#8217;t have to thread the environment manualy since the
-monadic bind does it for us. The type of the reader monad are one-argument
-functions.</p>
-</div>
-<div class="paragraph">
-<p>The Reader type is analogous to State, simply a wrapper for regular Clojure
-functions. If we want our functions to participate in the reader abstraction
-we have to wrap them in a Reader instance.</p>
-</div>
-<div class="listingblock">
-<div class="title">Valid function for the reader monad</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.reader</span> <span class="tok-ss">:as</span> <span class="tok-nv">r</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">start-server</span>
-  <span class="tok-p">(</span><span class="tok-nf">r/reader</span>
-    <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">env</span><span class="tok-p">]</span>
-      <span class="tok-s">&quot;Takes an environment with options as an argument and runs a web</span>
-<span class="tok-s">       server in the address specified by `:host` and `:port`.&quot;</span>
-      <span class="tok-p">(</span><span class="tok-nf">run-http-server</span> <span class="tok-p">(</span><span class="tok-ss">:host</span> <span class="tok-nv">env</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-ss">:port</span> <span class="tok-nv">env</span><span class="tok-p">)))))</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>cats provides a few reader functions already. <code>ask</code> is the simplest reader,
-simply returns the environment. We can execute readers using the <code>run-reader</code>
-function which accepts a reader and an environment.</p>
-</div>
-<div class="listingblock">
-<div class="title">Example of running the ask reader</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.reader</span> <span class="tok-ss">:as</span> <span class="tok-nv">r</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">r/run-reader</span> <span class="tok-nv">r/ask</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [1 2 3]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s use <code>mlet</code> for building new readers out of existing ones:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example of composing reader computations</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.reader</span> <span class="tok-ss">:as</span> <span class="tok-nv">r</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">env</span> <span class="tok-nv">r/ask</span><span class="tok-p">]</span>
-  <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">env</span><span class="tok-p">)))</span>
-<span class="tok-c1">;; =&gt; #&lt;Reader cats.labs.reader.Reader@2eebabb6&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We can then run it using <code>run-reader</code>:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example of composing reader computations</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.reader</span> <span class="tok-ss">:as</span> <span class="tok-nv">r</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">r/run-reader</span> <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">env</span> <span class="tok-nv">r/ask</span><span class="tok-p">]</span>
-                <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">env</span><span class="tok-p">)))</span>
-              <span class="tok-mi">41</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 42</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We can also alter the reader&#8217;s environment in a context using the <code>local</code>
-function which given a function and a reader returns a new reader whose
-environment is the result of applying the first function given to <code>local</code> to
-the original environment. Let&#8217;s see it in action to understand it better:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example of composing reader computations</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.reader</span> <span class="tok-ss">:as</span> <span class="tok-nv">r</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">r/run-reader</span> <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">env</span> <span class="tok-p">(</span><span class="tok-nf">r/local</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-mi">2</span> <span class="tok-nv">%</span><span class="tok-p">)</span> <span class="tok-nv">r/ask</span><span class="tok-p">)]</span>
-                <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">env</span> <span class="tok-mi">2</span><span class="tok-p">)))</span>
-              <span class="tok-mi">20</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 42</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that since we executed <code>ask</code> with the function <code>#(*2 %)</code> altering its
-original environment (20), the resulting <code>env</code> value is two times the original
-environment.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="writer"><a class="link" href="#writer">Writer</a></h3>
-<div class="paragraph">
-<p><strong>Status:</strong> Experimental</p>
-</div>
-<div class="paragraph">
-<p>TODO</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="continuation"><a class="link" href="#continuation">Continuation</a></h3>
-<div class="paragraph">
-<p><strong>Status:</strong> Experimental</p>
-</div>
-<div class="paragraph">
-<p>TODO</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="lens"><a class="link" href="#lens">Lens</a></h3>
-<div class="paragraph">
-<p><strong>Status:</strong> Stable</p>
-</div>
-<div class="paragraph">
-<p>Implementation of functional references to one value modeled as functions. Is
-a generalization of get and put mapping to the particular part of a data
-structure.</p>
-</div>
-<div class="sect3">
-<h4 id="first-steps"><a class="link" href="#first-steps">First steps</a></h4>
-<div class="paragraph">
-<p>We&#8217;ll start by using the most basic lens, the identity lens. We can get the value
-a lens is focused on using the <code>focus</code> function in <code>cats.labs.lens</code> ns:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.lens</span> <span class="tok-ss">:as</span> <span class="tok-nv">l</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">l/id</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [0 1 2 3]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We have two other primitives available: the <code>put</code> operation and <code>over</code>, which lets
-us apply a function over the focused value of a lens:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/id</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 42</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/id</span> <span class="tok-nb">count </span><span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 4</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>There are some builtin lenses that can be used out of the box such as <code>fst</code>, <code>snd</code>
-and <code>nth</code>. Let see some examples on how them can be used:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example using <code>fst</code> lense</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-c1">;; Focus over the first element of a vector</span>
-<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">l/fst</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 1</span>
-
-<span class="tok-c1">;; Apply a function over first element of a vector</span>
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">l/fst</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [2 2 3]</span>
-
-<span class="tok-c1">;; Replace the first value of an element of a vector</span>
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">l/fst</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [42 2 3]</span></code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Example using the <code>nth</code> lense</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 3</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [1 2 4]</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [1 2 42]</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="lenses-composition"><a class="link" href="#lenses-composition">Lenses composition</a></h4>
-<div class="paragraph">
-<p>One of the big advantatges of the lenses implementation of cats library is that
-them are implemented using plain functions:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">my-lens</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">l/fst</span> <span class="tok-nv">l/fst</span> <span class="tok-p">(</span><span class="tok-nf">l/nth</span> <span class="tok-mi">2</span><span class="tok-p">)))</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">data</span>
-  <span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span>
-   <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">my-lens</span> <span class="tok-nv">data</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 2</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">my-lens</span> <span class="tok-mi">42</span> <span class="tok-nv">data</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; [[0 1 42] [3 4 5]]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Lenses compose with regular function composition and, like transducers, the
-combined lens runs from left to right.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="builtin-lenses"><a class="link" href="#builtin-lenses">Builtin lenses</a></h4>
-<div class="paragraph">
-<p>There&#8217;s <code>key</code> and <code>select-keys</code> for focusing on one or multiple keys respectively:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example focusing in a specific key/keys of associative data structure</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/key</span> <span class="tok-ss">:a</span><span class="tok-p">)</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
-<span class="tok-c1">;; =&gt; 1</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/key</span> <span class="tok-ss">:a</span><span class="tok-p">)</span> <span class="tok-nb">str </span><span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
-<span class="tok-c1">;; =&gt; {:a &quot;1&quot;, :b 2}</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/key</span> <span class="tok-ss">:a</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
-<span class="tok-c1">;; =&gt; {:a 42, :b 2}</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:a</span><span class="tok-p">])</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
-<span class="tok-c1">;; =&gt; {:a 1}</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:c</span><span class="tok-p">])</span>
-        <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">m</span><span class="tok-p">]</span>
-         <span class="tok-p">(</span><span class="tok-nb">zipmap </span><span class="tok-p">(</span><span class="tok-nb">keys </span><span class="tok-nv">m</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nb">repeat </span><span class="tok-mi">42</span><span class="tok-p">)))</span>
-        <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span><span class="tok-p">})</span>
-<span class="tok-c1">;; =&gt; {:b 2, :a 42}</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:c</span><span class="tok-p">])</span>
-       <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">0</span><span class="tok-p">}</span>
-       <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-mi">1</span> <span class="tok-ss">:b</span> <span class="tok-mi">2</span> <span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">})</span>
-<span class="tok-c1">;; =&gt; {:b 2, :a 0}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><code>in</code> for focusing on a path:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example focusing in neest data structures</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/in</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:b</span><span class="tok-p">])</span>
-         <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-p">{</span><span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">}}})</span>
-<span class="tok-c1">;; =&gt; {:c 42}</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/in</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:b</span><span class="tok-p">])</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nb">zipmap </span><span class="tok-p">(</span><span class="tok-nb">vals </span><span class="tok-nv">%</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nb">keys </span><span class="tok-nv">%</span><span class="tok-p">))</span>
-        <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-p">{</span><span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">}}})</span>
-<span class="tok-c1">;; =&gt; {:a {:b {42 :c}}}</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/in</span> <span class="tok-p">[</span><span class="tok-ss">:a</span> <span class="tok-ss">:b</span><span class="tok-p">])</span>
-       <span class="tok-mi">42</span>
-       <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-p">{</span><span class="tok-ss">:c</span> <span class="tok-mi">42</span><span class="tok-p">}}})</span>
-<span class="tok-c1">;; =&gt; {:a {:b 42}}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s take a look at a combinator that will let us build a unit-conversion lens
-called <code>units</code>. We have to supply a function to convert from unit <code>a</code> to unit <code>b</code>
-and viceversa:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example definiting a "unit conversion" lense</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">sec-&gt;min</span> <span class="tok-p">[</span><span class="tok-nv">sec</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">/ </span><span class="tok-nv">sec</span> <span class="tok-mi">60</span><span class="tok-p">))</span>
-<span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">min-&gt;sec</span> <span class="tok-p">[</span><span class="tok-nv">min</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">* min </span><span class="tok-mi">60</span><span class="tok-p">))</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">mins</span> <span class="tok-p">(</span><span class="tok-nf">l/units</span> <span class="tok-nv">sec-&gt;min</span>
-                   <span class="tok-nv">min-&gt;sec</span><span class="tok-p">))</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-nv">mins</span> <span class="tok-mi">120</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 2</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-nv">mins</span> <span class="tok-mi">3</span> <span class="tok-mi">120</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 180</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-nv">mins</span> <span class="tok-nb">inc </span><span class="tok-mi">60</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 120</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And conditional lenses that can be defined using a predicate function and
-returns a lens that focuses in an element only if it passes the predicate:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example focusing using conditional lenses</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 2</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-nb">inc </span><span class="tok-mi">2</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 3</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 42</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/focus</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; nil</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/over</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-nb">inc </span><span class="tok-mi">1</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 1</span>
-
-<span class="tok-p">(</span><span class="tok-nf">l/put</span> <span class="tok-p">(</span><span class="tok-nf">l/passes</span> <span class="tok-nv">even?</span><span class="tok-p">)</span> <span class="tok-mi">42</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; 1</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="interoperability"><a class="link" href="#interoperability">Interoperability</a></h4>
-<div class="paragraph">
-<p>There are also <code>Focus</code> type that allows you to derive atom like objects from
-clojure atoms focusing to a specific portion of it using lenses.</p>
-</div>
-<div class="paragraph">
-<p>Let see an example focusing on a concrete set of keys on an asociative
-data structure referenced by an atom:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">state</span> <span class="tok-p">(</span><span class="tok-nf">atom</span> <span class="tok-p">{</span><span class="tok-ss">:x</span> <span class="tok-mi">1</span> <span class="tok-ss">:y</span> <span class="tok-mi">2</span> <span class="tok-ss">:z</span> <span class="tok-mi">3</span><span class="tok-p">}))</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">state-d</span>
-  <span class="tok-p">(</span><span class="tok-nf">l/focus-atom</span> <span class="tok-p">(</span><span class="tok-nf">l/select-keys</span> <span class="tok-p">[</span><span class="tok-ss">:x</span> <span class="tok-ss">:y</span><span class="tok-p">])</span> <span class="tok-nv">state</span><span class="tok-p">))</span>
-
-<span class="tok-o">@</span><span class="tok-nv">state-d</span>
-<span class="tok-c1">;; =&gt; {:x 1 :y 2}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The object returned by <code>focus-atom</code> function behaves identically to a clojure
-atom and it can be treated as drop in replacement of it:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">swap!</span> <span class="tok-nv">state-d</span> <span class="tok-nv">update</span> <span class="tok-ss">:x</span> <span class="tok-nv">inc</span><span class="tok-p">)</span>
-
-<span class="tok-o">@</span><span class="tok-nv">state</span>
-<span class="tok-c1">;; =&gt; {:x 2 :y 2 :z 3}</span>
-
-<span class="tok-o">@</span><span class="tok-nv">state-d</span>
-<span class="tok-c1">;; =&gt; {:x 2 :y 2}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And do not forget that you also can attach watchers to focused atoms in the same
-way as you will do that with clojure(script) atoms.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="traversals"><a class="link" href="#traversals">Traversals</a></h3>
-<div class="paragraph">
-<p><strong>Status:</strong> Experimental</p>
-</div>
-<div class="paragraph">
-<p>A traversal is similar to a lens but it focuses on multiple values instead of one.</p>
-</div>
-<div class="sect3">
-<h4 id="first-steps-2"><a class="link" href="#first-steps-2">First steps</a></h4>
-<div class="paragraph">
-<p>Therefore, we use the <code>foci</code> function for viewing the focused elements of a
-traversal.</p>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s look at the identity traversal, it&#8217;s called <code>it</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.traversal</span> <span class="tok-ss">:as</span> <span class="tok-nv">t</span><span class="tok-p">])</span>
-<span class="tok-p">(</span><span class="tok-nf">t/foci</span> <span class="tok-nv">t/it</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; (42)</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/foci</span> <span class="tok-nv">t/it</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; ([0 1 2 3])</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/put</span> <span class="tok-nv">t/it</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 42</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/over</span> <span class="tok-nv">t/it</span> <span class="tok-nb">count </span><span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; 4</span></code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="traversals-composition"><a class="link" href="#traversals-composition">Traversals composition</a></h4>
-<div class="paragraph">
-<p>Traversals like lenses are defined in terms of functions so the same approach
-also applies to traversals. Them can be composed just using <code>comp</code> or any
-other function composition technique.</p>
-</div>
-<div class="paragraph">
-<p>Traversals should be composed with other traversals. You can compose lenses
-with a traversal but it will become a traversal and you will have to use <code>foci</code>
-for viewing its values.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="builtin-traversals"><a class="link" href="#builtin-traversals">Builtin traversals</a></h4>
-<div class="paragraph">
-<p>The <code>each</code> traversal focuses every value in a collection, allowing us to map
-preservering structure. The <code>cat</code> traversal flattens a nested collection:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example using <code>each</code> traversal</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">t/foci</span> <span class="tok-nv">t/each</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; (0 1 2 3)</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/over</span> <span class="tok-nv">t/each</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [1 2 3 4]</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/put</span> <span class="tok-nv">t/each</span> <span class="tok-mi">42</span> <span class="tok-p">[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [42 42 42 42]</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/foci</span> <span class="tok-nv">t/cat</span> <span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
-<span class="tok-c1">;; =&gt; (0 1 2 3 4 5)</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/over</span> <span class="tok-nv">t/cat</span> <span class="tok-nb">inc </span><span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
-<span class="tok-c1">;; =&gt; [[1 2 3] [4 5 6]]</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/put</span> <span class="tok-nv">t/cat</span> <span class="tok-mi">42</span> <span class="tok-p">[[</span><span class="tok-mi">0</span> <span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]])</span>
-<span class="tok-c1">;; =&gt; [[42 42 42] [42 42 42]]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>filter</code> traversal can be used to filter can be used to filter the results
-of another by composition:</p>
-</div>
-<div class="listingblock">
-<div class="title">Example using <code>filter</code> traversal</div>
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">t/foci</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">t/each</span> <span class="tok-p">(</span><span class="tok-nf">t/filter</span> <span class="tok-nv">odd?</span><span class="tok-p">))</span>
-        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; (1 3 5)</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/over</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">t/each</span> <span class="tok-p">(</span><span class="tok-nf">t/filter</span> <span class="tok-nv">odd?</span><span class="tok-p">))</span>
-        <span class="tok-nv">inc</span>
-        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [2 2 4 4 6]</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/put</span> <span class="tok-p">(</span><span class="tok-nb">comp </span><span class="tok-nv">t/each</span> <span class="tok-p">(</span><span class="tok-nf">t/filter</span> <span class="tok-nv">odd?</span><span class="tok-p">))</span>
-       <span class="tok-mi">42</span>
-       <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [42 2 42 4 42]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Using <code>only</code> is equivalent to composing <code>each</code> and <code>filter</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">t/foci</span> <span class="tok-p">(</span><span class="tok-nf">t/only</span> <span class="tok-nv">odd?</span><span class="tok-p">)</span>
-        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; (1 3 5)</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/over</span> <span class="tok-p">(</span><span class="tok-nf">t/only</span> <span class="tok-nv">odd?</span><span class="tok-p">)</span>
-        <span class="tok-nv">inc</span>
-        <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [2 2 4 4 6]</span>
-
-<span class="tok-p">(</span><span class="tok-nf">t/put</span> <span class="tok-p">(</span><span class="tok-nf">t/only</span> <span class="tok-nv">odd?</span><span class="tok-p">)</span>
-       <span class="tok-mi">42</span>
-       <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
-<span class="tok-c1">;; =&gt; [42 2 42 4 42]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Another interesting traversals include <code>keys</code> for focusing on map keys, <code>vals</code>
-for focusing on map values, and <code>indexed</code> for focusing on index-value pairs.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="interoperability-2"><a class="link" href="#interoperability-2">Interoperability</a></h4>
-<div class="paragraph">
-<p>There are also <code>Foci</code> type that allows you to derive atom like objects from
-clojure atoms focusing to a specific portion of it using traversals.</p>
-</div>
-<div class="paragraph">
-<p>Let see an example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.traversal</span> <span class="tok-ss">:as</span> <span class="tok-nv">t</span><span class="tok-p">])</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">atom</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span><span class="tok-p">]))</span>
-
-<span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">fsa</span> <span class="tok-p">(</span><span class="tok-nf">t/foci-atom</span> <span class="tok-nv">t/each</span> <span class="tok-nv">a</span><span class="tok-p">))</span>
-
-<span class="tok-o">@</span><span class="tok-nv">fsa</span>
-<span class="tok-c1">;; =&gt; (1 2 3 4)</span>
-
-<span class="tok-p">(</span><span class="tok-nf">reset!</span> <span class="tok-nv">fsa</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
-<span class="tok-c1">;; =&gt; (42 42 42 42)</span>
-
-<span class="tok-o">@</span><span class="tok-nv">a</span>
-<span class="tok-c1">;; =&gt; [42 42 42 42]</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And do not forget that you also can attach watchers to focused atoms in the same
-way as you will do that with clojure(script) atoms.</p>
-</div>
-</div>
-</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="complementary-libraries"><a class="link" href="#complementary-libraries">Complementary libraries</a></h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>Some monads are defined as separated package to avoid additional
-and unnecesary dependencies to cats. Also, there are some libraries
-that build higher-level abstractions on top of what cats offers.</p>
-</div>
 <div class="ulist">
 <ul>
 <li>
@@ -2909,7 +2085,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-01-03 11:37:27 CET
+Last updated 2016-06-29 18:04:14 EEST
 </div>
 </div>
 </body>
