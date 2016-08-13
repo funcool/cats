@@ -56,6 +56,21 @@
   (-repr [_]
     (str "#<Right " (pr-str v) ">"))
 
+  #?@(:cljs [cljs.core/ILookup
+             (-lookup
+               [this k]
+                 (if (= k :right) (deref this) nil))
+             (-lookup
+               [this k not-found]
+                 (if (= k :right) (deref this) not-found))]
+      :clj  [clojure.lang.ILookup
+             (valAt
+               [this k]
+                 (if (= k :right) (deref this) nil))
+             (valAt
+               [this k not-found]
+                 (if (= k :right) (deref this) not-found))])
+
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
@@ -85,6 +100,21 @@
   p/Printable
   (-repr [_]
     (str "#<Left " (pr-str v) ">"))
+
+  #?@(:cljs [cljs.core/ILookup
+             (-lookup
+               [this k]
+                 (if (= k :left) (deref this) nil))
+             (-lookup
+               [this k not-found]
+                 (if (= k :left) (deref this) not-found))]
+      :clj  [clojure.lang.ILookup
+             (valAt
+               [this k]
+                 (if (= k :left) (deref this) nil))
+             (valAt
+               [this k not-found]
+                 (if (= k :left) (deref this) not-found))])
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
