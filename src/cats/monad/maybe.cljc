@@ -54,17 +54,17 @@
   #?@(:cljs [cljs.core/ILookup
              (-lookup
                [this k]
-                 (if (= k :just) (deref this) nil))
+                 (if (= k :just) @this nil))
              (-lookup
                [this k not-found]
-                 (if (= k :just) (deref this) not-found))]
+                 (if (= k :just) @this not-found))]
       :clj  [clojure.lang.ILookup
              (valAt
                [this k]
-                 (if (= k :just) (deref this) nil))
+                 (if (= k :just) @this nil))
              (valAt
                [this k not-found]
-                 (if (= k :just) (deref this) not-found))])
+                 (if (= k :just) @this not-found))])
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]

@@ -59,17 +59,17 @@
   #?@(:cljs [cljs.core/ILookup
              (-lookup
                [this k]
-                 (if (= k :right) (deref this) nil))
+                 (if (= k :right) @this nil))
              (-lookup
                [this k not-found]
-                 (if (= k :right) (deref this) not-found))]
+                 (if (= k :right) @this not-found))]
       :clj  [clojure.lang.ILookup
              (valAt
                [this k]
-                 (if (= k :right) (deref this) nil))
+                 (if (= k :right) @this nil))
              (valAt
                [this k not-found]
-                 (if (= k :right) (deref this) not-found))])
+                 (if (= k :right) @this not-found))])
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
@@ -104,17 +104,17 @@
   #?@(:cljs [cljs.core/ILookup
              (-lookup
                [this k]
-                 (if (= k :left) (deref this) nil))
+                 (if (= k :left) @this nil))
              (-lookup
                [this k not-found]
-                 (if (= k :left) (deref this) not-found))]
+                 (if (= k :left) @this not-found))]
       :clj  [clojure.lang.ILookup
              (valAt
                [this k]
-                 (if (= k :left) (deref this) nil))
+                 (if (= k :left) @this nil))
              (valAt
                [this k not-found]
-                 (if (= k :left) (deref this) not-found))])
+                 (if (= k :left) @this not-found))])
 
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
