@@ -5,6 +5,7 @@
                  [clojure.test.check]
                  [clojure.test.check.generators :as gen]
                  [clojure.test.check.properties :as prop :include-macros true]
+                 [cljs.core.match :refer-macros [match]]
                  [cats.labs.test :as lt]
                  [cats.builtin :as b]
                  [cats.protocols :as p]
@@ -20,6 +21,7 @@
                [clojure.test.check :as tc]
                [clojure.test.check.generators :as gen]
                [clojure.test.check.properties :as prop]
+               [clojure.core.match :refer [match]]
                [cats.labs.test :as lt]
                [cats.builtin :as b]
                [cats.protocols :as p]
@@ -227,3 +229,14 @@
       #?(:clj  (t/is (= "oh no!" (.getMessage @result)))
          :cljs (t/is (= "oh no!" (.-message @result))))
       )))
+
+(t/deftest match-test
+  (t/testing "Test ILookup"
+    (t/is (= (match [(either/left "failure")]
+                    [{:left l}] l
+                    [{:right r}] r)
+             "failure"))
+    (t/is (= (match [(either/right 123)]
+                    [{:left l}] l
+                    [{:right r}] r)
+             123))))

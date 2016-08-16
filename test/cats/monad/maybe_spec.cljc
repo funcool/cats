@@ -4,6 +4,7 @@
                  [clojure.test.check]
                  [clojure.test.check.generators :as gen]
                  [clojure.test.check.properties :as prop :include-macros true]
+                 [cljs.core.match :refer-macros [match]]
                  [cats.labs.test :as lt]
                  [cats.builtin :as b]
                  [cats.protocols :as p]
@@ -18,6 +19,7 @@
                [clojure.test.check :as tc]
                [clojure.test.check.generators :as gen]
                [clojure.test.check.properties :as prop]
+               [clojure.core.match :refer [match]]
                [cats.labs.test :as lt]
                [cats.builtin :as b]
                [cats.protocols :as p]
@@ -199,3 +201,14 @@
     (t/is (= (either/right (maybe/nothing))
              (ctx/with-context either/context
                (m/traverse #(either/right (inc %)) (maybe/nothing)))))))
+
+(t/deftest match-test
+  (t/testing "Test ILookup"
+    (t/is (= (match [(maybe/just 123)]
+                    [{:just v}] v
+                    [{:nothing _}] nil)
+             123))
+    (t/is (= (match [(maybe/nothing)]
+                    [{:just v}] v
+                    [{:nothing _}] nil)
+             nil))))
