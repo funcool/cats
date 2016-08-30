@@ -196,25 +196,32 @@
   (let [ctx (ctx/infer af)]
     (reduce (partial p/-fapply ctx) af avs)))
 
-(defn when
+(defmacro when
   "Given an expression and a monadic value,
   if the expression is logical true, return the monadic value.
   Otherwise, return nil in a monadic context."
   ([b mv]
-   (when (ctx/infer mv) b mv))
+   `(if ~b
+      (do ~mv)
+      (cats.core/pure nil)))
   ([ctx b mv]
-   (if b
-     mv
-     (pure ctx nil))))
+   `(if ~b
+      (do ~mv)
+      (cats.core/pure ~ctx nil))))
 
-(defn unless
+(defmacro unless
   "Given an expression and a monadic value,
   if the expression is not logical true, return the monadic value.
   Otherwise, return nil in a monadic context."
   ([b mv]
-   (when (not b) mv))
+   `(if (not ~b)
+      (do ~mv)
+      (cats.core/pure nil)))
   ([ctx b mv]
-   (when ctx (not b) mv)))
+   `(if (not ~b)
+      (do ~mv)
+      (cats.core/pure ~ctx nil))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Monadic Let Macro

@@ -203,20 +203,38 @@
 (t/deftest when-tests
   (t/testing "It returns the monadic value unchanged when the condition is true"
     (t/is (= (maybe/just 3)
-             (m/when true (maybe/just 3)))))
+             (m/when true (maybe/just 3))))
+    (t/is (= (maybe/just 3)
+             (m/when maybe/context true (maybe/just 3)))))
 
   (t/testing "It returns nil in the monadic context when the condition is false"
+    (ctx/with-context b/sequence-context
+      (t/is (= [nil]
+               (m/when false []))))
     (t/is (= [nil]
-             (m/when false [])))))
+             (m/when b/sequence-context false []))))
+
+  (t/testing "it doesn't evaluate the mv when the conditions is false"
+    (t/is (= [nil]
+             (m/when b/sequence-context false (throw (ex-info "bang" {})))))))
 
 (t/deftest unless-tests
   (t/testing "It returns the monadic value unchanged when the condition is false"
     (t/is (= (maybe/just 3)
-             (m/unless false (maybe/just 3)))))
+             (m/unless false (maybe/just 3))))
+    (t/is (= (maybe/just 3)
+             (m/unless maybe/context false (maybe/just 3)))))
 
   (t/testing "It returns nil in the monadic context when the condition is true"
+    (ctx/with-context b/sequence-context
+      (t/is (= [nil]
+               (m/unless true []))))
     (t/is (= [nil]
-             (m/unless true [])))))
+             (m/unless b/sequence-context true []))))
+
+  (t/testing "it doesn't evaluate the mv when the condition is true"
+    (t/is (= [nil]
+             (m/unless b/sequence-context true (throw (ex-info "bang" {})))))))
 
 (t/deftest curry-tests
   #?(:clj
