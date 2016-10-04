@@ -299,27 +299,26 @@
                   [s (clojure.set/difference depset symset)])]
     (into (empty deps) removed)))
 
-(defn- sort-batches*
-  [deps seen batches current]
-  (if (empty? deps)
-    (conj batches current)
-    (let [dep (first deps)
-          [s dependencies] dep
-          dependant? (some dependencies seen)]
-      (if (nil? dependant?)
-        (recur (subvec deps 1)
-               (conj seen s)
-               batches
-               (conj current s))
-        (recur (remove-deps (subvec deps 1) (set current))
-               (conj seen s)
-               (conj batches current)
-               [s])))))
-
 (defn- sort-batches
-  [deps]
-  (let [syms (into #{} (map first deps))]
-    (sort-batches* deps #{} [] [])))
+  ([deps]
+   (sort-batches deps #{} [] []))
+  ([deps seen batches current]
+   (if (empty? deps)
+     (conj batches current)
+     (let [[dependency & _] deps
+           [sym dependencies] dependency
+           dependant? (some dependencies seen)
+           next-deps (subvec deps 1)
+           next-seen (conj seen sym)]
+       (if dependant?
+         (recur (remove-deps next-deps (set current))
+                next-seen
+                (conj batches current)
+                [sym])
+         (recur next-deps
+                next-seen
+                batches
+                (conj current sym)))))))
 
 (defn- bindings->batches
   [bindings]
@@ -331,23 +330,23 @@
 (defn- alet*
   [batches env body]
   (let [code
-        (reduce (fn [acc syms]
-                  (let [[first-sym & rest-syms] syms
-                        first-appl (get env first-sym)
+        (reduce (fn [acc batch]
+                  (let [[first-sym & rest-syms] batch
+                        first-app (get env first-sym)
                         rest-apps (map #(get env %) rest-syms)]
-                    (if (= (count syms) 1)
-                      `(fmap (fn [~first-sym] ~acc) ~first-appl)
+                    (if (= (count batch) 1)
+                      `(fmap (fn [~first-sym] ~acc) ~first-app)
                       (let [cf (reduce (fn [f sym] `(fn [~sym] ~f))
                                        acc
-                                       (reverse syms))]
-                        `(fapply (fmap ~cf ~first-appl) ~@rest-apps)))))
+                                       (reverse batch))]
+                        `(fapply (fmap ~cf ~first-app) ~@rest-apps)))))
                 `(do ~@body)
                 (reverse batches))
         join-count (dec (count batches))]
     (reduce (fn [acc _]
-            `(join ~acc))
-        code
-        (range join-count))))
+              `(join ~acc))
+            code
+            (range join-count))))
 
 #?(:clj
    (defmacro alet
