@@ -83,8 +83,8 @@
              (m/alet [x (maybe/just 21)       ;; split 1
                       y (maybe/just 2)
                       z (maybe/just (* x y))  ;; split 2
-                      z (maybe/just (+ 3 z))] ;; split 3
-               (vector z)))))
+                      a (maybe/just (+ 3 z))] ;; split 3
+               (vector a)))))
 
   (t/testing "It works with more than one level of dependencies, with distinct split sizes"
     (t/is (= (maybe/just 66)
@@ -95,15 +95,7 @@
                       b (maybe/just 1)          ;; split 3
                       c (maybe/just 2)
                       d (maybe/just (+ a b c))] ;; split 4
-               d))))
-
-  (t/testing "It renames the body symbols correctly"
-    (t/is (= (maybe/just 42)
-             (m/alet [x (maybe/just 5)
-                      y (maybe/just 6)
-                      x (maybe/just (inc x))
-                      y (maybe/just (inc y))]
-               (* x y))))))
+               d)))))
 
 (t/deftest sequence-tests
   (t/testing "It works with vectors"

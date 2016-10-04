@@ -284,60 +284,6 @@
     :else
     '()))
 
-(defn- rename-sym
-  [expr renames]
-  (get renames expr expr))
-
-(defn- rename
-  [expr renames]
-  (cond
-    (symbol? expr)
-    (rename-sym expr renames)
-    (seq? expr)
-    (map #(rename % renames) expr)
-    :else
-    expr))
-
-(defn- dedupe-symbols*
-  [sym->ap body]
-  (letfn [(renamer [{:keys [body syms aps seen renames] :as summ} [s ap]]
-           (let [ap' (rename ap renames)
-                 new-aps (conj aps ap')]
-             (if (seen s)
-               (let [s' (gensym)
-                     new-syms (conj syms s')
-                     new-seen (conj seen s')
-                     new-renames (assoc renames s s')
-                     new-body (rename body new-renames)]
-                 {:syms new-syms
-                  :aps new-aps
-                  :seen new-seen
-                  :renames new-renames
-                  :body new-body})
-               (let [new-syms (conj syms s)
-                     new-seen (conj seen s)]
-                 {:syms new-syms
-                  :aps new-aps
-                  :seen new-seen
-                  :renames renames
-                  :body body}))))]
-    (let [summ
-          (reduce renamer
-                  {:syms []
-                   :aps []
-                   :seen #{}
-                   :renames {}
-                   :body body}
-                  sym->ap)]
-      [(mapv vector (:syms summ) (:aps summ)) (:body summ)])))
-
-(defn- dedupe-symbols
-  [bindings body]
-  (let [syms (map first bindings)
-        aps (map second bindings)
-        sym->ap (mapv vector syms aps)]
-    (dedupe-symbols* sym->ap body)))
-
 (defn- dependency-map
   [sym->ap]
   (let [syms (map first sym->ap)
@@ -353,7 +299,7 @@
                   [s (clojure.set/difference depset symset)])]
     (into (empty deps) removed)))
 
-(defn- topo-sort*
+(defn- sort-batches*
   [deps seen batches current]
   (if (empty? deps)
     (conj batches current)
@@ -370,37 +316,31 @@
                (conj batches current)
                [s])))))
 
-(defn- topo-sort
+(defn- sort-batches
   [deps]
   (let [syms (into #{} (map first deps))]
-    (topo-sort* deps #{} [] [])))
+    (sort-batches* deps #{} [] [])))
 
 (defn- bindings->batches
   [bindings]
   (let [syms (map first bindings)
         aps (map second bindings)
-        sym->ap (mapv vector syms aps)
-        sorted-deps (topo-sort (dependency-map sym->ap))]
-    sorted-deps))
+        sym->ap (mapv vector syms aps)]
+    (sort-batches (dependency-map sym->ap))))
 
 (defn- alet*
   [batches env body]
-  (let [fb (first batches)
-        rb (rest batches)
-        fs (first fb)
-        fa (get env fs)
-        code
+  (let [code
         (reduce (fn [acc syms]
-                  (let [fs (first syms)
-                        fa (get env fs)
-                        rs (rest syms)
-                        faps (map #(get env %) rs)]
+                  (let [[first-sym & rest-syms] syms
+                        first-appl (get env first-sym)
+                        rest-apps (map #(get env %) rest-syms)]
                     (if (= (count syms) 1)
-                      `(fmap (fn [~fs] ~acc) ~fa)
+                      `(fmap (fn [~first-sym] ~acc) ~first-appl)
                       (let [cf (reduce (fn [f sym] `(fn [~sym] ~f))
                                        acc
                                        (reverse syms))]
-                        `(fapply (fmap ~cf ~fa) ~@faps)))))
+                        `(fapply (fmap ~cf ~first-appl) ~@rest-apps)))))
                 `(do ~@body)
                 (reverse batches))
         join-count (dec (count batches))]
@@ -461,17 +401,16 @@
                     (not-empty bindings)
                     (even? (count bindings)))
        (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-     (let [bindings (partition 2 bindings)
-           [bindings body] (dedupe-symbols bindings body)
+     (when-not (= (count (map first (partition 2 bindings)))
+                  (count (into #{} (map first) (partition 2 bindings))))
+       (throw (IllegalArgumentException. "duplicated symbols are not allowed in alet bindings.")))
+     (let [bindings (into [] (partition 2 bindings))
            batches (bindings->batches bindings)
-           env (into {} bindings)]
-       (if (and (= (count batches) 1)
-                (= (count (map first bindings)) 1))
-         `(fmap (fn [~@(map first bindings)]
-                  ~@body)
-                ~@(map second bindings))
+           [symbols applicatives] bindings
+           env (into {} (map (fn [[sym app]] [sym app])) bindings)]
+       (if (= (count batches) (count symbols) 1)
+         `(fmap (fn [~@symbols] ~@body) ~@applicatives)
          (alet* batches env body)))))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; applicative "idiomatic apply"
