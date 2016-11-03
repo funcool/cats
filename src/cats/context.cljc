@@ -36,7 +36,7 @@
      :clj  (throw (IllegalArgumentException. text))))
 
 (defn context?
-  "Returnt `true` if the provided value satisfies
+  "Return `true` if the provided value satisfies
   the Context protocol."
   [v]
   (satisfies? p/Context v))
