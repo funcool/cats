@@ -884,7 +884,7 @@ Sets implement almost every abstraction in _cats_, from Semigroup to Monad.
 (use 'cats.builtin)
 (require '[cats.core :as m])
 
-(m/pure set-monad 42)
+(m/pure set-context 42)
 ;; => #{42}
 
 (m/fmap inc #{1 2 3 4})
@@ -1382,7 +1382,7 @@ help of the *mlet* macro for bind values to asyncrhonous calls:
 ;; <--- receiving request 200
 ;; ---> sending request 100
 ;; <--- receiving request 100
-;; "Elapsed time: 202.236804 msecs"
+;; "Elapsed time: 302.236804 msecs"
 ;; => 300
 ----
 
