@@ -337,7 +337,7 @@ the unique obvious case of using foldr is for small datastructures.
 ;; => StackOverflowError
 ----
 
-The *Foldable* abstraction is already implemented for cloure vectors, lazy seqs
+The *Foldable* abstraction is already implemented for Clojure vectors, lazy seqs
 and ranges plus the cats maybe, either and validation types. Let see an example
 how it behaves with maybe:
 
