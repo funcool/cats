@@ -605,7 +605,7 @@ values as falsey.
 ;; => #<Just 1>
 
 (m/mplus (maybe/just 1) (maybe/just 2))
-;; => #<Just 1>
+;; => #<Just 3>
 ----
 
 
