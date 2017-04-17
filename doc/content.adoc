@@ -1554,6 +1554,7 @@ the previously explained protocols.
 | vector   | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus, Foldable
 | hash-set | Semigroup, Monoid, Functor, Applicative, Monad, MonadZero, MonadPlus
 | hash-map | Semigroup, Monoid
+| function | Semigroup, Monoid, Functor, Applicative, Monad
 |==========================================================================================
 
 
