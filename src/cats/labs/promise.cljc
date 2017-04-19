@@ -4,7 +4,7 @@
             [cats.context :as mc]
             [cats.protocols :as mp]
             [promesa.core :as p]
-            [promesa.impl.proto :as pp])
+            [promesa.protocols :as pp])
   #?(:clj
      (:import java.util.concurrent.CompletableFuture)))
 
