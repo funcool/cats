@@ -1,5 +1,13 @@
 # Changelog #
 
+## Version 2.1.0 ##
+
+Date: 2017-04-20
+
+- Make cats work together with core.match for some types.
+- Convert `when` and `unless` to macros.
+- Update promesa dependency.
+
 ## Version 2.0.0 ##
 
 Date: 2016-07-28

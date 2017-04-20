@@ -1,6 +1,6 @@
 = Cats Documentation
 Andrey Antukh & Alejandro Gómez
-2.0.0
+2.1.0
 :toc: left
 :!numbered:
 :idseparator: -
@@ -36,7 +36,7 @@ it as a dependency in your *_project.clj_*:
 
 [source,clojure]
 ----
-[funcool/cats "2.0.0"]
+[funcool/cats "2.1.0"]
 ----
 
 And it works with the following platforms: *jdk7*, *jdk8*, *node*
