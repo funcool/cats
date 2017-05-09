@@ -59,6 +59,12 @@
   [v]
   (Identity. v))
 
+(defn identity?
+  "Return true in case of `v` is instance
+  of Identity monad."
+  [v]
+  (instance? Identity v))
+
 ;; --- Monad definition
 
 (def ^{:no-doc true}
