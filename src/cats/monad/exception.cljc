@@ -79,7 +79,7 @@
 
 (declare context)
 
-(deftype Success [v]
+(defrecord Success [v]
   p/Contextual
   (-get-context [_] context)
 
@@ -93,22 +93,9 @@
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
+             (deref [_] v)]))
 
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Success other)
-           (= v (.-v ^Success other))
-           false))]
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Success other)
-           (= v (.-v ^Success other))
-           false))]))
-
-(deftype Failure [e]
+(defrecord Failure [e]
   p/Contextual
   (-get-context [_] context)
 
@@ -122,21 +109,7 @@
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] (throw e))]
       :clj  [clojure.lang.IDeref
-             (deref [_] (throw e))])
-
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Failure other)
-           (= e (.-e ^Failure other))
-           false))]
-
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Failure other)
-           (= e (.-e ^Failure other))
-           false))]))
+             (deref [_] (throw e))]))
 
 (alter-meta! #'->Success assoc :private true)
 (alter-meta! #'->Failure assoc :private true)
