@@ -34,7 +34,7 @@
 
 ;; --- Type constructors
 
-(deftype Identity [v]
+(defrecord Identity [v]
   p/Contextual
   (-get-context [_] context)
 
@@ -48,21 +48,7 @@
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] v)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
-
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Identity other)
-           (= v (.-v ^Identity other))
-           false))]
-
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Identity other)
-           (= v (.-v ^Identity other))
-           false))]))
+             (deref [_] v)]))
 
 (alter-meta! #'->Identity assoc :private true)
 
