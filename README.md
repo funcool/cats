@@ -20,3 +20,18 @@ Stable:
 
 - **Documentation:** http://funcool.github.io/cats/latest/
 - **API reference:** http://funcool.github.io/cats/latest/api/
+
+## Tests
+
+To run Clojure tests:
+
+```
+lein test
+```
+
+To run ClojureScript tests:
+
+```
+./scripts/build
+node out/tests.js
+```
