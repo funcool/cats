@@ -32,6 +32,8 @@
       (maybe/just 1)
       ;; => #<Just [1]>
   "
+  #?(:cljs
+    (:require-macros [cats.monad.maybe :refer (maybe)]))
   (:require [cats.protocols :as p]
             [cats.context :as ctx]
             [cats.util :as util]))
