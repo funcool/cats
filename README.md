@@ -21,7 +21,7 @@ Stable:
 - **Documentation:** http://funcool.github.io/cats/latest/
 - **API reference:** http://funcool.github.io/cats/latest/api/
 
-## Tests
+### Tests
 
 To run Clojure tests:
 
