@@ -277,15 +277,17 @@
 
 ;; --- Utility functions
 
-(defn maybe
-  "Given a default value, a maybe and a function, return the default
-  if the maybe is a nothing; if its a just, apply the function to the
-  value it contains and return the result."
-  [default m f]
-  {:pre [(maybe? m)]}
-  (if (nothing? m)
-    default
-    (f (p/-extract m))))
+#?(:clj
+   (defmacro maybe
+     "Given a default value, a maybe and a function, return the default if the
+     maybe is a nothing; if its a just, apply the function to the value it
+     contains and return the result."
+     [default m f]
+     `(do
+        (assert (maybe? ~m) (str "'" ~m "' is not a Maybe monad"))
+        (if (nothing? ~m)
+          ~default
+          (~f (p/-extract ~m))))))
 
 (defn seq->maybe
   "Given a collection, return a nothing if its empty or a just with its

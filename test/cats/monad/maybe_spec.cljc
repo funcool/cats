@@ -26,7 +26,8 @@
                [cats.monad.maybe :as maybe]
                [cats.monad.either :as either]
                [cats.context :as ctx]
-               [cats.core :as m])))
+               [cats.core :as m])
+     (:import [java.lang.AssertionError])))
 
 ;; Generators
 
@@ -158,7 +159,9 @@
   (let [n (maybe/nothing)
         j (maybe/just 42)]
     (t/is (= 42 (maybe/maybe 42 n inc)))
-    (t/is (= 43 (maybe/maybe 42 j inc)))))
+    (t/is (= 43 (maybe/maybe 42 j inc)))
+    (t/is (thrown? AssertionError 43 (maybe/maybe 42 :not-maybe-value inc)))
+    (t/is (= 42 (maybe/maybe 42 n (throw (ex-info "shouldn't run" {})))))))
 
 (t/deftest seq-conversion-test
   (let [n (maybe/nothing)
