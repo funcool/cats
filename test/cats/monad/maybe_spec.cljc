@@ -160,7 +160,10 @@
     (t/is (= 42 (maybe/maybe 42 n inc)))
     (t/is (= 43 (maybe/maybe 42 j inc)))
     (t/is (= 42 (maybe/maybe 42 n (throw (ex-info "shouldn't run" {})))))
-    #?(:clj (t/is (thrown? java.lang.AssertionError 43 (maybe/maybe 42 :not-maybe-value inc))))))
+    (t/is (thrown?
+            #?(:clj  java.lang.AssertionError
+               :cljs js/Error)
+            43 (maybe/maybe 42 :not-maybe-value inc)))))
 
 (t/deftest seq-conversion-test
   (let [n (maybe/nothing)
