@@ -134,14 +134,10 @@
   "Return true in case of `v` is instance
   of Maybe monad."
   [v]
-  (cond
-    (or (instance? Just v) (instance? Nothing v))
-    true
-
-    (satisfies? p/Contextual v)
-    (identical? (p/-get-context v) context)
-
-    :else false))
+  (or (instance? Just v)
+      (instance? Nothing v)
+      (and (satisfies? p/Contextual v)
+           (identical? (p/-get-context v) context))))
 
 (defn just
   "A Just type constructor."
