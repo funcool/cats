@@ -198,9 +198,9 @@
 
 #?(:clj
    (defmacro when
-     "Given an expression and a monadic value,
-  if the expression is logical true, return the monadic value.
-  Otherwise, return nil in a monadic context."
+     "Given an expression and a monadic value, if the expression is logical
+     true, return the monadic value.  Otherwise, return nil in a monadic
+     context."
      ([b mv]
       `(if ~b
          (do ~mv)
@@ -212,9 +212,9 @@
 
 #?(:clj
    (defmacro unless
-     "Given an expression and a monadic value,
-  if the expression is not logical true, return the monadic value.
-  Otherwise, return nil in a monadic context."
+     "Given an expression and a monadic value, if the expression is not logical
+     true, return the monadic value.  Otherwise, return nil in a monadic
+     context."
      ([b mv]
       `(if (not ~b)
          (do ~mv)
