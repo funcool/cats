@@ -159,7 +159,8 @@
         j (maybe/just 42)]
     (t/is (= 42 (maybe/maybe 42 n inc)))
     (t/is (= 43 (maybe/maybe 42 j inc)))
-    (t/is (= 42 (maybe/maybe 42 n (throw (ex-info "shouldn't run" {})))))
+    (t/is (= 42 (maybe/maybe 42 n (do (throw (ex-info "shouldn't run" {}))
+                                      inc))))
     (t/is (thrown?
             #?(:clj  java.lang.AssertionError
                :cljs js/Error)
