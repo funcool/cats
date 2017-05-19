@@ -155,12 +155,13 @@
       (t/is (maybe/just? m1)))))
 
 (t/deftest maybe-test
-  (let [n (maybe/nothing)
-        j (maybe/just 42)]
+  (let [n          (maybe/nothing)
+        j          (maybe/just 42)
+        wrap-in-ex (fn [v] (do (throw (ex-info "shouldn't run" {})) v))]
     (t/is (= 42 (maybe/maybe 42 n inc)))
     (t/is (= 43 (maybe/maybe 42 j inc)))
-    (t/is (= 42 (maybe/maybe 42 n (do (throw (ex-info "shouldn't run" {}))
-                                      inc))))
+    (t/is (= 42 (maybe/maybe 42 n (wrap-in-ex inc))))
+    (t/is (= 43 (maybe/maybe (wrap-in-ex 42) j inc)))
     (t/is (thrown?
             #?(:clj  java.lang.AssertionError
                :cljs js/Error)
