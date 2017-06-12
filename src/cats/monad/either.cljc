@@ -288,7 +288,7 @@
   (partial filter left?))
 
 (def rights
-  "Given a collection of eithers, return only the values that are left."
+  "Given a collection of eithers, return only the values that are right."
   (partial filter right?))
 
 (def first-left
