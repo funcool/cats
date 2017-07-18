@@ -28,6 +28,7 @@
   (:require [cats.protocols :as p]))
 
 (def ^:dynamic *context* nil)
+(def ^:dynamic *override* nil)
 
 (defn throw-illegal-argument
   {:no-doc true :internal true}
@@ -53,6 +54,18 @@
           ~@body))))
 
 #?(:clj
+(defmacro with-context-override
+  "Set current context to specific monad."
+  [ctx & body]
+  `(do
+     (when-not (context? ~ctx)
+       (throw-illegal-argument
+        "The provided context does not implements Context."))
+     (binding [*context* ~ctx
+               *override* true]
+       ~@body))))
+
+#?(:clj
    (defmacro with-monad
      "Semantic alias for `with-context`."
      [ctx & body]
@@ -69,11 +82,14 @@
    *context*)
   ([v]
    (cond
-     (not (nil? *context*))
+     (not (nil? *override*))
      *context*
 
      (satisfies? p/Contextual v)
      (p/-get-context v)
+
+     (not (nil? *context*))
+     *context*
 
      :else
      (throw-illegal-argument

@@ -74,7 +74,7 @@
 (defn monoid-identity-element
   [{:keys [ctx gen empty eq] :or {empty (m/mempty ctx) eq =}}]
   (prop/for-all [x gen]
-    (ctx/with-context ctx
+    (ctx/with-context-override ctx
       (eq x
           (m/mappend x empty)
           (m/mappend empty x)))))

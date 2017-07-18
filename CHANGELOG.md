@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.2.1 ##
+
+Date: 2017-07-18
+
+- Fix override of nested contexts
+
 ## Version 2.1.0 ##
 
 Date: 2017-04-20
