@@ -15,7 +15,8 @@
                  [funcool/promesa "1.8.1" :scope "provided"]]
   :repositories  [["central"  {:url "http://repo1.maven.org/maven2/" :snapshots false}]
                   ["clojars"  {:url "https://clojars.org/repo/"}]
-                  ["nu-maven" {:url "s3p://nu-maven/releases/"}]]
+                  ["nu-maven" {:url "s3p://nu-maven/releases/"
+                               :sign-releases false}]]
   :source-paths   ["src"]
   :test-paths     ["test"]
   :jar-exclusions [#"\.swp|\.swo|user\.clj"])
