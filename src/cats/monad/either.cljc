@@ -45,95 +45,37 @@
 
 (declare context)
 
-(deftype Right [v]
+(defrecord Right [right]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
-  (-extract [_] v)
+  (-extract [_] right)
 
   p/Printable
   (-repr [_]
-    (str "#<Right " (pr-str v) ">"))
-
-  #?@(:cljs [cljs.core/ILookup
-             (-lookup
-               [this k]
-                 (if (= k :right) @this nil))
-             (-lookup
-               [this k not-found]
-                 (if (= k :right) @this not-found))]
-      :clj  [clojure.lang.ILookup
-             (valAt
-               [this k]
-                 (if (= k :right) @this nil))
-             (valAt
-               [this k not-found]
-                 (if (= k :right) @this not-found))])
+    (str "#<Right " (pr-str right) ">"))
 
   #?@(:cljs [cljs.core/IDeref
-             (-deref [_] v)]
+             (-deref [_] right)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
+             (deref [_] right)]))
 
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Right other)
-           (= v (.-v ^Right other))
-           false))]
-
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Right other)
-           (= v (.-v ^Right other))
-           false))]))
-
-(deftype Left [v]
+(defrecord Left [left]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
-  (-extract [_] v)
+  (-extract [_] left)
 
   p/Printable
   (-repr [_]
-    (str "#<Left " (pr-str v) ">"))
-
-  #?@(:cljs [cljs.core/ILookup
-             (-lookup
-               [this k]
-                 (if (= k :left) @this nil))
-             (-lookup
-               [this k not-found]
-                 (if (= k :left) @this not-found))]
-      :clj  [clojure.lang.ILookup
-             (valAt
-               [this k]
-                 (if (= k :left) @this nil))
-             (valAt
-               [this k not-found]
-                 (if (= k :left) @this not-found))])
+    (str "#<Left " (pr-str left) ">"))
 
   #?@(:cljs [cljs.core/IDeref
-             (-deref [_] v)]
+             (-deref [_] left)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
-
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Left other)
-           (= v (.-v ^Left other))
-           false))]
-
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Left other)
-           (= v (.-v ^Left other))
-           false))]))
+             (deref [_] left)]))
 
 (alter-meta! #'->Right assoc :private true)
 (alter-meta! #'->Left assoc :private true)
@@ -143,13 +85,13 @@
 
 (defn left
   "A Left type constructor."
-  ([] (Left. nil))
-  ([v] (Left. v)))
+  ([] (->Left nil))
+  ([v] (->Left v)))
 
 (defn right
   "A Right type constructor."
-  ([] (Right. nil))
-  ([v] (Right. v)))
+  ([] (->Right nil))
+  ([v] (->Right v)))
 
 (defn left?
   "Return true if `v` is an instance
@@ -188,14 +130,14 @@
     p/Functor
     (-fmap [_ f s]
       (if (right? s)
-        (right (f (.-v ^Right s)))
+        (right (f (p/-extract ^Right s)))
         s))
 
     p/Bifunctor
     (-bimap [_ f g s]
       (if (left? s)
-        (left  (f (.-v ^Left s)))
-        (right (g (.-v ^Right s)))))
+        (left  (f (p/-extract ^Left s)))
+        (right (g (p/-extract ^Right s)))))
 
     p/Applicative
     (-pure [_ v]
@@ -203,7 +145,7 @@
 
     (-fapply [m af av]
       (if (right? af)
-        (p/-fmap m (.-v ^Right af) av)
+        (p/-fmap m (p/-extract ^Right af) av)
         af))
 
     p/Monad
@@ -214,7 +156,7 @@
       (assert (either? s) (str "Context mismatch: " (p/-repr s)
                                " is not allowed to use with either context."))
       (if (right? s)
-        (f (.-v ^Right s))
+        (f (p/-extract ^Right s))
         s))
 
     p/MonadZero

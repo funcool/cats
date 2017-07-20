@@ -74,3 +74,6 @@
    {:ctx id/context
     :f   (comp id/identity str)
     :g   (comp id/identity count)}))
+
+(t/deftest predicate-test
+  (t/is (id/identity 1)))

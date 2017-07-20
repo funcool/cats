@@ -40,51 +40,23 @@
 
 (declare context)
 
-(deftype Just [v]
+(defrecord Just [just]
   p/Contextual
   (-get-context [_] context)
 
   p/Extract
-  (-extract [_] v)
+  (-extract [_] just)
 
   p/Printable
   (-repr [_]
-    (str "#<Just " (pr-str v) ">"))
-
-  #?@(:cljs [cljs.core/ILookup
-             (-lookup
-               [this k]
-                 (if (= k :just) @this nil))
-             (-lookup
-               [this k not-found]
-                 (if (= k :just) @this not-found))]
-      :clj  [clojure.lang.ILookup
-             (valAt
-               [this k]
-                 (if (= k :just) @this nil))
-             (valAt
-               [this k not-found]
-                 (if (= k :just) @this not-found))])
+    (str "#<Just " (pr-str just) ">"))
 
   #?@(:cljs [cljs.core/IDeref
-             (-deref [_] v)]
+             (-deref [_] just)]
       :clj  [clojure.lang.IDeref
-             (deref [_] v)])
+             (deref [_] just)]))
 
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (if (instance? Just other)
-           (= v (.-v ^Just other))
-           false))]
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (if (instance? Just other)
-           (= v (.-v ^Just other))
-           false))]))
-
-(deftype Nothing []
+(defrecord Nothing []
   p/Contextual
   (-get-context [_] context)
 
@@ -95,34 +67,10 @@
   (-repr [_]
     "#<Nothing>")
 
-  #?@(:cljs [cljs.core/ILookup
-             (-lookup
-               [this k]
-                 (if (= k :nothing) this nil))
-             (-lookup
-               [this k not-found]
-                 (if (= k :nothing) this not-found))]
-      :clj  [clojure.lang.ILookup
-             (valAt
-               [this k]
-                 (if (= k :nothing) this nil))
-             (valAt
-               [this k not-found]
-                 (if (= k :nothing) this not-found))])
-
   #?@(:cljs [cljs.core/IDeref
              (-deref [_] nil)]
       :clj  [clojure.lang.IDeref
-             (deref [_] nil)])
-
-  #?@(:clj
-      [Object
-       (equals [self other]
-         (instance? Nothing other))]
-      :cljs
-      [cljs.core/IEquiv
-       (-equiv [_ other]
-         (instance? Nothing other))]))
+             (deref [_] nil)]))
 
 (alter-meta! #'->Nothing assoc :private true)
 (alter-meta! #'->Just assoc :private true)
@@ -152,7 +100,7 @@
 (defn nothing
   "A Nothing type constructor."
   []
-  (Nothing.))
+  (assoc (Nothing.) :nothing nil))
 
 (defn just?
   "Returns true if `v` is an instance
