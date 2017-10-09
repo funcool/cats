@@ -1535,7 +1535,7 @@ generic abstraction instread of a specific purpose macro.
 
 * Promise monad: https://github.com/funcool/promesa
 * Concurrent data fetching: https://github.com/funcool/urania
-* Patter matching for the Cats' types: https://github.com/zalando/cats.match
+* Pattern matching for the Cats' types: https://github.com/zalando/cats.match
 
 == FAQ
 
