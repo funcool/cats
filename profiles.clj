@@ -9,8 +9,8 @@
             :src-uri "http://github.com/funcool/cats/blob/master/"
             :src-uri-prefix "#L"}
   :plugins [[funcool/codeina "0.5.0"]
-            [lein-ancient "0.6.7" :exclusions [org.clojure/tools.reader]]]}
- :1.8 {:dependencies [[org.clojure/clojure "1.8.0-RC4"]]}
+            [lein-ancient "0.6.15" :exclusions [org.clojure/tools.reader]]]}
+ :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
  :bench
  [:dev
   {:main ^:skip-aot benchmarks
