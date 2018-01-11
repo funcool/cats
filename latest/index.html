@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.5">
-<meta name="author" content="Andrey Antukh &amp; Alejandro Gómez">
+<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="author" content="Andrey Antukh &amp;amp;amp; Alejandro Gómez">
 <title>Cats Documentation</title>
 <style>
 .listingblock .pygments .hll { background-color: #ffffcc }
@@ -85,8 +85,8 @@
 <div id="header">
 <h1>Cats Documentation</h1>
 <div class="details">
-<span id="author" class="author">Andrey Antukh &amp; Alejandro Gómez</span><br>
-<span id="revdate">2.1.0</span>
+<span id="author" class="author">Andrey Antukh &amp;amp;amp; Alejandro Gómez</span><br>
+<span id="revdate">2.2.0</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -205,7 +205,7 @@ it as a dependency in your <strong><em>project.clj</em></strong>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;2.1.0&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">[</span><span class="tok-nv">funcool/cats</span> <span class="tok-s">&quot;2.2.0&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -235,7 +235,7 @@ associative binary operation is analogous to Clojure&#8217;s <code>into</code>.<
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mappend</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]</span> <span class="tok-p">[</span><span class="tok-mi">4</span> <span class="tok-mi">5</span> <span class="tok-mi">6</span><span class="tok-p">])</span>
@@ -248,7 +248,7 @@ associative binary operation is analogous to Clojure&#8217;s <code>into</code>.<
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
@@ -270,7 +270,7 @@ types the <code>mempty</code> function is analogous to Clojure&#8217;s <code>emp
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
@@ -291,7 +291,7 @@ context", and the abstraction consists of one unique function: <strong>fmap</str
 <div class="listingblock">
 <div class="title">Signature of <strong>fmap</strong> function</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-p">[</span><span class="tok-nv">f</span> <span class="tok-nv">fv</span><span class="tok-p">])</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">fmap</span> <span class="tok-p">[</span><span class="tok-nv">f</span> <span class="tok-nv">fv</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -308,7 +308,7 @@ protocols.</p>
 <div class="listingblock">
 <div class="title">One good example of a functor is the <strong>Maybe</strong> type:</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 2&gt;</span></code></pre>
@@ -324,7 +324,7 @@ Maybe monad.</p>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>just</strong> instance.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 2&gt;</span></code></pre>
@@ -341,7 +341,7 @@ over a <strong>nothing</strong> instance:</p>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>nothing</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">(</span><span class="tok-nf">nothing</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Nothing&gt;</span></code></pre>
 </div>
 </div>
@@ -356,7 +356,7 @@ always returns a result of the same type as its second argument.</p>
 <div class="listingblock">
 <div class="title">Example using fmap over <strong>vector</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">])</span>
 <span class="tok-c1">;; =&gt; [2 3 4]</span></code></pre>
@@ -368,7 +368,7 @@ is that map returns lazy seqs no matter what collection we pass to it:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">type</span> <span class="tok-p">(</span><span class="tok-nb">map inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">type</span> <span class="tok-p">(</span><span class="tok-nb">map inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span><span class="tok-p">]))</span>
 <span class="tok-c1">;; =&gt; clojure.lang.LazySeq (cljs.core/LazySeq in ClojureScript)</span></code></pre>
 </div>
 </div>
@@ -392,7 +392,7 @@ execute a function wrapped in the same context.</p>
 <div class="listingblock">
 <div class="title">Signature of <strong>fapply</strong> function</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">[</span><span class="tok-nv">af</span> <span class="tok-nv">av</span><span class="tok-p">])</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">[</span><span class="tok-nv">af</span> <span class="tok-nv">av</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -421,7 +421,7 @@ greeter function, and you only support a few languages.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
   <span class="tok-p">[</span><span class="tok-o">^</span><span class="tok-nv">String</span> <span class="tok-nv">lang</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-nf">condp</span> <span class="tok-nb">= </span><span class="tok-nv">lang</span>
     <span class="tok-s">&quot;es&quot;</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">name</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">str </span><span class="tok-s">&quot;Hola &quot;</span> <span class="tok-nv">name</span><span class="tok-p">))</span>
@@ -438,7 +438,7 @@ the returned greeter is a valid function or a nil value.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">make-greeter</span>
   <span class="tok-p">[</span><span class="tok-o">^</span><span class="tok-nv">String</span> <span class="tok-nv">lang</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-nf">condp</span> <span class="tok-nb">= </span><span class="tok-nv">lang</span>
     <span class="tok-s">&quot;es&quot;</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">name</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">str </span><span class="tok-s">&quot;Hola &quot;</span> <span class="tok-nv">name</span><span class="tok-p">)))</span>
@@ -453,7 +453,7 @@ can apply the returned greeter to any value without a defensive nil check:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;es&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;es&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just &quot;Hola Alex&quot;&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-nf">make-greeter</span> <span class="tok-s">&quot;en&quot;</span><span class="tok-p">)</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-s">&quot;Alex&quot;</span><span class="tok-p">))</span>
@@ -472,7 +472,7 @@ you to put some value in side-effect-free context of the current type.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">pure</span> <span class="tok-nv">maybe/maybe-monad</span> <span class="tok-mi">5</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 5&gt;</span></code></pre>
@@ -496,7 +496,7 @@ data structure. Let&#8217;s look at a little example using <code>foldl</code>:</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">foldl</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">foldl</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
 <span class="tok-c1">;; =&gt; 15</span></code></pre>
 </div>
 </div>
@@ -505,7 +505,7 @@ data structure. Let&#8217;s look at a little example using <code>foldl</code>:</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nb">reduce </span><span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nb">reduce </span><span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">acc</span> <span class="tok-nv">v</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
 <span class="tok-c1">;; =&gt; 15</span></code></pre>
 </div>
 </div>
@@ -514,7 +514,7 @@ data structure. Let&#8217;s look at a little example using <code>foldl</code>:</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">foldr</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span> <span class="tok-nv">wc</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">v</span> <span class="tok-nv">wc</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">foldr</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span> <span class="tok-nv">wc</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">v</span> <span class="tok-nv">wc</span><span class="tok-p">))</span> <span class="tok-mi">0</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">])</span>
 <span class="tok-c1">;; =&gt; 15</span></code></pre>
 </div>
 </div>
@@ -530,7 +530,7 @@ let&#8217;s see a graphical representation of the <code>foldl</code> execution m
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">((((acc⊕1)⊕2)⊕3)⊕4)⊕5</code></pre>
+<pre class="pygments highlight"><code data-lang="text"><span></span>((((acc⊕1)⊕2)⊕3)⊕4)⊕5</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -538,7 +538,7 @@ let&#8217;s see a graphical representation of the <code>foldl</code> execution m
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">1⊕(2⊕(3⊕(4⊕(5⊕(wc)))))</code></pre>
+<pre class="pygments highlight"><code data-lang="text"><span></span>1⊕(2⊕(3⊕(4⊕(5⊕(wc)))))</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -549,7 +549,7 @@ the unique obvious case of using foldr is for small datastructures.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/foldr</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nb">cons </span><span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">%1</span><span class="tok-p">)</span> <span class="tok-nv">%2</span><span class="tok-p">)</span> <span class="tok-o">&#39;</span><span class="tok-p">()</span> <span class="tok-p">(</span><span class="tok-nb">range </span><span class="tok-mi">100000</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/foldr</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nb">cons </span><span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">%1</span><span class="tok-p">)</span> <span class="tok-nv">%2</span><span class="tok-p">)</span> <span class="tok-o">&#39;</span><span class="tok-p">()</span> <span class="tok-p">(</span><span class="tok-nb">range </span><span class="tok-mi">100000</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; StackOverflowError</span></code></pre>
 </div>
 </div>
@@ -560,7 +560,7 @@ how it behaves with maybe:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/foldl</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">%1</span> <span class="tok-nv">%2</span><span class="tok-p">))</span> <span class="tok-mi">1</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/foldl</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">%1</span> <span class="tok-nv">%2</span><span class="tok-p">))</span> <span class="tok-mi">1</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 2&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/foldl</span> <span class="tok-o">#</span><span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">%1</span> <span class="tok-nv">%2</span><span class="tok-p">))</span> <span class="tok-mi">1</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
@@ -582,7 +582,7 @@ other terms, it works with reducing function that return monad types.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">m-div</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">m-div</span>
   <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-nv">y</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-k">if </span><span class="tok-p">(</span><span class="tok-nb">zero? </span><span class="tok-nv">y</span><span class="tok-p">)</span>
     <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span>
@@ -621,7 +621,7 @@ not:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">just-if-even</span>
   <span class="tok-p">[</span><span class="tok-nv">n</span><span class="tok-p">]</span>
@@ -637,7 +637,7 @@ be evaluated from left to right using the applicative&#8217;s <code>fapply</code
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.context</span> <span class="tok-ss">:as</span> <span class="tok-nv">ctx</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">ctx/with-context</span> <span class="tok-nv">maybe/context</span>
@@ -674,7 +674,7 @@ functions to it and putting new values in a completely different context.</p>
 <div class="listingblock">
 <div class="title">Bind function signature.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">[</span><span class="tok-nv">mv</span> <span class="tok-nv">f</span><span class="tok-p">])</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">[</span><span class="tok-nv">mv</span> <span class="tok-nv">f</span><span class="tok-p">])</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -685,7 +685,7 @@ returned value in a context.</p>
 <div class="listingblock">
 <div class="title">Example usage of the bind higher-order function.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
         <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 2&gt;</span></code></pre>
 </div>
@@ -700,7 +700,7 @@ you can use <code>return</code> or <code>pure</code> functions:</p>
 <div class="listingblock">
 <div class="title">Usage of return function in bind context.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
         <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">v</span><span class="tok-p">]</span>
           <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">v</span><span class="tok-p">))))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 2&gt;</span></code></pre>
@@ -718,7 +718,7 @@ functions. But observe what happens when the number of computations increases:</
 <div class="listingblock">
 <div class="title">Composability example of bind function.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
         <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
           <span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
                   <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">b</span><span class="tok-p">]</span>
@@ -732,7 +732,7 @@ macro: <strong>mlet</strong></p>
 <div class="listingblock">
 <div class="title">Previous example but using <strong>mlet</strong> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
          <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))]</span>
   <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">b</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
 </div>
@@ -751,7 +751,7 @@ composition it will short-circuit.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mzero</span> <span class="tok-nv">maybe/maybe-monad</span><span class="tok-p">)</span>
@@ -764,7 +764,7 @@ a predicate:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
@@ -784,7 +784,7 @@ can be captured in a function, which is available in <code>cats.core</code> name
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">guard</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">guard</span>
   <span class="tok-p">[</span><span class="tok-nv">b</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-k">if </span><span class="tok-nv">b</span>
     <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-nv">nil</span><span class="tok-p">)</span>
@@ -796,7 +796,7 @@ can be captured in a function, which is available in <code>cats.core</code> name
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
@@ -812,7 +812,7 @@ can be captured in a function, which is available in <code>cats.core</code> name
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
@@ -835,7 +835,7 @@ values as falsey.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mplus</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
@@ -887,7 +887,7 @@ Just A or Some A).</p>
 <div class="listingblock">
 <div class="title">Example creating instances of <code>Just</code> and <code>Nothing</code> types:</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 1&gt;</span>
 
 <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">)</span>
@@ -912,7 +912,7 @@ the <code>from-maybe</code> function for that.</p>
 <div class="listingblock">
 <div class="title">Example using <strong>from-maybe</strong> to extract values wrapped by <strong>just</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; 1</span>
 
 <span class="tok-p">(</span><span class="tok-nf">maybe/from-maybe</span> <span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
@@ -934,7 +934,7 @@ maybe values are derrefable.</p>
 <div class="listingblock">
 <div class="title">Example using <strong>deref</strong> to extract values wrapped by <strong>just</strong>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nb">deref </span><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nb">deref </span><span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; 1</span>
 
 <span class="tok-p">(</span><span class="tok-nb">deref </span><span class="tok-p">(</span><span class="tok-nf">maybe/nothing</span><span class="tok-p">))</span>
@@ -964,7 +964,7 @@ contrast with maybe) it can return some data with a failed computation result.</
 <div class="listingblock">
 <div class="title">Usage example of <strong>Either</strong> constructors.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.either</span> <span class="tok-ss">:refer</span> <span class="tok-ss">:all</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nb">right </span><span class="tok-ss">:valid-value</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Right [:valid-value :right]&gt;</span>
@@ -1019,7 +1019,7 @@ the error handling and recovery.</p>
 <div class="listingblock">
 <div class="title">Usage example of <strong>try-on</strong> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.exception</span> <span class="tok-ss">:as</span> <span class="tok-nv">exc</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.exception</span> <span class="tok-ss">:as</span> <span class="tok-nv">exc</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Success [1]&gt;</span>
@@ -1036,14 +1036,14 @@ the return value when executing a function with the exception as first parameter
 <div class="listingblock">
 <div class="title">Usage example of <code>try-or-else</code> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-else</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">exc/try-or-else</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span> <span class="tok-mi">2</span><span class="tok-p">)</span>
 <span class="tok-c1">;; =&gt; #&lt;Success [2]&gt;</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Usage example of <code>try-or-recover</code> macro.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">exc/try-or-recover</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">exc/try-or-recover</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)</span>
                     <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">e</span><span class="tok-p">]</span>
                       <span class="tok-p">(</span><span class="tok-nf">cond</span>
                         <span class="tok-p">(</span><span class="tok-nb">instance? </span><span class="tok-nv">NullPointerException</span> <span class="tok-nv">e</span><span class="tok-p">)</span> <span class="tok-mi">0</span>
@@ -1063,7 +1063,7 @@ enclosed exception.</p>
 <div class="listingblock">
 <div class="title">Example dereferencing a failure instance</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">f</span> <span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)))</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">f</span> <span class="tok-p">(</span><span class="tok-nf">exc/try-on</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-mi">1</span> <span class="tok-nv">nil</span><span class="tok-p">)))</span>
 
 <span class="tok-o">@</span><span class="tok-nv">f</span>
 <span class="tok-c1">;; =&gt; NullPointerException   clojure.lang.Numbers.ops (Numbers.java:961)</span></code></pre>
@@ -1078,7 +1078,7 @@ can&#8217;t use them directly. First, you must load the <code>cats.builtin</code
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/fmap</span> <span class="tok-nb">inc </span><span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span><span class="tok-p">])</span>
@@ -1094,7 +1094,7 @@ type to be equivalent to Maybe monad&#8217;s <code>Nothing</code>. This means th
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
@@ -1116,7 +1116,7 @@ in <em>cats</em>, most notably as a monad. Compare the following <code>for</code
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nb">for </span><span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nb">for </span><span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span>
       <span class="tok-nv">y</span> <span class="tok-p">[</span><span class="tok-mi">3</span> <span class="tok-mi">4</span> <span class="tok-mi">5</span><span class="tok-p">]]</span>
    <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">x</span> <span class="tok-nv">y</span><span class="tok-p">))</span>
 <span class="tok-c1">;; =&gt; (4 5 6 5 6 7)</span></code></pre>
@@ -1127,7 +1127,7 @@ in <em>cats</em>, most notably as a monad. Compare the following <code>for</code
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">]</span>
@@ -1159,7 +1159,7 @@ comprehensions.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">lazy-seq</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span><span class="tok-p">])</span>
@@ -1176,7 +1176,7 @@ comprehensions.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/pure</span> <span class="tok-nv">set-context</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
@@ -1200,7 +1200,7 @@ together:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">use</span> <span class="tok-ss">&#39;cats.builtin</span><span class="tok-p">)</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mappend</span> <span class="tok-p">{</span><span class="tok-ss">:a</span> <span class="tok-s">&quot;A&quot;</span><span class="tok-p">}</span> <span class="tok-p">{</span><span class="tok-ss">:b</span> <span class="tok-s">&quot;B&quot;</span><span class="tok-p">})</span>
@@ -1237,7 +1237,7 @@ this let-like bindings:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
          <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))]</span>
   <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)))</span></code></pre>
 </div>
@@ -1247,7 +1247,7 @@ this let-like bindings:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
         <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
           <span class="tok-p">(</span><span class="tok-nf">m/bind</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
                   <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">b</span><span class="tok-p">]</span>
@@ -1270,7 +1270,7 @@ a <code>:let</code> clause, just like with Clojure&#8217;s <code>for</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
          <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">a</span><span class="tok-p">))</span>
          <span class="tok-ss">:let</span> <span class="tok-p">[</span><span class="tok-nv">z</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)]]</span>
   <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">* </span><span class="tok-nv">z</span> <span class="tok-mi">2</span><span class="tok-p">)))</span></code></pre>
@@ -1283,7 +1283,7 @@ one used in <code>for</code>. We can filter out values using <code>bind</code> w
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:as</span> <span class="tok-nv">maybe</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">maybe/just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
@@ -1298,7 +1298,7 @@ inside <code>mlet</code> bindings. Here is an example with vectors:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">]</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.builtin</span><span class="tok-p">]</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">[</span><span class="tok-mi">1</span> <span class="tok-mi">2</span> <span class="tok-mi">3</span> <span class="tok-mi">4</span><span class="tok-p">]</span>
@@ -1316,7 +1316,7 @@ happen one at a time. This piece of code illustrates the usage of monadic bind:<
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">bind</span> <span class="tok-nv">return</span><span class="tok-p">]])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">bind</span> <span class="tok-nv">return</span><span class="tok-p">]])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">bind</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
@@ -1339,7 +1339,7 @@ and <code>(just 41)</code> are independent and thus could be evaluated at the sa
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">mlet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
        <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">41</span><span class="tok-p">)]</span>
   <span class="tok-p">(</span><span class="tok-nf">return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">)))</span>
 <span class="tok-c1">;; =&gt; #&lt;Just 42&gt;</span></code></pre>
@@ -1350,7 +1350,7 @@ and <code>(just 41)</code> are independent and thus could be evaluated at the sa
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">alet</span><span class="tok-p">]])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">alet</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-nf">alet</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">1</span><span class="tok-p">)</span>
        <span class="tok-nv">b</span> <span class="tok-p">(</span><span class="tok-nf">just</span> <span class="tok-mi">41</span><span class="tok-p">)]</span>
@@ -1364,7 +1364,7 @@ the applicative context with <code>fapply</code>. This is roughly what <code>ale
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">fapply</span> <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">a</span><span class="tok-p">]</span>
            <span class="tok-p">(</span><span class="tok-k">fn </span><span class="tok-p">[</span><span class="tok-nv">b</span><span class="tok-p">]</span>
              <span class="tok-p">(</span><span class="tok-nf">do</span>
                <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span><span class="tok-p">))))</span>
@@ -1389,7 +1389,7 @@ clj/cljs library for emulate asynchronous behavior:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.promise</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">promesa.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">p</span><span class="tok-p">])</span>
 
@@ -1425,7 +1425,7 @@ clj/cljs library for emulate asynchronous behavior:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">time</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">time</span>
  <span class="tok-o">@</span><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">sleep-promise</span> <span class="tok-mi">42</span><span class="tok-p">)</span>
            <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">sleep-promise</span> <span class="tok-mi">41</span><span class="tok-p">)</span>
            <span class="tok-nv">z</span> <span class="tok-p">(</span><span class="tok-nf">sleep-promise</span> <span class="tok-p">(</span><span class="tok-nb">inc </span><span class="tok-nv">x</span><span class="tok-p">))</span>
@@ -1462,7 +1462,7 @@ accept parameters until all the expected parameters are given.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">add</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">]</span>
   <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">))</span>
@@ -1493,7 +1493,7 @@ can&#8217;t be curried but an arity for the curried function must be given:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">m/curry</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
 
@@ -1517,7 +1517,7 @@ building up results with context-specific effects.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried+</span> <span class="tok-p">(</span><span class="tok-nf">m/curry</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
@@ -1549,7 +1549,7 @@ if the function we are lifting has a fixed and a single arity:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">add</span> <span class="tok-p">[</span><span class="tok-nv">a</span> <span class="tok-nv">b</span> <span class="tok-nv">c</span><span class="tok-p">]</span>
@@ -1573,7 +1573,7 @@ that has multiple arities or is variadic:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">add-m</span> <span class="tok-p">(</span><span class="tok-nf">m/lift-m</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
@@ -1595,7 +1595,7 @@ mandatory when using this macro:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.monad.maybe</span> <span class="tok-ss">:refer</span> <span class="tok-p">[</span><span class="tok-nv">just</span> <span class="tok-nv">nothing</span><span class="tok-p">]])</span>
 
 <span class="tok-p">(</span><span class="tok-k">def </span><span class="tok-nv">curried-add-m</span> <span class="tok-p">(</span><span class="tok-nf">m/curry-lift-m</span> <span class="tok-mi">3</span> <span class="tok-nv">+</span><span class="tok-p">))</span>
@@ -1638,7 +1638,7 @@ for writing generators:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.core</span> <span class="tok-ss">:as</span> <span class="tok-nv">m</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.test</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">clojure.test.check.generators</span> <span class="tok-ss">:as</span> <span class="tok-nv">gen</span><span class="tok-p">])</span>
 
@@ -1685,7 +1685,7 @@ type and in consequence use it in <code>mlet</code> or <code>alet</code> macros.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">org.clojure/core.async</span> <span class="tok-s">&quot;0.2.385&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">[</span><span class="tok-nv">org.clojure/core.async</span> <span class="tok-s">&quot;0.2.385&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1696,7 +1696,7 @@ our case it&#8217;s consist in a just sleep operation:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">clojure.core.async</span> <span class="tok-ss">:as</span> <span class="tok-nv">a</span><span class="tok-p">])</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">clojure.core.async</span> <span class="tok-ss">:as</span> <span class="tok-nv">a</span><span class="tok-p">])</span>
 <span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.channel</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">async-call</span>
@@ -1715,7 +1715,7 @@ help of the <strong>mlet</strong> macro for bind values to asyncrhonous calls:</
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">time</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">time</span>
  <span class="tok-p">(</span><span class="tok-nf">&lt;!!</span> <span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">200</span><span class="tok-p">)</span>
                <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">100</span><span class="tok-p">)]</span>
         <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">x</span> <span class="tok-nv">y</span><span class="tok-p">)))))</span>
@@ -1758,7 +1758,7 @@ used <code>mlet</code> macro, but it has some advantages over it. Let see an exa
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">time</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">time</span>
   <span class="tok-p">(</span><span class="tok-nf">a/&lt;!!</span> <span class="tok-p">(</span><span class="tok-nf">m/alet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">100</span><span class="tok-p">)</span>
                   <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">100</span><span class="tok-p">)]</span>
             <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">x</span> <span class="tok-nv">y</span><span class="tok-p">)))))</span>
@@ -1798,7 +1798,7 @@ for asynchronous calls.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">time</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">time</span>
  <span class="tok-p">(</span><span class="tok-nf">a/&lt;!!</span> <span class="tok-p">(</span><span class="tok-nf">m/alet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">120</span><span class="tok-p">)</span>
                  <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">130</span><span class="tok-p">)</span>
                  <span class="tok-nv">z</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-p">(</span><span class="tok-nb">- </span><span class="tok-nv">x</span> <span class="tok-mi">100</span><span class="tok-p">))</span>
@@ -1834,7 +1834,7 @@ type and in consequence use it in <code>mlet</code> or <code>alet</code> macros.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">[</span><span class="tok-nv">manifold</span> <span class="tok-s">&quot;0.1.1&quot;</span><span class="tok-p">]</span></code></pre>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">[</span><span class="tok-nv">manifold</span> <span class="tok-s">&quot;0.1.1&quot;</span><span class="tok-p">]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1849,7 +1849,7 @@ call:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.manifold</span> <span class="tok-ss">:as</span> <span class="tok-nv">mf</span><span class="tok-p">]</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">require</span> <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">cats.labs.manifold</span> <span class="tok-ss">:as</span> <span class="tok-nv">mf</span><span class="tok-p">]</span>
          <span class="tok-o">&#39;</span><span class="tok-p">[</span><span class="tok-nv">manifold.deferred</span> <span class="tok-ss">:as</span> <span class="tok-nv">d</span><span class="tok-p">])</span>
 
 <span class="tok-p">(</span><span class="tok-kd">defn </span><span class="tok-nv">async-call</span>
@@ -1869,7 +1869,7 @@ using <code>mlet</code> and <code>alet</code> respectivelly.</p>
 <div class="listingblock">
 <div class="title">Example using manifold deferred with <code>mlet</code>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">time</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">time</span>
   <span class="tok-o">@</span><span class="tok-p">(</span><span class="tok-nf">m/mlet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">200</span><span class="tok-p">)</span>
             <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">100</span><span class="tok-p">)]</span>
      <span class="tok-p">(</span><span class="tok-nf">m/return</span> <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">x</span> <span class="tok-nv">y</span><span class="tok-p">)))))</span>
@@ -1889,7 +1889,7 @@ generic abstraction instread of a specific purpose macro.</p>
 <div class="listingblock">
 <div class="title">Example using manifold deferred with <code>alet</code>.</div>
 <div class="content">
-<pre class="pygments highlight"><code data-lang="clojure"><span class="tok-p">(</span><span class="tok-nf">time</span>
+<pre class="pygments highlight"><code data-lang="clojure"><span></span><span class="tok-p">(</span><span class="tok-nf">time</span>
   <span class="tok-o">@</span><span class="tok-p">(</span><span class="tok-nf">m/alet</span> <span class="tok-p">[</span><span class="tok-nv">x</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">100</span><span class="tok-p">)</span>
             <span class="tok-nv">y</span> <span class="tok-p">(</span><span class="tok-nf">async-call</span> <span class="tok-mi">100</span><span class="tok-p">)]</span>
      <span class="tok-p">(</span><span class="tok-nb">+ </span><span class="tok-nv">x</span> <span class="tok-nv">y</span><span class="tok-p">)))))</span>
@@ -1917,7 +1917,7 @@ generic abstraction instread of a specific purpose macro.</p>
 <p>Concurrent data fetching: <a href="https://github.com/funcool/urania" class="bare">https://github.com/funcool/urania</a></p>
 </li>
 <li>
-<p>Patter matching for the Cats' types: <a href="https://github.com/zalando/cats.match" class="bare">https://github.com/zalando/cats.match</a></p>
+<p>Pattern matching for the Cats' types: <a href="https://github.com/zalando/cats.match" class="bare">https://github.com/zalando/cats.match</a></p>
 </li>
 </ul>
 </div>
@@ -2018,7 +2018,7 @@ them correctly, you can use <code>define-clojure-indent</code> like in the follo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="elisp"><span class="tok-p">(</span><span class="tok-nb">require</span> <span class="tok-ss">&#39;clojure-mode</span><span class="tok-p">)</span>
+<pre class="pygments highlight"><code data-lang="elisp"><span></span><span class="tok-p">(</span><span class="tok-nb">require</span> <span class="tok-ss">&#39;clojure-mode</span><span class="tok-p">)</span>
 
 <span class="tok-p">(</span><span class="tok-nv">define-clojure-indent</span>
   <span class="tok-p">(</span><span class="tok-nv">alet</span> <span class="tok-ss">&#39;defun</span><span class="tok-p">)</span>
@@ -2037,7 +2037,7 @@ them correctly, you can use <code>define-clojure-indent</code> like in the follo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">git clone https://github.com/funcool/cats</code></pre>
+<pre class="pygments highlight"><code data-lang="text"><span></span>git clone https://github.com/funcool/cats</code></pre>
 </div>
 </div>
 </div>
@@ -2048,7 +2048,7 @@ them correctly, you can use <code>define-clojure-indent</code> like in the follo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">lein test</code></pre>
+<pre class="pygments highlight"><code data-lang="text"><span></span>lein test</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2056,7 +2056,7 @@ them correctly, you can use <code>define-clojure-indent</code> like in the follo
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">./scripts/build
+<pre class="pygments highlight"><code data-lang="text"><span></span>./scripts/build
 node ./out/tests.js</code></pre>
 </div>
 </div>
@@ -2065,7 +2065,7 @@ node ./out/tests.js</code></pre>
 <h3 id="license"><a class="link" href="#license">License</a></h3>
 <div class="listingblock">
 <div class="content">
-<pre class="pygments highlight"><code data-lang="text">Copyright (c) 2014-2016 Andrey Antukh &lt;niwi@niwi.nz&gt;
+<pre class="pygments highlight"><code data-lang="text"><span></span>Copyright (c) 2014-2016 Andrey Antukh &lt;niwi@niwi.nz&gt;
 Copyright (c) 2014-2016 Alejandro Gómez &lt;alejandro@dialelo.com&gt;
 
 All rights reserved.
@@ -2098,7 +2098,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code></pre
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-04-20 15:34:45 CEST
+Last updated 2018-01-11 09:53:43 CET
 </div>
 </div>
 </body>
