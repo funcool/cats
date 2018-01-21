@@ -10,6 +10,7 @@
        [(:require
          [cats.context :as ctx :include-macros true]
          [cats.core :as m :include-macros true]
+         [cats.data :as d]
          [cats.monad.state :as state]
          [cljs.test :as t])]))
 
