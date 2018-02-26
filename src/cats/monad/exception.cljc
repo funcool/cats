@@ -216,7 +216,7 @@
   (let [result (exec-try-on func)]
     (ctx/with-context context
       (if (failure? result)
-        (recoverfn (.failure ^Failure result))
+        (recoverfn (.-failure ^Failure result))
         result))))
 
 #?(:clj
