@@ -64,7 +64,10 @@
 
 (defprotocol Bifunctor
   "A 'Functor' of two arguments."
-  (-bimap  [btor f g bv] "Map over both arguments at the same time."))
+  (-bimap  [btor f g bv] "Map over both arguments at the same time.")
+  (-breturn [btor b f g]
+    "If the result of expression b is logical true, evaluate function g and return the result
+     wrapped in a bifunctor. Otherwise evaluate g and return the result in a bifunctor."))
 
 (defprotocol Applicative
   "The Applicative abstraction."

@@ -139,6 +139,11 @@
         (left  (f (p/-extract ^Left s)))
         (right (g (p/-extract ^Right s)))))
 
+    (-breturn [_ b f g]
+      (if b
+        (right (g))
+        (left (f))))
+
     p/Applicative
     (-pure [_ v]
       (right v))

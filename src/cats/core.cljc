@@ -113,6 +113,13 @@
     (return true)
     (mzero)))
 
+#?(:clj
+   (defn guard-unless
+     [b f]
+     (when-not (satisfies? p/Bifunctor (ctx/infer))
+       (throw (IllegalArgumentException. "unless must be used within bifunctor context")))
+     `(p/-breturn (ctx/infer) ~b ~f (constantly true))))
+
 (defn join
   "Remove one level of monadic structure.
   This is the same as `(bind mv identity)`."
@@ -264,6 +271,8 @@
                       :let  `(let ~r ~acc)
                       :when `(bind (guard ~r)
                                    (fn [~(gensym)] ~acc))
+                      :unless `(bind (guard-unless ~@r)
+                                     (fn [~(gensym)] ~acc))
                       `(bind ~r (fn [~l] ~acc))))
                   `(do ~@body)))))
 
