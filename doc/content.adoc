@@ -267,7 +267,7 @@ Examples:
 ----
 (require '[cats.monad.maybe :as maybe])
 
-(pure maybe/maybe-monad 5)
+(pure maybe/context 5)
 ;; => #<Just 5>
 ----
 
