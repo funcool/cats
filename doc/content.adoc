@@ -519,7 +519,7 @@ For the already familiar Maybe type the identity element is Nothing:
 (require '[cats.core :as m])
 (require '[cats.monad.maybe :as maybe])
 
-(m/mzero maybe/maybe-monad)
+(m/mzero maybe/context)
 ;; => #<Nothing>
 ----
 
