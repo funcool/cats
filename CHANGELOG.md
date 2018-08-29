@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.3.0 ##
+
+Date: 2018-08-29
+
+- Add state monad implementation
+
 ## Version 2.2.0 ##
 
 Date: 2018-01-11
