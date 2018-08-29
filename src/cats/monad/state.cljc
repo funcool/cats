@@ -135,7 +135,7 @@
                        (return y)))
     (def initial-state 1)
     (run-state computation initial-state)
-  This should be return something to: #<Pair [1 2]>"
+  This should return something to: #<Pair [1 2]>"
   [state seed]
   ((p/-extract state) seed))
 
