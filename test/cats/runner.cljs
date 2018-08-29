@@ -6,6 +6,7 @@
             [cats.monad.exception-spec]
             [cats.monad.either-spec]
             [cats.monad.maybe-spec]
+            [cats.monad.state-spec]
             [cats.monad.identity-spec]
             [cats.labs.sugar-spec]
             [cats.labs.channel-spec]
@@ -22,6 +23,7 @@
    'cats.monad.either-spec
    'cats.monad.maybe-spec
    'cats.monad.identity-spec
+   'cats.monad.state-spec
    'cats.labs.sugar-spec
    'cats.labs.channel-spec
    'cats.labs.promise-spec))
