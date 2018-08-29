@@ -13,7 +13,6 @@ Date: 2018-01-11
 - Fix some issues with wrong handling of dynamic context.
 - Convert some functions to macros for delay args evaluation.
 
-
 ## Version 2.1.0 ##
 
 Date: 2017-04-20
