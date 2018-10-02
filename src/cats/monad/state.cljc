@@ -4,7 +4,8 @@
             [cats.core :as m]
             [cats.data :as d]
             [cats.protocols :as p]
-            [cats.util :as util]))
+            [cats.util :as util])
+  (:import (cats.data Pair)))
 
 (declare context)
 
@@ -73,7 +74,7 @@
 
     (-mbind [_ self f]
       (state (fn [s]
-               (let [p          ((p/-extract self) s)
+               (let [^Pair p  ((p/-extract self) s)
                      value    (.-fst p)
                      newstate (.-snd p)]
                  ((p/-extract (f value)) newstate)))))
