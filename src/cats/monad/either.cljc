@@ -127,6 +127,13 @@
   context
   (reify
     p/Context
+
+    p/Semigroup
+    (-mappend [_ sv sv']
+      (if (right? sv)
+        sv
+        sv'))
+
     p/Functor
     (-fmap [_ f s]
       (if (right? s)
