@@ -6,6 +6,10 @@ Date: 2018-08-29
 
 - Add state monad implementation
 
+Date: 2018-10-05
+
+- Implement Semigroup for Either
+
 ## Version 2.2.0 ##
 
 Date: 2018-01-11
