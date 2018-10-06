@@ -47,6 +47,13 @@
 (def vectors-gen
   (gen/vector gen/any))
 
+;; Semigroup
+
+(defspec either-semigroup 10
+  (lt/semigroup-associativity
+   {:ctx either/context
+    :gen (rights-of (gen/not-empty vectors-gen))}))
+
 ;; Functor
 
 (defspec either-first-functor-law 10
