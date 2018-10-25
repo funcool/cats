@@ -306,7 +306,7 @@ And the same operation can be done using `foldr`:
 ;; => 15
 ----
 
-The main difference between `foldl` and `reduce` is that `foldl` has a fixed
+The main difference between `foldl` and `reduce` is that `reduce` has a fixed
 arity so all parameters are mandatory and `foldl` is a generic abstraction that
 can work with other types apart from collections.
 
