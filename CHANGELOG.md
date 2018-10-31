@@ -2,6 +2,10 @@
 
 ## Version 2.3.0 ##
 
+Date: 2018-10-31
+
+- Override put,get,swap to receive monad context
+
 Date: 2018-08-29
 
 - Add state monad implementation
