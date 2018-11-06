@@ -11,7 +11,6 @@
                  [manifold "0.1.6" :scope "provided"]
                  [funcool/promesa "1.9.0" :scope "provided"]]
   :deploy-repositories {"releases"  :clojars
-                        :sign-releases false
                         "snapshots" :clojars}
   :source-paths   ["src"]
   :test-paths     ["test"]
