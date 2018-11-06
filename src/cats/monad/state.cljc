@@ -109,23 +109,29 @@
 (defn get
   "Return a State instance with computation that returns
   the current state."
-  []
-  (ctx/with-context (get-context)
-    (-get-state (ctx/infer))))
+  ([context]
+   (ctx/with-context context
+     (-get-state (ctx/infer))))
+  ([]
+   (get (get-context))))
 
 (defn put
   "Return a State instance with computation that replaces
   the current state with specified new state."
-  [newstate]
-  (ctx/with-context (get-context)
-    (-put-state (ctx/infer) newstate)))
+  ([newstate context]
+   (ctx/with-context context
+     (-put-state (ctx/infer) newstate)))
+  ([newstate]
+   (put newstate (get-context))))
 
 (defn swap
   "Return a State instance with computation that applies the
   specified function to state and returns the old state."
-  [f]
-  (ctx/with-context (get-context)
-    (-swap-state (ctx/infer) f)))
+  ([f context]
+   (ctx/with-context context
+     (-swap-state (ctx/infer) f)))
+  ([f]
+   (swap f (get-context))))
 
 (defn run
   "Given a State instance, execute the
