@@ -1,5 +1,5 @@
-(defproject funcool/cats "2.3.0"
-  :description "Category Theory abstractions for Clojure"
+(defproject funcool/cats "2.3.1"
+  :description "Category Theory1abstractions for Clojure"
   :url         "https://github.com/funcool/cats"
   :license {:name "BSD (2 Clause)"
             :url  "http://opensource.org/licenses/BSD-2-Clause"}
@@ -11,6 +11,7 @@
                  [manifold "0.1.6" :scope "provided"]
                  [funcool/promesa "1.9.0" :scope "provided"]]
   :deploy-repositories {"releases"  :clojars
+                        :sign-releases false
                         "snapshots" :clojars}
   :source-paths   ["src"]
   :test-paths     ["test"]

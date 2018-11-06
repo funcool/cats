@@ -1,10 +1,12 @@
 # Changelog #
 
-## Version 2.3.0 ##
+## Version 2.3.1 ##
 
 Date: 2018-10-31
 
 - Override put,get,swap to receive monad context
+
+## Version 2.3.0 ##
 
 Date: 2018-08-29
 
