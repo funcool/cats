@@ -2,10 +2,10 @@
   (:refer-clojure :exclude [eval get])
   (:require [cats.context :as ctx :refer [*context*]]
             [cats.core :as m]
-            [cats.data :as d]
+            [cats.data :as d #?@(:cljs [:refer [Pair]])]
             [cats.protocols :as p]
             [cats.util :as util])
-  (:import (cats.data Pair)))
+  #?(:clj (:import (cats.data Pair))))
 
 (declare context)
 
