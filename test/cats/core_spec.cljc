@@ -298,3 +298,36 @@
       (t/is (= (maybe/just 1)
                (ctx/with-context maybe/context
                  (m/foldm m-div 1 [])))))))
+
+(t/deftest do-let-tests
+  (t/testing "Support regular let bindings inside do-let"
+    (t/is (= (maybe/just 2)
+             (m/do-let [i (maybe/just 1)
+                        :let [i (inc i)]]
+               (m/return i)))))
+
+  (t/testing "Support :when guards inside its bindings"
+    (t/is (= (maybe/nothing)
+             (m/do-let [i (maybe/just 2)
+                        :when (> i 2)]
+               (m/return i))))
+    (t/is (= [3 4 5]
+             (m/do-let [i [1 2 3 4 5]
+                        :when (> i 2)]
+                       (m/return i)))))
+
+  (t/testing "Support one single form"
+    (t/is (= (maybe/just 2)
+             (m/do-let (maybe/just 2)))))
+
+  (t/testing "Support multiple single form"
+    (t/is (= (maybe/just 3)
+             (m/do-let (maybe/just 2)
+                       (maybe/just 3)))))
+
+  (t/testing "Bound variables are always in scope"
+    (t/is (= (maybe/just 6)
+             (m/do-let [x (maybe/just 2)]
+                       (maybe/just x)
+                       [y (maybe/just (+ 2 x))]
+                       (maybe/just (+ 2 y)))))))

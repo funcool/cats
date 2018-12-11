@@ -1013,3 +1013,39 @@
   ([ctx f tv]
    (ctx/with-context ctx
      (p/-traverse (p/-get-context tv) f tv))))
+
+(defmacro do-let
+  "Haskell-inspired monadic do notation
+   it allows one to drop the _ when  we don't need the extracted value
+
+  Basically,
+  (do-let
+    a
+    b
+    [c d
+     e f]
+    x
+    y)
+
+  Translates into:
+
+  (mlet
+    [_ a
+     _ b
+     c d
+     e f
+     _ x]
+    y)
+  "
+  [& forms]
+  (assert (not (empty? forms)) "do-let must have at least one argument")
+  (assert (not (vector? (last forms))) "Last argument of do-let must not be a vector")
+  (if (= 1 (count forms))
+    `(do (assert (not (satisfies? p/Monad ~(first forms))) "Single argument of do-let must implement Monad protocol")
+         ~(first forms))
+    `(mlet ~(vec (reduce (fn [acc form]
+                           (cond (vector? form) (into acc form)
+                                 :else          (into acc ['_ form])))
+                         []
+                         (butlast forms)))
+       ~(last forms))))

@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.3.2
+
+Date: 2018-11-07
+
+- Introduce haskell-inspired do-let macro
+
 ## Version 2.3.1 ##
 
 Date: 2018-10-31
