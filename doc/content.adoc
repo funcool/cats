@@ -157,7 +157,10 @@ over a *nothing* instance:
 .Example using fmap over *nothing*.
 [source, clojure]
 ----
-(m/fmap inc (nothing))
+(require '[cats.monad.maybe :as maybe])
+(require '[cats.core :as m])
+
+(m/fmap inc (maybe/nothing))
 ;; => #<Nothing>
 ----
 
@@ -237,9 +240,9 @@ Let's convert this factory to use the Maybe type:
 (defn make-greeter
   [^String lang]
   (condp = lang
-    "es" (just (fn [name] (str "Hola " name)))
-    "en" (just (fn [name] (str "Hello " name)))
-    (nothing)))
+    "es" (maybe/just (fn [name] (str "Hola " name)))
+    "en" (maybe/just (fn [name] (str "Hello " name)))
+    (maybe/nothing)))
 ----
 
 As you can see, this version of the factory differs only slightly from the
@@ -248,13 +251,13 @@ can apply the returned greeter to any value without a defensive nil check:
 
 [source, clojure]
 ----
-(fapply (make-greeter "es") (just "Alex"))
+(m/fapply (make-greeter "es") (maybe/just "Alex"))
 ;; => #<Just "Hola Alex">
 
-(fapply (make-greeter "en") (just "Alex"))
+(m/fapply (make-greeter "en") (maybe/just "Alex"))
 ;; => #<Just "Hello Alex">
 
-(fapply (make-greeter "it") (just "Alex"))
+(m/fapply (make-greeter "it") (maybe/just "Alex"))
 ;; => #<Nothing>
 ----
 
@@ -267,7 +270,7 @@ Examples:
 ----
 (require '[cats.monad.maybe :as maybe])
 
-(pure maybe/context 5)
+(m/pure maybe/context 5)
 ;; => #<Just 5>
 ----
 
@@ -286,7 +289,7 @@ data structure. Let's look at a little example using `foldl`:
 
 [source, clojure]
 ----
-(foldl (fn [acc v] (+ acc v)) 0 [1 2 3 4 5])
+(m/foldl (fn [acc v] (+ acc v)) 0 [1 2 3 4 5])
 ;; => 15
 ----
 
@@ -302,7 +305,7 @@ And the same operation can be done using `foldr`:
 
 [source, clojure]
 ----
-(foldr (fn [v wc] (+ v wc)) 0 [1 2 3 4 5])
+(m/foldr (fn [v wc] (+ v wc)) 0 [1 2 3 4 5])
 ;; => 15
 ----
 
