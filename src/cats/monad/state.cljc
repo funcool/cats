@@ -141,7 +141,7 @@
                             y (put-state (inc x))]
                        (return y)))
     (def initial-state 1)
-    (run-state computation initial-state)
+    (run computation initial-state)
   This should return something to: #<Pair [1 2]>"
   [state seed]
   ((p/-extract state) seed))
@@ -151,7 +151,7 @@
   wrapped computation and return the resultant
   value, ignoring the state.
   Equivalent to taking the first value of the pair instance
-  returned by `run-state` function."
+  returned by `run` function."
   [state seed]
   (first (run state seed)))
 
@@ -160,7 +160,7 @@
   wrapped computation and return the resultant
   state.
   Equivalent to taking the second value of the pair instance
-  returned by `run-state` function."
+  returned by `run` function."
   [state seed]
   (second (run state seed)))
 
