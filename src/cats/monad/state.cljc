@@ -91,7 +91,7 @@
 
     p/Printable
     (-repr [_]
-      #"<State>")))
+      "#<State>")))
 
 (util/make-printable (type context))
 
