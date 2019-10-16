@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.3.3
+
+Date: 2019-10-02
+
+- Fix typo in cats/monad/state.clj: -repr should return a string, not a regex
+
 ## Version 2.3.2
 
 Date: 2018-11-07
