@@ -49,4 +49,7 @@
     (t/is (= (state/run (state/wrap-fn (fn [] (+ 2 3))) 0) (d/pair 5 0))))
 
   (t/testing "post-increment"
-    (t/is (= (state/run postincrement 1) (d/pair 1 2)))))
+    (t/is (= (state/run postincrement 1) (d/pair 1 2))))
+
+  (t/testing "print context"
+    (t/is (= (pr-str state/context) "#<State>"))))
