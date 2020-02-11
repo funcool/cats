@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.3.4
+
+Date: 2020-02-11
+
+- gets can receive monad context as argument
+
 ## Version 2.3.3
 
 Date: 2019-10-02
