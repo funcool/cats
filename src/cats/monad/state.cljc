@@ -167,9 +167,11 @@
 (defn gets
   "State monad that returns the result of applying
   a function to a state"
-  [projfn]
-  (m/mlet [s (get)]
-    (m/return (projfn s))))
+  ([projfn context]
+   (m/mlet [s (get context)]
+     (m/return (projfn s))))
+  ([projfn]
+   (gets projfn (get-context))))
 
 (defn wrap-fn
   "Wraps a (possibly side-effecting) function to a state monad"
