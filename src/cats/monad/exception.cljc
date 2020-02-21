@@ -73,7 +73,7 @@
   "Return true if `v` is an instance of
   the Throwable or js/Error type."
   [e]
-  (instance? #?(:clj Exception :cljs js/Error) e))
+  (instance? #?(:clj Throwable :cljs js/Error) e))
 
 ;; --- Types and implementations.
 
