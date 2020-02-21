@@ -199,7 +199,7 @@
         (throwable? result) (failure result)
         (exception? result) result
         :else (success result)))
-    (catch #?(:clj Exception
+    (catch #?(:clj Throwable
               :cljs js/Error) e (failure e))))
 
 (defn ^{:no-doc true}
