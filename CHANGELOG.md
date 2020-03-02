@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.3.5
+
+Date: 2020-02-21
+
+- Change exception monad to catch all throwables instead of exceptions only
+
 ## Version 2.3.4
 
 Date: 2020-02-11
