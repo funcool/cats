@@ -284,60 +284,6 @@
     :else
     '()))
 
-(defn- rename-sym
-  [expr renames]
-  (get renames expr expr))
-
-(defn- rename
-  [expr renames]
-  (cond
-    (symbol? expr)
-    (rename-sym expr renames)
-    (seq? expr)
-    (map #(rename % renames) expr)
-    :else
-    expr))
-
-(defn- dedupe-symbols*
-  [sym->ap body]
-  (letfn [(renamer [{:keys [body syms aps seen renames] :as summ} [s ap]]
-           (let [ap' (rename ap renames)
-                 new-aps (conj aps ap')]
-             (if (seen s)
-               (let [s' (gensym)
-                     new-syms (conj syms s')
-                     new-seen (conj seen s')
-                     new-renames (assoc renames s s')
-                     new-body (rename body new-renames)]
-                 {:syms new-syms
-                  :aps new-aps
-                  :seen new-seen
-                  :renames new-renames
-                  :body new-body})
-               (let [new-syms (conj syms s)
-                     new-seen (conj seen s)]
-                 {:syms new-syms
-                  :aps new-aps
-                  :seen new-seen
-                  :renames renames
-                  :body body}))))]
-    (let [summ
-          (reduce renamer
-                  {:syms []
-                   :aps []
-                   :seen #{}
-                   :renames {}
-                   :body body}
-                  sym->ap)]
-      [(mapv vector (:syms summ) (:aps summ)) (:body summ)])))
-
-(defn- dedupe-symbols
-  [bindings body]
-  (let [syms (map first bindings)
-        aps (map second bindings)
-        sym->ap (mapv vector syms aps)]
-    (dedupe-symbols* sym->ap body)))
-
 (defn- dependency-map
   [sym->ap]
   (let [syms (map first sym->ap)
@@ -462,9 +408,11 @@
                     (even? (count bindings)))
        (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
      (let [bindings (partition 2 bindings)
-           [bindings body] (dedupe-symbols bindings body)
+           symbols (into #{} (map first bindings))
            batches (bindings->batches bindings)
-           env (into {} bindings)]
+           env (into {} (map #(into [] %) bindings))]
+       (when-not (= (count symbols) (count bindings))
+         (throw (IllegalArgumentException. "no duplicate symbols allowed in bindings.")))
        (if (and (= (count batches) 1)
                 (= (count (map first bindings)) 1))
          `(fmap (fn [~@(map first bindings)]
