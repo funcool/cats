@@ -4,19 +4,34 @@
             [cats.context :as mc]
             [cats.protocols :as mp]
             [promesa.core :as p]
+            [promesa.impl :as pi]
             [promesa.protocols :as pp])
   #?(:clj
      (:import java.util.concurrent.CompletableFuture)))
 
 (declare context)
 
-(extend-type #?(:cljs p/Promise :clj CompletableFuture)
-  mp/Contextual
-  (-get-context [_] context)
+#?(:cljs
+   (defn extend-promise!
+     [t]
+     (extend-type t
+       mp/Contextual
+       (-get-context [_] context)
 
-  mp/Extract
-  (-extract [it]
-    (pp/-extract it)))
+       mp/Extract
+       (-extract [it]
+         (pp/-extract it)))))
+
+#?(:cljs (extend-promise! pi/*default-promise*))
+
+#?(:clj
+   (extend-type CompletableFuture
+     mp/Contextual
+     (-get-context [_] context)
+
+     mp/Extract
+     (-extract [it]
+       (pp/-extract it))))
 
 (def ^:no-doc context
   (reify
@@ -29,7 +44,7 @@
     (-bimap [_ err succ mv]
       (-> mv
           (pp/-map succ)
-          (pp/-catch err)))
+          (pp/-thenErr err)))
 
     mp/Monad
     (-mreturn [_ v]
