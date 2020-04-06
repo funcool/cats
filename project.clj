@@ -9,7 +9,7 @@
                  [org.clojure/test.check "0.9.0" :scope "provided"]
                  [org.clojure/core.match "0.3.0-alpha4" :scope "provided"]
                  [manifold "0.1.6" :scope "provided"]
-                 [funcool/promesa "1.9.0" :scope "provided"]]
+                 [funcool/promesa "5.1.0" :scope "provided"]]
   :deploy-repositories {"releases"  :clojars
                         "snapshots" :clojars}
   :source-paths   ["src"]
