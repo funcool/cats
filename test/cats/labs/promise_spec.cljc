@@ -4,31 +4,21 @@
                      [cats.context :as ctx :include-macros true]
                      [cats.core :as m :include-macros true]
                      [cats.labs.promise :as pm]
-                     [promesa.core :as p])
+                     [promesa.core :as p]
+                     [promesa.impl :as pi]
+                     [promesa.exec :as pe])
      :clj  (:require [clojure.test :as t]
                      [cats.builtin :as b]
                      [cats.context :as ctx]
                      [cats.core :as m]
                      [cats.labs.promise :as pm]
-                     [promesa.core :as p])))
+                     [promesa.core :as p]
+                     [promesa.exec :as pe])))
 
 
 (defn future-ok
   [sleep value]
-  (p/promise (fn [resolve reject]
-               (p/schedule sleep #(resolve value)))))
-
-(defn future-fail
-  [sleep value]
-  (p/promise (fn [_ reject]
-               (p/schedule sleep #(reject value)))))
-
-
-#?(:cljs
-   (t/deftest extract-from-rejected-promise
-     (let [p1 (p/rejected 42)]
-       (t/is (p/rejected? p1))
-       (t/is (= (p/extract p1) 42)))))
+  (p/delay sleep value))
 
 (t/deftest chaining-using-bind
   #?(:cljs
