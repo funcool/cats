@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.3.6
+
+Date: 2020-04-07
+
+- Bump Promesa version from 1.9.0 to 5.1.0
+
 ## Version 2.3.5
 
 Date: 2020-02-21
