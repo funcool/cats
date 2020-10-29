@@ -331,3 +331,10 @@
                        (maybe/just x)
                        [y (maybe/just (+ 2 x))]
                        (maybe/just (+ 2 y)))))))
+
+(t/deftest for-tests
+  (t/testing "m/for works like (m/sequence (clojure.core/for))"
+    (t/is (= (maybe/just [2 3])
+             (m/sequence [(maybe/just 2) (maybe/just 3)])
+             (m/sequence (for [x [2 3]] (maybe/just x)))
+             (m/for [x [2 3]] (maybe/just x))))))

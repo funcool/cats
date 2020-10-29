@@ -35,7 +35,7 @@
      (:require [cats.protocols :as p]
                [clojure.set]
                [cats.context :as ctx]))
-  (:refer-clojure :exclude [filter sequence unless when]))
+  (:refer-clojure :exclude [filter sequence unless when for]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Context-aware functions
@@ -343,13 +343,13 @@
   (let [syms (map first sym->ap)
         symset (set syms)]
     (into []
-          (for [[s ap] sym->ap
+          (clojure.core/for [[s ap] sym->ap
                 :let [ds (set (deps ap symset))]]
             [s ds]))))
 
 (defn- remove-deps
   [deps symset]
-  (let [removed (for [[s depset] deps]
+  (let [removed (clojure.core/for [[s depset] deps]
                   [s (clojure.set/difference depset symset)])]
     (into (empty deps) removed)))
 
@@ -551,7 +551,7 @@
    See `cats.labs.sugar/ap->` for more in-depth discussion."
   [expr name & forms]
   `(let [~name ~expr
-         ~@(interleave (repeat name) (for [form forms] `(ap ~@form)))]
+         ~@(interleave (repeat name) (clojure.core/for [form forms] `(ap ~@form)))]
      ~name))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -650,7 +650,7 @@
                            ([] f#)
                            ([~@args] ~body))
          :else
-         (let [arities (for [n (range 1 (count args))]
+         (let [arities (clojure.core/for [n (range 1 (count args))]
                          `([~@(take n args)] (curry* ~(drop n args) ~body)))]
            `(fn f#
               ([] f#)
@@ -807,6 +807,20 @@
                     (return (cons v vs))))
                 (return ())
                 (reverse mvs))))))
+
+(defmacro for
+  "Syntactic wrapper for (sequence (for [,,,] mv)).
+
+      (require '[cats.core :as m]
+               '[cats.monad.maybe :as maybe])
+
+      (m/for [x [2 3]] (maybe/just x))
+      ;; => #<Just [[2, 3]]>
+
+  See cats.core/sequence
+  See clojure.core/for"
+  [seq-exprs mv]
+  `(sequence (clojure.core/for ~seq-exprs ~body-expr)))
 
 (defn mapseq
   "Given a function `mf` that takes a value and puts it into a
