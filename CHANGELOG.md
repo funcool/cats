@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.4.0
+
+Date: 2020-11-03
+
+- Add `cats.core/for` macro
+
 ## Version 2.3.6
 
 Date: 2020-04-07
