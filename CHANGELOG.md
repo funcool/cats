@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.4.1
+
+Date: 2020-11-04
+
+- Fix bug in `for` implementation
+
 ## Version 2.4.0
 
 Date: 2020-11-03
