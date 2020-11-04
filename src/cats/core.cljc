@@ -819,7 +819,7 @@
 
   See cats.core/sequence
   See clojure.core/for"
-  [seq-exprs mv]
+  [seq-exprs body-expr]
   `(sequence (clojure.core/for ~seq-exprs ~body-expr)))
 
 (defn mapseq
