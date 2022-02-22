@@ -1,0 +1,2 @@
+{:config-paths ["../resources/clj-kondo.exports/funcool/cats"]
+ :lint-as {clojure.test.check.properties/for-all clojure.core/let}}

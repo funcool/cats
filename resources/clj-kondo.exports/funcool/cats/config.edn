@@ -1,0 +1,9 @@
+{:lint-as {cats.core/mlet clojure.core/let
+           cats.core/alet clojure.core/let
+           cats.core/ap-> clojure.core/->
+           cats.core/ap->> clojure.core/->>
+           cats.core/as-ap-> clojure.core/as->
+           cats.core/->= clojure.core/->
+           cats.core/->>= clojure.core/->>
+           cats.core/as->= clojure.core/as->
+           cats.core/for clojure.core/for}}
