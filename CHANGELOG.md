@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.4.2
+
+Date: 2022-02-22
+
+- Exports clj-kondo configuration, this makes every lib consumer to lint correctly its usages
+
 ## Version 2.4.1
 
 Date: 2020-11-04
