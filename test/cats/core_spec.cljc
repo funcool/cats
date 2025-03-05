@@ -31,9 +31,9 @@
 (t/deftest mlet-tests
   (t/testing "Support regular let bindings inside mlet"
     (t/is (= (maybe/just 2)
-             (m/mlet [i (maybe/just 1)
+             (m/mlet [{i :i j :j} (maybe/just {:i 1 :j 0})
                       :let [i (inc i)]]
-               (m/return i)))))
+               (m/return (+ i j))))))
 
   (t/testing "Support :when guards inside its bindings"
     (t/is (= (maybe/nothing)
