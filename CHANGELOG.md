@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 2.4.3
+
+Date: 2025-03-10
+
+- Change mlet to declare monad functions on a single let form to avoid too long class file names
+
 ## Version 2.4.2
 
 Date: 2022-02-22

@@ -229,6 +229,22 @@
 ;; Monadic Let Macro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn- flatten-bindings
+  [bindings]
+  (filterv symbol? (tree-seq coll? seq bindings)))
+
+(defn- parse-step
+  [[l r] fn-bindings fn-sym]
+  (case l
+    :let
+    (let [normalized-bindings (flatten-bindings (conj fn-bindings (take-nth 2 r)))]
+      [`(let ~r (~fn-sym ~@normalized-bindings)) normalized-bindings])
+    :when
+    (let [normalized-bindings (flatten-bindings fn-bindings)]
+      [`(bind (guard ~r) (partial ~fn-sym ~@normalized-bindings)) (conj normalized-bindings '_)])
+    (let [normalized-bindings (flatten-bindings fn-bindings)]
+      [`(bind ~r (partial ~fn-sym ~@normalized-bindings)) (conj normalized-bindings l)])))
+
 #?(:clj
    (defmacro mlet
      "Monad composition macro that works like Clojure's
@@ -258,14 +274,20 @@
                     (not-empty bindings)
                     (even? (count bindings)))
        (throw (IllegalArgumentException. "bindings has to be a vector with even number of elements.")))
-     (->> (reverse (partition 2 bindings))
-          (reduce (fn [acc [l r]]
-                    (case l
-                      :let  `(let ~r ~acc)
-                      :when `(bind (guard ~r)
-                                   (fn [~(gensym)] ~acc))
-                      `(bind ~r (fn [~l] ~acc))))
-                  `(do ~@body)))))
+     (let [first-sym (gensym)
+           [let-body new-fn-bindings] (parse-step (take 2 bindings) [] first-sym)]
+       (loop [rem-bindings (next (partition 2 bindings))
+              current-sym first-sym
+              fn-bindings new-fn-bindings
+              new-bindings []]
+         (if (empty? rem-bindings)
+           (list 'let (into [] cat [[current-sym `(fn ~'_ ~(conj ['&] fn-bindings) ~@body)] new-bindings]) let-body)
+           (let [new-sym (gensym)
+                 [expr new-fn-bindings] (parse-step (first rem-bindings) fn-bindings new-sym)]
+             (recur (next rem-bindings)
+                    new-sym
+                    new-fn-bindings
+                    (into [] cat [[current-sym `(fn ~'_ ~(conj ['&] fn-bindings) ~expr)] new-bindings]))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Applicative Let Macro
