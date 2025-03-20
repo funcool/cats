@@ -30,10 +30,11 @@
 
 (t/deftest mlet-tests
   (t/testing "Support regular let bindings inside mlet"
-    (t/is (= (maybe/just 2)
-             (m/mlet [{i :i j :j} (maybe/just {:i 1 :j 0})
-                      :let [i (inc i)]]
-               (m/return (+ i j))))))
+    (t/is (= (maybe/just 20)
+             (m/mlet [[{:n/keys [a b c] y2 :i j :j :or {c 'yes}}] (maybe/just [{:i 1 :j 1 :n/a 2 :n/b 3}])
+                      :let [[[x1 y1] [x2 & [y2]] & remaining :as all-vec] (sorted-map j a b 4)]
+                      {age :age :keys [m/w ::m/z :zero] :or {z 5 w 5} :as all-map} (m/return {:age (+ x1 x2 y1 y2) :zero 0})]
+                     (m/return (when (= c 'yes) (+ zero w z age)))))))
 
   (t/testing "Support :when guards inside its bindings"
     (t/is (= (maybe/nothing)
