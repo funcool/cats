@@ -34,6 +34,7 @@
      :clj
      (:require [cats.protocols :as p]
                [clojure.set]
+               [clojure.walk :as walk]
                [cats.context :as ctx]))
   (:refer-clojure :exclude [filter sequence unless when for]))
 
@@ -229,21 +230,26 @@
 ;; Monadic Let Macro
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn- flatten-bindings
-  [bindings]
-  (filterv symbol? (tree-seq coll? seq bindings)))
+#?(:clj
+   (defn- extract-bound-symbols
+     [bindings]
+     (->> bindings
+          (walk/prewalk #(if (map? %) (dissoc (update % :keys (partial map (comp symbol name))) :or) %))
+          (tree-seq coll? seq)
+          (filterv #(and (symbol? %) (not= '& %))))))
 
-(defn- parse-step
-  [[l r] fn-bindings fn-sym]
-  (case l
-    :let
-    (let [normalized-bindings (flatten-bindings (conj fn-bindings (take-nth 2 r)))]
-      [`(let ~r (~fn-sym ~@normalized-bindings)) normalized-bindings])
-    :when
-    (let [normalized-bindings (flatten-bindings fn-bindings)]
-      [`(bind (guard ~r) (partial ~fn-sym ~@normalized-bindings)) (conj normalized-bindings '_)])
-    (let [normalized-bindings (flatten-bindings fn-bindings)]
-      [`(bind ~r (partial ~fn-sym ~@normalized-bindings)) (conj normalized-bindings l)])))
+#?(:clj
+   (defn- parse-step
+     [[l r] fn-bindings fn-sym]
+     (case l
+       :let
+       (let [normalized-bindings (extract-bound-symbols (conj fn-bindings (take-nth 2 r)))]
+         [`(let ~r (~fn-sym ~@normalized-bindings)) normalized-bindings])
+       :when
+       (let [normalized-bindings (extract-bound-symbols fn-bindings)]
+         [`(bind (guard ~r) (partial ~fn-sym ~@normalized-bindings)) (conj normalized-bindings '_)])
+       (let [normalized-bindings (extract-bound-symbols fn-bindings)]
+         [`(bind ~r (partial ~fn-sym ~@normalized-bindings)) (conj normalized-bindings l)]))))
 
 #?(:clj
    (defmacro mlet
